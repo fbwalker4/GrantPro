@@ -16,6 +16,7 @@
         <a href="/grant/{{ grant.id }}/paper-submission" class="btn btn-primary">📦 Paper Submission</a>
         {% if existing_sections and existing_sections|length > 0 %}
         <form method="POST" action="/grant/{{ grant.id }}/clone" style="display: inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-secondary" title="Clone this application">📋 Clone Application</button>
         </form>
         {% endif %}

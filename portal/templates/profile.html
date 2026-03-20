@@ -17,6 +17,7 @@
     <div class="card">
         <h2>Account Information</h2>
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="form-group">
                     <label class="form-label" for="first_name">First Name</label>
@@ -58,6 +59,7 @@
     <div class="card">
         <h2>Notification Preferences</h2>
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="form-group">
                 <label>
                     <input type="checkbox" name="notify_deadlines" {% if profile.notify_deadlines %}checked{% endif %}>
@@ -78,6 +80,7 @@
         <h2>Deadline Reminders</h2>
         <p style="color: var(--text-muted); margin-bottom: 1rem;">Choose when to receive reminders before grant deadlines.</p>
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="form-group">
                 <label>
                     <input type="checkbox" name="notify_deadlines" {% if profile.notify_deadlines %}checked{% endif %}>

@@ -785,12 +785,14 @@
             sidebar.classList.add('mobile-open');
             backdrop.classList.add('active');
             document.body.style.overflow = 'hidden';
+            hamburger.setAttribute('aria-expanded', 'true');
         }
 
         function closeSidebar() {
             sidebar.classList.remove('mobile-open');
             backdrop.classList.remove('active');
             document.body.style.overflow = '';
+            hamburger.setAttribute('aria-expanded', 'false');
         }
 
         hamburger.addEventListener('click', openSidebar);

@@ -468,6 +468,12 @@
                 <p class="step-desc">Download the grant files to upload</p>
             </div>
             
+            {# Create a map of section IDs to drafts for quick lookup (must be before sidebar uses it) #}
+            {% set existing_sections_by_id = {} %}
+            {% for draft in drafts %}
+            {% set _ = existing_sections_by_id.update({draft.section: draft}) %}
+            {% endfor %}
+
             {# Use template_sections for navigation in the correct order #}
             {% set ns = namespace(counter=2) %}
             {% for section in template_sections %}

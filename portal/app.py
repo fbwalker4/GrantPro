@@ -155,7 +155,7 @@ def csrf_required(f):
     def decorated_function(*args, **kwargs):
         if request.method == 'POST':
             # CSRF token must be present AND match session token
-            token = request.form.get('csrf_token') or request.headers.get('X-CSRF-Token')
+            token = request.form.get('csrf_token') or request.headers.get('X-CSRF-Token') or request.headers.get('X-CSRFToken')
             expected = session.get('csrf_token')
             # Both None = True (passes), but this only happens for guests with no session
             # Any logged-in session will have a csrf_token set by generate_csrf_token()
@@ -177,7 +177,7 @@ def csrf_required_allow_guest(f):
     def decorated_function(*args, **kwargs):
         if request.method == 'POST' and 'user_id' in session:
             # Only enforce CSRF for logged-in users
-            token = request.form.get('csrf_token') or request.headers.get('X-CSRF-Token')
+            token = request.form.get('csrf_token') or request.headers.get('X-CSRF-Token') or request.headers.get('X-CSRFToken')
             expected = session.get('csrf_token')
             if token != expected:
                 return jsonify({'error': 'CSRF token validation failed'}), 403
@@ -894,11 +894,6 @@ def wizard():
 @csrf_required
 def wizard_save():
     """Save wizard progress"""
-    # Check CSRF token for API
-    token=request.form.get('csrf_token')
-    if token != session.get('csrf_token'):
-        return jsonify({'success': False, 'error': 'CSRF validation failed'}), 403
-    
     data = request.json
     # Store in session for navigation
     session['wizard_data'] = data
@@ -1132,15 +1127,18 @@ def api_save_grant():
     # CSRF enforced for logged-in users via csrf_required_allow_guest
     # Guests (no user_id in session) skip CSRF since they have no persistent session
     
-    data = request.json
-    grant_id = data.get('grant_id')
-    notes = data.get('notes', '')
-    email = data.get('email', '').strip().lower()  # Optional for guests
+    data = request.json or {}
+    grant_id = data.get('grant_id') or request.form.get('grant_id')
+    notes = data.get('notes', '') or request.form.get('notes', '')
+    email = (data.get('email', '') or request.form.get('email', '')).strip().lower()
     
     # Check if user is logged in
     if 'user_id' in session:
         # Logged in user - save to their account
         success = user_models.save_grant(session['user_id'], grant_id, notes)
+        if request.form:
+            flash('Grant saved!', 'success')
+            return redirect(request.referrer or url_for('grants'))
         return jsonify({'success': success, 'logged_in': True})
     else:
         # Guest user - save to leads with saved grants
@@ -1628,7 +1626,7 @@ def start_application(grant_id):
         self_client_id = f"client-self-{user_id}"
         conn2 = get_db()
         conn2.execute(
-            'INSERT OR IGNORE INTO clients (id, user_id, organization_name, contact_name, email, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+            'INSERT OR IGNORE INTO clients (id, user_id, organization_name, contact_name, contact_email, created_at) VALUES (?, ?, ?, ?, ?, ?)',
             (self_client_id, user_id, org_name,
              f"{user.get('first_name', '')} {user.get('last_name', '')}".strip(),
              user.get('email', ''), datetime.now().isoformat())
@@ -3442,8 +3440,16 @@ def grant_calendar_ics(grant_id):
         return "Grant not found", 404
 
     deadline_str = grant['deadline'] or ''
-    # Normalize deadline to YYYYMMDD format
-    deadline_clean = deadline_str.replace('-', '').replace('/', '')[:8]
+    # Parse deadline to YYYYMMDD format, handling common formats
+    deadline_clean = ''
+    for fmt in ('%Y-%m-%d', '%m/%d/%Y', '%Y/%m/%d', '%m-%d-%Y'):
+        try:
+            deadline_clean = datetime.strptime(deadline_str[:10], fmt).strftime('%Y%m%d')
+            break
+        except (ValueError, TypeError):
+            continue
+    if not deadline_clean:
+        deadline_clean = deadline_str.replace('-', '').replace('/', '')[:8]
     if len(deadline_clean) < 8:
         deadline_clean = datetime.now().strftime('%Y%m%d')
 
