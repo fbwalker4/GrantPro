@@ -565,6 +565,21 @@ def subscription_cancel():
     return redirect(url_for('dashboard'))
 
 
+@app.route('/webhook/stripe', methods=['POST'])
+def stripe_webhook():
+    """Handle Stripe webhook events (no CSRF/auth - called server-to-server by Stripe)"""
+    payload = request.get_data()
+    sig_header = request.headers.get('Stripe-Signature')
+
+    result, error = stripe_payment.handle_webhook(payload, sig_header)
+
+    if error:
+        app.logger.error(f'Stripe webhook error: {error}')
+        return jsonify({'error': error}), 400
+
+    return jsonify(result), 200
+
+
 @app.route('/contact', methods=['GET', 'POST'])
 @csrf_required
 def contact():
