@@ -1,79 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Grants - Grant Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-primary: #0f0f12;
-            --bg-secondary: #18181c;
-            --bg-tertiary: #222228;
-            --bg-card: #1c1c22;
-            --border-color: #2a2a32;
-            --text-primary: #f4f4f5;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-            --accent-primary: #2563eb;
-            --accent-hover: #3b82f6;
-            --accent-success: #059669;
-            --accent-warning: #d97706;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); }
-        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        h1 { font-family: 'Fraunces', serif; font-size: 2rem; margin-bottom: 2rem; }
-        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.2s; }
-        .btn-primary { background: var(--accent-primary); color: white; }
-        .btn-primary:hover { background: var(--accent-hover); }
-        .grants-grid { display: grid; gap: 1rem; }
-        .grant-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; }
-        .grant-card h3 { font-size: 1.25rem; margin-bottom: 0.5rem; }
-        .grant-card p { color: var(--text-secondary); font-size: 0.9rem; }
-        .status-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
-        .status-draft { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
-        .status-submitted { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-        .status-funded { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-        .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
-    </style>
-</head>
-<body style="background-color: #0f0f12 !important;">
-    {% extends "layout.html" %}
-    {% block content %}
-    <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h1>My Grants</h1>
-            <a href="/grants" class="btn btn-primary">+ Find Grants</a>
-        </div>
-        
-        {% if grants %}
-        <div class="grants-grid">
-            {% for item in grants %}
-            <div class="grant-card">
-                <div style="display: flex; justify-content: space-between; align-items: start;">
-                    <div>
-                        <h3>{{ item.grant.title }}</h3>
-                        <p>{{ item.grant.agency }}</p>
-                        <p style="margin-top: 0.5rem;">Amount: ${{ "{:,.0f}".format(item.grant.amount_min) }} - ${{ "{:,.0f}".format(item.grant.amount_max) }}</p>
-                        <p>Deadline: {{ item.grant.deadline }}</p>
-                    </div>
-                    <span class="status-badge status-{{ item.status }}">{{ item.status }}</span>
-                </div>
-                <div style="margin-top: 1rem;">
-                    <a href="/grant/{{ item.grant.id }}" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">View Application</a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty-state">
-            <h2 style="margin-bottom: 1rem;">No grants yet</h2>
-            <p>Start by finding grants that match your needs.</p>
-            <a href="/grants" class="btn btn-primary" style="margin-top: 1.5rem;">Browse Grants</a>
-        </div>
-        {% endif %}
+{% extends "layout.html" %}
+{% block title %}My Grants - Grant Pro{% endblock %}
+{% block content %}
+<style>
+    .grants-grid { display: grid; gap: 1rem; }
+    .my-grant-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; }
+    .my-grant-card h3 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+    .my-grant-card p { color: var(--text-secondary); font-size: 0.9rem; }
+    .status-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+    .status-draft { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
+    .status-submitted { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .status-funded { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+</style>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <h1 class="page-title">My Grants</h1>
     </div>
-    {% endblock %}
-</body>
-</html>
+    <a href="/grants" class="btn btn-primary">+ Find Grants</a>
+</div>
+
+{% if grants %}
+<div class="grants-grid">
+    {% for item in grants %}
+    <div class="my-grant-card">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div>
+                <h3>{{ item.grant.title }}</h3>
+                <p>{{ item.grant.agency }}</p>
+                <p style="margin-top: 0.5rem;">Amount: ${{ "{:,.0f}".format(item.grant.amount_min) }} - ${{ "{:,.0f}".format(item.grant.amount_max) }}</p>
+                <p>Deadline: {{ item.grant.deadline }}</p>
+            </div>
+            <span class="status-badge status-{{ item.status }}">{{ item.status }}</span>
+        </div>
+        <div style="margin-top: 1rem;">
+            <a href="/grant/{{ item.grant.id }}" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">View Application</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">📁</div>
+    <div class="empty-title">No grants yet</div>
+    <div class="empty-text">Start by finding grants that match your needs.</div>
+    <a href="/grants" class="btn btn-primary">Browse Grants</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,287 +1,263 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Help & FAQ - Grant Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-primary: #0a0a0c;
-            --bg-secondary: #121216;
-            --bg-tertiary: #1a1a20;
-            --bg-card: #1c1c24;
-            --border-color: #2a2a36;
-            --text-primary: #f4f4f6;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-            --accent-primary: #6366f1;
-            --accent-hover: #818cf8;
-            --accent-success: #10b981;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; }
-        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
-        h1 { font-family: 'Fraunces', serif; font-size: 2.5rem; margin-bottom: 1rem; }
-        h2 { font-family: 'Fraunces', serif; font-size: 1.5rem; margin: 2rem 0 1rem; color: var(--accent-hover); }
-        h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.5rem; }
-        p { color: var(--text-secondary); margin-bottom: 1rem; }
-        .faq-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 1rem; overflow: hidden; }
-        .faq-question { padding: 1.25rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
-        .faq-question:hover { background: var(--bg-tertiary); }
-        .faq-answer { padding: 0 1.25rem 1.25rem; display: none; }
-        .faq-item.open .faq-answer { display: block; }
-        .faq-item.open .faq-question::after { transform: rotate(180deg); }
-        .faq-question::after { content: "▼"; font-size: 0.75rem; color: var(--text-muted); }
-        .back-link { display: inline-block; margin-bottom: 1.5rem; color: var(--accent-hover); text-decoration: none; }
-        .back-link:hover { text-decoration: underline; }
-        .toc { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
-        .toc h3 { margin-top: 0; }
-        .toc ul { list-style: none; }
-        .toc li { margin: 0.5rem 0; }
-        .toc a { color: var(--accent-hover); text-decoration: none; }
-        .toc a:hover { text-decoration: underline; }
-        code { background: var(--bg-tertiary); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9em; }
-    </style>
-</head>
-<body>
-    {% extends "layout.html" %}
-    {% block content %}
-    <div class="container">
-        <a href="/dashboard" class="back-link">← Back to Dashboard</a>
-        
-        <h1>Help & FAQ</h1>
-        <p>Everything you need to know about using Grant Pro.</p>
-        
-        <div class="toc">
-            <h3>Quick Links</h3>
+{% extends "layout.html" %}
+{% block title %}Help & FAQ - Grant Pro{% endblock %}
+{% block content %}
+<style>
+    .help-container { max-width: 900px; margin: 0 auto; }
+    .help-container h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 1rem; }
+    .help-container h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin: 2rem 0 1rem; color: var(--accent-hover); }
+    .help-container h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.5rem; }
+    .help-container p { color: var(--text-secondary); margin-bottom: 1rem; }
+    .faq-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 1rem; overflow: hidden; }
+    .faq-question { padding: 1.25rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+    .faq-question:hover { background: var(--bg-tertiary); }
+    .faq-answer { padding: 0 1.25rem 1.25rem; display: none; }
+    .faq-item.open .faq-answer { display: block; }
+    .faq-item.open .faq-question::after { transform: rotate(180deg); }
+    .faq-question::after { content: "▼"; font-size: 0.75rem; color: var(--text-muted); }
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: var(--accent-hover); text-decoration: none; }
+    .back-link:hover { text-decoration: underline; }
+    .toc { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+    .toc h3 { margin-top: 0; }
+    .toc ul { list-style: none; }
+    .toc li { margin: 0.5rem 0; }
+    .toc a { color: var(--accent-hover); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    code { background: var(--bg-tertiary); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9em; }
+</style>
+
+<div class="help-container">
+    <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+
+    <h1>Help & FAQ</h1>
+    <p>Everything you need to know about using Grant Pro.</p>
+
+    <div class="toc">
+        <h3>Quick Links</h3>
+        <ul>
+            <li><a href="#getting-started">Getting Started</a></li>
+            <li><a href="#finding-grants">Finding Grants</a></li>
+            <li><a href="#eligibility">Eligibility</a></li>
+            <li><a href="#applications">Applications</a></li>
+            <li><a href="#clients">Managing Clients</a></li>
+            <li><a href="#pricing">Pricing & Billing</a></li>
+            <li><a href="#troubleshooting">Troubleshooting</a></li>
+        </ul>
+    </div>
+
+    <h2 id="getting-started">Getting Started</h2>
+
+    <div class="faq-item">
+        <div class="faq-question">How do I create an account?</div>
+        <div class="faq-answer">
+            <p>Click "Sign Up" on the homepage and enter your email, password, and organization name (optional). You can also sign up as an individual if you don't represent an organization.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">What can I do after signing up?</div>
+        <div class="faq-answer">
+            <p>After signing up, you can:</p>
             <ul>
-                <li><a href="#getting-started">Getting Started</a></li>
-                <li><a href="#finding-grants">Finding Grants</a></li>
-                <li><a href="#eligibility">Eligibility</a></li>
-                <li><a href="#applications">Applications</a></li>
-                <li><a href="#clients">Managing Clients</a></li>
-                <li><a href="#pricing">Pricing & Billing</a></li>
-                <li><a href="#troubleshooting">Troubleshooting</a></li>
+                <li>Search and filter through 130+ federal grants</li>
+                <li>Use the Grant Finder Wizard to find matching grants</li>
+                <li>Check eligibility for specific grants</li>
+                <li>Save grants to your favorites</li>
+                <li>Create and manage client profiles</li>
+                <li>Track grant applications through the workflow</li>
+                <li>Download applications in DOCX/PDF format</li>
             </ul>
         </div>
-        
-        <h2 id="getting-started">Getting Started</h2>
-        
-        <div class="faq-item">
-            <div class="faq-question">How do I create an account?</div>
-            <div class="faq-answer">
-                <p>Click "Sign Up" on the homepage and enter your email, password, and organization name (optional). You can also sign up as an individual if you don't represent an organization.</p>
-            </div>
-        </div>
-        
-        <div class="faq-item">
-            <div class="faq-question">What can I do after signing up?</div>
-            <div class="faq-answer">
-                <p>After signing up, you can:</p>
-                <ul>
-                    <li>Search and filter through 130+ federal grants</li>
-                    <li>Use the Grant Finder Wizard to find matching grants</li>
-                    <li>Check eligibility for specific grants</li>
-                    <li>Save grants to your favorites</li>
-                    <li>Create and manage client profiles</li>
-                    <li>Track grant applications through the workflow</li>
-                    <li>Download applications in DOCX/PDF format</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="faq-item">
-            <div class="faq-question">What is the Grant Finder Wizard?</div>
-            <div class="faq-answer">
-                <p>The wizard is a step-by-step guide that helps you find grants matching your organization type, category, and funding needs. It asks simple questions and then recommends the best grants for you.</p>
-            </div>
-        </div>
-        
-        <h2 id="finding-grants">Finding Grants</h2>
-        
-        <div class="faq-item">
-            <div class="faq-question">How do I search for grants?</div>
-            <div class="faq-answer">
-                <p>Go to the Research page or use the search on the Grants page. You can filter by:</p>
-                <ul>
-                    <li>Keyword (e.g., "health", "education")</li>
-                    <li>Agency (NSF, DOE, NIH, etc.)</li>
-                    <li>Category (Technology, Health, Environment, etc.)</li>
-                    <li>Funding amount range</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="faq-item">
-            <div class="faq-question">What grants are available?</div>
-            <div class="faq-answer">
-                <p>We have 130+ grants from federal agencies including:</p>
-                <ul>
-                    <li><strong>NSF</strong> - National Science Foundation (research, education)</li>
-                    <li><strong>DOE</strong> - Department of Energy (energy, technology)</li>
-                    <li><strong>NIH</strong> - National Institutes of Health (health, medical research)</li>
-                    <li><strong>USDA</strong> - Agriculture, rural development</li>
-                    <li><strong>EPA</strong> - Environmental projects</li>
-                    <li><strong>DOT</strong> - Transportation, infrastructure</li>
-                    <li><strong>HUD</strong> - Housing, community development</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="faq-item">
-            <div class="faq-question">Can I apply for grants as an individual?</div>
-            <div class="faq-answer">
-                <p>Yes! Many grants are available for individuals, including:</p>
-                <ul>
-                    <li>Artist grants (NEA, state arts councils)</li>
-                    <li>Research fellowships (NIH, NSF)</li>
-                    <li>Small business grants (SBIR/STTR)</li>
-                </ul>
-                <p>Use the eligibility checker or wizard and select "Individual / Artist" as your organization type.</p>
-            </div>
-        </div>
-        
-        <h2 id="eligibility">Eligibility</h2>
-        
-        <div class="faq-item">
-            <div class="faq-question">How do I check if I'm eligible for a grant?</div>
-            <div class="faq-answer">
-                <p>Visit the Eligibility page or click "Check Eligibility" on any grant detail. You'll answer questions about your organization type, and we'll tell you if you likely qualify.</p>
-            </div>
-        </div>
-        
-        <div class="faq-item">
-            <div class="faq-question">What organization types are eligible?</div>
-            <div class="faq-answer">
-                <p>Eligibility varies by grant. Common eligible organizations:</p>
-                <ul>
-                    <li>501(c)(3) Nonprofits</li>
-                    <li>Small Businesses (for-profit)</li>
-                    <li>Higher Education (universities, colleges)</li>
-                    <li>State and Local Governments</li>
-                    <li>Tribal Organizations</li>
-                    <li>Individuals (artists, researchers)</li>
-                </ul>
-            </div>
-        </div>
-        
-        <h2 id="applications">Applications</h2>
-        
-        <div class="faq-item">
-            <div class="faq-question">How do I start a grant application?</div>
-            <div class="faq-answer">
-                <p>Find a grant you're interested in, click on it, then click "Start Application". You'll be guided through each required section with tips on what to include.</p>
-            </div>
-        </div>
-        
-        <div class="faq-item">
-            <div class="faq-question">What are the grant sections?</div>
-            <div class="faq-answer">
-                <p>Most federal grants include these sections:</p>
-                <ul>
-                    <li><strong>Project Summary/Abstract</strong> - Brief overview</li>
-                    <li><strong>Project Description</strong> - Detailed plan (often 10-15 pages)</li>
-                    <li><strong>Budget & Budget Justification</strong> - Costs and rationale</li>
-                    <li><strong>Biographical Sketches</strong> - Team qualifications</li>
-                    <li><strong>References Cited</strong> - Bibliography</li>
-                    <li><strong>Facilities & Resources</strong> - Available equipment</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="faq-item">
-            <div class="faq-question">Can I download my application?</div>
-            <div class="faq-answer">
-                <p>Yes! In the Guided Submission view, click "Download" to export your application as:</p>
-                <ul>
-                    <li><strong>DOCX</strong> - Word document for editing</li>
-                    <li><strong>PDF</strong> - Read-only format</li>
-                    <li><strong>TXT</strong> - Plain text</li>
-                </ul>
-            </div>
-        </div>
-        
-        <h2 id="clients">Managing Clients</h2>
-        
-        <div class="faq-item">
-            <div class="faq-question">How do I add a client?</div>
-            <div class="faq-answer">
-                <p>Go to Clients → Add Client. Enter their organization name, contact name, and email. You can then track their grants separately.</p>
-            </div>
-        </div>
-        
-        <div class="faq-item">
-            <div class="faq-question">Can I manage multiple clients?</div>
-            <div class="faq-answer">
-                <p>Yes! The system is designed for consultants managing multiple clients. Each client has their own grants, and you can track progress separately.</p>
-            </div>
-        </div>
-        
-        <h2 id="pricing">Pricing & Billing</h2>
-        
-        <div class="faq-item">
-            <div class="faq-question">How much does it cost?</div>
-            <div class="faq-answer">
-                <p>Simple subscription pricing:</p>
-                <ul>
-                    <li><strong>Free</strong> - Search grants, check eligibility, use the wizard</li>
-                    <li><strong>$19.95/month</strong> - AI writing, templates, guided submission, 3 grants/month</li>
-                    <li><strong>$199.95/year</strong> - Same as monthly, save $39.45/year</li>
-                    <li><strong>Enterprise</strong> - Custom pricing for agencies and consultants</li>
-                </ul>
-                <p>Cancel anytime. No long-term commitments.</p>
-            </div>
-        </div>
-
-        <div class="faq-item">
-            <div class="faq-question">Is there a free tier?</div>
-            <div class="faq-answer">
-                <p>Yes! Sign up for free to search 131+ federal grants, check eligibility, and use the Grant Finder Wizard. Upgrade when you're ready to start writing and submitting applications.</p>
-            </div>
-        </div>
-        
-        <h2 id="troubleshooting">Troubleshooting</h2>
-        
-        <div class="faq-item">
-            <div class="faq-question">I forgot my password - how do I reset it?</div>
-            <div class="faq-answer">
-                <p>Click "Forgot Password" on the login page and enter your email. You'll receive a reset link (in demo mode, the token is shown on screen).</p>
-            </div>
-        </div>
-        
-        <div class="faq-item">
-            <div class="faq-question">The page isn't loading correctly</div>
-            <div class="faq-answer">
-                <p>Try:</p>
-                <ul>
-                    <li>Clear your browser cache</li>
-                    <li>Disable browser extensions</li>
-                    <li>Try a different browser</li>
-                    <li>Make sure you're logged in (some pages require authentication)</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="faq-item">
-            <div class="faq-question">How do I contact support?</div>
-            <div class="faq-answer">
-                <p>Email support@grantpro.org with your question. We typically respond within 24-48 hours.</p>
-            </div>
-        </div>
-        
-        <p style="margin-top: 3rem; color: var(--text-muted); text-align: center;">
-            Still have questions? Email support@grantpro.org
-        </p>
     </div>
-    
-    <script>
-        document.querySelectorAll('.faq-question').forEach(q => {
-            q.addEventListener('click', () => {
-                q.parentElement.classList.toggle('open');
-            });
+
+    <div class="faq-item">
+        <div class="faq-question">What is the Grant Finder Wizard?</div>
+        <div class="faq-answer">
+            <p>The wizard is a step-by-step guide that helps you find grants matching your organization type, category, and funding needs. It asks simple questions and then recommends the best grants for you.</p>
+        </div>
+    </div>
+
+    <h2 id="finding-grants">Finding Grants</h2>
+
+    <div class="faq-item">
+        <div class="faq-question">How do I search for grants?</div>
+        <div class="faq-answer">
+            <p>Go to the Research page or use the search on the Grants page. You can filter by:</p>
+            <ul>
+                <li>Keyword (e.g., "health", "education")</li>
+                <li>Agency (NSF, DOE, NIH, etc.)</li>
+                <li>Category (Technology, Health, Environment, etc.)</li>
+                <li>Funding amount range</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">What grants are available?</div>
+        <div class="faq-answer">
+            <p>We have 130+ grants from federal agencies including:</p>
+            <ul>
+                <li><strong>NSF</strong> - National Science Foundation (research, education)</li>
+                <li><strong>DOE</strong> - Department of Energy (energy, technology)</li>
+                <li><strong>NIH</strong> - National Institutes of Health (health, medical research)</li>
+                <li><strong>USDA</strong> - Agriculture, rural development</li>
+                <li><strong>EPA</strong> - Environmental projects</li>
+                <li><strong>DOT</strong> - Transportation, infrastructure</li>
+                <li><strong>HUD</strong> - Housing, community development</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">Can I apply for grants as an individual?</div>
+        <div class="faq-answer">
+            <p>Yes! Many grants are available for individuals, including:</p>
+            <ul>
+                <li>Artist grants (NEA, state arts councils)</li>
+                <li>Research fellowships (NIH, NSF)</li>
+                <li>Small business grants (SBIR/STTR)</li>
+            </ul>
+            <p>Use the eligibility checker or wizard and select "Individual / Artist" as your organization type.</p>
+        </div>
+    </div>
+
+    <h2 id="eligibility">Eligibility</h2>
+
+    <div class="faq-item">
+        <div class="faq-question">How do I check if I'm eligible for a grant?</div>
+        <div class="faq-answer">
+            <p>Visit the Eligibility page or click "Check Eligibility" on any grant detail. You'll answer questions about your organization type, and we'll tell you if you likely qualify.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">What organization types are eligible?</div>
+        <div class="faq-answer">
+            <p>Eligibility varies by grant. Common eligible organizations:</p>
+            <ul>
+                <li>501(c)(3) Nonprofits</li>
+                <li>Small Businesses (for-profit)</li>
+                <li>Higher Education (universities, colleges)</li>
+                <li>State and Local Governments</li>
+                <li>Tribal Organizations</li>
+                <li>Individuals (artists, researchers)</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2 id="applications">Applications</h2>
+
+    <div class="faq-item">
+        <div class="faq-question">How do I start a grant application?</div>
+        <div class="faq-answer">
+            <p>Find a grant you're interested in, click on it, then click "Start Application". You'll be guided through each required section with tips on what to include.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">What are the grant sections?</div>
+        <div class="faq-answer">
+            <p>Most federal grants include these sections:</p>
+            <ul>
+                <li><strong>Project Summary/Abstract</strong> - Brief overview</li>
+                <li><strong>Project Description</strong> - Detailed plan (often 10-15 pages)</li>
+                <li><strong>Budget & Budget Justification</strong> - Costs and rationale</li>
+                <li><strong>Biographical Sketches</strong> - Team qualifications</li>
+                <li><strong>References Cited</strong> - Bibliography</li>
+                <li><strong>Facilities & Resources</strong> - Available equipment</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">Can I download my application?</div>
+        <div class="faq-answer">
+            <p>Yes! In the Guided Submission view, click "Download" to export your application as:</p>
+            <ul>
+                <li><strong>DOCX</strong> - Word document for editing</li>
+                <li><strong>PDF</strong> - Read-only format</li>
+                <li><strong>TXT</strong> - Plain text</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2 id="clients">Managing Clients</h2>
+
+    <div class="faq-item">
+        <div class="faq-question">How do I add a client?</div>
+        <div class="faq-answer">
+            <p>Go to Clients → Add Client. Enter their organization name, contact name, and email. You can then track their grants separately.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">Can I manage multiple clients?</div>
+        <div class="faq-answer">
+            <p>Yes! The system is designed for consultants managing multiple clients. Each client has their own grants, and you can track progress separately.</p>
+        </div>
+    </div>
+
+    <h2 id="pricing">Pricing & Billing</h2>
+
+    <div class="faq-item">
+        <div class="faq-question">How much does it cost?</div>
+        <div class="faq-answer">
+            <p>Simple subscription pricing:</p>
+            <ul>
+                <li><strong>Free</strong> - Search grants, check eligibility, use the wizard</li>
+                <li><strong>$19.95/month</strong> - AI writing, templates, guided submission, 3 grants/month</li>
+                <li><strong>$199.95/year</strong> - Same as monthly, save $39.45/year</li>
+                <li><strong>Enterprise</strong> - Custom pricing for agencies and consultants</li>
+            </ul>
+            <p>Cancel anytime. No long-term commitments.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">Is there a free tier?</div>
+        <div class="faq-answer">
+            <p>Yes! Sign up for free to search 131+ federal grants, check eligibility, and use the Grant Finder Wizard. Upgrade when you're ready to start writing and submitting applications.</p>
+        </div>
+    </div>
+
+    <h2 id="troubleshooting">Troubleshooting</h2>
+
+    <div class="faq-item">
+        <div class="faq-question">I forgot my password - how do I reset it?</div>
+        <div class="faq-answer">
+            <p>Click "Forgot Password" on the login page and enter your email. You'll receive a reset link (in demo mode, the token is shown on screen).</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">The page isn't loading correctly</div>
+        <div class="faq-answer">
+            <p>Try:</p>
+            <ul>
+                <li>Clear your browser cache</li>
+                <li>Disable browser extensions</li>
+                <li>Try a different browser</li>
+                <li>Make sure you're logged in (some pages require authentication)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">How do I contact support?</div>
+        <div class="faq-answer">
+            <p>Email support@grantpro.org with your question. We typically respond within 24-48 hours.</p>
+        </div>
+    </div>
+
+    <p style="margin-top: 3rem; color: var(--text-muted); text-align: center;">
+        Still have questions? Email support@grantpro.org
+    </p>
+</div>
+
+<script>
+    document.querySelectorAll('.faq-question').forEach(q => {
+        q.addEventListener('click', () => {
+            q.parentElement.classList.toggle('open');
         });
-    </script>
-    {% endblock %}
-</body>
-</html>
+    });
+</script>
+{% endblock %}

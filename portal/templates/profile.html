@@ -1,139 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Profile - Grant Pro{% endblock %}</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-primary: #0f0f12;
-            --bg-secondary: #18181c;
-            --bg-tertiary: #222228;
-            --bg-card: #1c1c22;
-            --border-color: #2a2a32;
-            --text-primary: #f4f4f5;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-            --accent-primary: #2563eb;
-            --accent-hover: #3b82f6;
-            --accent-success: #059669;
-            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-            --radius-sm: 6px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
-        
-        .navbar { background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .navbar a { color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
-        .navbar a:hover { color: var(--text-primary); }
-        
-        .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
-        
-        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-md); margin-bottom: 1.5rem; }
-        
-        h1 { font-family: 'Fraunces', serif; color: var(--text-primary); margin-bottom: 0.5rem; }
-        h2 { color: var(--text-primary); margin-bottom: 1rem; font-size: 1.25rem; }
-        
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-secondary); }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 1rem; background: var(--bg-tertiary); color: var(--text-primary); }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent-primary); }
-        
-        .btn { display: inline-block; padding: 12px 24px; border-radius: var(--radius-sm); cursor: pointer; border: none; font-size: 1rem; font-weight: 600; transition: all 0.2s; }
-        .btn-primary { background: var(--gradient-primary); color: white; }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
-        
-        .alert { padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem; }
-        .alert-success { background: rgba(5, 150, 105, 0.15); color: #10b981; border: 1px solid rgba(5, 150, 105, 0.3); }
-        .alert-error { background: rgba(220, 38, 38, 0.15); color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.3); }
-    </style>
+{% extends "layout.html" %}
+{% block title %}Profile - Grant Pro{% endblock %}
+{% block content %}
+<style>
+    .profile-container { max-width: 800px; }
+    .profile-container h1 { font-family: 'Playfair Display', serif; color: var(--text-primary); margin-bottom: 0.5rem; }
+    .profile-container h2 { color: var(--text-primary); margin-bottom: 1rem; font-size: 1.25rem; }
+    .profile-container .alert { padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem; }
+    .profile-container .alert-success { background: rgba(5, 150, 105, 0.15); color: #10b981; border: 1px solid rgba(5, 150, 105, 0.3); }
+    .profile-container .alert-error { background: rgba(220, 38, 38, 0.15); color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.3); }
+</style>
 
-    <!-- UserWay Accessibility Widget -->
-    <script async src="https://cdn.userway.org/widget.js#account=demo"></script>
-</head>
-        <body style="background-color: #0f0f12 !important; color: #f4f4f5;">
-    <nav class="navbar">
-        <a href="/dashboard">← Back to Dashboard</a>
-        <a href="/logout">Logout</a>
-    </nav>
-    
-    <div class="container">
-        <h1>Your Profile</h1>
-        <p style="color: #666; margin-bottom: 2rem;">Manage your account and preferences.</p>
-        
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        
-        <div class="card" style="background-color: #1c1c22;">
-            <h2>Account Information</h2>
-            <form method="POST">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div class="form-group">
-                        <label for="first_name">First Name</label>
-                        <input type="text" id="first_name" name="first_name" value="{{ user.first_name or '' }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="last_name">Last Name</label>
-                        <input type="text" id="last_name" name="last_name" value="{{ user.last_name or '' }}">
-                    </div>
-                </div>
-                
+<div class="profile-container">
+    <h1>Your Profile</h1>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">Manage your account and preferences.</p>
+
+    <div class="card">
+        <h2>Account Information</h2>
+        <form method="POST">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" value="{{ user.email }}" disabled style="background: #222228; color: #a1a1aa;">
-                    <small style="color: #71717a;">Email cannot be changed</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="organization_name">Organization Name</label>
-                    <input type="text" id="organization_name" name="organization_name" value="{{ user.organization_name or '' }}">
-                </div>
-                
-                <div class="form-group">
-                    <label for="organization_type">Organization Type</label>
-                    <select id="organization_type" name="organization_type">
-                        <option value="">Select...</option>
-                        <option value="nonprofit" {% if profile.organization_type == 'nonprofit' %}selected{% endif %}>Nonprofit / 501(c)(3)</option>
-                        <option value="small business" {% if profile.organization_type == 'small business' %}selected{% endif %}>Small Business</option>
-                        <option value="government" {% if profile.organization_type == 'government' %}selected{% endif %}>Government</option>
-                        <option value="university" {% if profile.organization_type == 'university' %}selected{% endif %}>University</option>
-                        <option value="individual" {% if profile.organization_type == 'individual' %}selected{% endif %}>Individual / Artist</option>
-                    </select>
-                </div>
-                
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-            </form>
-        </div>
-        
-        <div class="card" style="background-color: #1c1c22;">
-            <h2>Notification Preferences</h2>
-            <form method="POST">
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" name="notify_deadlines" {% if profile.notify_deadlines %}checked{% endif %}>
-                        Notify me about upcoming grant deadlines
-                    </label>
+                    <label class="form-label" for="first_name">First Name</label>
+                    <input class="form-input" type="text" id="first_name" name="first_name" value="{{ user.first_name or '' }}">
                 </div>
                 <div class="form-group">
-                    <label>
-                        <input type="checkbox" name="notify_new_grants" {% if profile.notify_new_grants %}checked{% endif %}>
-                        Notify me about new grants that match my profile
-                    </label>
+                    <label class="form-label" for="last_name">Last Name</label>
+                    <input class="form-input" type="text" id="last_name" name="last_name" value="{{ user.last_name or '' }}">
                 </div>
-                <button type="submit" class="btn btn-primary">Save Preferences</button>
-            </form>
-        </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input class="form-input" type="email" value="{{ user.email }}" disabled style="background: var(--bg-tertiary); color: var(--text-muted);">
+                <small style="color: var(--text-muted);">Email cannot be changed</small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="organization_name">Organization Name</label>
+                <input class="form-input" type="text" id="organization_name" name="organization_name" value="{{ user.organization_name or '' }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="organization_type">Organization Type</label>
+                <select class="form-select" id="organization_type" name="organization_type">
+                    <option value="">Select...</option>
+                    <option value="nonprofit" {% if profile.organization_type == 'nonprofit' %}selected{% endif %}>Nonprofit / 501(c)(3)</option>
+                    <option value="small business" {% if profile.organization_type == 'small business' %}selected{% endif %}>Small Business</option>
+                    <option value="government" {% if profile.organization_type == 'government' %}selected{% endif %}>Government</option>
+                    <option value="university" {% if profile.organization_type == 'university' %}selected{% endif %}>University</option>
+                    <option value="individual" {% if profile.organization_type == 'individual' %}selected{% endif %}>Individual / Artist</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
     </div>
-</body>
-</html>
+
+    <div class="card">
+        <h2>Notification Preferences</h2>
+        <form method="POST">
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="notify_deadlines" {% if profile.notify_deadlines %}checked{% endif %}>
+                    Notify me about upcoming grant deadlines
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="notify_new_grants" {% if profile.notify_new_grants %}checked{% endif %}>
+                    Notify me about new grants that match my profile
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Preferences</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

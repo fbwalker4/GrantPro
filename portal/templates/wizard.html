@@ -1,256 +1,185 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Grant Pro{% endblock %}</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-primary: #0f0f12;
-            --bg-secondary: #18181c;
-            --bg-tertiary: #222228;
-            --bg-card: #1c1c22;
-            --border-color: #2a2a32;
-            --text-primary: #f4f4f5;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-            --accent-primary: #2563eb;
-            --accent-hover: #3b82f6;
-            --accent-success: #059669;
-            --accent-warning: #d97706;
-            --accent-danger: #dc2626;
-            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            --gradient-success: linear-gradient(135deg, #059669 0%, #10b981 100%);
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
-            --radius-sm: 6px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
-        
-        .navbar { background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .navbar a { color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
-        .navbar a:hover { color: var(--text-primary); }
-        
-        .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
-        
-        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-md); margin-bottom: 1.5rem; }
-        
-        h1 { font-family: 'Fraunces', serif; color: var(--text-primary); margin-bottom: 0.5rem; }
-        h2 { color: var(--text-primary); margin-bottom: 1rem; font-size: 1.25rem; }
-        .subtitle { color: var(--text-secondary); margin-bottom: 2rem; }
-        
-        .progress { display: flex; justify-content: space-between; margin-bottom: 2rem; }
-        .progress-step { flex: 1; text-align: center; padding: 0.5rem; color: var(--text-muted); }
-        .progress-step.active { color: var(--accent-primary); font-weight: 600; }
-        .progress-step.completed { color: var(--accent-success); }
-        
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-secondary); }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 1rem; background: var(--bg-tertiary); color: var(--text-primary); }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent-primary); }
-        
-        .btn { display: inline-block; padding: 12px 24px; border-radius: var(--radius-sm); text-decoration: none; font-size: 1rem; cursor: pointer; border: none; font-weight: 600; transition: all 0.2s; }
-        .btn-primary { background: var(--gradient-primary); color: white; }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
-        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); }
-        
-        .checkbox-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .checkbox-item { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); }
-        
-        .info-box { background: rgba(37, 99, 235, 0.15); border-left: 4px solid var(--accent-primary); padding: 1rem; margin: 1rem 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
-        
-        .alert { padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem; }
-        .alert-success { background: rgba(5, 150, 105, 0.15); color: #10b981; border: 1px solid rgba(5, 150, 105, 0.3); }
-    </style>
+{% extends "layout.html" %}
+{% block title %}Grant Finder Wizard - Grant Pro{% endblock %}
+{% block content %}
+<style>
+    .wizard-container { max-width: 800px; }
+    .wizard-container h1 { font-family: 'Playfair Display', serif; color: var(--text-primary); margin-bottom: 0.5rem; }
+    .wizard-container .subtitle { color: var(--text-secondary); margin-bottom: 2rem; }
+    .wizard-container .progress { display: flex; justify-content: space-between; margin-bottom: 2rem; }
+    .wizard-container .progress-step { flex: 1; text-align: center; padding: 0.5rem; color: var(--text-muted); }
+    .wizard-container .progress-step.active { color: var(--accent-primary); font-weight: 600; }
+    .wizard-container .progress-step.completed { color: var(--accent-success); }
+    .wizard-container .checkbox-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .wizard-container .checkbox-item { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); }
+    .wizard-container .info-box { background: rgba(37, 99, 235, 0.15); border-left: 4px solid var(--accent-primary); padding: 1rem; margin: 1rem 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+</style>
 
-    <!-- UserWay Accessibility Widget -->
-    <script async src="https://cdn.userway.org/widget.js#account=demo"></script>
-</head>
-<body style="background-color: #0f0f12 !important; color: #f4f4f5;">
-    <nav class="navbar">
-        <a href="/" style="font-size: 1.3rem; font-weight: bold;">📝 Grant Pro</a>
-        <div>
-            {% if session.get('user_id') %}
-            <a href="/dashboard">Dashboard</a>
-            {% else %}
-            <a href="/login">Log In</a>
-            {% endif %}
+<div class="wizard-container">
+    <div class="card">
+        <h1>Grant Finder Wizard</h1>
+        <p class="subtitle">Answer a few questions to find grants that match your organization.</p>
+
+        <div class="progress">
+            <div class="progress-step {% if step >= 1 %}active{% endif %}">1. Organization</div>
+            <div class="progress-step {% if step >= 2 %}active{% endif %}">2. Project Type</div>
+            <div class="progress-step {% if step >= 3 %}active{% endif %}">3. Funding</div>
+            <div class="progress-step {% if step >= 4 %}active{% endif %}">4. Results</div>
         </div>
-    </nav>
-    
-    <div class="container">
-        <div class="card">
-            <h1>🔍 Grant Finder Wizard</h1>
-            <p class="subtitle">Answer a few questions to find grants that match your organization.</p>
-            
-            <div class="progress">
-                <div class="progress-step {% if step >= 1 %}active{% endif %}">1. Organization</div>
-                <div class="progress-step {% if step >= 2 %}active{% endif %}">2. Project Type</div>
-                <div class="progress-step {% if step >= 3 %}active{% endif %}">3. Funding</div>
-                <div class="progress-step {% if step >= 4 %}active{% endif %}">4. Results</div>
+
+        <form id="wizardForm">
+            {% if step == 1 %}
+            <div class="form-group">
+                <label class="form-label" for="org_type">What type of organization are you?</label>
+                <select class="form-select" id="org_type" name="organization_type" required>
+                    <option value="">Select organization type...</option>
+                    <option value="nonprofit" {% if wizard_data.get('organization_type') == 'nonprofit' or user.organization_type == 'nonprofit' %}selected{% endif %}>Nonprofit / 501(c)(3)</option>
+                    <option value="small business" {% if wizard_data.get('organization_type') == 'small business' or user.organization_type == 'small business' %}selected{% endif %}>Small Business / For-Profit</option>
+                    <option value="government" {% if wizard_data.get('organization_type') == 'government' or user.organization_type == 'government' %}selected{% endif %}>Government (City, County, State)</option>
+                    <option value="university" {% if wizard_data.get('organization_type') == 'university' or user.organization_type == 'university' %}selected{% endif %}>University / Higher Education</option>
+                    <option value="tribal" {% if wizard_data.get('organization_type') == 'tribal' or user.organization_type == 'tribal' %}selected{% endif %}>Tribal Organization</option>
+                    <option value="individual" {% if wizard_data.get('organization_type') == 'individual' or user.organization_type == 'individual' %}selected{% endif %}>Individual / Artist</option>
+                </select>
             </div>
-            
-            <form id="wizardForm">
-                {% if step == 1 %}
-                <div class="form-group">
-                    <label for="org_type">What type of organization are you?</label>
-                    <select id="org_type" name="organization_type" required>
-                        <option value="">Select organization type...</option>
-                        <option value="nonprofit" {% if wizard_data.get('organization_type') == 'nonprofit' or user.organization_type == 'nonprofit' %}selected{% endif %}>Nonprofit / 501(c)(3)</option>
-                        <option value="small business" {% if wizard_data.get('organization_type') == 'small business' or user.organization_type == 'small business' %}selected{% endif %}>Small Business / For-Profit</option>
-                        <option value="government" {% if wizard_data.get('organization_type') == 'government' or user.organization_type == 'government' %}selected{% endif %}>Government (City, County, State)</option>
-                        <option value="university" {% if wizard_data.get('organization_type') == 'university' or user.organization_type == 'university' %}selected{% endif %}>University / Higher Education</option>
-                        <option value="tribal" {% if wizard_data.get('organization_type') == 'tribal' or user.organization_type == 'tribal' %}selected{% endif %}>Tribal Organization</option>
-                        <option value="individual" {% if wizard_data.get('organization_type') == 'individual' or user.organization_type == 'individual' %}selected{% endif %}>Individual / Artist</option>
-                    </select>
+
+            <div class="form-group">
+                <label class="form-label" for="org_name">Organization Name</label>
+                <input class="form-input" type="text" id="org_name" name="organization_name"
+                       value="{{ wizard_data.get('organization_name') or user.organization_name or '' }}"
+                       placeholder="Your organization name">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="employees">How many employees?</label>
+                <select class="form-select" id="employees" name="employees">
+                    <option value="">Select...</option>
+                    <option value="1" {% if wizard_data.get('employees') == '1' %}selected{% endif %}>Just me / Freelancer</option>
+                    <option value="2-10" {% if wizard_data.get('employees') == '2-10' %}selected{% endif %}>2-10 employees</option>
+                    <option value="11-50" {% if wizard_data.get('employees') == '11-50' %}selected{% endif %}>11-50 employees</option>
+                    <option value="51-200" {% if wizard_data.get('employees') == '51-200' %}selected{% endif %}>51-200 employees</option>
+                    <option value="200+" {% if wizard_data.get('employees') == '200+' %}selected{% endif %}>200+ employees</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="nextStep(2)">Next →</button>
+
+            {% elif step == 2 %}
+            <div class="form-group">
+                <label class="form-label">What type of project do you need funding for?</label>
+                <div class="checkbox-group">
+                    {% set selected_cats = wizard_data.get('category', '').split(',') if wizard_data.get('category') else [] %}
+                    <label class="checkbox-item"><input type="checkbox" name="category" value="technology" {% if 'technology' in selected_cats %}checked{% endif %}> Technology / Software</label>
+                    <label class="checkbox-item"><input type="checkbox" name="category" value="health" {% if 'health' in selected_cats %}checked{% endif %}> Healthcare</label>
+                    <label class="checkbox-item"><input type="checkbox" name="category" value="energy" {% if 'energy' in selected_cats %}checked{% endif %}> Energy / Clean Tech</label>
+                    <label class="checkbox-item"><input type="checkbox" name="category" value="environment" {% if 'environment' in selected_cats %}checked{% endif %}> Environment</label>
+                    <label class="checkbox-item"><input type="checkbox" name="category" value="education" {% if 'education' in selected_cats %}checked{% endif %}> Education</label>
+                    <label class="checkbox-item"><input type="checkbox" name="category" value="arts" {% if 'arts' in selected_cats %}checked{% endif %}> Arts / Culture</label>
+                    <label class="checkbox-item"><input type="checkbox" name="category" value="community" {% if 'community' in selected_cats %}checked{% endif %}> Community Development</label>
+                    <label class="checkbox-item"><input type="checkbox" name="category" value="infrastructure" {% if 'infrastructure' in selected_cats %}checked{% endif %}> Infrastructure</label>
                 </div>
-                
-                <div class="form-group">
-                    <label for="org_name">Organization Name</label>
-                    <input type="text" id="org_name" name="organization_name" 
-                           value="{{ wizard_data.get('organization_name') or user.organization_name or '' }}"
-                           placeholder="Your organization name">
-                </div>
-                
-                <div class="form-group">
-                    <label for="employees">How many employees?</label>
-                    <select id="employees" name="employees">
-                        <option value="">Select...</option>
-                        <option value="1" {% if wizard_data.get('employees') == '1' %}selected{% endif %}>Just me / Freelancer</option>
-                        <option value="2-10" {% if wizard_data.get('employees') == '2-10' %}selected{% endif %}>2-10 employees</option>
-                        <option value="11-50" {% if wizard_data.get('employees') == '11-50' %}selected{% endif %}>11-50 employees</option>
-                        <option value="51-200" {% if wizard_data.get('employees') == '51-200' %}selected{% endif %}>51-200 employees</option>
-                        <option value="200+" {% if wizard_data.get('employees') == '200+' %}selected{% endif %}>200+ employees</option>
-                    </select>
-                </div>
-                
-                <button type="button" class="btn btn-primary" onclick="nextStep(2)">Next →</button>
-                
-                {% elif step == 2 %}
-                <div class="form-group">
-                    <label>What type of project do you need funding for?</label>
-                    <div class="checkbox-group">
-                        {% set selected_cats = wizard_data.get('category', '').split(',') if wizard_data.get('category') else [] %}
-                        <label class="checkbox-item"><input type="checkbox" name="category" value="technology" {% if 'technology' in selected_cats %}checked{% endif %}> Technology / Software</label>
-                        <label class="checkbox-item"><input type="checkbox" name="category" value="health" {% if 'health' in selected_cats %}checked{% endif %}> Healthcare</label>
-                        <label class="checkbox-item"><input type="checkbox" name="category" value="energy" {% if 'energy' in selected_cats %}checked{% endif %}> Energy / Clean Tech</label>
-                        <label class="checkbox-item"><input type="checkbox" name="category" value="environment" {% if 'environment' in selected_cats %}checked{% endif %}> Environment</label>
-                        <label class="checkbox-item"><input type="checkbox" name="category" value="education" {% if 'education' in selected_cats %}checked{% endif %}> Education</label>
-                        <label class="checkbox-item"><input type="checkbox" name="category" value="arts" {% if 'arts' in selected_cats %}checked{% endif %}> Arts / Culture</label>
-                        <label class="checkbox-item"><input type="checkbox" name="category" value="community" {% if 'community' in selected_cats %}checked{% endif %}> Community Development</label>
-                        <label class="checkbox-item"><input type="checkbox" name="category" value="infrastructure" {% if 'infrastructure' in selected_cats %}checked{% endif %}> Infrastructure</label>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="project_desc">Briefly describe your project</label>
-                    <input type="text" id="project_desc" name="project_description" 
-                           value="{{ wizard_data.get('project_description', '') }}"
-                           placeholder="What do you want to do?">
-                </div>
-                
-                <div class="info-box">
-                    <strong>Tip:</strong> You can apply for multiple grants for the same project. We'll help you find all eligible opportunities.
-                </div>
-                
-                <button type="button" class="btn btn-secondary" onclick="nextStep(1)">← Back</button>
-                <button type="button" class="btn btn-primary" onclick="nextStep(3)">Next →</button>
-                
-                {% elif step == 3 %}
-                <div class="form-group">
-                    <label for="amount_min">How much funding do you need?</label>
-                    <select id="amount_min" name="amount_min">
-                        <option value="0" {% if wizard_data.get('amount_min') == '0' %}selected{% endif %}>Any amount</option>
-                        <option value="1000" {% if wizard_data.get('amount_min') == '1000' %}selected{% endif %}>Under $5,000</option>
-                        <option value="5000" {% if wizard_data.get('amount_min') == '5000' %}selected{% endif %}>$5,000 - $25,000</option>
-                        <option value="25000" {% if wizard_data.get('amount_min') == '25000' %}selected{% endif %}>$25,000 - $100,000</option>
-                        <option value="100000" {% if wizard_data.get('amount_min') == '100000' %}selected{% endif %}>$100,000 - $500,000</option>
-                        <option value="500000" {% if wizard_data.get('amount_min') == '500000' %}selected{% endif %}>$500,000+</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="timeline">When do you need the funding?</label>
-                    <select id="timeline" name="timeline">
-                        <option value="asap" {% if wizard_data.get('timeline') == 'asap' %}selected{% endif %}>As soon as possible</option>
-                        <option value="6months" {% if wizard_data.get('timeline') == '6months' %}selected{% endif %}>Within 6 months</option>
-                        <option value="12months" {% if wizard_data.get('timeline') == '12months' %}selected{% endif %}>Within 12 months</option>
-                        <option value="flexible" {% if wizard_data.get('timeline') == 'flexible' %}selected{% endif %}>Flexible / No deadline</option>
-                    </select>
-                </div>
-                
-                <button type="button" class="btn btn-secondary" onclick="nextStep(2)">← Back</button>
-                <button type="button" class="btn btn-primary" onclick="submitWizard()">Find My Grants →</button>
-                {% endif %}
-            </form>
-        </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="project_desc">Briefly describe your project</label>
+                <input class="form-input" type="text" id="project_desc" name="project_description"
+                       value="{{ wizard_data.get('project_description', '') }}"
+                       placeholder="What do you want to do?">
+            </div>
+
+            <div class="info-box">
+                <strong>Tip:</strong> You can apply for multiple grants for the same project. We'll help you find all eligible opportunities.
+            </div>
+
+            <button type="button" class="btn btn-secondary" onclick="nextStep(1)">← Back</button>
+            <button type="button" class="btn btn-primary" onclick="nextStep(3)">Next →</button>
+
+            {% elif step == 3 %}
+            <div class="form-group">
+                <label class="form-label" for="amount_min">How much funding do you need?</label>
+                <select class="form-select" id="amount_min" name="amount_min">
+                    <option value="0" {% if wizard_data.get('amount_min') == '0' %}selected{% endif %}>Any amount</option>
+                    <option value="1000" {% if wizard_data.get('amount_min') == '1000' %}selected{% endif %}>Under $5,000</option>
+                    <option value="5000" {% if wizard_data.get('amount_min') == '5000' %}selected{% endif %}>$5,000 - $25,000</option>
+                    <option value="25000" {% if wizard_data.get('amount_min') == '25000' %}selected{% endif %}>$25,000 - $100,000</option>
+                    <option value="100000" {% if wizard_data.get('amount_min') == '100000' %}selected{% endif %}>$100,000 - $500,000</option>
+                    <option value="500000" {% if wizard_data.get('amount_min') == '500000' %}selected{% endif %}>$500,000+</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="timeline">When do you need the funding?</label>
+                <select class="form-select" id="timeline" name="timeline">
+                    <option value="asap" {% if wizard_data.get('timeline') == 'asap' %}selected{% endif %}>As soon as possible</option>
+                    <option value="6months" {% if wizard_data.get('timeline') == '6months' %}selected{% endif %}>Within 6 months</option>
+                    <option value="12months" {% if wizard_data.get('timeline') == '12months' %}selected{% endif %}>Within 12 months</option>
+                    <option value="flexible" {% if wizard_data.get('timeline') == 'flexible' %}selected{% endif %}>Flexible / No deadline</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn btn-secondary" onclick="nextStep(2)">← Back</button>
+            <button type="button" class="btn btn-primary" onclick="submitWizard()">Find My Grants →</button>
+            {% endif %}
+        </form>
     </div>
-    
-    <script>
-        // Save form data before navigating
-        function saveCurrentStep() {
-            const form = document.getElementById('wizardForm');
-            const formData = new FormData(form);
-            const data = {};
-            
-            // Get checkboxes
-            const checkboxes = form.querySelectorAll('input[type="checkbox"]');
-            const selectedCategories = [];
-            checkboxes.forEach(cb => {
-                if (cb.checked) selectedCategories.push(cb.value);
-            });
-            
-            for (let [key, value] of formData.entries()) {
-                if (value) data[key] = value;
-            }
-            if (selectedCategories.length > 0) {
-                data.category = selectedCategories.join(',');
-            }
-            
-            // Merge with existing wizard_data from server
-            const existing = {{ wizard_data | tojson }};
-            Object.assign(data, existing);
-            
-            return data;
+</div>
+
+<script>
+    // Save form data before navigating
+    function saveCurrentStep() {
+        const form = document.getElementById('wizardForm');
+        const formData = new FormData(form);
+        const data = {};
+
+        // Get checkboxes
+        const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+        const selectedCategories = [];
+        checkboxes.forEach(cb => {
+            if (cb.checked) selectedCategories.push(cb.value);
+        });
+
+        for (let [key, value] of formData.entries()) {
+            if (value) data[key] = value;
         }
-        
-        function nextStep(step) {
-            const data = saveCurrentStep();
-            
-            // Save to session via API
-            fetch('/api/wizard/save', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}'},
-                body: JSON.stringify(data)
-            }).then(() => {
-                window.location.href = '/wizard?step=' + step;
-            });
+        if (selectedCategories.length > 0) {
+            data.category = selectedCategories.join(',');
         }
-        
-        function submitWizard() {
-            const data = saveCurrentStep();
-            
-            // Map wizard field names to grants route field names
-            const params = new URLSearchParams();
-            if (data.organization_type) params.append('org_type', data.organization_type);
-            if (data.category) params.append('category', data.category);
-            if (data.amount_min) params.append('amount_min', data.amount_min);
-            
-            // Save to session and redirect
-            fetch('/api/wizard/save', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}'},
-                body: JSON.stringify(data)
-            }).then(() => {
-                window.location.href = '/wizard/recommendations?' + params.toString();
-            });
-        }
-    </script>
-</body>
-</html>
+
+        // Merge with existing wizard_data from server
+        const existing = {{ wizard_data | tojson }};
+        Object.assign(data, existing);
+
+        return data;
+    }
+
+    function nextStep(step) {
+        const data = saveCurrentStep();
+
+        // Save to session via API
+        fetch('/api/wizard/save', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}'},
+            body: JSON.stringify(data)
+        }).then(() => {
+            window.location.href = '/wizard?step=' + step;
+        });
+    }
+
+    function submitWizard() {
+        const data = saveCurrentStep();
+
+        // Map wizard field names to grants route field names
+        const params = new URLSearchParams();
+        if (data.organization_type) params.append('org_type', data.organization_type);
+        if (data.category) params.append('category', data.category);
+        if (data.amount_min) params.append('amount_min', data.amount_min);
+
+        // Save to session and redirect
+        fetch('/api/wizard/save', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}'},
+            body: JSON.stringify(data)
+        }).then(() => {
+            window.location.href = '/wizard/recommendations?' + params.toString();
+        });
+    }
+</script>
+{% endblock %}

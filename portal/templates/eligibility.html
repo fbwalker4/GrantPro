@@ -1,483 +1,268 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eligibility Checker - Grant Pro</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        :root {
-            --bg-primary: #0f0f12;
-            --bg-secondary: #18181c;
-            --bg-tertiary: #222228;
-            --bg-card: #1c1c22;
-            --border-color: #2a2a32;
-            --text-primary: #f4f4f5;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-            --accent-primary: #2563eb;
-            --accent-hover: #3b82f6;
-            --accent-success: #059669;
-            --accent-warning: #d97706;
-            --accent-danger: #dc2626;
-            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
-            --radius-sm: 6px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-        }
-        
-        body { 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            line-height: 1.6; 
-            color: var(--text-primary);
-            background: var(--bg-secondary);
-        }
-        
-        .navbar { 
-            background: var(--bg-primary); 
-            color: var(--text-primary); 
-            padding: 1rem 2rem; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .navbar a { 
-            color: var(--text-primary); 
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        .navbar a:hover {
-            color: var(--accent-primary);
-        }
-        
-        .container { 
-            max-width: 800px; 
-            margin: 0 auto; 
-            padding: 2rem; 
-        }
-        
-        .card { 
-            background: var(--bg-card); 
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg); 
-            padding: 2rem; 
-            box-shadow: var(--shadow-md); 
-            margin-bottom: 1.5rem; 
-        }
-        
-        h1 { 
-            color: var(--text-primary); 
-            margin-bottom: 0.5rem;
-            font-family: 'Playfair Display', serif;
-            font-size: 1.75rem;
-        }
-        
-        h2 {
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-            font-size: 1.25rem;
-        }
-        
-        .subtitle { 
-            color: var(--text-secondary); 
-            margin-bottom: 2rem; 
-        }
-        
-        .form-group { 
-            margin-bottom: 1.5rem; 
-        }
-        .form-group label { 
-            display: block; 
-            margin-bottom: 0.5rem; 
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-        .form-group input, .form-group select { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md); 
-            font-size: 1rem;
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            transition: border-color 0.2s;
-        }
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: var(--accent-primary);
-        }
-        .form-group select {
-            cursor: pointer;
-        }
-        
-        .btn { 
-            display: inline-block; 
-            padding: 12px 24px; 
-            border-radius: var(--radius-md); 
-            cursor: pointer; 
-            border: none; 
-            font-size: 1rem;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        .btn-primary { 
-            background: var(--gradient-primary); 
-            color: white;
-        }
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-        }
-        
-        .result { 
-            padding: 1.5rem; 
-            border-radius: var(--radius-md); 
-            margin-top: 1.5rem; 
-        }
-        .result.eligible { 
-            background: rgba(5, 150, 105, 0.15);
-            border: 2px solid var(--accent-success); 
-        }
-        .result.not-eligible { 
-            background: rgba(220, 38, 38, 0.15);
-            border: 2px solid var(--accent-danger); 
-        }
-        .result.limited { 
-            background: rgba(217, 119, 6, 0.15);
-            border: 2px solid var(--accent-warning); 
-        }
-        
-        .result h3 {
-            margin-bottom: 0.5rem;
-        }
-        
-        .result ul {
-            margin-top: 0.5rem;
-            padding-left: 1.5rem;
-        }
-        
-        .result li {
-            margin-bottom: 0.25rem;
-        }
-        
-        .info-box { 
-            background: rgba(37, 99, 235, 0.15);
-            border-left: 4px solid var(--accent-primary); 
-            padding: 1rem; 
-            margin: 1rem 0; 
-            border-radius: 0 var(--radius-md) var(--radius-md) 0;
-        }
-        
-        .user-info {
-            background: var(--bg-tertiary);
-            padding: 1rem;
-            border-radius: var(--radius-md);
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border-color);
-        }
-        
-        .user-info p {
-            margin: 0.25rem 0;
-            color: var(--text-secondary);
-        }
-        
-        .user-info strong {
-            color: var(--text-primary);
-        }
-        
-        .checkbox-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 0.75rem;
-            margin-top: 0.5rem;
-        }
-        
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem;
-            background: var(--bg-tertiary);
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        
-        .checkbox-item:hover {
-            background: var(--border-color);
-        }
-        
-        .checkbox-item input {
-            width: auto;
-            margin: 0;
-        }
-        
-        .checkbox-item span {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-    </style>
+{% extends "layout.html" %}
+{% block title %}Eligibility Checker - Grant Pro{% endblock %}
+{% block content %}
+<style>
+    .elig-container { max-width: 800px; }
+    .elig-container h1 { font-family: 'Playfair Display', serif; color: var(--text-primary); margin-bottom: 0.5rem; font-size: 1.75rem; }
+    .elig-container h2 { color: var(--text-primary); margin-bottom: 1rem; font-size: 1.25rem; }
+    .elig-container .subtitle { color: var(--text-secondary); margin-bottom: 2rem; }
+    .elig-container .result { padding: 1.5rem; border-radius: var(--radius-md); margin-top: 1.5rem; }
+    .elig-container .result.eligible { background: rgba(5, 150, 105, 0.15); border: 2px solid var(--accent-success); }
+    .elig-container .result.not-eligible { background: rgba(220, 38, 38, 0.15); border: 2px solid var(--accent-danger); }
+    .elig-container .result.limited { background: rgba(217, 119, 6, 0.15); border: 2px solid var(--accent-warning); }
+    .elig-container .result h3 { margin-bottom: 0.5rem; }
+    .elig-container .result ul { margin-top: 0.5rem; padding-left: 1.5rem; }
+    .elig-container .result li { margin-bottom: 0.25rem; }
+    .elig-container .info-box { background: rgba(37, 99, 235, 0.15); border-left: 4px solid var(--accent-primary); padding: 1rem; margin: 1rem 0; border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+    .elig-container .user-info-box { background: var(--bg-tertiary); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; border: 1px solid var(--border-color); }
+    .elig-container .user-info-box p { margin: 0.25rem 0; color: var(--text-secondary); }
+    .elig-container .user-info-box strong { color: var(--text-primary); }
+    .elig-container .checkbox-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; margin-top: 0.5rem; }
+    .elig-container .checkbox-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: var(--bg-tertiary); border-radius: var(--radius-sm); cursor: pointer; transition: background 0.2s; }
+    .elig-container .checkbox-item:hover { background: var(--border-color); }
+    .elig-container .checkbox-item input { width: auto; margin: 0; }
+    .elig-container .checkbox-item span { color: var(--text-secondary); font-size: 0.9rem; }
+</style>
 
-    <!-- UserWay Accessibility Widget -->
-    <script async src="https://cdn.userway.org/widget.js#account=demo"></script>
-</head>
-<body>
-    <nav class="navbar">
-        <a href="/" style="font-size: 1.3rem; font-weight: bold;">📝 Grant Pro</a>
-        <div>
-            {% if user %}
-            <a href="/dashboard">Dashboard</a> | <a href="/logout">Log Out</a>
+<div class="elig-container">
+    <div class="card">
+        <h1>Eligibility Checker</h1>
+        <p class="subtitle">Find out if you qualify for a grant before you apply.</p>
+
+        {% if user %}
+        <div class="user-info-box">
+            <p><strong>Organization:</strong> {{ user.organization_name or 'Not specified' }}</p>
+            <p><strong>Type:</strong> {{ user.organization_type or 'Not specified' }}</p>
+        </div>
+        {% endif %}
+
+        <form id="eligibilityForm">
+            {% if not user %}
+            <div class="form-group">
+                <label class="form-label" for="organization_type">What type of organization are you?</label>
+                <select class="form-select" id="organization_type" name="organization_type" required>
+                    <option value="">Select...</option>
+                    <option value="nonprofit">Nonprofit / 501(c)(3)</option>
+                    <option value="small business">Small Business / For-Profit</option>
+                    <option value="government">Government (City, County, State)</option>
+                    <option value="university">University / Higher Education</option>
+                    <option value="tribal">Tribal Organization</option>
+                    <option value="individual">Individual / Artist</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="organization_name">Organization Name</label>
+                <input class="form-input" type="text" id="organization_name" name="organization_name" placeholder="Your organization name">
+            </div>
             {% else %}
-            <a href="/login">Log In</a>
+            <input type="hidden" id="organization_type" name="organization_type" value="{{ user.organization_type }}">
+            <input type="hidden" id="organization_name" name="organization_name" value="{{ user.organization_name }}">
             {% endif %}
-        </div>
-    </nav>
-    
-    <div class="container">
-        <div class="card">
-            <h1>✅ Eligibility Checker</h1>
-            <p class="subtitle">Find out if you qualify for a grant before you apply.</p>
-            
-            {% if user %}
-            <div class="user-info">
-                <p><strong>Organization:</strong> {{ user.organization_name or 'Not specified' }}</p>
-                <p><strong>Type:</strong> {{ user.organization_type or 'Not specified' }}</p>
+
+            <div class="form-group">
+                <label class="form-label" for="mission">Mission / Focus Area</label>
+                <select class="form-select" id="mission" name="mission" required>
+                    <option value="">Select your primary mission area...</option>
+                    <option value="arts">Arts & Culture</option>
+                    <option value="education">Education</option>
+                    <option value="health">Health & Human Services</option>
+                    <option value="environment">Environment & Conservation</option>
+                    <option value="community">Community Development</option>
+                    <option value="research">Scientific Research</option>
+                    <option value="technology">Technology & Innovation</option>
+                    <option value="agriculture">Agriculture & Food Security</option>
+                    <option value="economic">Economic Development</option>
+                    <option value="arts-education">Arts Education</option>
+                </select>
             </div>
-            {% endif %}
-            
-            <form id="eligibilityForm">
-                {% if not user %}
-                <div class="form-group">
-                    <label for="organization_type">What type of organization are you?</label>
-                    <select id="organization_type" name="organization_type" required>
-                        <option value="">Select...</option>
-                        <option value="nonprofit">Nonprofit / 501(c)(3)</option>
-                        <option value="small business">Small Business / For-Profit</option>
-                        <option value="government">Government (City, County, State)</option>
-                        <option value="university">University / Higher Education</option>
-                        <option value="tribal">Tribal Organization</option>
-                        <option value="individual">Individual / Artist</option>
-                    </select>
+
+            <div class="form-group">
+                <label class="form-label">Additional Focus Areas (select all that apply)</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="topics" value="youth">
+                        <span>Youth & Children</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="topics" value="seniors">
+                        <span>Seniors</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="topics" value="veterans">
+                        <span>Veterans</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="topics" value="disability">
+                        <span>Disability Services</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="topics" value="housing">
+                        <span>Housing</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="topics" value="workforce">
+                        <span>Workforce Development</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="topics" value="environment">
+                        <span>Environmental</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="topics" value="arts">
+                        <span>Arts & Culture</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="topics" value="education">
+                        <span>Education</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="topics" value="health">
+                        <span>Health</span>
+                    </label>
                 </div>
-                
-                <div class="form-group">
-                    <label for="organization_name">Organization Name</label>
-                    <input type="text" id="organization_name" name="organization_name" placeholder="Your organization name">
-                </div>
-                {% else %}
-                <input type="hidden" id="organization_type" name="organization_type" value="{{ user.organization_type }}">
-                <input type="hidden" id="organization_name" name="organization_name" value="{{ user.organization_name }}">
-                {% endif %}
-                
-                <div class="form-group">
-                    <label for="mission">Mission / Focus Area</label>
-                    <select id="mission" name="mission" required>
-                        <option value="">Select your primary mission area...</option>
-                        <option value="arts">Arts & Culture</option>
-                        <option value="education">Education</option>
-                        <option value="health">Health & Human Services</option>
-                        <option value="environment">Environment & Conservation</option>
-                        <option value="community">Community Development</option>
-                        <option value="research">Scientific Research</option>
-                        <option value="technology">Technology & Innovation</option>
-                        <option value="agriculture">Agriculture & Food Security</option>
-                        <option value="economic">Economic Development</option>
-                        <option value="arts-education">Arts Education</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Additional Focus Areas (select all that apply)</label>
-                    <div class="checkbox-group">
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="topics" value="youth">
-                            <span>Youth & Children</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="topics" value="seniors">
-                            <span>Seniors</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="topics" value="veterans">
-                            <span>Veterans</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="topics" value="disability">
-                            <span>Disability Services</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="topics" value="housing">
-                            <span>Housing</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="topics" value="workforce">
-                            <span>Workforce Development</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="topics" value="environment">
-                            <span>Environmental</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="topics" value="arts">
-                            <span>Arts & Culture</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="topics" value="education">
-                            <span>Education</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="topics" value="health">
-                            <span>Health</span>
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="budget">Annual Budget (approximate)</label>
-                    <select id="budget" name="budget">
-                        <option value="">Select...</option>
-                        <option value="under50k">Under $50,000</option>
-                        <option value="50k-250k">$50,000 - $250,000</option>
-                        <option value="250k-1m">$250,000 - $1,000,000</option>
-                        <option value="1m-5m">$1,000,000 - $5,000,000</option>
-                        <option value="over5m">Over $5,000,000</option>
-                    </select>
-                </div>
-                
-                <button type="submit" class="btn btn-primary">Check Eligibility</button>
-            </form>
-            
-            <div id="result"></div>
-        </div>
-        
-        <div class="card">
-            <h2>How It Works</h2>
-            <div class="info-box">
-                <p>Our eligibility checker analyzes your organization type and matches it against grant requirements. It's not a guarantee, but gives you a good idea of your chances before spending time on an application.</p>
             </div>
-            <p><strong>Note:</strong> Some grants have additional eligibility requirements beyond organization type. Always read the full eligibility criteria on the grant listing.</p>
-        </div>
+
+            <div class="form-group">
+                <label class="form-label" for="budget">Annual Budget (approximate)</label>
+                <select class="form-select" id="budget" name="budget">
+                    <option value="">Select...</option>
+                    <option value="under50k">Under $50,000</option>
+                    <option value="50k-250k">$50,000 - $250,000</option>
+                    <option value="250k-1m">$250,000 - $1,000,000</option>
+                    <option value="1m-5m">$1,000,000 - $5,000,000</option>
+                    <option value="over5m">Over $5,000,000</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Check Eligibility</button>
+        </form>
+
+        <div id="result"></div>
     </div>
-    
-    <script>
-        document.getElementById('eligibilityForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const orgType = document.getElementById('organization_type').value;
-            const orgName = document.getElementById('organization_name').value;
-            const mission = document.getElementById('mission').value;
-            
-            if (!orgType) {
-                alert('Please select an organization type');
-                return;
-            }
-            
-            if (!mission) {
-                alert('Please select a mission area');
-                return;
-            }
-            
-            // Get selected topics
-            const topics = [];
-            document.querySelectorAll('input[name="topics"]:checked').forEach(cb => {
-                topics.push(cb.value);
-            });
-            
-            // Show eligibility info based on org type
-            const resultDiv = document.getElementById('result');
-            
-            let message = '';
-            
-            // Mission-based recommendations
-            const missionGrants = {
-                'arts': ['NEA Grants', 'National Endowment for the Arts', 'State Arts Councils', 'Foundation for Contemporary Arts'],
-                'education': ['Department of Education', 'NSF Education', 'State Education Grants', 'Private Foundations'],
-                'health': ['HRSA Grants', 'NIH Community Health', 'CDC Programs', 'Robert Wood Johnson Foundation'],
-                'environment': ['EPA Grants', 'USDA Conservation', 'National Fish & Wildlife', 'State Environmental'],
-                'community': ['HUD Community Development', 'CDBG', 'EDA Economic Development', 'Local Community Foundations'],
-                'research': ['NSF Research', 'NIH Grants', 'DOE Research', 'Private Research Foundations'],
-                'technology': ['SBIR/STTR', 'NIST Grants', 'National Science Foundation', 'Tech Innovation Grants'],
-                'agriculture': ['USDA Grants', 'Farm Service Agency', 'Rural Development', 'Agricultural Foundations'],
-                'economic': ['EDA Grants', 'SBA Loans/Grants', 'Economic Development Admin', 'State Economic Development'],
-                'arts-education': ['NEA Arts Education', 'Department of Education Arts', 'State Arts Education', 'Private Education Foundations']
-            };
-            
-            if (orgType === 'nonprofit') {
-                message = `
-                    <div class="result eligible">
-                        <h3>✓ Might Fit Your Organization</h3>
-                        <p>Based on your nonprofit status, these grant programs historically accept similar organizations:</p>
-                        <ul style="margin-top: 0.5rem;">
-                            <li>NSF (for research)</li>
-                            <li>NEH, NEA (arts/humanities)</li>
-                            <li>USDA community programs</li>
-                            <li>EDA economic development</li>
-                        </ul>
-                        <p style="margin-top: 1rem; font-size: 0.85rem; color: #888;"><em>* Eligibility is determined by each grantor after reviewing your full application. This is a general match based on organization type.</em></p>
-                        ${mission && missionGrants[mission] ? `
-                        <p style="margin-top: 1rem;"><strong>Grants for ${mission}:</strong></p>
-                        <ul style="margin-top: 0.5rem;">
-                            ${missionGrants[mission].map(g => `<li>${g}</li>`).join('')}
-                        </ul>
-                        ` : ''}
-                    </div>
-                `;
-            } else if (orgType === 'small business') {
-                message = `
-                    <div class="result limited">
-                        <h3>⚠️ Potential Fit</h3>
-                        <p>For-profit businesses may qualify for these programs:</p>
-                        <ul style="margin-top: 0.5rem;">
-                            <li>SBIR/STTR programs (federal R&D)</li>
-                            <li>State business grants</li>
-                            <li>Some foundation grants</li>
-                        </ul>
-                        <p style="margin-top: 1rem; font-size: 0.85rem; color: #888;"><em>* Most federal grants require nonprofit status. Each grantor makes the final decision.</em></p>
-                    </div>
-                `;
-            } else if (orgType === 'government') {
-                message = `
-                    <div class="result eligible">
-                        <h3>✓ Potential Fit</h3>
-                        <p>Government entities have historically accessed these programs:</p>
-                        <ul style="margin-top: 0.5rem;">
-                            <li>CDBG (community development)</li>
-                            <li>EDA public works</li>
-                            <li>DOT infrastructure grants</li>
-                            <li>Broadband expansion</li>
-                        </ul>
-                        <p style="margin-top: 1rem; font-size: 0.85rem; color: #888;"><em>* Each grantor determines eligibility after reviewing your application.</em></p>
-                    </div>
-                `;
-            } else if (orgType === 'individual') {
-                message = `
-                    <div class="result limited">
-                        <h3>⚠️ Potential Fit</h3>
-                        <p>Individuals may qualify for these opportunities:</p>
-                        <ul style="margin-top: 0.5rem;">
-                            <li>Artist grants (state arts councils)</li>
-                            <li>Some foundation grants</li>
-                            <li>Fiscal sponsorship through nonprofits</li>
-                        </ul>
-                        <p style="margin-top: 1rem; font-size: 0.85rem; color: #888;"><em>* Eligibility varies by grant. Apply directly or through a fiscal sponsor.</em></p>
-                    </div>
-                `;
-            } else {
-                message = `
-                    <div class="result">
-                        <h3>Find Your Matches</h3>
-                        <p>Use our <a href="/grants" style="color: var(--accent-primary);">grant search</a> to find opportunities that might fit your organization.</p>
-                    </div>
-                `;
-            }
-            
-            resultDiv.innerHTML = message;
+
+    <div class="card">
+        <h2>How It Works</h2>
+        <div class="info-box">
+            <p>Our eligibility checker analyzes your organization type and matches it against grant requirements. It's not a guarantee, but gives you a good idea of your chances before spending time on an application.</p>
+        </div>
+        <p><strong>Note:</strong> Some grants have additional eligibility requirements beyond organization type. Always read the full eligibility criteria on the grant listing.</p>
+    </div>
+</div>
+
+<script>
+    document.getElementById('eligibilityForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const orgType = document.getElementById('organization_type').value;
+        const orgName = document.getElementById('organization_name').value;
+        const mission = document.getElementById('mission').value;
+
+        if (!orgType) {
+            alert('Please select an organization type');
+            return;
+        }
+
+        if (!mission) {
+            alert('Please select a mission area');
+            return;
+        }
+
+        // Get selected topics
+        const topics = [];
+        document.querySelectorAll('input[name="topics"]:checked').forEach(cb => {
+            topics.push(cb.value);
         });
-    </script>
-</body>
-</html>
+
+        // Show eligibility info based on org type
+        const resultDiv = document.getElementById('result');
+
+        let message = '';
+
+        // Mission-based recommendations
+        const missionGrants = {
+            'arts': ['NEA Grants', 'National Endowment for the Arts', 'State Arts Councils', 'Foundation for Contemporary Arts'],
+            'education': ['Department of Education', 'NSF Education', 'State Education Grants', 'Private Foundations'],
+            'health': ['HRSA Grants', 'NIH Community Health', 'CDC Programs', 'Robert Wood Johnson Foundation'],
+            'environment': ['EPA Grants', 'USDA Conservation', 'National Fish & Wildlife', 'State Environmental'],
+            'community': ['HUD Community Development', 'CDBG', 'EDA Economic Development', 'Local Community Foundations'],
+            'research': ['NSF Research', 'NIH Grants', 'DOE Research', 'Private Research Foundations'],
+            'technology': ['SBIR/STTR', 'NIST Grants', 'National Science Foundation', 'Tech Innovation Grants'],
+            'agriculture': ['USDA Grants', 'Farm Service Agency', 'Rural Development', 'Agricultural Foundations'],
+            'economic': ['EDA Grants', 'SBA Loans/Grants', 'Economic Development Admin', 'State Economic Development'],
+            'arts-education': ['NEA Arts Education', 'Department of Education Arts', 'State Arts Education', 'Private Education Foundations']
+        };
+
+        if (orgType === 'nonprofit') {
+            message = `
+                <div class="result eligible">
+                    <h3>✓ Might Fit Your Organization</h3>
+                    <p>Based on your nonprofit status, these grant programs historically accept similar organizations:</p>
+                    <ul style="margin-top: 0.5rem;">
+                        <li>NSF (for research)</li>
+                        <li>NEH, NEA (arts/humanities)</li>
+                        <li>USDA community programs</li>
+                        <li>EDA economic development</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-size: 0.85rem; color: #888;"><em>* Eligibility is determined by each grantor after reviewing your full application. This is a general match based on organization type.</em></p>
+                    ${mission && missionGrants[mission] ? `
+                    <p style="margin-top: 1rem;"><strong>Grants for ${mission}:</strong></p>
+                    <ul style="margin-top: 0.5rem;">
+                        ${missionGrants[mission].map(g => `<li>${g}</li>`).join('')}
+                    </ul>
+                    ` : ''}
+                </div>
+            `;
+        } else if (orgType === 'small business') {
+            message = `
+                <div class="result limited">
+                    <h3>⚠️ Potential Fit</h3>
+                    <p>For-profit businesses may qualify for these programs:</p>
+                    <ul style="margin-top: 0.5rem;">
+                        <li>SBIR/STTR programs (federal R&D)</li>
+                        <li>State business grants</li>
+                        <li>Some foundation grants</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-size: 0.85rem; color: #888;"><em>* Most federal grants require nonprofit status. Each grantor makes the final decision.</em></p>
+                </div>
+            `;
+        } else if (orgType === 'government') {
+            message = `
+                <div class="result eligible">
+                    <h3>✓ Potential Fit</h3>
+                    <p>Government entities have historically accessed these programs:</p>
+                    <ul style="margin-top: 0.5rem;">
+                        <li>CDBG (community development)</li>
+                        <li>EDA public works</li>
+                        <li>DOT infrastructure grants</li>
+                        <li>Broadband expansion</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-size: 0.85rem; color: #888;"><em>* Each grantor determines eligibility after reviewing your application.</em></p>
+                </div>
+            `;
+        } else if (orgType === 'individual') {
+            message = `
+                <div class="result limited">
+                    <h3>⚠️ Potential Fit</h3>
+                    <p>Individuals may qualify for these opportunities:</p>
+                    <ul style="margin-top: 0.5rem;">
+                        <li>Artist grants (state arts councils)</li>
+                        <li>Some foundation grants</li>
+                        <li>Fiscal sponsorship through nonprofits</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-size: 0.85rem; color: #888;"><em>* Eligibility varies by grant. Apply directly or through a fiscal sponsor.</em></p>
+                </div>
+            `;
+        } else {
+            message = `
+                <div class="result">
+                    <h3>Find Your Matches</h3>
+                    <p>Use our <a href="/grants" style="color: var(--accent-primary);">grant search</a> to find opportunities that might fit your organization.</p>
+                </div>
+            `;
+        }
+
+        resultDiv.innerHTML = message;
+    });
+</script>
+{% endblock %}

@@ -1,101 +1,70 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ grant.title }} - Grant Details</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-primary: #0a0a0c;
-            --bg-secondary: #121216;
-            --bg-tertiary: #1a1a20;
-            --bg-card: #1c1c24;
-            --border-color: #2a2a36;
-            --text-primary: #f4f4f6;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-            --accent-primary: #6366f1;
-            --accent-hover: #818cf8;
-            --accent-success: #10b981;
-            --accent-warning: #f59e0b;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; }
-        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
-        .header { margin-bottom: 2rem; }
-        .back-link { display: inline-block; color: var(--accent-hover); text-decoration: none; margin-bottom: 1rem; }
-        .back-link:hover { text-decoration: underline; }
-        h1 { font-family: 'Fraunces', serif; font-size: 1.75rem; margin-bottom: 0.5rem; }
-        .agency { color: var(--accent-hover); font-weight: 600; font-size: 0.9rem; }
-        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
-        .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.75rem; }
-        .amount { font-family: 'Fraunces', serif; font-size: 2rem; color: var(--accent-success); }
-        .deadline { color: var(--accent-warning); font-weight: 600; }
-        .cfda { background: var(--bg-tertiary); padding: 0.25rem 0.75rem; border-radius: 6px; font-family: monospace; }
-        .label { color: var(--text-muted); font-size: 0.85rem; }
-        .value { color: var(--text-primary); margin-top: 0.25rem; }
-        .tag { display: inline-block; background: rgba(99, 102, 241, 0.2); color: var(--accent-hover); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; margin: 0.25rem 0.25rem 0.25rem 0; }
-        .tag.match { background: rgba(16, 185, 129, 0.2); color: var(--accent-success); }
-        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 1.75rem; border-radius: 10px; text-decoration: none; font-weight: 600; transition: all 0.2s; }
-        .btn-primary { background: var(--accent-primary); color: white; }
-        .btn-primary:hover { background: var(--accent-hover); }
-        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); }
-        .actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
-    </style>
-</head>
-<body>
-    {% extends "layout.html" %}
-    {% block content %}
-    <div class="container">
-        <a href="/grants" class="back-link">← Back to Grants</a>
-        
-        <div class="header">
-            <div class="agency">{{ grant.agency }}</div>
-            <h1>{{ grant.title }}</h1>
-            <p style="color: var(--text-secondary);">{{ grant.description }}</p>
-        </div>
-        
-        <div class="card">
-            <div class="card-header">Funding Amount</div>
-            <div class="amount">${{ "{:,.0f}".format(grant.amount_min) }} - ${{ "{:,.0f}".format(grant.amount_max) }}</div>
-        </div>
-        
-        <div class="card">
-            <div class="card-header">Key Details</div>
-            <p><span class="label">Deadline:</span> <span class="deadline">{{ grant.deadline }}</span></p>
-            <p style="margin-top: 0.5rem;"><span class="label">Opportunity #:</span> <span class="cfda">{{ grant.opportunity_number }}</span></p>
-            {% if grant.cfda %}
-            <p style="margin-top: 0.5rem;"><span class="label">CFDA #:</span> <span class="cfda">{{ grant.cfda }}</span></p>
-            {% endif %}
-            <p style="margin-top: 0.5rem;"><span class="label">Category:</span> <span class="tag">{{ grant.category }}</span></p>
-        </div>
-        
-        <div class="card">
-            <div class="card-header">Eligibility</div>
-            <p class="value">{{ grant.eligibility }}</p>
-            {% if grant.match_required %}
-            <p style="margin-top: 0.75rem;"><span class="label">Match Required:</span> Yes - {{ grant.match_percent }}%</p>
-            {% endif %}
-        </div>
-        
-        <div class="card">
-            <div class="card-header">Next Steps</div>
-            <div class="actions">
-                <a href="/start-grant/{{ grant.id }}" class="btn btn-primary">Start Application</a>
-                <a href="/eligibility" class="btn btn-secondary">Check Eligibility</a>
-            </div>
-        </div>
-        
-        <div class="card" style="margin-top: 1.5rem;">
-            <div class="card-header">Ready to Apply?</div>
-            <p style="color: var(--text-secondary); font-size: 0.9rem;">
-                Use our guided submission workflow to complete each section step-by-step. 
-                You'll get tips specific to this grant's requirements and can download 
-                your application in DOCX or PDF format when done.
-            </p>
+{% extends "layout.html" %}
+{% block title %}{{ grant.title }} - Grant Details{% endblock %}
+{% block content %}
+<style>
+    .grant-detail-container { max-width: 900px; }
+    .grant-detail-container .back-link { display: inline-block; color: var(--accent-hover); text-decoration: none; margin-bottom: 1rem; }
+    .grant-detail-container .back-link:hover { text-decoration: underline; }
+    .grant-detail-container .header { margin-bottom: 2rem; }
+    .grant-detail-container .agency { color: var(--accent-hover); font-weight: 600; font-size: 0.9rem; }
+    .grant-detail-container h1 { font-family: 'Playfair Display', serif; font-size: 1.75rem; margin-bottom: 0.5rem; }
+    .grant-detail-container .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.75rem; }
+    .grant-detail-container .amount { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--accent-success); }
+    .grant-detail-container .deadline { color: var(--accent-warning); font-weight: 600; }
+    .grant-detail-container .cfda { background: var(--bg-tertiary); padding: 0.25rem 0.75rem; border-radius: 6px; font-family: monospace; }
+    .grant-detail-container .label { color: var(--text-muted); font-size: 0.85rem; }
+    .grant-detail-container .value { color: var(--text-primary); margin-top: 0.25rem; }
+    .grant-detail-container .tag { display: inline-block; background: rgba(37, 99, 235, 0.15); color: var(--accent-hover); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; margin: 0.25rem 0.25rem 0.25rem 0; }
+    .grant-detail-container .actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+</style>
+
+<div class="grant-detail-container">
+    <a href="/grants" class="back-link">← Back to Grants</a>
+
+    <div class="header">
+        <div class="agency">{{ grant.agency }}</div>
+        <h1>{{ grant.title }}</h1>
+        <p style="color: var(--text-secondary);">{{ grant.description }}</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Funding Amount</div>
+        <div class="amount">${{ "{:,.0f}".format(grant.amount_min) }} - ${{ "{:,.0f}".format(grant.amount_max) }}</div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Key Details</div>
+        <p><span class="label">Deadline:</span> <span class="deadline">{{ grant.deadline }}</span></p>
+        <p style="margin-top: 0.5rem;"><span class="label">Opportunity #:</span> <span class="cfda">{{ grant.opportunity_number }}</span></p>
+        {% if grant.cfda %}
+        <p style="margin-top: 0.5rem;"><span class="label">CFDA #:</span> <span class="cfda">{{ grant.cfda }}</span></p>
+        {% endif %}
+        <p style="margin-top: 0.5rem;"><span class="label">Category:</span> <span class="tag">{{ grant.category }}</span></p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Eligibility</div>
+        <p class="value">{{ grant.eligibility }}</p>
+        {% if grant.match_required %}
+        <p style="margin-top: 0.75rem;"><span class="label">Match Required:</span> Yes - {{ grant.match_percent }}%</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <div class="card-header">Next Steps</div>
+        <div class="actions">
+            <a href="/start-grant/{{ grant.id }}" class="btn btn-primary">Start Application</a>
+            <a href="/eligibility" class="btn btn-secondary">Check Eligibility</a>
         </div>
     </div>
-    {% endblock %}
-</body>
-</html>
+
+    <div class="card" style="margin-top: 1.5rem;">
+        <div class="card-header">Ready to Apply?</div>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+            Use our guided submission workflow to complete each section step-by-step.
+            You'll get tips specific to this grant's requirements and can download
+            your application in DOCX or PDF format when done.
+        </p>
+    </div>
+</div>
+{% endblock %}
