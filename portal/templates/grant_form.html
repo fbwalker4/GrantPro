@@ -6,18 +6,18 @@
 <h1>Assign Grant to {{ client.organization_name }}</h1>
 
 <div class="card">
-    <form method="POST">
+    <form method="POST" role="form" aria-label="Assign grant to client">
         <label for="grant_name">Grant Name</label>
-        <input type="text" id="grant_name" name="grant_name" required placeholder="e.g., NSF Smart & Connected Communities">
-        
+        <input type="text" id="grant_name" name="grant_name" required aria-required="true" placeholder="e.g., NSF Smart & Connected Communities">
+
         <label for="agency">Funding Agency</label>
-        <input type="text" id="agency" name="agency" required placeholder="e.g., National Science Foundation">
-        
+        <input type="text" id="agency" name="agency" required aria-required="true" placeholder="e.g., National Science Foundation">
+
         <label for="amount">Requested Amount ($)</label>
-        <input type="number" id="amount" name="amount" required placeholder="500000">
-        
+        <input type="number" id="amount" name="amount" required aria-required="true" placeholder="500000">
+
         <label for="deadline">Deadline</label>
-        <input type="date" id="deadline" name="deadline" required>
+        <input type="date" id="deadline" name="deadline" required aria-required="true">
         
         <div style="display: flex; gap: 1rem;">
             <button type="submit" class="btn btn-primary">Assign Grant</button>

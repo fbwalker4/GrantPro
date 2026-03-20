@@ -66,10 +66,10 @@
     </style>
 </head>
 <body>
-    <header class="header">
-        <nav class="nav">
-            <a href="/" class="logo">Grant Pro</a>
-            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+    <header class="header" role="banner">
+        <nav class="nav" role="navigation" aria-label="Main navigation">
+            <a href="/" class="logo" aria-label="Grant Pro home">Grant Pro</a>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navLinks">
                 <span></span><span></span><span></span>
             </button>
             <div class="nav-links" id="navLinks">
@@ -81,7 +81,7 @@
         </nav>
     </header>
     
-    <main class="container">
+    <main class="container" role="main">
         <h1>Simple, Transparent Pricing</h1>
         <p class="subtitle">No hidden fees. Cancel anytime. Research free — upgrade when you find a grant worth pursuing.</p>
         
@@ -172,13 +172,15 @@
         </div>
     </main>
     
-    <footer class="footer">
+    <footer class="footer" role="contentinfo">
         <p>&copy; 2026 Grant Pro by Futurespec Consulting. All rights reserved.</p>
         <p><a href="/terms">Terms</a> | <a href="/privacy">Privacy</a> | <a href="/refund">Refund Policy</a> | <a href="/contact">Contact</a></p>
     </footer>
     <script>
     document.getElementById('navToggle').addEventListener('click', function() {
-        document.getElementById('navLinks').classList.toggle('open');
+        var links = document.getElementById('navLinks');
+        links.classList.toggle('open');
+        this.setAttribute('aria-expanded', links.classList.contains('open'));
     });
     </script>
 </body>

@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% block title %}Mark Submitted - {{ grant.grant_name }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 640px; margin: 0 auto;">
+    <h1>Mark as Submitted</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+        Record submission details for <strong>{{ grant.grant_name }}</strong>
+    </p>
+
+    <form method="POST" class="card" style="padding: 2rem;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div style="margin-bottom: 1.25rem;">
+            <label for="submission_date" style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Submission Date</label>
+            <input type="date" id="submission_date" name="submission_date" value="{{ today }}"
+                   style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-primary);">
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+            <label for="confirmation_number" style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Confirmation / Tracking Number</label>
+            <input type="text" id="confirmation_number" name="confirmation_number" placeholder="e.g. GRANTS-2026-00123"
+                   style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-primary);">
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+            <label for="portal_used" style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Submission Method</label>
+            <select id="portal_used" name="portal_used"
+                    style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-primary);">
+                <option value="">-- Select --</option>
+                <option value="Grants.gov">Grants.gov</option>
+                <option value="Agency Portal">Agency Portal</option>
+                <option value="Mail/Paper">Mail / Paper</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+            <label for="notes" style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Notes</label>
+            <textarea id="notes" name="notes" rows="4" placeholder="Any additional notes about the submission..."
+                      style="width: 100%; padding: 0.6rem; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-primary); resize: vertical;"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-success" style="flex: 1;">Mark as Submitted</button>
+            <a href="/grant/{{ grant.id }}" class="btn btn-secondary" style="flex: 1; text-align: center;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

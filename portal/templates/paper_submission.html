@@ -1,0 +1,469 @@
+{% extends "layout.html" %}
+
+{% block title %}Paper Submission - {{ grant.grant_name }}{% endblock %}
+
+{% block extra %}
+<style>
+    .ps-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .ps-header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.75rem;
+        margin: 0 0 0.25rem 0;
+    }
+    .ps-header-meta {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+    .ps-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    /* Checklist cards */
+    .checklist-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .checklist-card h2 {
+        font-size: 1.15rem;
+        font-weight: 600;
+        margin: 0 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .checklist-item:last-child {
+        border-bottom: none;
+    }
+    .status-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
+    .status-icon.ready {
+        background: rgba(5, 150, 105, 0.15);
+        color: #10b981;
+    }
+    .status-icon.missing {
+        background: rgba(217, 119, 6, 0.15);
+        color: #d97706;
+    }
+    .status-icon.complete {
+        background: rgba(5, 150, 105, 0.15);
+        color: #10b981;
+    }
+    .status-icon.incomplete {
+        background: rgba(220, 38, 38, 0.15);
+        color: #dc2626;
+    }
+    .checklist-label {
+        flex: 1;
+        font-size: 0.9rem;
+    }
+    .checklist-label small {
+        display: block;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+    }
+    .checklist-action {
+        flex-shrink: 0;
+    }
+
+    /* Form preview cards */
+    .form-preview {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+    .form-preview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background: var(--bg-tertiary);
+        border-bottom: 1px solid var(--border-color);
+    }
+    .form-preview-header h3 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+    .form-preview-body {
+        padding: 1.5rem;
+    }
+    .form-field-row {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 0.5rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        font-size: 0.9rem;
+    }
+    .form-field-row:last-child {
+        border-bottom: none;
+    }
+    .form-field-label {
+        color: var(--text-muted);
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+    .form-field-value {
+        color: var(--text-primary);
+    }
+    .form-field-value.filled {
+        color: #10b981;
+    }
+    .form-field-value.empty {
+        color: #d97706;
+        font-style: italic;
+    }
+
+    /* Budget table */
+    .budget-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+    .budget-table th {
+        background: var(--bg-tertiary);
+        padding: 0.6rem 0.75rem;
+        text-align: left;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--border-color);
+    }
+    .budget-table td {
+        padding: 0.5rem 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .budget-table tr:last-child td {
+        font-weight: 600;
+        border-top: 2px solid var(--border-color);
+    }
+    .budget-table input {
+        width: 100%;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        color: var(--text-primary);
+        padding: 0.35rem 0.5rem;
+        font-size: 0.85rem;
+        text-align: right;
+    }
+    .budget-table input:focus {
+        outline: none;
+        border-color: var(--accent-primary);
+    }
+
+    /* Assurance checklist */
+    .assurance-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+    .assurance-item input[type="checkbox"] {
+        margin-top: 0.15rem;
+        flex-shrink: 0;
+        accent-color: var(--accent-primary);
+    }
+
+    /* Progress summary */
+    .progress-bar-container {
+        background: var(--bg-tertiary);
+        border-radius: 8px;
+        height: 8px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+    }
+    .progress-bar-fill {
+        height: 100%;
+        border-radius: 8px;
+        transition: width 0.3s ease;
+    }
+    .progress-bar-fill.green { background: var(--gradient-success); }
+    .progress-bar-fill.amber { background: linear-gradient(135deg, #d97706, #f59e0b); }
+    .progress-bar-fill.red { background: linear-gradient(135deg, #dc2626, #ef4444); }
+
+    /* Print styles */
+    @media print {
+        .sidebar, .hamburger-btn, .sidebar-backdrop, .ps-actions, .no-print,
+        .checklist-action, .btn { display: none !important; }
+        .main-content { margin-left: 0 !important; padding: 0.5in !important; }
+        .form-preview, .checklist-card { break-inside: avoid; page-break-inside: avoid; }
+        body { background: white; color: black; }
+        .form-preview-header { background: #f0f0f0 !important; }
+        .budget-table input { border: 1px solid #ccc; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="ps-header">
+    <div>
+        <h1>Paper Submission Package</h1>
+        <div class="ps-header-meta">
+            {{ grant.grant_name }} | {{ grant.agency }}
+            {% if template_name %}
+             | Template: {{ template_name|upper }}
+            {% endif %}
+        </div>
+    </div>
+    <div class="ps-actions">
+        <a href="/grant/{{ grant.id }}/paper-download" class="btn btn-primary">
+            PDF Download Complete Package
+        </a>
+        <button onclick="window.print()" class="btn btn-secondary">
+            Print Package
+        </button>
+        <a href="/grant/{{ grant.id }}" class="btn btn-ghost">
+            Back to Grant
+        </a>
+    </div>
+</div>
+
+<!-- Readiness Summary -->
+{% set total_sections = template_sections|length %}
+{% set complete_sections = [] %}
+{% for sec in template_sections %}
+    {% if sec.id in existing_sections %}
+        {% if complete_sections.append(1) %}{% endif %}
+    {% endif %}
+{% endfor %}
+{% set filled_fields = [] %}
+{% for key, val in sf424_fields.items() %}
+    {% if val %}
+        {% if filled_fields.append(1) %}{% endif %}
+    {% endif %}
+{% endfor %}
+{% set section_pct = (complete_sections|length / total_sections * 100)|int if total_sections > 0 else 0 %}
+{% set field_pct = (filled_fields|length / sf424_fields|length * 100)|int if sf424_fields|length > 0 else 0 %}
+
+<div class="stats-grid" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="stat-icon green">SF</div>
+        <div class="stat-value">{{ filled_fields|length }}/{{ sf424_fields|length }}</div>
+        <div class="stat-label">SF-424 Fields Ready</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill {% if field_pct >= 80 %}green{% elif field_pct >= 50 %}amber{% else %}red{% endif %}"
+                 style="width: {{ field_pct }}%"></div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple">S</div>
+        <div class="stat-value">{{ complete_sections|length }}/{{ total_sections }}</div>
+        <div class="stat-label">Sections Written</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill {% if section_pct >= 80 %}green{% elif section_pct >= 50 %}amber{% else %}red{% endif %}"
+                 style="width: {{ section_pct }}%"></div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon amber">F</div>
+        <div class="stat-value">{{ required_forms|length }}</div>
+        <div class="stat-label">Required Forms</div>
+    </div>
+</div>
+
+<!-- Required Standard Forms Checklist -->
+<div class="checklist-card">
+    <h2>Required Standard Forms</h2>
+    {% for form in required_forms %}
+    {% set form_upper = form.upper().replace('-','').replace(' ','').replace('_','') %}
+    {% set is_sf424 = form_upper == 'SF424' %}
+    {% set has_data = is_sf424 and filled_fields|length > 4 %}
+    <div class="checklist-item">
+        <div class="status-icon {% if has_data %}ready{% elif is_sf424 %}missing{% else %}missing{% endif %}">
+            {% if has_data %}&#10003;{% else %}!{% endif %}
+        </div>
+        <div class="checklist-label">
+            <strong>{{ form }}</strong>
+            {% if is_sf424 and has_data %}
+            <small>Auto-filled from your organization profile</small>
+            {% elif is_sf424 %}
+            <small>Some fields need data - complete your organization profile</small>
+            {% else %}
+            <small>Review form details below</small>
+            {% endif %}
+        </div>
+        <div class="checklist-action">
+            {% if form_upper in ('SF424', 'SF424A', 'SF424B') %}
+            <a href="/grant/{{ grant.id }}/paper-download-form/{{ form }}" class="btn btn-small btn-secondary">
+                PDF {{ form }}
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Sections Checklist -->
+<div class="checklist-card">
+    <h2>Required Sections</h2>
+    {% for sec in template_sections %}
+    <div class="checklist-item">
+        <div class="status-icon {% if sec.id in existing_sections %}complete{% else %}incomplete{% endif %}">
+            {% if sec.id in existing_sections %}&#10003;{% else %}&#10007;{% endif %}
+        </div>
+        <div class="checklist-label">
+            {{ sec.name or sec.id.replace('_', ' ').title() }}
+            {% if sec.required %}<span class="required-badge" style="margin-left: 0.5rem; background:#dc3545; color:white; padding:0.1rem 0.4rem; border-radius:3px; font-size:0.65rem;">Required</span>{% endif %}
+            {% if sec.max_pages %}<small>Max {{ sec.max_pages }} pages</small>{% endif %}
+        </div>
+        <div class="checklist-action">
+            {% if sec.id in existing_sections %}
+            <span class="badge badge-green">Complete</span>
+            {% else %}
+            <a href="/grant/{{ grant.id }}/section/{{ sec.id }}" class="btn btn-small btn-primary">Write</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- SF-424 Preview -->
+<div class="form-preview">
+    <div class="form-preview-header">
+        <h3>SF-424 - Application for Federal Assistance</h3>
+        <a href="/grant/{{ grant.id }}/paper-download-form/SF424" class="btn btn-small btn-secondary">
+            PDF Download SF-424
+        </a>
+    </div>
+    <div class="form-preview-body">
+        {% for label, value in sf424_fields.items() %}
+        <div class="form-field-row">
+            <div class="form-field-label">{{ label }}</div>
+            <div class="form-field-value {% if value %}filled{% else %}empty{% endif %}">
+                {% if value %}{{ value }}{% else %}Not provided - update profile{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- SF-424A Budget Preview -->
+<div class="form-preview">
+    <div class="form-preview-header">
+        <h3>SF-424A - Budget Information</h3>
+        <a href="/grant/{{ grant.id }}/paper-download-form/SF424A" class="btn btn-small btn-secondary">
+            PDF Download SF-424A
+        </a>
+    </div>
+    <div class="form-preview-body">
+        <table class="budget-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th style="width:150px;">Federal ($)</th>
+                    <th style="width:150px;">Non-Federal ($)</th>
+                    <th style="width:150px;">Total ($)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cat in budget_categories %}
+                <tr>
+                    <td>{{ cat }}</td>
+                    <td><input type="text" placeholder="0.00" class="budget-fed" data-row="{{ loop.index0 }}"></td>
+                    <td><input type="text" placeholder="0.00" class="budget-nonfed" data-row="{{ loop.index0 }}"></td>
+                    <td><input type="text" placeholder="0.00" class="budget-total" data-row="{{ loop.index0 }}" readonly tabindex="-1"></td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td><strong>TOTAL</strong></td>
+                    <td><input type="text" id="total-fed" readonly tabindex="-1" style="font-weight:600;"></td>
+                    <td><input type="text" id="total-nonfed" readonly tabindex="-1" style="font-weight:600;"></td>
+                    <td><input type="text" id="total-all" readonly tabindex="-1" style="font-weight:600;"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- SF-424B Assurances Preview -->
+<div class="form-preview">
+    <div class="form-preview-header">
+        <h3>SF-424B - Assurances (Non-Construction)</h3>
+        <a href="/grant/{{ grant.id }}/paper-download-form/SF424B" class="btn btn-small btn-secondary">
+            PDF Download SF-424B
+        </a>
+    </div>
+    <div class="form-preview-body">
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+            The applicant certifies that it will comply with all of the following:
+        </p>
+        {% for assurance in assurances %}
+        <div class="assurance-item">
+            <input type="checkbox" id="assurance-{{ loop.index }}">
+            <label for="assurance-{{ loop.index }}">
+                <strong>{{ loop.index }}.</strong> {{ assurance }}
+            </label>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Bottom actions -->
+<div style="display: flex; justify-content: center; gap: 1rem; margin: 2rem 0; flex-wrap: wrap;">
+    <a href="/grant/{{ grant.id }}/paper-download" class="btn btn-primary" style="padding: 0.85rem 2rem; font-size: 1rem;">
+        PDF Download Complete Package
+    </a>
+    <button onclick="window.print()" class="btn btn-secondary" style="padding: 0.85rem 2rem; font-size: 1rem;">
+        Print Package
+    </button>
+</div>
+
+<script>
+// Auto-calculate budget totals
+function recalcBudget() {
+    var totalFed = 0, totalNon = 0, totalAll = 0;
+    document.querySelectorAll('.budget-fed').forEach(function(el) {
+        var row = el.dataset.row;
+        var fed = parseFloat(el.value.replace(/[^0-9.]/g, '')) || 0;
+        var nonfedEl = document.querySelector('.budget-nonfed[data-row="'+row+'"]');
+        var totalEl = document.querySelector('.budget-total[data-row="'+row+'"]');
+        var nonfed = parseFloat(nonfedEl.value.replace(/[^0-9.]/g, '')) || 0;
+        var rowTotal = fed + nonfed;
+        totalEl.value = rowTotal > 0 ? rowTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '';
+        totalFed += fed;
+        totalNon += nonfed;
+        totalAll += rowTotal;
+    });
+    document.getElementById('total-fed').value = totalFed > 0 ? totalFed.toLocaleString('en-US', {minimumFractionDigits: 2}) : '';
+    document.getElementById('total-nonfed').value = totalNon > 0 ? totalNon.toLocaleString('en-US', {minimumFractionDigits: 2}) : '';
+    document.getElementById('total-all').value = totalAll > 0 ? totalAll.toLocaleString('en-US', {minimumFractionDigits: 2}) : '';
+}
+document.querySelectorAll('.budget-fed, .budget-nonfed').forEach(function(el) {
+    el.addEventListener('input', recalcBudget);
+});
+</script>
+{% endblock %}

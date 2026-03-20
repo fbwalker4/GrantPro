@@ -30,7 +30,7 @@
             <tr>
                 <td>{{ client.organization_name }}</td>
                 <td>{{ client.contact_name }}</td>
-                <td><span class="status-badge status-{{ client.status }}">{{ client.status }}</span></td>
+                <td><span class="status-badge status-{{ client.status }}" role="status">{{ client.status }}</span></td>
                 <td>
                     <a href="/grant/{{ grant.id }}/use-template?client_id={{ client.id }}" class="btn btn-primary btn-small">
                         Use This Client

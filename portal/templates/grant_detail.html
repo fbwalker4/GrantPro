@@ -11,8 +11,14 @@
         <p style="color: #4361ee; font-size: 0.9rem;">📋 Template: {{ template_name|upper }}</p>
         {% endif %}
     </div>
-    <div style="display: flex; gap: 0.5rem;">
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
         <a href="/grant/{{ grant.id }}/guided" class="btn btn-success">🎯 Guided Submission</a>
+        <a href="/grant/{{ grant.id }}/paper-submission" class="btn btn-primary">📦 Paper Submission</a>
+        {% if existing_sections and existing_sections|length > 0 %}
+        <form method="POST" action="/grant/{{ grant.id }}/clone" style="display: inline;">
+            <button type="submit" class="btn btn-secondary" title="Clone this application">📋 Clone Application</button>
+        </form>
+        {% endif %}
         <div style="display: flex; gap: 0.5rem;">
             <a href="/grant/{{ grant.id }}/download/txt" class="btn btn-secondary">📄 TXT</a>
             <a href="/grant/{{ grant.id }}/download/docx" class="btn btn-secondary">📝 DOCX</a>
@@ -27,7 +33,7 @@
         <p><strong>Agency:</strong> {{ grant.agency }}</p>
         <p><strong>Amount:</strong> ${{ "{:,.0f}".format(grant.amount) }}</p>
         <p><strong>Deadline:</strong> {{ grant.deadline }}</p>
-        <p><strong>Status:</strong> <span class="status-badge status-{{ grant.status }}">{{ grant.status }}</span></p>
+        <p><strong>Status:</strong> <span class="status-badge status-{{ grant.status }}" role="status">{{ grant.status }}</span></p>
         {% if grant.template %}
         <p><strong>Template:</strong> {{ grant.template }}</p>
         {% endif %}
@@ -42,6 +48,96 @@
         </div>
     </div>
 </div>
+
+{# ---- Post-Submission Tracking ---- #}
+{% if grant.status in ('draft', 'in_progress', 'research', 'assigned') %}
+<div class="card" style="margin-bottom: 2rem; border-left: 4px solid #4361ee;">
+    <h2>Ready to Submit?</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+        Once you have submitted this grant through the appropriate portal, record the submission details here.
+    </p>
+    <a href="/grant/{{ grant.id }}/mark-submitted" class="btn btn-success">Mark as Submitted</a>
+</div>
+{% elif grant.status == 'submitted' %}
+<div class="card" style="margin-bottom: 2rem; border-left: 4px solid #f59e0b;">
+    <h2>Submission Details</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+        <p><strong>Submitted:</strong> {{ grant.submission_date or grant.submitted_at or 'N/A' }}</p>
+        <p><strong>Confirmation #:</strong> {{ grant.confirmation_number or 'N/A' }}</p>
+        <p><strong>Method:</strong> {{ grant.portal_used or 'N/A' }}</p>
+    </div>
+    {% if grant.submission_notes %}
+    <p style="color: var(--text-secondary); font-style: italic;">{{ grant.submission_notes }}</p>
+    {% endif %}
+
+    <hr style="border-color: var(--border-color); margin: 1.25rem 0;">
+    <h3>Update Outcome</h3>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <form method="POST" action="/grant/{{ grant.id }}/update-status" style="flex: 1; min-width: 260px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="new_status" value="funded">
+            <div style="margin-bottom: 0.75rem;">
+                <label style="font-weight: 600; font-size: 0.9rem;">Amount Funded ($)</label>
+                <input type="number" name="amount_funded" step="0.01" placeholder="0.00"
+                       style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-primary);">
+            </div>
+            <div style="margin-bottom: 0.75rem;">
+                <label style="font-weight: 600; font-size: 0.9rem;">Notification Date</label>
+                <input type="date" name="notification_date"
+                       style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-primary);">
+            </div>
+            <button type="submit" class="btn btn-success" style="width: 100%;">Mark as Funded</button>
+        </form>
+        <form method="POST" action="/grant/{{ grant.id }}/update-status" style="flex: 1; min-width: 260px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="new_status" value="rejected">
+            <div style="margin-bottom: 0.75rem;">
+                <label style="font-weight: 600; font-size: 0.9rem;">Rejection Reason</label>
+                <textarea name="rejection_reason" rows="2" placeholder="Optional reason..."
+                          style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-primary); resize: vertical;"></textarea>
+            </div>
+            <div style="margin-bottom: 0.75rem;">
+                <label style="font-weight: 600; font-size: 0.9rem;">Notification Date</label>
+                <input type="date" name="notification_date"
+                       style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-primary);">
+            </div>
+            <button type="submit" class="btn btn-secondary" style="width: 100%; background: #dc3545; color: white; border-color: #dc3545;">Mark as Rejected</button>
+        </form>
+    </div>
+</div>
+{% elif grant.status == 'funded' %}
+<div class="card" style="margin-bottom: 2rem; border-left: 4px solid #10b981;">
+    <h2 style="color: #34d399;">Funded</h2>
+    {% if grant.amount_funded %}
+    <p><strong>Amount Funded:</strong> ${{ "{:,.2f}".format(grant.amount_funded) }}</p>
+    {% endif %}
+    {% if grant.notification_date %}
+    <p><strong>Notification Date:</strong> {{ grant.notification_date }}</p>
+    {% endif %}
+    {% if grant.submission_date %}
+    <p><strong>Originally Submitted:</strong> {{ grant.submission_date }}</p>
+    {% endif %}
+    {% if grant.confirmation_number %}
+    <p><strong>Confirmation #:</strong> {{ grant.confirmation_number }}</p>
+    {% endif %}
+</div>
+{% elif grant.status == 'rejected' %}
+<div class="card" style="margin-bottom: 2rem; border-left: 4px solid #dc3545;">
+    <h2 style="color: #f87171;">Not Funded</h2>
+    {% if grant.notification_date %}
+    <p><strong>Notification Date:</strong> {{ grant.notification_date }}</p>
+    {% endif %}
+    {% if grant.rejection_reason %}
+    <p><strong>Reason:</strong> {{ grant.rejection_reason }}</p>
+    {% endif %}
+    {% if grant.submission_date %}
+    <p><strong>Originally Submitted:</strong> {{ grant.submission_date }}</p>
+    {% endif %}
+    {% if grant.confirmation_number %}
+    <p><strong>Confirmation #:</strong> {{ grant.confirmation_number }}</p>
+    {% endif %}
+</div>
+{% endif %}
 
 <div class="card">
     <h2>Grant Sections</h2>
@@ -89,7 +185,7 @@
         <div class="section-content" id="section-{{ section.id }}">
             {{ existing_sections[section.id].content }}
         </div>
-        <button class="copy-btn" onclick="copyToClipboard(document.getElementById('section-{{ section.id }}').textContent, this)">
+        <button class="copy-btn" aria-label="Copy section content to clipboard" onclick="copyToClipboard(document.getElementById('section-{{ section.id }}').textContent, this)">
             📋 Copy to Clipboard
         </button>
         {% else %}

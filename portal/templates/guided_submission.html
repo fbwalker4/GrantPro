@@ -434,10 +434,10 @@
 </head>
 <body>
     <div class="guided-container">
-        <div class="sidebar">
+        <div class="sidebar" role="navigation" aria-label="Submission steps">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                 <h2 style="margin-bottom: 0;">🎯 Guided Submission</h2>
-                <button class="compact-toggle" id="compactToggle" onclick="toggleCompactMode()">
+                <button class="compact-toggle" id="compactToggle" onclick="toggleCompactMode()" aria-label="Toggle compact view">
                     ⊟ Compact
                 </button>
             </div>
@@ -447,7 +447,7 @@
             </p>
 
             <!-- Progress Bar -->
-            <div class="progress-bar-container">
+            <div class="progress-bar-container" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Submission progress">
                 <div class="progress-label" id="progressLabel">0 of 0 sections copied</div>
                 <div class="progress-bar-track">
                     <div class="progress-bar-fill" id="progressFill"></div>
@@ -505,7 +505,7 @@
             </div>
         </div>
         
-        <div class="content-area">
+        <div class="content-area" role="main">
             <div class="content-header" id="downloads">
                 <h1>{{ grant.grant_name }}</h1>
                 <p>{{ grant.agency }} | Deadline: {{ grant.deadline }}</p>
@@ -551,7 +551,7 @@
                     <h3>
                         {{ section.name or section.id.replace('_', ' ').title() }}
                         {% if section.id in existing_sections_by_id %}
-                        <button class="copy-btn" onclick="copyToClipboard(this, '{{ section.id }}')">
+                        <button class="copy-btn" aria-label="Copy {{ section.name or section.id.replace('_', ' ').title() }} to clipboard" onclick="copyToClipboard(this, '{{ section.id }}')">
                             📋 Copy
                         </button>
                         {% endif %}
@@ -589,7 +589,7 @@
                 <div class="copy-block" id="section-{{ loop.index0 }}">
                     <h3>
                         {{ draft.section.replace('_', ' ').title() }}
-                        <button class="copy-btn" onclick="copyToClipboard(this, '{{ draft.section }}')">
+                        <button class="copy-btn" aria-label="Copy {{ draft.section.replace('_', ' ').title() }} to clipboard" onclick="copyToClipboard(this, '{{ draft.section }}')">
                             📋 Copy
                         </button>
                     </h3>
@@ -600,7 +600,7 @@
             <div class="empty-state">
                 <h3>No Content Yet</h3>
                 <p>Go back to the grant and add content to each section first.</p>
-                <a href="/grant/{{ grant.id }}" class="download-btn download-docx">← Back to Grant</a>
+                <a href="/grant/{{ grant.id }}" class="download-btn download-docx" aria-label="Back to grant detail page">← Back to Grant</a>
             </div>
             {% endif %}
             

@@ -757,6 +757,10 @@ def profile():
     
     if request.method == 'POST':
         # Update profile - only include fields that exist in user_profiles table
+        # Collect selected reminder days as comma-separated string
+        reminder_days_list = request.form.getlist('reminder_days')
+        reminder_days_str = ','.join(reminder_days_list) if reminder_days_list else ''
+
         profile_data = {
             'bio': request.form.get('bio', ''),
             'interests': request.form.get('interests', ''),
@@ -766,6 +770,7 @@ def profile():
             'preferred_categories': request.form.get('preferred_categories', ''),
             'notify_deadlines': 1 if request.form.get('notify_deadlines') else 0,
             'notify_new_grants': 1 if request.form.get('notify_new_grants') else 0,
+            'reminder_days': reminder_days_str,
         }
         user_models.update_user_profile(user['id'], profile_data)
         
@@ -1301,8 +1306,53 @@ def migrate_grants_table():
     finally:
         conn.close()
 
+def migrate_grants_submission_tracking():
+    """Add submission tracking columns to grants table if missing"""
+    conn = get_db()
+    try:
+        result = conn.execute("PRAGMA table_info(grants)").fetchall()
+        columns = [row[1] for row in result]
+
+        new_cols = {
+            'submission_date': 'TEXT',
+            'confirmation_number': 'TEXT',
+            'portal_used': 'TEXT',
+            'submission_notes': 'TEXT',
+            'amount_funded': 'REAL',
+            'rejection_reason': 'TEXT',
+            'notification_date': 'TEXT',
+        }
+        for col, col_type in new_cols.items():
+            if col not in columns:
+                conn.execute(f'ALTER TABLE grants ADD COLUMN {col} {col_type}')
+                print(f"Added {col} column to grants table")
+
+        conn.commit()
+    except Exception as e:
+        print(f"Migration note: {e}")
+    finally:
+        conn.close()
+
 migrate_clients_table()
 migrate_grants_table()
+migrate_grants_submission_tracking()
+
+def migrate_user_profiles_reminder_days():
+    """Add reminder_days column to user_profiles table if missing"""
+    conn = get_db()
+    try:
+        result = conn.execute("PRAGMA table_info(user_profiles)").fetchall()
+        columns = [row[1] for row in result]
+        if 'reminder_days' not in columns:
+            conn.execute("ALTER TABLE user_profiles ADD COLUMN reminder_days TEXT DEFAULT '7,3,1'")
+            conn.commit()
+            print("Added reminder_days column to user_profiles table")
+    except Exception as e:
+        print(f"Migration note: {e}")
+    finally:
+        conn.close()
+
+migrate_user_profiles_reminder_days()
 
 
 @app.route('/admin')
@@ -2152,6 +2202,412 @@ Tips for this section:
     })
 
 
+@app.route('/grant/<grant_id>/paper-submission')
+@login_required
+@paid_required
+def paper_submission(grant_id):
+    """Paper submission package - pre-filled forms and checklists"""
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    conn = get_db()
+    grant = conn.execute('''
+        SELECT g.*, c.organization_name, c.contact_name, c.contact_email
+        FROM grants g JOIN clients c ON g.client_id = c.id WHERE g.id = ?
+    ''', (grant_id,)).fetchone()
+
+    if not grant:
+        conn.close()
+        return "Grant not found", 404
+
+    drafts = conn.execute('''
+        SELECT section, content, status FROM drafts
+        WHERE grant_id = ? AND content IS NOT NULL AND content != ''
+        ORDER BY section
+    ''', (grant_id,)).fetchall()
+    conn.close()
+
+    existing_sections = {d['section']: d for d in drafts}
+
+    template_name = grant['template'] if 'template' in grant.keys() and grant['template'] else 'generic'
+    template = grant_researcher.get_grant_template(template_name)
+    template_sections = grant_researcher.get_template_sections(template_name)
+    if not template_sections:
+        template_sections = [
+            {'id': 'abstract', 'name': 'Abstract'},
+            {'id': 'project_summary', 'name': 'Project Summary'},
+            {'id': 'project_description', 'name': 'Project Description'},
+            {'id': 'budget', 'name': 'Budget'},
+            {'id': 'budget_justification', 'name': 'Budget Justification'},
+            {'id': 'facilities', 'name': 'Facilities'},
+            {'id': 'key_personnel', 'name': 'Key Personnel'},
+        ]
+    if not template:
+        template = {'name': 'Standard Federal Grant', 'forms': ['SF424', 'SF424A', 'Project Narrative', 'Budget']}
+
+    user = get_current_user()
+    org_data = user_models.get_organization_details(user['id']) if user else {}
+    org_details = org_data.get('organization_details') or {}
+    org_profile = org_data.get('organization_profile') or {}
+
+    sf424_fields = {
+        'Applicant Legal Name': user.get('organization_name') or '',
+        'EIN / TIN': org_details.get('ein', ''),
+        'UEI': org_details.get('uei', ''),
+        'Address': ', '.join(filter(None, [
+            org_details.get('address_line1', ''), org_details.get('city', ''),
+            org_details.get('state', ''), org_details.get('zip_code', '')])),
+        'Phone': org_details.get('phone', '') or user.get('phone', ''),
+        'Project Title': grant['grant_name'],
+        'Requested Amount': f"${grant['amount']:,.2f}" if grant['amount'] else '',
+        'Federal Agency': grant['agency'],
+    }
+
+    budget_categories = ['Personnel', 'Fringe Benefits', 'Travel', 'Equipment',
+                         'Supplies', 'Contractual', 'Other', 'Indirect Costs']
+
+    assurances = [
+        'Has the legal authority to apply for Federal assistance',
+        'Will comply with all Federal statutes and regulations',
+        'Will give Federal agencies access to records',
+        'Will comply with requirements of OMB Circular A-87 / 2 CFR 200',
+        'Will comply with the Drug-Free Workplace Act',
+        'Will comply with the Civil Rights Act of 1964',
+        'Will comply with environmental standards (NEPA)',
+        'Will comply with the Hatch Act',
+        'Will comply with flood insurance requirements',
+        'Will comply with lobbying restrictions',
+    ]
+
+    required_forms = template.get('forms', ['SF424'])
+
+    return render_template('paper_submission.html',
+                         grant=grant, template=template, template_name=template_name,
+                         template_sections=template_sections, existing_sections=existing_sections,
+                         sf424_fields=sf424_fields, budget_categories=budget_categories,
+                         assurances=assurances, required_forms=required_forms,
+                         org_details=org_details, org_profile=org_profile)
+
+
+@app.route('/grant/<grant_id>/paper-download')
+@login_required
+@paid_required
+def paper_download(grant_id):
+    """Generate combined PDF package for paper submission"""
+    import io
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    conn = get_db()
+    grant = conn.execute('''
+        SELECT g.*, c.organization_name, c.contact_name, c.contact_email
+        FROM grants g JOIN clients c ON g.client_id = c.id WHERE g.id = ?
+    ''', (grant_id,)).fetchone()
+    drafts = conn.execute('''
+        SELECT section, content FROM drafts
+        WHERE grant_id = ? AND content IS NOT NULL AND content != '' ORDER BY section
+    ''', (grant_id,)).fetchall()
+    conn.close()
+
+    if not grant:
+        flash('Grant not found', 'error')
+        return redirect(url_for('dashboard'))
+
+    user = get_current_user()
+    org_data = user_models.get_organization_details(user['id']) if user else {}
+    org_details = org_data.get('organization_details') or {}
+
+    try:
+        from reportlab.lib.pagesizes import letter
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import inch
+        from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer,
+                                        PageBreak, Table, TableStyle, HRFlowable)
+        from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+        from reportlab.lib import colors
+
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=letter,
+                                topMargin=0.75*inch, bottomMargin=0.75*inch,
+                                leftMargin=1*inch, rightMargin=1*inch)
+        styles = getSampleStyleSheet()
+
+        title_style = ParagraphStyle('PkgTitle', parent=styles['Heading1'],
+                                     alignment=TA_CENTER, fontSize=22, spaceAfter=6)
+        subtitle_style = ParagraphStyle('PkgSubtitle', parent=styles['Normal'],
+                                        alignment=TA_CENTER, fontSize=12,
+                                        textColor=colors.grey, spaceAfter=20)
+        form_title_style = ParagraphStyle('FormTitle', parent=styles['Heading2'],
+                                          fontSize=16, spaceAfter=12,
+                                          textColor=colors.HexColor('#1a365d'))
+        section_head = ParagraphStyle('SectionHead', parent=styles['Heading2'],
+                                      fontSize=14, spaceAfter=8)
+        story = []
+
+        # ---- COVER PAGE ----
+        story.append(Spacer(1, 1.5*inch))
+        story.append(Paragraph("GRANT APPLICATION PACKAGE", title_style))
+        story.append(Paragraph("Paper Submission", subtitle_style))
+        story.append(Spacer(1, 0.3*inch))
+        story.append(HRFlowable(width="80%", thickness=1, color=colors.HexColor('#2563eb')))
+        story.append(Spacer(1, 0.4*inch))
+
+        cover_data = [
+            ['Project Title:', grant['grant_name']],
+            ['Federal Agency:', grant['agency']],
+            ['Applicant:', grant['organization_name']],
+            ['Requested Amount:', f"${grant['amount']:,.2f}" if grant['amount'] else 'N/A'],
+            ['Deadline:', str(grant['deadline'])],
+            ['Contact:', grant.get('contact_name', 'N/A')],
+        ]
+        cover_table = Table(cover_data, colWidths=[2*inch, 4*inch])
+        cover_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 11),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('TOPPADDING', (0, 0), (-1, -1), 4),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ]))
+        story.append(cover_table)
+        story.append(Spacer(1, 0.5*inch))
+        gen_date = datetime.now().strftime('%B %d, %Y')
+        story.append(Paragraph(f"Generated: {gen_date}", subtitle_style))
+        story.append(PageBreak())
+
+        # ---- SF-424 ----
+        story.append(Paragraph("STANDARD FORM 424 (SF-424)", form_title_style))
+        story.append(Paragraph("Application for Federal Assistance", styles['Normal']))
+        story.append(Spacer(1, 0.2*inch))
+        story.append(HRFlowable(width="100%", thickness=0.5, color=colors.grey))
+        story.append(Spacer(1, 0.15*inch))
+
+        org_name = user.get('organization_name', '') or grant['organization_name']
+        addr_parts = [org_details.get('address_line1', ''), org_details.get('address_line2', ''),
+                      ', '.join(filter(None, [org_details.get('city', ''),
+                                               org_details.get('state', ''),
+                                               org_details.get('zip_code', '')]))]
+        full_address = ', '.join(filter(None, addr_parts)) or 'N/A'
+
+        sf424_rows = [
+            ['1. Type of Submission:', 'Application'],
+            ['2. Type of Application:', 'New'],
+            ['3. Date Received:', gen_date],
+            ['4. Applicant Identifier:', org_details.get('uei', 'N/A')],
+            ['5. Federal Agency:', grant['agency']],
+            ['7. Project Title:', grant['grant_name']],
+            ['8a. Applicant Legal Name:', org_name],
+            ['8b. EIN/TIN:', org_details.get('ein', 'N/A')],
+            ['8c. UEI:', org_details.get('uei', 'N/A')],
+            ['8d. Address:', full_address],
+            ['8e. Phone:', org_details.get('phone', '') or 'N/A'],
+            ['9. Contact Person:', grant.get('contact_name', 'N/A')],
+            ['10. Contact Email:', grant.get('contact_email', 'N/A')],
+            ['15. Estimated Federal Funding:', f"${grant['amount']:,.2f}" if grant['amount'] else 'N/A'],
+        ]
+        sf_table = Table(sf424_rows, colWidths=[2.5*inch, 3.5*inch])
+        sf_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+            ('TOPPADDING', (0, 0), (-1, -1), 4),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cccccc')),
+            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f0f4f8')),
+        ]))
+        story.append(sf_table)
+        story.append(PageBreak())
+
+        # ---- SF-424A BUDGET ----
+        story.append(Paragraph("STANDARD FORM 424A (SF-424A)", form_title_style))
+        story.append(Paragraph("Budget Information - Non-Construction Programs", styles['Normal']))
+        story.append(Spacer(1, 0.2*inch))
+        story.append(HRFlowable(width="100%", thickness=0.5, color=colors.grey))
+        story.append(Spacer(1, 0.15*inch))
+
+        budget_rows = [['Category', 'Federal ($)', 'Non-Federal ($)', 'Total ($)']]
+        for cat in ['Personnel', 'Fringe Benefits', 'Travel', 'Equipment',
+                     'Supplies', 'Contractual', 'Other', 'Indirect Costs']:
+            budget_rows.append([cat, '', '', ''])
+        budget_rows.append(['TOTAL', '', '', ''])
+
+        bt = Table(budget_rows, colWidths=[2*inch, 1.5*inch, 1.5*inch, 1.5*inch])
+        bt.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cccccc')),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a365d')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#f0f4f8')),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('TOPPADDING', (0, 0), (-1, -1), 6),
+            ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
+        ]))
+        story.append(bt)
+        story.append(PageBreak())
+
+        # ---- WRITTEN SECTIONS ----
+        for draft in drafts:
+            section_title = draft['section'].replace('_', ' ').title()
+            story.append(Paragraph(section_title, section_head))
+            story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor('#e2e8f0')))
+            story.append(Spacer(1, 0.1*inch))
+            content_html = draft['content'].replace('\n', '<br/>')
+            story.append(Paragraph(content_html, styles['Normal']))
+            story.append(Spacer(1, 0.3*inch))
+
+        doc.build(story)
+        buffer.seek(0)
+        safe_name = grant['grant_name'].replace(' ', '_').replace('/', '-')
+        return send_file(buffer, mimetype='application/pdf', as_attachment=True,
+                         download_name=f"{safe_name}_Paper_Package.pdf")
+
+    except ImportError:
+        flash('reportlab not installed. Cannot generate PDF package.', 'error')
+        return redirect(url_for('grant_detail', grant_id=grant_id))
+
+
+@app.route('/grant/<grant_id>/paper-download-form/<form_name>')
+@login_required
+@paid_required
+def paper_download_form(grant_id, form_name):
+    """Download an individual standard form as PDF"""
+    import io
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    conn = get_db()
+    grant = conn.execute('''
+        SELECT g.*, c.organization_name, c.contact_name, c.contact_email
+        FROM grants g JOIN clients c ON g.client_id = c.id WHERE g.id = ?
+    ''', (grant_id,)).fetchone()
+    conn.close()
+
+    if not grant:
+        flash('Grant not found', 'error')
+        return redirect(url_for('dashboard'))
+
+    user = get_current_user()
+    org_data = user_models.get_organization_details(user['id']) if user else {}
+    org_details = org_data.get('organization_details') or {}
+
+    try:
+        from reportlab.lib.pagesizes import letter
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import inch
+        from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer,
+                                        Table, TableStyle, HRFlowable)
+        from reportlab.lib.enums import TA_CENTER
+        from reportlab.lib import colors
+
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=letter,
+                                topMargin=0.75*inch, bottomMargin=0.75*inch,
+                                leftMargin=1*inch, rightMargin=1*inch)
+        styles = getSampleStyleSheet()
+        form_title_style = ParagraphStyle('FormTitle', parent=styles['Heading1'],
+                                          alignment=TA_CENTER, fontSize=18, spaceAfter=12,
+                                          textColor=colors.HexColor('#1a365d'))
+        story = []
+        gen_date = datetime.now().strftime('%B %d, %Y')
+        org_name = user.get('organization_name', '') or grant['organization_name']
+        full_address = ', '.join(filter(None, [
+            org_details.get('address_line1', ''), org_details.get('city', ''),
+            org_details.get('state', ''), org_details.get('zip_code', '')])) or 'N/A'
+
+        normalized = form_name.upper().replace('-', '').replace('_', '').replace(' ', '')
+
+        if normalized in ('SF424',):
+            story.append(Paragraph("STANDARD FORM 424 (SF-424)", form_title_style))
+            story.append(Paragraph("Application for Federal Assistance", styles['Normal']))
+            story.append(Spacer(1, 0.3*inch))
+            rows = [
+                ['1. Type of Submission:', 'Application'],
+                ['2. Type of Application:', 'New'],
+                ['3. Date Received:', gen_date],
+                ['5. Federal Agency:', grant['agency']],
+                ['7. Project Title:', grant['grant_name']],
+                ['8a. Applicant Legal Name:', org_name],
+                ['8b. EIN/TIN:', org_details.get('ein', 'N/A')],
+                ['8c. UEI:', org_details.get('uei', 'N/A')],
+                ['8d. Address:', full_address],
+                ['8e. Phone:', org_details.get('phone', '') or 'N/A'],
+                ['15. Estimated Federal Funding:', f"${grant['amount']:,.2f}" if grant['amount'] else 'N/A'],
+            ]
+            t = Table(rows, colWidths=[2.5*inch, 3.5*inch])
+            t.setStyle(TableStyle([
+                ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cccccc')),
+                ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f0f4f8')),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+                ('TOPPADDING', (0, 0), (-1, -1), 4),
+            ]))
+            story.append(t)
+
+        elif normalized in ('SF424A',):
+            story.append(Paragraph("STANDARD FORM 424A (SF-424A)", form_title_style))
+            story.append(Paragraph("Budget Information", styles['Normal']))
+            story.append(Spacer(1, 0.3*inch))
+            brows = [['Category', 'Federal ($)', 'Non-Federal ($)', 'Total ($)']]
+            for cat in ['Personnel', 'Fringe Benefits', 'Travel', 'Equipment',
+                        'Supplies', 'Contractual', 'Other', 'Indirect Costs']:
+                brows.append([cat, '', '', ''])
+            brows.append(['TOTAL', '', '', ''])
+            t = Table(brows, colWidths=[2*inch, 1.5*inch, 1.5*inch, 1.5*inch])
+            t.setStyle(TableStyle([
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cccccc')),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a365d')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#f0f4f8')),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+                ('TOPPADDING', (0, 0), (-1, -1), 6),
+                ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
+            ]))
+            story.append(t)
+
+        elif normalized in ('SF424B',):
+            story.append(Paragraph("STANDARD FORM 424B (SF-424B)", form_title_style))
+            story.append(Paragraph("Assurances - Non-Construction Programs", styles['Normal']))
+            story.append(Spacer(1, 0.3*inch))
+            for i, a in enumerate([
+                'Has the legal authority to apply for Federal assistance',
+                'Will comply with all Federal statutes and regulations',
+                'Will give Federal agencies access to records',
+                'Will comply with OMB Circular A-87 / 2 CFR 200',
+                'Will comply with the Drug-Free Workplace Act',
+                'Will comply with the Civil Rights Act of 1964',
+                'Will comply with environmental standards (NEPA)',
+                'Will comply with the Hatch Act',
+                'Will comply with flood insurance requirements',
+                'Will comply with lobbying restrictions',
+            ], 1):
+                story.append(Paragraph(f"<b>{i}.</b>  [ ]  The applicant {a}.", styles['Normal']))
+                story.append(Spacer(1, 0.08*inch))
+            story.append(Spacer(1, 0.5*inch))
+            story.append(Paragraph("Signature: ____________________________    Date: ____________", styles['Normal']))
+            story.append(Spacer(1, 0.15*inch))
+            story.append(Paragraph(f"Organization: {org_name}", styles['Normal']))
+        else:
+            story.append(Paragraph(form_name, form_title_style))
+            story.append(Paragraph("This form must be completed manually.", styles['Normal']))
+
+        doc.build(story)
+        buffer.seek(0)
+        safe_name = form_name.replace(' ', '_').replace('/', '-')
+        return send_file(buffer, mimetype='application/pdf', as_attachment=True,
+                         download_name=f"{safe_name}.pdf")
+
+    except ImportError:
+        flash('reportlab not installed. Cannot generate PDF.', 'error')
+        return redirect(url_for('paper_submission', grant_id=grant_id))
+
 
 @app.route('/grant/<grant_id>/guided')
 @login_required
@@ -2207,6 +2663,97 @@ def guided_submission(grant_id):
                          grant=grant, 
                          drafts=drafts,
                          template_sections=template_sections)
+
+@app.route('/grant/<grant_id>/mark-submitted', methods=['GET', 'POST'])
+@login_required
+@paid_required
+@csrf_required
+def mark_submitted(grant_id):
+    """Mark a grant as submitted with tracking metadata"""
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    conn = get_db()
+    grant = conn.execute('''
+        SELECT g.*, c.organization_name
+        FROM grants g JOIN clients c ON g.client_id = c.id
+        WHERE g.id = ?
+    ''', (grant_id,)).fetchone()
+
+    if not grant:
+        conn.close()
+        return "Grant not found", 404
+
+    if request.method == 'POST':
+        submission_date = request.form.get('submission_date', datetime.now().strftime('%Y-%m-%d'))
+        confirmation_number = request.form.get('confirmation_number', '')
+        portal_used = request.form.get('portal_used', '')
+        notes = request.form.get('notes', '')
+
+        conn.execute('''
+            UPDATE grants
+            SET status = 'submitted',
+                submitted_at = ?,
+                submission_date = ?,
+                confirmation_number = ?,
+                portal_used = ?,
+                submission_notes = ?
+            WHERE id = ?
+        ''', (datetime.now().isoformat(), submission_date, confirmation_number,
+              portal_used, notes, grant_id))
+        conn.commit()
+        conn.close()
+        flash('Grant marked as submitted!', 'success')
+        return redirect(url_for('grant_detail', grant_id=grant_id))
+
+    conn.close()
+    today = datetime.now().strftime('%Y-%m-%d')
+    return render_template('mark_submitted.html', grant=grant, today=today)
+
+
+@app.route('/grant/<grant_id>/update-status', methods=['POST'])
+@login_required
+@paid_required
+@csrf_required
+def update_grant_status(grant_id):
+    """Update grant status to funded or rejected"""
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    new_status = request.form.get('new_status', '')
+    if new_status not in ('funded', 'rejected'):
+        flash('Invalid status', 'error')
+        return redirect(url_for('grant_detail', grant_id=grant_id))
+
+    notification_date = request.form.get('notification_date', datetime.now().strftime('%Y-%m-%d'))
+    conn = get_db()
+
+    if new_status == 'funded':
+        amount_funded = request.form.get('amount_funded', 0)
+        try:
+            amount_funded = float(amount_funded)
+        except (TypeError, ValueError):
+            amount_funded = 0
+        conn.execute('''
+            UPDATE grants
+            SET status = 'funded', amount_funded = ?, notification_date = ?
+            WHERE id = ?
+        ''', (amount_funded, notification_date, grant_id))
+    else:
+        rejection_reason = request.form.get('rejection_reason', '')
+        conn.execute('''
+            UPDATE grants
+            SET status = 'rejected', rejection_reason = ?, notification_date = ?
+            WHERE id = ?
+        ''', (rejection_reason, notification_date, grant_id))
+
+    conn.commit()
+    conn.close()
+    flash(f'Grant marked as {new_status}!', 'success')
+    return redirect(url_for('grant_detail', grant_id=grant_id))
+
 
 @app.route('/grant/<grant_id>/download/<fmt>')
 @login_required
@@ -2875,6 +3422,124 @@ def unsubscribe_post():
     """Handle POST unsubscribe"""
     email = request.form.get('email', '').strip().lower()
     return redirect(url_for('unsubscribe', email=email))
+
+
+# ============ CALENDAR EXPORT ============
+
+@app.route('/grant/<grant_id>/calendar.ics')
+@login_required
+def grant_calendar_ics(grant_id):
+    """Export grant deadline as ICS calendar file"""
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    conn = get_db()
+    grant = conn.execute('SELECT * FROM grants WHERE id = ?', (grant_id,)).fetchone()
+    conn.close()
+
+    if not grant:
+        return "Grant not found", 404
+
+    deadline_str = grant['deadline'] or ''
+    # Normalize deadline to YYYYMMDD format
+    deadline_clean = deadline_str.replace('-', '').replace('/', '')[:8]
+    if len(deadline_clean) < 8:
+        deadline_clean = datetime.now().strftime('%Y%m%d')
+
+    grant_title = grant['grant_name'] or 'Grant'
+    grant_agency = grant['agency'] or ''
+
+    ics_content = (
+        "BEGIN:VCALENDAR\r\n"
+        "VERSION:2.0\r\n"
+        "PRODID:-//GrantPro//EN\r\n"
+        "BEGIN:VEVENT\r\n"
+        f"SUMMARY:Grant Deadline: {grant_title}\r\n"
+        f"DTSTART;VALUE=DATE:{deadline_clean}\r\n"
+        f"DESCRIPTION:{grant_agency} - {grant_title}\r\n"
+        f"UID:{grant_id}@grantpro\r\n"
+        f"DTSTAMP:{datetime.now().strftime('%Y%m%dT%H%M%SZ')}\r\n"
+        "END:VEVENT\r\n"
+        "END:VCALENDAR\r\n"
+    )
+
+    from flask import Response
+    response = Response(ics_content, mimetype='text/calendar')
+    response.headers['Content-Disposition'] = f'attachment; filename="{grant_id}-deadline.ics"'
+    return response
+
+
+# ============ APPLICATION CLONING ============
+
+@app.route('/grant/<grant_id>/clone', methods=['POST'])
+@login_required
+@paid_required
+@csrf_required
+def clone_grant(grant_id):
+    """Clone an existing grant application with all its sections"""
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    conn = get_db()
+
+    # Read source grant
+    source = conn.execute('SELECT * FROM grants WHERE id = ?', (grant_id,)).fetchone()
+    if not source:
+        conn.close()
+        flash('Grant not found', 'error')
+        return redirect(url_for('my_grants'))
+
+    # Read all draft sections from the source grant
+    drafts = conn.execute('SELECT * FROM drafts WHERE grant_id = ?', (grant_id,)).fetchall()
+
+    # Create new grant ID and timestamp
+    new_grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    now = datetime.now().isoformat()
+
+    # Insert cloned grant with " (Copy)" appended to title
+    source_dict = dict(source)
+    new_name = (source_dict.get('grant_name') or 'Grant') + ' (Copy)'
+
+    conn.execute('''
+        INSERT INTO grants (id, client_id, grant_name, agency, amount, deadline, status, assigned_at, template, opportunity_number, cfda)
+        VALUES (?, ?, ?, ?, ?, ?, 'draft', ?, ?, ?, ?)
+    ''', (
+        new_grant_id,
+        source_dict.get('client_id'),
+        new_name,
+        source_dict.get('agency', ''),
+        source_dict.get('amount', 0),
+        source_dict.get('deadline', ''),
+        now,
+        source_dict.get('template', 'generic'),
+        source_dict.get('opportunity_number', ''),
+        source_dict.get('cfda', ''),
+    ))
+
+    # Clone all draft sections
+    for draft in drafts:
+        d = dict(draft)
+        draft_id = f"draft-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{d.get('section', 'unknown')}"
+        conn.execute('''
+            INSERT INTO drafts (id, client_id, grant_id, section, content, version, created_at, updated_at, status)
+            VALUES (?, ?, ?, ?, ?, 1, ?, ?, 'draft')
+        ''', (
+            draft_id,
+            d.get('client_id'),
+            new_grant_id,
+            d.get('section'),
+            d.get('content', ''),
+            now,
+            now,
+        ))
+
+    conn.commit()
+    conn.close()
+
+    flash(f'Grant cloned: {new_name}', 'success')
+    return redirect(url_for('grant_detail', grant_id=new_grant_id))
 
 
 # ============ MAIN ============

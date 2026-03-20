@@ -119,14 +119,14 @@
 </div>
 
 <div class="search-filters">
-    <form id="searchForm">
+    <form id="searchForm" role="search" aria-label="Search grants">
         <div class="filter-row">
             <div>
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Search Keywords</label>
+                <label for="keyword" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Search Keywords</label>
                 <input type="text" id="keyword" name="keyword" placeholder="e.g., energy, AI, healthcare, IoT" style="width: 100%;">
             </div>
             <div>
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Agency</label>
+                <label for="agency" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Agency</label>
                 <select id="agency" name="agency" style="width: 100%;">
                     <option value="">All Agencies</option>
                     <option value="NSF">National Science Foundation</option>
@@ -140,7 +140,7 @@
                 </select>
             </div>
             <div>
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Category</label>
+                <label for="category" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Category</label>
                 <select id="category" name="category" style="width: 100%;">
                     <option value="">All Categories</option>
                     <option value="Technology">Technology</option>
@@ -155,11 +155,11 @@
         </div>
         <div class="filter-row" style="margin-top: 1rem;">
             <div>
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Min Amount ($)</label>
+                <label for="minAmount" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Min Amount ($)</label>
                 <input type="number" id="minAmount" name="min_amount" placeholder="50000" style="width: 100%;">
             </div>
             <div>
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Max Amount ($)</label>
+                <label for="maxAmount" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Max Amount ($)</label>
                 <input type="number" id="maxAmount" name="max_amount" placeholder="1000000" style="width: 100%;">
             </div>
             <div style="display: flex; align-items: flex-end;">
@@ -169,7 +169,7 @@
     </form>
 </div>
 
-<div class="results-count" id="resultsCount"></div>
+<div class="results-count" id="resultsCount" role="status" aria-live="polite"></div>
 
 <div id="results">
     <div class="loading">Loading grants...</div>

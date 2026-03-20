@@ -285,7 +285,9 @@ def get_user_profile(user_id):
     conn.close()
     
     if row:
-        return dict(zip(['user_id', 'bio', 'interests', 'eligible_entities', 'funding_amount_min', 'funding_amount_max', 'preferred_categories', 'notify_deadlines', 'notify_new_grants'], row))
+        # Use column names from cursor description for forward compatibility
+        columns = [desc[0] for desc in c.description]
+        return dict(zip(columns, row))
     return None
 
 
@@ -299,8 +301,8 @@ def update_user_profile(user_id, profile_data):
     allowed_fields = {
         'bio', 'interests', 'eligible_entities', 'funding_amount_min',
         'funding_amount_max', 'preferred_categories', 'notify_deadlines',
-        'notify_new_grants', 'first_name', 'last_name', 'organization_name',
-        'organization_type'
+        'notify_new_grants', 'reminder_days', 'first_name', 'last_name',
+        'organization_name', 'organization_type'
     }
     
     fields = []

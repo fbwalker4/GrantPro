@@ -8,27 +8,27 @@
         <h1 class="page-title">🏛️ Grant Management</h1>
         <p class="page-subtitle">Add, edit, and manage grants in the database</p>
     </div>
-    <button class="btn btn-primary" onclick="showAddForm()">➕ Add Grant</button>
+    <button class="btn btn-primary" onclick="showAddForm()" aria-label="Add new grant">➕ Add Grant</button>
 </div>
 
 <!-- Add/Edit Form Modal -->
 <div id="grantForm" class="card" style="display: none; margin-bottom: 2rem;">
     <h2 class="card-title" id="formTitle">Add New Grant</h2>
-    <form method="POST" id="grantFormData">
+    <form method="POST" id="grantFormData" role="form" aria-label="Add or edit grant">
         <input type="hidden" name="action" id="formAction" value="add">
         <input type="hidden" name="id" id="grantId">
-        
+
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
             <div class="form-group">
-                <label>Grant ID (unique)</label>
-                <input type="text" name="id" id="inputId" required placeholder="e.g., nsf-2026-001">
+                <label for="inputId">Grant ID (unique)</label>
+                <input type="text" name="id" id="inputId" required aria-required="true" placeholder="e.g., nsf-2026-001">
             </div>
             <div class="form-group">
-                <label>Title</label>
-                <input type="text" name="title" id="inputTitle" required placeholder="Grant title">
+                <label for="inputTitle">Title</label>
+                <input type="text" name="title" id="inputTitle" required aria-required="true" placeholder="Grant title">
             </div>
             <div class="form-group">
-                <label>Agency</label>
+                <label for="inputAgency">Agency</label>
                 <select name="agency" id="inputAgency">
                     <option value="">Select agency...</option>
                     {% for agency in agencies %}
@@ -38,7 +38,7 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Category</label>
+                <label for="inputCategory">Category</label>
                 <select name="category" id="inputCategory">
                     <option value="">Select category...</option>
                     {% for cat in categories %}
@@ -53,19 +53,19 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Min Amount ($)</label>
+                <label for="inputAmountMin">Min Amount ($)</label>
                 <input type="number" name="amount_min" id="inputAmountMin" value="0">
             </div>
             <div class="form-group">
-                <label>Max Amount ($)</label>
+                <label for="inputAmountMax">Max Amount ($)</label>
                 <input type="number" name="amount_max" id="inputAmountMax" value="0">
             </div>
             <div class="form-group">
-                <label>Deadline</label>
+                <label for="inputDeadline">Deadline</label>
                 <input type="date" name="deadline" id="inputDeadline">
             </div>
             <div class="form-group">
-                <label>Template</label>
+                <label for="inputTemplate">Template</label>
                 <select name="template" id="inputTemplate">
                     <option value="generic">Generic</option>
                     <option value="nsf">NSF</option>
@@ -80,17 +80,17 @@
         </div>
         
         <div class="form-group">
-            <label>Description</label>
+            <label for="inputDescription">Description</label>
             <textarea name="description" id="inputDescription" rows="3" placeholder="Grant description"></textarea>
         </div>
-        
+
         <div class="form-group">
-            <label>Eligibility</label>
+            <label for="inputEligibility">Eligibility</label>
             <input type="text" name="eligibility" id="inputEligibility" placeholder="Who is eligible">
         </div>
-        
+
         <div class="form-group">
-            <label>URL</label>
+            <label for="inputUrl">URL</label>
             <input type="url" name="url" id="inputUrl" placeholder="https://...">
         </div>
         
@@ -125,7 +125,7 @@
     <div class="card-header">
         <h2 class="card-title">All Grants</h2>
         <div style="display: flex; gap: 0.5rem;">
-            <input type="text" id="searchGrants" placeholder="Search grants..." onkeyup="filterGrants()" style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary);">
+            <input type="text" id="searchGrants" placeholder="Search grants..." onkeyup="filterGrants()" aria-label="Search grants" style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary);">
         </div>
     </div>
     

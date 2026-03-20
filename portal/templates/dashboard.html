@@ -13,7 +13,7 @@
             <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">Unlock full grant applications, AI writing, and submit to funders for only $19.95/month</p>
         </div>
     </div>
-    <a href="/upgrade" class="btn btn-primary" style="background: #b45309; white-space: nowrap;">Upgrade to Standard</a>
+    <a href="/upgrade" class="btn btn-primary" style="background: #b45309; white-space: nowrap;" aria-label="Upgrade to Standard plan">Upgrade to Standard</a>
 </div>
 {% endif %}
 
@@ -27,7 +27,7 @@
             <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">Save your EIN, address, mission area, and organization details once — we'll auto-fill every grant application. More grants become available with proper identifiers.</p>
         </div>
     </div>
-    <a href="/onboarding" class="btn btn-primary" style="background: #2563eb; white-space: nowrap;">Complete Profile →</a>
+    <a href="/onboarding" class="btn btn-primary" style="background: #2563eb; white-space: nowrap;" aria-label="Complete your organization profile">Complete Profile →</a>
 </div>
 {% endif %}
 
@@ -123,7 +123,7 @@
 <div class="card">
     <div class="card-header">
         <h2 class="card-title">💾 Saved Grants</h2>
-        <a href="/grants" class="btn btn-ghost">View All →</a>
+        <a href="/grants" class="btn btn-ghost" aria-label="View all saved grants">View All →</a>
     </div>
     
     {% if saved_grants %}
@@ -152,7 +152,7 @@
                         <td>{{ grant.category }}</td>
                         <td style="color: var(--text-muted);">{{ grant.saved_at[:10] if grant.saved_at else 'Recently' }}</td>
                         <td>
-                            <a href="/grant/{{ grant.id }}" class="btn btn-ghost btn-sm">View →</a>
+                            <a href="/grant/{{ grant.id }}" class="btn btn-ghost btn-sm" aria-label="View grant details for {{ grant.title }}">View →</a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -183,11 +183,11 @@
                 <h3 class="grant-card-title">{{ project.grant.title }}</h3>
                 <div class="grant-card-agency">{{ project.grant.agency }}</div>
             </div>
-            <span class="badge 
+            <span class="badge
                 {% if project.status == 'intake' %}badge-amber
                 {% elif project.status == 'drafting' %}badge-purple
                 {% elif project.status == 'review' %}badge-red
-                {% else %}badge-green{% endif %}">
+                {% else %}badge-green{% endif %}" role="status">
                 {{ project.status|title }}
             </span>
         </div>
@@ -234,13 +234,20 @@
         </div>
         {% set upcoming = saved_grants|selectattr('deadline')|sort(attribute='deadline')|list %}
         {% if upcoming %}
-            {% for grant in upcoming[:3] %}
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color);">
-                <div>
+            {% for grant in upcoming[:5] %}
+            {% set deadline_str = grant.deadline[:10] if grant.deadline else '' %}
+            <div class="deadline-item" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 0.5rem;">
+                <div style="flex: 1; min-width: 150px;">
                     <div style="font-weight: 500; font-size: 0.9rem;">{{ grant.title }}</div>
                     <div style="font-size: 0.8rem; color: var(--text-muted);">{{ grant.agency }}</div>
                 </div>
-                <span class="badge badge-amber">📅 {{ grant.deadline[:10] }}</span>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span class="deadline-countdown" data-deadline="{{ deadline_str }}" style="font-size: 0.8rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 12px;"></span>
+                    <span class="badge badge-amber" style="white-space: nowrap;">📅 {{ deadline_str }}</span>
+                    {% if grant.id %}
+                    <a href="/grant/{{ grant.id }}/calendar.ics" title="Export to Calendar" aria-label="Export {{ grant.title }} deadline to calendar" style="text-decoration: none; font-size: 1rem; padding: 0.2rem 0.4rem; border-radius: 4px; background: rgba(67, 97, 238, 0.1); display: inline-flex; align-items: center;">📆</a>
+                    {% endif %}
+                </div>
             </div>
             {% endfor %}
         {% else %}
@@ -248,4 +255,50 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+(function() {
+    var countdowns = document.querySelectorAll('.deadline-countdown');
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    countdowns.forEach(function(el) {
+        var deadlineStr = el.getAttribute('data-deadline');
+        if (!deadlineStr) return;
+
+        var parts = deadlineStr.split('-');
+        var deadline = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        var diff = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+
+        if (diff < 0) {
+            el.textContent = 'Overdue';
+            el.style.background = 'rgba(220, 38, 38, 0.15)';
+            el.style.color = '#dc2626';
+        } else if (diff === 0) {
+            el.textContent = 'Due today';
+            el.style.background = 'rgba(220, 38, 38, 0.15)';
+            el.style.color = '#dc2626';
+        } else if (diff === 1) {
+            el.textContent = '1 day left';
+            el.style.background = 'rgba(220, 38, 38, 0.15)';
+            el.style.color = '#dc2626';
+        } else {
+            el.textContent = diff + ' days left';
+            if (diff <= 3) {
+                el.style.background = 'rgba(220, 38, 38, 0.15)';
+                el.style.color = '#dc2626';
+            } else if (diff <= 7) {
+                el.style.background = 'rgba(245, 158, 11, 0.15)';
+                el.style.color = '#f59e0b';
+            } else if (diff <= 30) {
+                el.style.background = 'rgba(234, 179, 8, 0.15)';
+                el.style.color = '#ca8a04';
+            } else {
+                el.style.background = 'rgba(16, 185, 129, 0.15)';
+                el.style.color = '#10b981';
+            }
+        }
+    });
+})();
+</script>
 {% endblock %}

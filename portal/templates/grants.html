@@ -17,9 +17,9 @@
 <div class="card">
     <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
         <div style="flex: 1; min-width: 200px;">
-            <input type="text" id="searchInput" class="form-input" placeholder="Search grants..." onkeyup="filterGrants()">
+            <input type="text" id="searchInput" class="form-input" placeholder="Search grants..." onkeyup="filterGrants()" aria-label="Search grants">
         </div>
-        <select id="agencyFilter" class="form-select" style="width: auto; min-width: 150px;" onchange="filterGrants()">
+        <select id="agencyFilter" class="form-select" style="width: auto; min-width: 150px;" onchange="filterGrants()" aria-label="Filter by agency">
             <option value="">All Agencies</option>
             <option value="NSF">NSF</option>
             <option value="DOE">DOE</option>
@@ -32,7 +32,7 @@
             <option value="DHS">DHS</option>
             <option value="HHS">HHS</option>
         </select>
-        <select id="categoryFilter" class="form-select" style="width: auto; min-width: 150px;" onchange="filterGrants()">
+        <select id="categoryFilter" class="form-select" style="width: auto; min-width: 150px;" onchange="filterGrants()" aria-label="Filter by category">
             <option value="">All Categories</option>
             <option value="Technology">Technology</option>
             <option value="Healthcare">Healthcare</option>
@@ -42,14 +42,14 @@
             <option value="Manufacturing">Manufacturing</option>
             <option value="Agriculture">Agriculture</option>
         </select>
-        <select id="amountFilter" class="form-select" style="width: auto; min-width: 150px;" onchange="filterGrants()">
+        <select id="amountFilter" class="form-select" style="width: auto; min-width: 150px;" onchange="filterGrants()" aria-label="Filter by minimum amount">
             <option value="">Any Amount</option>
             <option value="100000">$100K+</option>
             <option value="250000">$250K+</option>
             <option value="500000">$500K+</option>
             <option value="1000000">$1M+</option>
         </select>
-        <select id="eligibilityFilter" class="form-select" style="width: auto; min-width: 150px;" onchange="filterGrants()">
+        <select id="eligibilityFilter" class="form-select" style="width: auto; min-width: 150px;" onchange="filterGrants()" aria-label="Filter by eligibility type">
             <option value="">All Eligibility</option>
             <option value="Small Business">Small Business</option>
             <option value="Nonprofit">Nonprofit</option>
@@ -126,7 +126,7 @@
                 </button>
             {% endif %}
             
-            <a href="/grant-info/{{ grant.id }}" class="btn btn-ghost" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+            <a href="/grant-info/{{ grant.id }}" class="btn btn-ghost" style="padding: 0.5rem 1rem; font-size: 0.85rem;" aria-label="View details for {{ grant.title }}">
                 Details →
             </a>
         </div>
@@ -135,26 +135,26 @@
 </div>
 
 <!-- Request Template Modal -->
-<div id="templateModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+<div id="templateModal" role="dialog" aria-modal="true" aria-labelledby="templateModalTitle" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
     <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; max-width: 500px; width: 90%;">
-        <h3 style="margin-bottom: 1rem;">Request Template</h3>
+        <h3 id="templateModalTitle" style="margin-bottom: 1rem;">Request Template</h3>
         <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
             Don't see a template for this grant? Let us know and we'll build one!
         </p>
-        <form method="POST" action="/api/request-template">
+        <form method="POST" action="/api/request-template" role="form" aria-label="Request a grant template">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" id="modalGrantId" name="grant_id" value="">
             <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Grant</label>
-                <input type="text" id="modalGrantTitle" readonly style="width: 100%; padding: 0.75rem; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary);">
+                <label for="modalGrantTitle" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Grant</label>
+                <input type="text" id="modalGrantTitle" readonly aria-label="Selected grant name" style="width: 100%; padding: 0.75rem; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary);">
             </div>
             <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Your Email</label>
-                <input type="email" name="email" required placeholder="you@company.com" style="width: 100%; padding: 0.75rem; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary);">
+                <label for="modalEmail" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Your Email</label>
+                <input type="email" id="modalEmail" name="email" required aria-required="true" placeholder="you@company.com" style="width: 100%; padding: 0.75rem; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary);">
             </div>
             <div style="display: flex; gap: 1rem;">
                 <button type="submit" class="btn btn-primary" style="flex: 1;">Submit Request</button>
-                <button type="button" onclick="closeModal()" class="btn btn-secondary" style="flex: 1;">Cancel</button>
+                <button type="button" onclick="closeModal()" class="btn btn-secondary" style="flex: 1;" aria-label="Close template request dialog">Cancel</button>
             </div>
         </form>
     </div>

@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1>Edit: {{ section.replace('_', ' ').title() }}</h1>
-<p><a href="/grant/{{ grant.id }}">← Back to Grant</a></p>
+<p><a href="/grant/{{ grant.id }}" aria-label="Back to grant detail page">← Back to Grant</a></p>
 
 {% if section_guidance %}
 <div class="card" style="background: #fff3cd; border-color: #ffc107; margin-bottom: 1rem;">
@@ -23,9 +23,9 @@
 {% endif %}
 
 <div class="card">
-    <form method="POST">
+    <form method="POST" role="form" aria-label="Edit grant section content">
         <label for="content">{{ section.replace('_', ' ').title() }} Content</label>
-        <textarea id="content" name="content" class="form-textarea" style="min-height: 400px;">{{ content }}</textarea>
+        <textarea id="content" name="content" class="form-textarea" aria-label="Section content editor" style="min-height: 400px;">{{ content }}</textarea>
         <div id="content-counter" style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 1rem 0;"></div>
 
         <div style="display: flex; gap: 1rem;">

@@ -33,10 +33,10 @@
     <!-- Send Test Email -->
     <div class="card">
         <h2 class="card-title">🧪 Send Test Email</h2>
-        <form action="/admin/emails/send-test" method="POST">
+        <form action="/admin/emails/send-test" method="POST" role="form" aria-label="Send test email">
             <div class="form-group">
-                <label>Recipient Email</label>
-                <input type="email" name="email" required placeholder="test@example.com">
+                <label for="emailTestRecipient">Recipient Email</label>
+                <input type="email" id="emailTestRecipient" name="email" required aria-required="true" placeholder="test@example.com">
             </div>
             <input type="hidden" name="template" value="welcome">
             <button type="submit" class="btn btn-primary">Send Test</button>

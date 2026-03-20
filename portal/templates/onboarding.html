@@ -410,9 +410,9 @@
 <body>
     <div class="app-layout">
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside class="sidebar" role="navigation" aria-label="Main navigation">
             <div class="sidebar-logo">
-                <div class="sidebar-logo-icon"><img src="/static/images/gp_logo.png" alt="Grant Pro" style="width:36px;height:36px;object-fit:contain;border-radius:8px;"></div>
+                <div class="sidebar-logo-icon"><img src="/static/images/gp_logo.png" alt="Grant Pro logo" style="width:36px;height:36px;object-fit:contain;border-radius:8px;"></div>
                 <span class="sidebar-logo-text">Grant Pro</span>
             </div>
             
@@ -456,12 +456,12 @@
         </aside>
         
         <!-- Main Content -->
-        <main class="main-content">
+        <main class="main-content" role="main">
             <div class="flash-messages">
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
-                            <div class="flash flash-{{ category }}">{{ message }}</div>
+                            <div class="flash flash-{{ category }}" role="status">{{ message }}</div>
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
@@ -475,7 +475,7 @@
                 </p>
             </div>
             
-            <form method="POST" action="/onboarding">
+            <form method="POST" action="/onboarding" role="form" aria-label="Organization profile">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 
                 <!-- Section 1: Federal Identifiers -->
@@ -777,7 +777,7 @@
                                     <option value="completed" {% if grant.status == 'completed' %}selected{% endif %}>Completed</option>
                                     <option value="active" {% if grant.status == 'active' %}selected{% endif %}>Active</option>
                                 </select>
-                                <button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>
+                                <button type="button" class="remove-btn" aria-label="Remove this past grant" onclick="this.parentElement.remove()">×</button>
                             </div>
                             {% endfor %}
                         {% endif %}
@@ -811,7 +811,7 @@
                     <option value="completed">Completed</option>
                     <option value="active">Active</option>
                 </select>
-                <button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>
+                <button type="button" class="remove-btn" aria-label="Remove this past grant" onclick="this.parentElement.remove()">×</button>
             `;
             container.appendChild(div);
         }

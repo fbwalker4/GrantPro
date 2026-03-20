@@ -73,5 +73,45 @@
             <button type="submit" class="btn btn-primary">Save Preferences</button>
         </form>
     </div>
+
+    <div class="card">
+        <h2>Deadline Reminders</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">Choose when to receive reminders before grant deadlines.</p>
+        <form method="POST">
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="notify_deadlines" {% if profile.notify_deadlines %}checked{% endif %}>
+                    Enable deadline reminders
+                </label>
+            </div>
+            <div class="form-group" style="margin-top: 1rem;">
+                <label class="form-label">Remind me before deadlines:</label>
+                {% set active_days = (profile.reminder_days or '7,3,1').split(',') %}
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" name="reminder_days" value="30" {% if '30' in active_days %}checked{% endif %}>
+                        30 days before
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" name="reminder_days" value="14" {% if '14' in active_days %}checked{% endif %}>
+                        14 days before
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" name="reminder_days" value="7" {% if '7' in active_days %}checked{% endif %}>
+                        7 days before
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" name="reminder_days" value="3" {% if '3' in active_days %}checked{% endif %}>
+                        3 days before
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" name="reminder_days" value="1" {% if '1' in active_days %}checked{% endif %}>
+                        1 day before
+                    </label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Save Reminder Settings</button>
+        </form>
+    </div>
 </div>
 {% endblock %}

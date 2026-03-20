@@ -5,9 +5,9 @@
 {% block content %}
 <div style="min-height: 60vh; display: flex; align-items: center; justify-content: center; padding: 2rem;">
     <div class="card" style="max-width: 500px; text-align: center;">
-        <div style="font-size: 4rem; margin-bottom: 1rem;">{{ icon }}</div>
+        <div style="font-size: 4rem; margin-bottom: 1rem;" aria-hidden="true">{{ icon }}</div>
         <h1 style="margin-bottom: 1rem;">{{ title }}</h1>
-        <p style="color: var(--text-secondary); margin-bottom: 2rem;">{{ message }}</p>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;" role="status">{{ message }}</p>
         <a href="/" class="btn btn-primary">Go to Homepage</a>
     </div>
 </div>

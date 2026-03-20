@@ -8,7 +8,7 @@
         <h1 class="page-title">👥 Lead Management</h1>
         <p class="page-subtitle">Manage email subscribers and leads</p>
     </div>
-    <a href="/admin/export-leads" class="btn btn-primary">📥 Export CSV</a>
+    <a href="/admin/export-leads" class="btn btn-primary" aria-label="Export leads as CSV file">📥 Export CSV</a>
 </div>
 
 <!-- Stats -->
@@ -64,7 +64,7 @@
                     </td>
                     <td style="color: var(--text-muted);">{{ lead.created_at[:19] if lead.created_at else '-' }}</td>
                     <td>
-                        <a href="mailto:{{ lead.email }}" class="btn btn-ghost btn-sm">✉️ Email</a>
+                        <a href="mailto:{{ lead.email }}" class="btn btn-ghost btn-sm" aria-label="Send email to {{ lead.email }}">✉️ Email</a>
                         <a href="/admin/leads/delete/{{ lead.id }}" class="btn btn-ghost btn-sm" style="color: var(--accent-warning);" onclick="return confirm('Delete this lead?')">Delete</a>
                     </td>
                 </tr>
@@ -85,10 +85,10 @@
 <div class="grid-2" style="margin-top: 2rem;">
     <div class="card">
         <h3 class="card-title">📧 Email All Leads</h3>
-        <form action="/admin/emails/send-test" method="POST">
+        <form action="/admin/emails/send-test" method="POST" role="form" aria-label="Send test email">
             <div class="form-group">
-                <label>Send test to yourself, then forward</label>
-                <input type="email" name="email" placeholder="your@email.com" required>
+                <label for="leadTestEmail">Send test to yourself, then forward</label>
+                <input type="email" id="leadTestEmail" name="email" placeholder="your@email.com" required aria-required="true">
             </div>
             <input type="hidden" name="template" value="welcome">
             <button type="submit" class="btn btn-primary">Send Test Email</button>

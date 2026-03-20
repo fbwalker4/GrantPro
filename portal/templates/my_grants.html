@@ -8,8 +8,14 @@
     .my-grant-card p { color: var(--text-secondary); font-size: 0.9rem; }
     .status-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
     .status-draft { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
+    .status-research { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
+    .status-assigned { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
+    .status-in_progress { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
     .status-submitted { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
     .status-funded { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .status-rejected { background: rgba(220, 38, 38, 0.2); color: #f87171; }
+    .submission-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; }
+    .submission-meta span { margin-right: 1rem; }
 </style>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
@@ -25,15 +31,35 @@
     <div class="my-grant-card">
         <div style="display: flex; justify-content: space-between; align-items: start;">
             <div>
-                <h3>{{ item.grant.title }}</h3>
-                <p>{{ item.grant.agency }}</p>
-                <p style="margin-top: 0.5rem;">Amount: ${{ "{:,.0f}".format(item.grant.amount_min) }} - ${{ "{:,.0f}".format(item.grant.amount_max) }}</p>
-                <p>Deadline: {{ item.grant.deadline }}</p>
+                <h3>{{ item.grant_name or 'Untitled Grant' }}</h3>
+                <p>{{ item.agency }}</p>
+                <p style="margin-top: 0.5rem;">Amount: ${{ "{:,.0f}".format(item.amount or 0) }}</p>
+                <p>Deadline: {{ item.deadline or 'N/A' }}</p>
+                {% if item.status == 'submitted' %}
+                <div class="submission-meta">
+                    {% if item.submission_date %}<span>Submitted: {{ item.submission_date }}</span>{% endif %}
+                    {% if item.confirmation_number %}<span>Conf #: {{ item.confirmation_number }}</span>{% endif %}
+                    {% if item.portal_used %}<span>Via: {{ item.portal_used }}</span>{% endif %}
+                </div>
+                {% elif item.status == 'funded' %}
+                <div class="submission-meta">
+                    {% if item.amount_funded %}<span>Funded: ${{ "{:,.2f}".format(item.amount_funded) }}</span>{% endif %}
+                    {% if item.notification_date %}<span>Notified: {{ item.notification_date }}</span>{% endif %}
+                </div>
+                {% elif item.status == 'rejected' %}
+                <div class="submission-meta">
+                    {% if item.notification_date %}<span>Notified: {{ item.notification_date }}</span>{% endif %}
+                    {% if item.rejection_reason %}<span>Reason: {{ item.rejection_reason }}</span>{% endif %}
+                </div>
+                {% endif %}
             </div>
             <span class="status-badge status-{{ item.status }}">{{ item.status }}</span>
         </div>
-        <div style="margin-top: 1rem;">
-            <a href="/grant/{{ item.grant.id }}" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">View Application</a>
+        <div style="margin-top: 1rem; display: flex; gap: 0.5rem; align-items: center;">
+            <a href="/grant/{{ item.id }}" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">View Application</a>
+            <form method="POST" action="/grant/{{ item.id }}/clone" style="display: inline;">
+                <button type="submit" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.75rem;" title="Clone this grant">📋 Clone</button>
+            </form>
         </div>
     </div>
     {% endfor %}

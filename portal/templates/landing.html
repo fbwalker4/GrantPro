@@ -825,30 +825,30 @@
     var hamburger=document.getElementById('hamburger');
     var mobileNav=document.getElementById('mobileNav');
     if(hamburger&&mobileNav){
-        hamburger.onclick=function(){mobileNav.classList.toggle('open');};
-        document.querySelectorAll('#mobileNav a').forEach(function(a){a.onclick=function(){mobileNav.classList.remove('open');};});
+        hamburger.onclick=function(){mobileNav.classList.toggle('open');hamburger.setAttribute('aria-expanded',mobileNav.classList.contains('open'));};
+        document.querySelectorAll('#mobileNav a').forEach(function(a){a.onclick=function(){mobileNav.classList.remove('open');hamburger.setAttribute('aria-expanded','false');};});
     }
 })();
 </script>
-    <header class="header">
+    <header class="header" role="banner">
         <div class="header-inner">
-            <a href="/" class="logo">
+            <a href="/" class="logo" aria-label="Grant Pro home">
                 <div class="logo-icon">
-                    <img src="/static/images/gp_logo.png" alt="Grant Pro" style="width:44px;height:44px;object-fit:contain;border-radius:8px;background:rgba(37,99,235,0.08);padding:4px;">
+                    <img src="/static/images/gp_logo.png" alt="Grant Pro logo" style="width:44px;height:44px;object-fit:contain;border-radius:8px;background:rgba(37,99,235,0.08);padding:4px;">
                 </div>
                 <span class="logo-text">Grant Pro</span>
             </a>
-            <nav class="nav">
+            <nav class="nav" role="navigation" aria-label="Main navigation">
                 <a href="#features">Features</a>
                 <a href="#how-it-works">How It Works</a>
                 <a href="#pricing">Pricing</a>
                 <a href="/login" class="nav-btn">Sign In</a>
             </nav>
-            <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+            <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileNav">
                 <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
         </div>
-        <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav" id="mobileNav" role="navigation" aria-label="Mobile navigation">
             <a href="#features">Features</a>
             <a href="#how-it-works">How It Works</a>
             <a href="#pricing">Pricing</a>
@@ -856,6 +856,7 @@
         </div>
     </header>
     
+    <main>
     <section class="hero">
         <div class="hero-content">
             <div class="hero-badge">Grant Writing Software for Everyone</div>
@@ -1270,7 +1271,8 @@
         </div>
     </section>
     
-    <footer>
+    </main>
+    <footer role="contentinfo">
         <div style="max-width: 1200px; margin: 0 auto; padding: 2rem; text-align: center;">
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; text-align: left; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
                 <!-- Column 1: About -->

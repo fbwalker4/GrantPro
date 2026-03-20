@@ -21,11 +21,11 @@
     <h2 class="card-title">Select a Client</h2>
     
     {% if clients %}
-    <form method="POST">
+    <form method="POST" role="form" aria-label="Select client for grant application">
         <div style="display: grid; gap: 1rem;">
             {% for client in clients %}
             <label style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; border: 2px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                <input type="radio" name="client_id" value="{{ client.id }}" required style="margin-top: 0.25rem;">
+                <input type="radio" name="client_id" value="{{ client.id }}" required aria-required="true" style="margin-top: 0.25rem;">
                 <div>
                     <div style="font-weight: 600;">{{ client.organization_name }}</div>
                     <div style="font-size: 0.9rem; color: var(--text-secondary);">

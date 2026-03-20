@@ -16,7 +16,7 @@
         <h2>Contact Info</h2>
         <p><strong>Contact:</strong> {{ client.contact_name }}</p>
         <p><strong>Email:</strong> {{ client.contact_email }}</p>
-        <p><strong>Status:</strong> <span class="status-badge status-{{ client.status }}">{{ client.status }}</span></p>
+        <p><strong>Status:</strong> <span class="status-badge status-{{ client.status }}" role="status">{{ client.status }}</span></p>
         <p><strong>Stage:</strong> {{ client.current_stage }}</p>
         <p><strong>Created:</strong> {{ client.created_at[:10] }}</p>
     </div>
@@ -39,7 +39,7 @@
                     <td><a href="/grant/{{ grant.id }}">{{ grant.grant_name }}</a></td>
                     <td>{{ grant.agency }}</td>
                     <td>${{ "{:,.0f}".format(grant.amount) }}</td>
-                    <td><span class="status-badge status-{{ grant.status }}">{{ grant.status }}</span></td>
+                    <td><span class="status-badge status-{{ grant.status }}" role="status">{{ grant.status }}</span></td>
                 </tr>
                 {% endfor %}
             </tbody>
