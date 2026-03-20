@@ -675,6 +675,7 @@
     <script async src="https://cdn.userway.org/widget.js#account=demo"></script>
 </head>
 <body>
+    <a href="#main-content" class="sr-only" style="position:absolute;left:-9999px;top:0;z-index:9999;padding:0.5rem 1rem;background:var(--accent-primary);color:white;text-decoration:none;" onfocus="this.style.left='0'" onblur="this.style.left='-9999px'">Skip to main content</a>
     <!-- Mobile hamburger button -->
     <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">
         <span></span>
@@ -686,14 +687,14 @@
 
     <div class="app-layout">
         <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
+        <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
             <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close menu">&times;</button>
             <div class="sidebar-logo">
                 <div class="sidebar-logo-icon"><img src="/static/images/gp_logo.png" alt="Grant Pro" style="width:36px;height:36px;object-fit:contain;border-radius:8px;"></div>
                 <span class="sidebar-logo-text">Grant Pro</span>
             </div>
             
-            <nav class="nav-section">
+            <nav class="nav-section" aria-label="Main">
                 <div class="nav-section-title">Main</div>
                 <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">
                     <span class="nav-link-icon">🏠</span>
@@ -709,7 +710,7 @@
                 </a>
             </nav>
             
-            <nav class="nav-section">
+            <nav class="nav-section" aria-label="Manage">
                 <div class="nav-section-title">Manage</div>
                 {% if user and user.plan in ['monthly', 'annual', 'enterprise'] %}
                 <a href="/clients" class="nav-link {% if request.path.startswith('/client') %}active{% endif %}">
@@ -727,7 +728,7 @@
                 </a>
             </nav>
             
-            <nav class="nav-section">
+            <nav class="nav-section" aria-label="Tools">
                 <div class="nav-section-title">Tools</div>
                 <a href="/eligibility" class="nav-link {% if request.path == '/eligibility' %}active{% endif %}">
                     <span class="nav-link-icon">✓</span>
@@ -758,7 +759,7 @@
         </aside>
         
         <!-- Main Content -->
-        <main class="main-content">
+        <main class="main-content" role="main" id="main-content">
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
