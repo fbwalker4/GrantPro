@@ -28,6 +28,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger('grantpro')
 
+
+def safe_int(value, default=0):
+    """Safely convert form input to int, returning default on failure."""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
 # Import grant researcher
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / "research"))
@@ -735,8 +743,8 @@ def profile():
             'bio': request.form.get('bio', ''),
             'interests': request.form.get('interests', ''),
             'eligible_entities': request.form.get('eligible_entities', ''),
-            'funding_amount_min': int(request.form.get('funding_amount_min', 0)) or None,
-            'funding_amount_max': int(request.form.get('funding_amount_max', 0)) or None,
+            'funding_amount_min': safe_int(request.form.get('funding_amount_min', 0)) or None,
+            'funding_amount_max': safe_int(request.form.get('funding_amount_max', 0)) or None,
             'preferred_categories': request.form.get('preferred_categories', ''),
             'notify_deadlines': 1 if request.form.get('notify_deadlines') else 0,
             'notify_new_grants': 1 if request.form.get('notify_new_grants') else 0,
@@ -2534,8 +2542,8 @@ def admin_grants(action=None):
             'title': request.form.get('title'),
             'agency': request.form.get('agency'),
             'category': request.form.get('category'),
-            'amount_min': int(request.form.get('amount_min', 0)),
-            'amount_max': int(request.form.get('amount_max', 0)),
+            'amount_min': safe_int(request.form.get('amount_min', 0)),
+            'amount_max': safe_int(request.form.get('amount_max', 0)),
             'deadline': request.form.get('deadline'),
             'description': request.form.get('description'),
             'eligibility': request.form.get('eligibility'),
@@ -2554,8 +2562,8 @@ def admin_grants(action=None):
             'title': request.form.get('title'),
             'agency': request.form.get('agency'),
             'category': request.form.get('category'),
-            'amount_min': int(request.form.get('amount_min', 0)),
-            'amount_max': int(request.form.get('amount_max', 0)),
+            'amount_min': safe_int(request.form.get('amount_min', 0)),
+            'amount_max': safe_int(request.form.get('amount_max', 0)),
             'deadline': request.form.get('deadline'),
             'description': request.form.get('description'),
             'eligibility': request.form.get('eligibility'),
