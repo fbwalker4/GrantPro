@@ -165,7 +165,7 @@ def handle_checkout_complete(session):
         subscription = stripe.Subscription.retrieve(subscription_id)
         plan_interval = subscription['items']['data'][0]['price']['recurring']['interval']
         plan_type = 'monthly' if plan_interval == 'month' else 'annual'
-    except:
+    except Exception:
         plan_type = 'monthly'  # Default
     
     # Update user in database
@@ -177,7 +177,7 @@ def handle_checkout_complete(session):
     try:
         current_period_end = datetime.fromtimestamp(subscription['current_period_end'])
         sub_end = current_period_end.isoformat()
-    except:
+    except (KeyError, TypeError, ValueError, OSError):
         sub_end = None
     
     c.execute('''UPDATE users SET 
@@ -211,7 +211,7 @@ def handle_subscription_update(subscription):
     try:
         current_period_end = datetime.fromtimestamp(subscription['current_period_end'])
         sub_end = current_period_end.isoformat()
-    except:
+    except (KeyError, TypeError, ValueError, OSError):
         sub_end = None
     
     conn = sqlite3.connect(str(DB_PATH))

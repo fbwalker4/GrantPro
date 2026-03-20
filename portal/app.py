@@ -513,9 +513,9 @@ def payment_success():
                     plan = session.get('metadata', {}).get('plan', 'monthly')
                     flash(f'Payment successful! You are now on the {plan.title()} plan.', 'success')
                     return render_template('payment_success.html', user=user, plan=plan)
-        except:
-            pass
-    
+        except Exception as e:
+            app.logger.warning(f'Stripe session verification failed: {e}')
+
     flash('Payment successful!', 'success')
     return redirect(url_for('dashboard'))
 
@@ -617,9 +617,9 @@ def forgot_password():
         email = request.form.get('email')
         token = user_models.create_password_reset(email)
         if token:
-            flash(f'Password reset link sent to {email} (demo mode - token: {token[:20]}...)', 'info')
-        else:
-            flash('If that email exists, a reset link has been sent', 'info')
+            app.logger.info(f'Password reset token generated for {email}')
+        # Same message whether email exists or not (prevents email enumeration)
+        flash('If that email exists, a password reset link has been sent.', 'info')
         return redirect(url_for('login'))
     
     return render_template('forgot_password.html')
@@ -1835,8 +1835,8 @@ def generate_section_content(grant_id, section_id):
     if grant_intake:
         try:
             client_info = json.loads(grant['intake_data'])
-        except:
-            pass
+        except (json.JSONDecodeError, TypeError) as e:
+            app.logger.warning(f'Failed to parse intake data for grant {grant.get("id")}: {e}')
     
     # Build prompt for AI - include ALL grant-specific info
     agency = grant['agency'] if 'agency' in grant.keys() and grant['agency'] else 'Unknown'
@@ -1857,8 +1857,8 @@ def generate_section_content(grant_id, section_id):
             if rg.get('name') == grant_name or rg.get('id') == grant.get('id'):
                 research_grant_info = rg
                 break
-    except:
-        pass
+    except Exception as e:
+        app.logger.warning(f'Research grant lookup failed: {e}')
     
     if research_grant_info:
         amount_min = research_grant_info.get('amount_min', amount_val)
