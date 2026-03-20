@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}All Grants - Grant Writer Pro{% endblock %}
+{% block title %}All Grants - Grant Pro{% endblock %}
 
 {% block content %}
 <div class="page-header">
@@ -111,7 +111,7 @@
             {% if grant.template and grant.template != 'generic' %}
                 <span class="badge badge-purple">📝 Template Available</span>
                 {% if user and user.plan in ['monthly', 'annual', 'enterprise'] %}
-                <a href="/grant/{{ grant.id }}/apply" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                <a href="/start-grant/{{ grant.id }}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
                     Apply Now →
                 </a>
                 {% else %}
