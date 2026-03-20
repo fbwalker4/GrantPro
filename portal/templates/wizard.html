@@ -248,7 +248,7 @@
                 headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}'},
                 body: JSON.stringify(data)
             }).then(() => {
-                window.location.href = '/grants?' + params.toString();
+                window.location.href = '/wizard/recommendations?' + params.toString();
             });
         }
     </script>

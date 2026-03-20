@@ -251,6 +251,19 @@ def login_required(f):
     return decorated_function
 
 
+def paid_required(f):
+    """Decorator to require a paid subscription plan. Must be applied AFTER @login_required."""
+    from functools import wraps
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user = get_current_user()
+        if not user or user.get('plan') not in ('monthly', 'annual', 'enterprise'):
+            flash('This feature requires a paid plan. Upgrade to get started.', 'info')
+            return redirect(url_for('upgrade'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 def admin_required(f):
     """Decorator to require admin role. Must be applied AFTER @login_required."""
     from functools import wraps
@@ -326,7 +339,9 @@ def inject_user():
 
 @app.route('/')
 def index():
-    """Landing page"""
+    """Landing page - redirect logged-in users to dashboard"""
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
     return render_template('landing.html')
 
 
@@ -456,8 +471,11 @@ def signup():
                 session['selected_plan'] = selected_plan
                 return redirect(url_for('payment_checkout'))
             else:
-                flash('Account created! Please log in.', 'success')
-                return redirect(url_for('login'))
+                # Auto-login and send to onboarding
+                session['user_id'] = user_id
+                session['user_name'] = first_name or email
+                flash('Welcome to Grant Pro! Let\'s set up your organization profile.', 'success')
+                return redirect(url_for('onboarding'))
     
     return render_template('signup.html', plan=plan)
 
@@ -1528,6 +1546,7 @@ def grant_info(grant_id):
 # Start application - select client
 @app.route('/start-grant/<grant_id>', methods=['GET', 'POST'])
 @login_required
+@paid_required
 @csrf_required
 def start_application(grant_id):
     """Select a client to assign this grant to"""
@@ -1553,11 +1572,36 @@ def start_application(grant_id):
     conn.close()
     
     if not clients:
-        flash('You need to add a client first', 'warning')
-        return redirect(url_for('new_client'))
+        # Auto-create a "self" client for non-enterprise users
+        user = get_current_user()
+        org_name = user.get('organization_name') or f"{user.get('first_name', '')} {user.get('last_name', '')}".strip() or 'My Organization'
+        self_client_id = f"client-self-{user_id}"
+        conn2 = get_db()
+        conn2.execute(
+            'INSERT OR IGNORE INTO clients (id, user_id, organization_name, contact_name, email, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+            (self_client_id, user_id, org_name,
+             f"{user.get('first_name', '')} {user.get('last_name', '')}".strip(),
+             user.get('email', ''), datetime.now().isoformat())
+        )
+        conn2.commit()
+        conn2.close()
+        # Re-fetch clients
+        conn = get_db()
+        clients = conn.execute(
+            'SELECT * FROM clients WHERE user_id = ? ORDER BY organization_name',
+            (user_id,)
+        ).fetchall()
+        conn.close()
     
-    if request.method == 'POST':
-        client_id = request.form.get('client_id')
+    # Auto-select if only one client (skip selection page)
+    if len(clients) == 1 and request.method == 'GET':
+        from werkzeug.datastructures import ImmutableMultiDict
+        # Simulate POST with the single client
+        request_client_id = dict(clients[0])['id'] if isinstance(clients[0], sqlite3.Row) else clients[0][0]
+        # Redirect as POST by setting client_id and falling through
+
+    if request.method == 'POST' or (len(clients) == 1 and request.method == 'GET'):
+        client_id = request.form.get('client_id') if request.method == 'POST' else (dict(clients[0])['id'] if isinstance(clients[0], sqlite3.Row) else clients[0][0])
         if not client_id:
             flash('Please select a client', 'error')
             return redirect(url_for('start_application', grant_id=grant_id))
@@ -1808,6 +1852,7 @@ def sanitize_for_prompt(value, max_length=2000):
 @app.route('/grant/<grant_id>/generate/<section_id>', methods=['POST'])
 @require_rate_limit(endpoint='generate_section', max_requests=10, window=60)
 @login_required
+@paid_required
 @csrf_required
 def generate_section_content(grant_id, section_id):
     """Generate AI content for a grant section"""
@@ -2110,6 +2155,7 @@ Tips for this section:
 
 @app.route('/grant/<grant_id>/guided')
 @login_required
+@paid_required
 def guided_submission(grant_id):
     """Guided submission mode - split view with instructions"""
     # Check ownership
@@ -2164,6 +2210,7 @@ def guided_submission(grant_id):
 
 @app.route('/grant/<grant_id>/download/<fmt>')
 @login_required
+@paid_required
 def download_grant(grant_id, fmt):
     """Download grant as PDF or DOCX"""
     # Check ownership
