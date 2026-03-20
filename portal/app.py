@@ -553,7 +553,7 @@ def subscription_manage():
 @csrf_required
 def subscription_cancel():
     """Cancel subscription"""
-    user = user_models.get_user_id(session['user_id'])
+    user = user_models.get_user_by_id(session['user_id'])
     
     success, message = stripe_payment.cancel_subscription(user['id'])
     

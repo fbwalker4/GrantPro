@@ -12,6 +12,16 @@ from pathlib import Path
 
 DB_PATH = Path.home() / ".hermes" / "grant-system" / "tracking" / "grants.db"
 
+# Column order must match the CREATE TABLE + ALTER TABLE schema exactly
+USER_COLUMNS = [
+    'id', 'email', 'password_hash', 'first_name', 'last_name',
+    'organization_name', 'organization_type', 'phone', 'role',
+    'verified', 'verification_token', 'created_at', 'updated_at',
+    'last_login', 'plan', 'grants_this_month', 'max_grants_per_month',
+    'subscription_status', 'stripe_customer_id', 'stripe_subscription_id',
+    'subscription_start', 'subscription_end', 'onboarding_completed'
+]
+
 def init_user_db():
     """Initialize user-related database tables"""
     conn = sqlite3.connect(str(DB_PATH))
@@ -219,7 +229,7 @@ def get_user_by_email(email):
     conn.close()
     
     if row:
-        return dict(zip(['id', 'email', 'password_hash', 'first_name', 'last_name', 'organization_name', 'organization_type', 'phone', 'role', 'verified', 'verification_token', 'created_at', 'updated_at', 'last_login', 'plan', 'grants_this_month', 'max_grants_per_month', 'onboarding_completed'], row))
+        return dict(zip(USER_COLUMNS, row))
     return None
 
 
@@ -230,9 +240,9 @@ def get_user_by_id(user_id):
     c.execute('SELECT * FROM users WHERE id = ?', (user_id,))
     row = c.fetchone()
     conn.close()
-    
+
     if row:
-        return dict(zip(['id', 'email', 'password_hash', 'first_name', 'last_name', 'organization_name', 'organization_type', 'phone', 'role', 'verified', 'verification_token', 'created_at', 'updated_at', 'last_login', 'plan', 'grants_this_month', 'max_grants_per_month', 'onboarding_completed'], row))
+        return dict(zip(USER_COLUMNS, row))
     return None
 
 
