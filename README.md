@@ -1,10 +1,48 @@
-# Grant Pro - AI Grant Writing System
+# GrantPro - AI-Powered Grant Writing System
 
-An end-to-end local grant writing system powered by AI. Built for consultants, agencies, and organizations who write federal grants.
+An end-to-end grant writing platform powered by Google Gemini AI. Built for consultants, nonprofits, agencies, and small businesses who write federal grants.
 
-**Website**: https://grantpro.org  
-**Local Server**: http://localhost:5001  
+**Website**: https://grantpro.org
+**Local Server**: http://localhost:5001
 **Business**: Futurespec Consulting, LLC
+
+---
+
+## Table of Contents
+
+1. [Project Overview](#project-overview)
+2. [Architecture Overview](#architecture-overview)
+3. [Tech Stack](#tech-stack)
+4. [Database Schema](#database-schema)
+5. [Route Map](#route-map)
+6. [Features](#features)
+7. [Template System](#template-system)
+8. [Subscription Model](#subscription-model)
+9. [Environment Variables](#environment-variables)
+10. [Getting Started](#getting-started)
+11. [Production Deployment](#production-deployment)
+12. [Security](#security)
+13. [File Reference](#file-reference)
+14. [Changelog](#changelog)
+
+---
+
+## Project Overview
+
+GrantPro is a self-hosted web application that helps users discover, write, and submit federal grant applications. It combines a database of 131 federal grant opportunities with 21 agency-specific templates and AI-powered content generation to guide users through the entire grant lifecycle -- from research to submission tracking.
+
+### Who It's For
+
+| Audience | Use Case | Recommended Plan |
+|----------|----------|------------------|
+| **Consultants** | Write grants for multiple clients | Enterprise |
+| **Government agencies** | In-house grant writers | Monthly or Annual |
+| **Nonprofits** | Write their own grants | Free (research) / Monthly (writing) |
+| **Small businesses** | SBIR/STTR grants | Monthly or Annual |
+
+### Business Model
+
+Subscription SaaS at **$19.95/month** or **$199.95/year**, with a free tier for research-only access and an enterprise tier for client management. Payments processed via Stripe.
 
 ---
 
@@ -12,689 +50,1017 @@ An end-to-end local grant writing system powered by AI. Built for consultants, a
 
 ```
 ~/.hermes/grant-system/
-├── portal/                    # Flask web application
-│   ├── app.py                # Main Flask app (all routes)
-│   ├── templates/            # HTML templates
-│   └── requirements.txt      # Python dependencies
-├── core/                     # Backend logic
-│   ├── user_models.py        # User auth, subscriptions
-│   ├── grant_db.py           # Grant database operations
-│   ├── email_system.py       # Email notifications
-│   ├── stripe_payment.py     # Stripe integration
-│   ├── budget_builder.py     # Budget creation
-│   ├── deadline_reminder.py  # Cron-style reminders
-│   └── cli.py               # Command-line interface
-├── research/                 # Grant research
-│   ├── grant_researcher.py   # Grant search engine
-│   └── iot_grants_db.json   # 131 federal grants
-├── templates/                # Agency templates
-│   └── agency_templates.json # 14 agency templates
-├── tracking/                 # Data storage
-│   ├── grants.db            # SQLite (users, clients, grants)
-│   └── clients.json         # Client records
-├── docs/                     # Documentation
+├── portal/                         # Flask web application
+│   ├── app.py                      # Main Flask app (3,568 lines, all routes)
+│   ├── requirements.txt            # Python dependencies
+│   ├── static/
+│   │   └── images/
+│   │       └── gp_logo.png         # GrantPro logo
+│   └── templates/                  # 46 Jinja2 HTML templates
+│       ├── layout.html             # Base template (dark theme, nav, fonts)
+│       ├── landing.html            # Public landing page
+│       ├── about.html              # About page
+│       ├── pricing.html            # Pricing tiers
+│       ├── contact.html            # Contact form
+│       ├── login.html              # Login form
+│       ├── signup.html             # Registration form
+│       ├── forgot_password.html    # Password reset request
+│       ├── reset_password.html     # Password reset form
+│       ├── dashboard.html          # User dashboard
+│       ├── profile.html            # User profile editor
+│       ├── onboarding.html         # New user onboarding wizard
+│       ├── wizard.html             # Grant matching wizard
+│       ├── wizard_recommendations.html # Wizard results
+│       ├── eligibility.html        # Eligibility checker
+│       ├── grants.html             # Saved grants list
+│       ├── my_grants.html          # User's grant applications
+│       ├── grant_info.html         # Grant detail (research view)
+│       ├── grant_form.html         # Start a new grant application
+│       ├── grant_detail.html       # Grant application detail
+│       ├── grant_research.html     # Grant search/research
+│       ├── section_form.html       # Edit a single grant section
+│       ├── guided_submission.html  # Side-by-side submission workflow
+│       ├── paper_submission.html   # SF-424 / paper submission package
+│       ├── mark_submitted.html     # Record submission confirmation
+│       ├── select_client.html      # Client selector
+│       ├── select_client_for_grant.html # Client selector for grants
+│       ├── clients.html            # Client list
+│       ├── client_form.html        # Add/edit client
+│       ├── client_detail.html      # Client detail view
+│       ├── intake_form.html        # Client intake questionnaire
+│       ├── upgrade.html            # Plan upgrade page
+│       ├── payment_manual.html     # Manual payment instructions
+│       ├── payment_success.html    # Payment confirmation
+│       ├── list_templates.html     # Browse agency templates
+│       ├── view_template.html      # View single template
+│       ├── admin.html              # Admin dashboard
+│       ├── admin_grants.html       # Admin grant management
+│       ├── admin_templates.html    # Admin template CMS
+│       ├── admin_leads.html        # Admin leads management
+│       ├── admin_emails.html       # Admin email tools
+│       ├── terms.html              # Terms of Service
+│       ├── privacy.html            # Privacy Policy
+│       ├── refund.html             # Refund Policy
+│       ├── help.html               # FAQ / Help
+│       └── message.html            # Flash message page
+├── core/                           # Backend business logic
+│   ├── user_models.py              # User auth, profiles, subscriptions
+│   ├── grant_db.py                 # Grant/client/draft database operations
+│   ├── email_system.py             # Transactional email (Resend API)
+│   ├── stripe_payment.py           # Stripe subscription integration
+│   ├── budget_builder.py           # Budget category builder
+│   ├── deadline_reminder.py        # Deadline notification system
+│   └── cli.py                      # Command-line interface
+├── research/                       # Grant research engine
+│   ├── grant_researcher.py         # Grant search, filtering, matching
+│   ├── iot_grants_db.json          # 131 federal grant opportunities
+│   └── grants.db                   # Research SQLite database
+├── templates/                      # Agency template definitions
+│   └── agency_templates.json       # 21 agency templates (1,121 lines)
+├── tracking/                       # Data storage (SQLite databases)
+│   ├── grants.db                   # Main database (users, clients, grants, drafts)
+│   ├── users.db                    # User database
+│   ├── leads.db                    # Newsletter subscriber leads
+│   ├── email_log.db                # Email send log
+│   └── clients.json                # Legacy client records
+├── data/                           # Runtime data
+│   └── deadline_reminders.json     # Reminder state
+├── archive/                        # Archived test/utility scripts
+│   ├── check_template.py
+│   ├── fix_budget_data.py
+│   ├── list_templates.py
+│   ├── setup_test_user.py
+│   ├── simple_test.py
+│   ├── test_ai_org.py
+│   ├── test_ai.py
+│   ├── test_all_templates.py
+│   ├── test_fast.py
+│   ├── test_generic.py
+│   ├── test_quick.py
+│   ├── test_template.py
+│   └── DEPRECATED.md
+├── docs/                           # Documentation
 │   ├── competitive-analysis.md
+│   ├── comprehensive-testing-report.md
 │   └── user-testing-report.md
-└── data/                     # Runtime data
-    └── deadline_reminders.json
+├── intake/                         # Intake form template
+│   └── questionnaire.html
+├── invoices/                       # Invoice template
+│   └── template.html
+├── marketing/                      # Marketing assets
+│   └── landing-page.html
+├── documents/                      # Uploaded documents (empty)
+├── drafts/                         # Draft exports (empty)
+├── output/                         # Generated file output (empty)
+├── reviews/                        # Grant reviews (empty)
+├── AI_PROMPTS.md                   # AI prompt templates per section
+├── INTAKE_QUESTIONS.md             # 37 client intake questions
+├── DOCUMENT_CHECKLIST.md           # Required docs per grant type
+├── AGREEMENT.md                    # Client service agreement
+├── TRACKING.md                     # Pipeline stage definitions
+├── README.md                       # This file
+└── .gitignore                      # Git ignore rules
 ```
 
 ---
 
-## Tech Stack Decisions
+## Tech Stack
 
-### Why This Stack?
+| Layer | Technology | Version / Notes |
+|-------|-----------|-----------------|
+| **Language** | Python 3.x | 3.10+ recommended |
+| **Web framework** | Flask | >= 2.3.0 |
+| **Database** | SQLite | Local file-based, zero config |
+| **AI engine** | Google Gemini | via `google-genai` >= 1.0.0 |
+| **Payments** | Stripe | via `stripe` >= 5.0.0 |
+| **PDF generation** | ReportLab | >= 4.0.0 (SF-424 forms, paper packages) |
+| **DOCX generation** | python-docx | >= 0.8.0 |
+| **HTTP client** | Requests | >= 2.28.0 |
+| **Email** | Resend API | Optional; console fallback in dev |
+| **Templating** | Jinja2 | Bundled with Flask |
+| **Fonts** | Inter + Playfair Display | Google Fonts CDN |
+| **CSS** | Custom dark theme | CSS custom properties, no framework |
+| **JavaScript** | Vanilla JS only | No React/Vue/Angular |
+| **Auth** | Custom PBKDF2 | 100,000 iterations, SHA-256 |
 
-| Component | Choice | Rationale |
-|-----------|--------|------------|
-| **Backend** | Flask (Python) | Lightweight, easy to modify, no JS framework bloat |
-| **Database** | SQLite | Local-only, no cloud, privacy-first, zero config |
-| **AI** | Gemini via Google AI | $0 (Rusty's API key), no middleman, direct access |
-| **Auth** | Custom PBKDF2 | No third-party auth services, full control |
-| **Payments** | Stripe | Ready to use, just needs API keys |
-| **Storage** | Local filesystem | Air-gapped, no cloud dependencies |
-| **TLD** | .org | Institutional trust, cheaper than .io/.ai |
+### What Was Rejected (and Why)
 
-### What We Rejected
-
-- **Supabase/Firebase**: Too much vendor lock-in
-- **PostgreSQL**: Overkill for local use
-- **OpenRouter**: Unnecessary middleman, adds latency/cost
-- **Next.js/React**: Over-engineering for this use case
-- **Auth0/Clerk**: Adds complexity, costs, third-party dependency
-
----
-
-## Theory of Use
-
-### Target Users
-
-1. **Consultants** - Write grants for clients (use Enterprise plan)
-2. **Agencies** - In-house grant writers (use Monthly/Annual)
-3. **Nonprofits** - Write their own grants (use Free tier)
-4. **Small Business** - SBIR/STTR grants (use Free to research, upgrade to submit)
-
-### User Flow
-
-```
-1. Sign Up / Login
-       ↓
-2. Search Grants (Free) OR Upgrade (for submissions)
-       ↓
-3. Use Grant Wizard → Find matching grants
-       ↓
-4. Create Client → Start Grant Application
-       ↓
-5. Guided Submission → Fill in sections with AI help
-       ↓
-6. Download as DOCX/PDF → Submit to federal portal
-```
-
-### Subscription Model
-
-| Tier | Price | Grants/Month | Features |
-|------|-------|--------------|----------|
-| Free | $0 | 0 | Search, save favorites, view templates |
-| Monthly | $19.95 | 3 | AI writing, templates, guided submission |
-| Annual | $199 | 36 | Same as monthly, save $40 |
-| Enterprise | Custom | Unlimited | White-label, API, client management |
-
-### Anti-Reseller Policy
-
-- **Base plans**: Only for your organization's grants (must be in account holder's name)
-- **Enterprise**: Required if using for clients (resale permitted)
-- **Rationale**: Prevents users from signing up and reselling access
-
----
-
-## Third-Party Services
-
-### Required to Go Live
-
-1. **Domain**: grantpro.org ($10-15/year via Namecheap/GoDaddy)
-2. **Stripe**: STRIPE_API_KEY, STRIPE_MONTHLY_PRICE_ID, STRIPE_ANNUAL_PRICE_ID
-
-### Optional
-
-- **Email**: System uses local console for dev; Resend API for production (user needs to provide key)
-
-### Already Configured
-
-- **AI**: Gemini via Google AI Studio (Rusty's API key in environment)
-
----
-
-## Features
-
-### Working Features
-
-| Feature | Status | Notes |
-|---------|--------|-------|
-| User Auth | ✅ | Signup, login, password reset |
-| Subscription Tiers | ✅ | Free/Monthly/Annual/Enterprise |
-| Grant Research | ✅ | 131 federal grants, searchable |
-| Grant Wizard | ✅ | Multi-step matching flow |
-| Templates | ✅ | 21 agency templates with sections |
-| Template Editor | ✅ | Admin CMS for templates |
-| Client Management | ✅ | Add/edit clients |
-| Grant Management | ✅ | Create, track, submit grants |
-| **Guided Submission** | ✅ | Step-by-step with copy buttons |
-| **Section-by-Section Writing** | ✅ | Edit each section with guidance |
-| **AI Content Generation** | ✅ | Generate section content with AI |
-| **Template-Ordered Sections** | ✅ | Sections in exact grant order |
-| DOCX/PDF Export | ✅ | Download grant sections |
-| Stripe Integration | ✅ | Ready (needs keys) |
-| Eligibility Checker | ✅ | Question-based filtering |
-| Deadline Reminders | ✅ | Cron-style notifications |
-| Legal Pages | ✅ | Terms, Privacy, Refund, FAQ |
-
-### Known Limitations
-
-- **Email**: Console-only in dev; needs Resend API for production
-- **SSL**: Needs reverse proxy (nginx/Caddy) for HTTPS
-- **Cron**: Deadline reminders use file-based triggers; production needs real cron
-
----
-
-## Templates
-
-### Included Templates (21)
-
-1. **NSF** - National Science Foundation (10 sections, 15 pages)
-2. **DOE** - Department of Energy (7 sections)
-3. **NIH** - National Institutes of Health (8 sections)
-4. **USDA** - Department of Agriculture (6 sections)
-5. **EPA** - Environmental Protection Agency (4 sections)
-6. **DOT** - Department of Transportation (4 sections)
-7. **NIST** - National Institute of Standards and Technology (3 sections)
-8. **NEA** - National Endowment for the Arts (5 sections)
-9. **NEA Challenge America** (4 sections)
-10. **Generic Federal Grant** (8 sections)
-11. **Artist Individual** (5 sections)
-12. **Micro-Grant** (4 sections, under $5K)
-13. **Small Business Grant** (5 sections)
-14. **Community Project** (5 sections)
-15. **Department of Education** (7 sections)
-16. **HUD** - Housing and Urban Development (7 sections)
-17. **NASA** (7 sections)
-18. **DOD** - Department of Defense (7 sections)
-19. **FEMA** (7 sections)
-20. **DOL** - Department of Labor (8 sections)
-21. **DOJ** - Department of Justice (8 sections)
-
-### How It Works
-
-1. User selects a grant from the 131 grants in the database
-2. System assigns the correct agency template based on the funding agency
-3. Grant detail page shows ALL sections in the exact order required by that agency
-4. Each section shows:
-   - Guidance text from the template
-   - Page/character limits
-   - Required badge
-   - AI Generate button to write content
-5. Guided Submission mode:
-   - Shows sections in order
-   - Copy button for each section
-   - Download as DOCX/PDF/TXT
-   - Instructions for pasting into grant portal
-
-### Template Structure
-
-Each template includes:
-- Required forms (SF424, SF424A, etc.)
-- Required sections with:
-  - Name and ID
-  - Page/character limits
-  - Detailed guidance on what to write
-  - Components (subsections)
-- CFDA number
-- Submission system (Grants.gov, etc.)
+- **Supabase/Firebase** -- vendor lock-in
+- **PostgreSQL** -- overkill for local/single-server use
+- **OpenRouter** -- unnecessary middleman for AI
+- **Next.js/React** -- over-engineering for this use case
+- **Auth0/Clerk** -- adds cost and third-party dependency
 
 ---
 
 ## Database Schema
 
-### Users Table
+All tables live in `tracking/grants.db` (main app) and `tracking/leads.db` (newsletter). SQLite with `Row` factory for dict-style access.
 
-```sql
-users (
-  id TEXT PRIMARY KEY,
-  email TEXT UNIQUE,
-  password_hash TEXT,
-  first_name, last_name,
-  organization_name, organization_type,
-  phone,
-  role TEXT DEFAULT 'user',  -- 'user' or 'admin'
-  plan TEXT DEFAULT 'free',   -- 'free', 'monthly', 'annual', 'enterprise'
-  grants_this_month INTEGER DEFAULT 0,
-  max_grants_per_month INTEGER DEFAULT 0,
-  subscription_status TEXT,
-  stripe_customer_id,
-  stripe_subscription_id,
-  created_at, updated_at, last_login
-)
-```
+### users (23 columns)
 
-### Clients Table
+| Column | Type | Default | Notes |
+|--------|------|---------|-------|
+| id | TEXT | PK | Format: `user-YYYYMMDD-HHMMSS` |
+| email | TEXT | UNIQUE NOT NULL | Login identifier |
+| password_hash | TEXT | NOT NULL | PBKDF2 `salt$hash` |
+| first_name | TEXT | | |
+| last_name | TEXT | | |
+| organization_name | TEXT | | |
+| organization_type | TEXT | | |
+| phone | TEXT | | |
+| role | TEXT | `'user'` | `'user'` or `'admin'` |
+| verified | INTEGER | | Email verification flag |
+| verification_token | TEXT | | Email verification token |
+| created_at | TEXT | | ISO 8601 |
+| updated_at | TEXT | | ISO 8601 |
+| last_login | TEXT | | ISO 8601 |
+| plan | TEXT | `'free'` | `'free'`, `'monthly'`, `'annual'`, `'enterprise'` |
+| grants_this_month | INTEGER | 0 | Usage counter |
+| max_grants_per_month | INTEGER | 0 | Plan limit (0=free, 3=paid, 999=enterprise) |
+| subscription_status | TEXT | `'inactive'` | `'active'`, `'inactive'`, `'canceled'` |
+| stripe_customer_id | TEXT | | Stripe customer ID |
+| stripe_subscription_id | TEXT | | Stripe subscription ID |
+| subscription_start | TEXT | | ISO 8601 |
+| subscription_end | TEXT | | ISO 8601 |
+| onboarding_completed | INTEGER | 0 | 1 when onboarding wizard finished |
 
-```sql
-clients (
-  id TEXT PRIMARY KEY,
-  user_id TEXT,
-  organization_name,
-  contact_name, email, phone,
-  organization_type,
-  eligible_entities TEXT,  -- JSON array
-  notes TEXT,
-  created_at
-)
-```
+### user_profiles
 
-### Grants Table
+| Column | Type | Default | Notes |
+|--------|------|---------|-------|
+| user_id | TEXT | PK, FK | References users.id |
+| bio | TEXT | | |
+| interests | TEXT | | |
+| eligible_entities | TEXT | | JSON array |
+| funding_amount_min | INTEGER | | |
+| funding_amount_max | INTEGER | | |
+| preferred_categories | TEXT | | |
+| notify_deadlines | INTEGER | 1 | |
+| notify_new_grants | INTEGER | 1 | |
+| reminder_days | TEXT | `'7,3,1'` | Comma-separated days before deadline |
 
-```sql
-grants (
-  id TEXT PRIMARY KEY,
-  user_id TEXT,
-  client_id TEXT,
-  grant_id TEXT,  -- Reference to research/iot_grants_db.json
-  agency,
-  title,
-  status TEXT,   -- 'draft', 'in_progress', 'submitted', 'funded', 'rejected'
-  amount_requested,
-  amount_funded,
-  deadline,
-  template TEXT, -- 'nsf', 'doe', etc.
-  sections TEXT, -- JSON with user-entered content
-  created_at, updated_at
-)
-```
+### organization_details
+
+| Column | Type | Default | Notes |
+|--------|------|---------|-------|
+| user_id | TEXT | PK, FK | |
+| ein | TEXT | | Employer Identification Number |
+| duns | TEXT | | DUNS number |
+| uei | TEXT | | Unique Entity Identifier |
+| address_line1 | TEXT | | |
+| address_line2 | TEXT | | |
+| city | TEXT | | |
+| state | TEXT | | |
+| zip_code | TEXT | | |
+| country | TEXT | `'USA'` | |
+| phone | TEXT | | |
+| website | TEXT | | |
+| created_at | TEXT | | |
+| updated_at | TEXT | | |
+
+### organization_profile
+
+| Column | Type | Notes |
+|--------|------|-------|
+| user_id | TEXT | PK, FK |
+| annual_revenue | TEXT | |
+| year_founded | INTEGER | |
+| employees | TEXT | |
+| organization_type | TEXT | |
+
+### mission_focus
+
+| Column | Type | Notes |
+|--------|------|-------|
+| id | INTEGER | PK, autoincrement |
+| user_id | TEXT | FK |
+| focus_area | TEXT | UNIQUE per user |
+
+### past_grant_experience
+
+| Column | Type | Notes |
+|--------|------|-------|
+| id | INTEGER | PK, autoincrement |
+| user_id | TEXT | FK |
+| grant_name | TEXT | |
+| funding_organization | TEXT | |
+| year_received | INTEGER | |
+| amount_received | INTEGER | |
+| status | TEXT | |
+
+### clients
+
+| Column | Type | Default | Notes |
+|--------|------|---------|-------|
+| id | TEXT | PK | Format: `client-YYYYMMDD-HHMMSS` |
+| user_id | TEXT | | FK to users (added via migration) |
+| organization_name | TEXT | | |
+| contact_name | TEXT | | |
+| contact_email | TEXT | | |
+| status | TEXT | `'new'` | |
+| current_stage | TEXT | `'new'` | |
+| created_at | TEXT | | |
+| updated_at | TEXT | | |
+| intake_data | TEXT | | JSON blob |
+| notes | TEXT | | |
+
+### grants
+
+| Column | Type | Default | Notes |
+|--------|------|---------|-------|
+| id | TEXT | PK | Format: `grant-YYYYMMDD-HHMMSS` |
+| client_id | TEXT | FK | References clients.id |
+| grant_name | TEXT | | |
+| agency | TEXT | | e.g., `NSF`, `DOE` |
+| amount | REAL | | Requested amount |
+| deadline | TEXT | | |
+| status | TEXT | `'research'` | `'draft'`, `'research'`, `'assigned'`, `'submitted'`, `'funded'`, `'rejected'` |
+| assigned_at | TEXT | | |
+| submitted_at | TEXT | | |
+| result | TEXT | | |
+| opportunity_number | TEXT | | Migration-added |
+| cfda | TEXT | | CFDA number, migration-added |
+| template | TEXT | | Agency template key, migration-added |
+| submission_date | TEXT | | When submitted, migration-added |
+| confirmation_number | TEXT | | Portal confirmation, migration-added |
+| portal_used | TEXT | | e.g., Grants.gov, migration-added |
+| submission_notes | TEXT | | Free-text notes, migration-added |
+| amount_funded | REAL | | Actual funded amount, migration-added |
+| rejection_reason | TEXT | | Migration-added |
+| notification_date | TEXT | | When notified of outcome, migration-added |
+
+### drafts
+
+| Column | Type | Default | Notes |
+|--------|------|---------|-------|
+| id | TEXT | PK | |
+| client_id | TEXT | FK | |
+| grant_id | TEXT | FK | References grants.id |
+| section | TEXT | | Section ID (e.g., `project_summary`) |
+| content | TEXT | | User/AI-generated content |
+| version | INTEGER | 1 | |
+| created_at | TEXT | | |
+| updated_at | TEXT | | |
+| status | TEXT | `'draft'` | |
+
+### documents
+
+| Column | Type | Default | Notes |
+|--------|------|---------|-------|
+| id | TEXT | PK | |
+| client_id | TEXT | FK | |
+| doc_type | TEXT | | |
+| file_path | TEXT | | |
+| uploaded_at | TEXT | | |
+| status | TEXT | `'pending'` | |
+
+### invoices
+
+| Column | Type | Default | Notes |
+|--------|------|---------|-------|
+| id | TEXT | PK | |
+| client_id | TEXT | FK | |
+| invoice_type | TEXT | | |
+| amount | REAL | | |
+| status | TEXT | `'pending'` | |
+| created_at | TEXT | | |
+| paid_at | TEXT | | |
+| grant_id | TEXT | | |
+
+### saved_grants
+
+| Column | Type | Notes |
+|--------|------|-------|
+| id | INTEGER | PK, autoincrement |
+| user_id | TEXT | FK, UNIQUE with grant_id |
+| grant_id | TEXT | |
+| notes | TEXT | |
+| saved_at | TEXT | |
+
+### user_applications
+
+| Column | Type | Default | Notes |
+|--------|------|---------|-------|
+| id | TEXT | PK | |
+| user_id | TEXT | FK | |
+| grant_id | TEXT | | |
+| status | TEXT | `'draft'` | |
+| progress | INTEGER | 0 | Percentage |
+| started_at | TEXT | | |
+| updated_at | TEXT | | |
+| submitted_at | TEXT | | |
+| notes | TEXT | | |
+
+### password_resets
+
+| Column | Type | Default | Notes |
+|--------|------|---------|-------|
+| email | TEXT | NOT NULL | |
+| token | TEXT | NOT NULL | |
+| created_at | TEXT | | |
+| expires_at | TEXT | | |
+| used | INTEGER | 0 | |
+
+### leads (in tracking/leads.db)
+
+| Column | Type | Default | Notes |
+|--------|------|---------|-------|
+| id | INTEGER | PK, autoincrement | |
+| email | TEXT | UNIQUE NOT NULL | |
+| created_at | TIMESTAMP | CURRENT_TIMESTAMP | |
+| status | TEXT | `'active'` | `'active'` or `'unsubscribed'` |
+| source | TEXT | `'landing_page'` | |
+
+### guest_saves (in tracking/grants.db)
+
+| Column | Type | Notes |
+|--------|------|-------|
+| id | INTEGER | PK, autoincrement |
+| session_id | TEXT | |
+| grant_id | TEXT | |
+| saved_at | TEXT | |
 
 ---
 
-## Legal & Compliance
+## Route Map
 
-### Required Disclaimers
+All routes are defined in `portal/app.py`. Decorators are listed in order of application.
 
-- **USA Only**: Service for USA-based customers only
-- **Not Legal Advice**: Not a law firm
-- **No Guarantees**: Funding not guaranteed
+### Public Routes (no auth required)
 
-### Legal Pages
+| Route | Method | Function | Decorators | Description |
+|-------|--------|----------|------------|-------------|
+| `/` | GET | `index` | -- | Landing page (redirects to dashboard if logged in) |
+| `/about` | GET | `about` | -- | About page |
+| `/pricing` | GET | `pricing` | -- | Pricing tiers page |
+| `/help`, `/faq` | GET | `help_page` | -- | FAQ / help page |
+| `/terms` | GET | `terms` | -- | Terms of Service |
+| `/privacy` | GET | `privacy` | -- | Privacy Policy |
+| `/refund` | GET | `refund` | -- | Refund Policy |
+| `/contact` | GET, POST | `contact` | csrf_required | Contact form |
+| `/unsubscribe` | GET, POST | -- | csrf_required (POST) | Email unsubscribe |
+| `/static/images/<path>` | GET | `serve_image` | -- | Static image serving |
 
-- `/terms` - Terms of Service
-- `/privacy` - Privacy Policy  
-- `/refund` - Refund Policy
-- `/help` - FAQ
+### Auth Routes
 
-### Company Info
+| Route | Method | Function | Decorators | Description |
+|-------|--------|----------|------------|-------------|
+| `/login` | GET, POST | `login` | csrf_required | User login |
+| `/signup` | GET, POST | `signup` | csrf_required | User registration |
+| `/logout` | GET | `logout` | -- | Logout (clears session) |
+| `/forgot-password` | GET, POST | `forgot_password` | csrf_required | Request password reset |
+| `/reset-password/<token>` | GET, POST | `reset_password` | csrf_required | Reset password with token |
 
-- **Name**: Futurespec Consulting, LLC
-- **Address**: [User provided address]
+### User Routes (login_required)
+
+| Route | Method | Function | Decorators | Description |
+|-------|--------|----------|------------|-------------|
+| `/dashboard` | GET | `dashboard` | login_required | User dashboard with stats |
+| `/profile` | GET, POST | `profile` | login_required, csrf_required | Edit profile and preferences |
+| `/onboarding` | GET, POST | `onboarding` | login_required, csrf_required | New user onboarding wizard |
+| `/settings` | GET | `settings` | login_required | User settings page |
+
+### Subscription & Payment Routes
+
+| Route | Method | Function | Decorators | Description |
+|-------|--------|----------|------------|-------------|
+| `/upgrade` | GET, POST | `upgrade` | login_required, csrf_required | Plan upgrade page |
+| `/payment/checkout` | GET | `payment_checkout` | login_required | Stripe checkout redirect |
+| `/payment/success` | GET | `payment_success` | login_required | Payment confirmation |
+| `/payment/cancel` | GET | `payment_cancel` | -- | Payment cancellation |
+| `/subscription/manage` | GET | `subscription_manage` | login_required | Manage subscription |
+| `/subscription/cancel` | POST | `subscription_cancel` | login_required | Cancel subscription |
+| `/webhook/stripe` | POST | `stripe_webhook` | -- | Stripe webhook handler |
+| `/api/subscribe` | POST | `api_subscribe` | csrf_required | Newsletter subscribe |
+
+### Grant Discovery Routes
+
+| Route | Method | Function | Decorators | Description |
+|-------|--------|----------|------------|-------------|
+| `/wizard` | GET | `wizard` | login_required | Grant matching wizard |
+| `/api/wizard/save` | POST | `wizard_save` | login_required, csrf_required | Save wizard answers |
+| `/wizard/recommendations` | GET | `wizard_recommendations` | login_required | View wizard results |
+| `/eligibility` | GET | `eligibility` | -- | Eligibility checker page |
+| `/api/check-eligibility` | POST | `check_eligibility` | csrf_required | Run eligibility check |
+| `/research` | GET | `research` | login_required | Grant research page |
+| `/api/search-grants` | GET | `search_grants` | -- | Search grants API |
+| `/api/grant/<grant_id>` | GET | `get_grant` | -- | Get single grant data |
+| `/grants` | GET | `grants_list` | login_required | Saved grants list |
+| `/api/save-grant` | POST | `save_grant` | csrf_required_allow_guest | Save/favorite a grant |
+| `/api/unsave-grant` | POST | `unsave_grant` | login_required, csrf_required | Remove saved grant |
+| `/api/is-saved-grant/<id>` | GET | `is_saved_grant` | -- | Check if grant is saved |
+| `/api/request-template` | POST | `request_template` | csrf_required | Request a template for a grant |
+
+### Grant Application Routes
+
+| Route | Method | Function | Decorators | Description |
+|-------|--------|----------|------------|-------------|
+| `/my-grants` | GET | `my_grants` | login_required | User's grant applications |
+| `/apply` | GET | `apply` | login_required | Apply for a grant (select client) |
+| `/grant-info/<grant_id>` | GET | `grant_info` | login_required | Grant info before starting |
+| `/start-grant/<grant_id>` | GET, POST | `start_grant` | login_required, paid_required, csrf_required | Start a new application |
+| `/grant/<grant_id>` | GET | `grant_detail` | login_required | View grant application |
+| `/grant/<grant_id>/section/<section>` | GET, POST | `section_form` | login_required, csrf_required | Edit a section |
+| `/grant/<grant_id>/generate/<section_id>` | POST | `generate_section` | rate_limit(10/60s), login_required, paid_required, csrf_required | AI-generate section content |
+| `/grant/<grant_id>/use-template` | GET | `use_template` | login_required | Apply template to grant |
+| `/grant/<grant_id>/clone` | POST | `clone_grant` | login_required, paid_required, csrf_required | Clone a grant application |
+
+### Submission & Tracking Routes
+
+| Route | Method | Function | Decorators | Description |
+|-------|--------|----------|------------|-------------|
+| `/grant/<grant_id>/guided` | GET | `guided_submission` | login_required, paid_required | Side-by-side guided submission |
+| `/grant/<grant_id>/paper-submission` | GET | `paper_submission` | login_required, paid_required | Paper/SF-424 submission page |
+| `/grant/<grant_id>/paper-download` | GET | `paper_download` | login_required, paid_required | Download full paper package (PDF) |
+| `/grant/<grant_id>/paper-download-form/<form>` | GET | `paper_download_form` | login_required, paid_required | Download individual SF-424 form |
+| `/grant/<grant_id>/mark-submitted` | GET, POST | `mark_submitted` | login_required, paid_required, csrf_required | Record submission details |
+| `/grant/<grant_id>/update-status` | POST | `update_status` | login_required, paid_required, csrf_required | Update funded/rejected status |
+| `/grant/<grant_id>/download/<fmt>` | GET | `download_grant` | login_required, paid_required | Download as DOCX/PDF/TXT |
+| `/grant/<grant_id>/calendar.ics` | GET | `grant_calendar` | login_required | Export deadline as ICS calendar event |
+| `/api/copy-section` | POST | `copy_section` | login_required, csrf_required | Copy section content |
+
+### Client Management Routes
+
+| Route | Method | Function | Decorators | Description |
+|-------|--------|----------|------------|-------------|
+| `/clients` | GET | `clients_list` | login_required | List user's clients |
+| `/client/new` | GET, POST | `client_new` | login_required, csrf_required | Create new client |
+| `/client/<client_id>` | GET | `client_detail` | login_required | View client |
+| `/client/<client_id>/intake` | GET, POST | `client_intake` | login_required, csrf_required | Client intake form |
+| `/client/<client_id>/grant/new` | GET, POST | `client_grant_new` | login_required, csrf_required | Start grant for client |
+
+### Template Routes
+
+| Route | Method | Function | Decorators | Description |
+|-------|--------|----------|------------|-------------|
+| `/templates` | GET | `list_templates` | login_required | Browse all agency templates |
+| `/template/<template_name>` | GET | `view_template` | -- | View single template detail |
+
+### Admin Routes (login_required + admin_required)
+
+| Route | Method | Function | Decorators | Description |
+|-------|--------|----------|------------|-------------|
+| `/admin` | GET | `admin_index` | -- (checks role inline) | Admin dashboard |
+| `/admin/dashboard` | GET | `admin_dashboard` | -- | Admin dashboard redirect |
+| `/admin/grants` | GET | `admin_grants` | login_required, admin_required | Manage all grants |
+| `/admin/grants/<action>` | GET, POST | `admin_grants` | login_required, admin_required | Grant CRUD actions |
+| `/admin/templates` | GET, POST | `admin_templates` | login_required, admin_required | Template CMS |
+| `/admin/leads` | GET | `admin_leads` | login_required, admin_required | View leads/subscribers |
+| `/admin/leads/delete/<id>` | GET | `admin_leads_delete` | login_required, admin_required | Delete a lead |
+| `/admin/emails` | GET | `admin_emails` | login_required, admin_required | Email management |
+| `/admin/emails/send-test` | POST | `admin_send_test` | login_required, admin_required | Send test email |
+| `/admin/export-leads` | GET | `admin_export_leads` | login_required, admin_required | Export leads as CSV |
 
 ---
 
-## Running the System
+## Features
 
-### Development
+### User Authentication & Accounts
 
-```bash
-# Start web portal
-cd ~/.hermes/grant-system/portal
-python3 app.py
+- Email/password signup and login
+- PBKDF2 password hashing (100,000 iterations, SHA-256)
+- Password reset via token (email or console)
+- Session management with secure cookies (HttpOnly, SameSite=Strict)
+- Role-based access: `user` and `admin`
+- Multi-step onboarding wizard for new users (org details, focus areas, grant history)
 
-# Access at http://localhost:5001
+### Subscription Management
 
-# Login as admin
-# Email: rusty@test.com
-# Password: admin123
-```
+- Four tiers: Free, Monthly ($19.95), Annual ($199.95), Enterprise (custom)
+- Stripe Checkout integration for payment
+- Subscription lifecycle: create, manage, cancel
+- Stripe webhook handler for status updates
+- Plan-based feature gating via `@paid_required` decorator
+- Usage tracking (grants per month)
 
-### Production
+### Grant Discovery
 
-```bash
-# 1. Point domain to server
-# 2. Set environment variables
-export STRIPE_API_KEY=sk_...
-export STRIPE_MONTHLY_PRICE_ID=price_...
-export STRIPE_ANNUAL_PRICE_ID=price_...
+- **Grant Wizard**: Multi-step questionnaire that matches users to grants by eligibility, focus area, and funding range
+- **Search**: Full-text search across 131 federal grant opportunities
+- **Eligibility Checker**: Question-based filtering by organization type, size, and focus
+- **Save/Favorite**: Save grants for later (works for guests and logged-in users)
+- **Recommendations**: AI-matched grant suggestions based on wizard answers
 
-# 3. Run behind nginx/Caddy for HTTPS
-# 4. Set up cron for deadline_reminder.py
-```
+### Grant Writing
 
----
+- **AI Content Generation**: Google Gemini generates section content using organization intake data (mission, budget, programs, service area)
+- **Section-by-Section Editing**: Edit each section individually with agency-specific guidance
+- **Template-Ordered Sections**: Sections presented in the exact order required by the funding agency
+- **Budget Builder**: Standard federal budget categories (personnel, fringe, equipment, supplies, travel, consultants, other)
+- **Retry Logic**: Exponential backoff (3 retries) for transient API/SSL errors
+- **Rate Limiting**: 10 AI generation requests per minute per IP
 
-## Admin Functions
+### Guided Submission
 
-### Access Admin Panel
+- Side-by-side workflow: grant content on the left, submission instructions on the right
+- Copy-to-clipboard buttons for each section
+- Compact mode toggle for focused viewing
+- Progress tracking per section
+- Download as DOCX, PDF, or TXT
 
-1. Login as user with `role = 'admin'`
-2. Navigate to `/admin`
+### Paper Submission
 
-### Admin Capabilities
+- SF-424 form generation with organization data pre-filled
+- Full paper submission package as PDF (ReportLab)
+- Individual form downloads (SF-424, SF-424A, etc.)
+- Print-optimized layout
 
-- **Templates**: Add/edit/delete agency templates
-- **Grants**: View all user grants
+### Post-Submission Tracking
+
+- **Mark Submitted**: Record submission date, confirmation number, portal used, notes
+- **Status Updates**: Track outcomes -- funded (with amount) or rejected (with reason)
+- **Notification Date**: Record when outcome notification was received
+- **Dashboard Stats**: Active grants, submitted count, total funded amount
+
+### Application Cloning
+
+- Clone any grant application with all sections and content
+- Creates a new grant with " (Copy)" suffix
+- Useful for applying to similar grants or resubmitting
+
+### Deadline Management
+
+- Countdown timers on grant detail pages
+- Configurable reminder days (default: 7, 3, 1 days before deadline)
+- ICS calendar export for any grant deadline
+- File-based reminder system (cron-compatible)
+
+### Admin Panel
+
+- **Templates**: Full CMS for agency templates (add, edit, delete sections)
+- **Grants**: View and manage all user grants
 - **Users**: View all registered users
-- **Leads**: View newsletter subscribers
+- **Leads**: View, delete, and export newsletter subscribers as CSV
+- **Emails**: Send test emails, view email configuration
+
+### Accessibility
+
+- ARIA labels on interactive elements
+- Skip navigation link
+- Mobile hamburger menu
+- Semantic HTML throughout
+- High-contrast dark theme with accessible color ratios
 
 ---
 
-## Files Reference
+## Template System
 
-| File | Purpose |
-|------|---------|
-| `AI_PROMPTS.md` | Prompts for writing each grant section |
-| `INTAKE_QUESTIONS.md` | 37 intake questions for clients |
-| `DOCUMENT_CHECKLIST.md` | Required documents per grant type |
-| `AGREEMENT.md` | Client service agreement template |
-| `TRACKING.md` | Pipeline stages definition |
-| `competitive-analysis.md` | Market research, competitor pricing |
+### 21 Agency Templates
+
+Templates are defined in `templates/agency_templates.json` and provide structured guidance for each federal agency's grant requirements.
+
+| # | Template Key | Agency | Sections | Notes |
+|---|-------------|--------|----------|-------|
+| 1 | `nsf` | National Science Foundation | 10 | 15-page project description |
+| 2 | `doe` | Department of Energy | 7 | |
+| 3 | `nih` | National Institutes of Health | 8 | |
+| 4 | `usda` | Department of Agriculture | 6 | |
+| 5 | `epa` | Environmental Protection Agency | 4 | |
+| 6 | `dot` | Department of Transportation | 4 | |
+| 7 | `nist` | National Institute of Standards and Technology | 3 | |
+| 8 | `nea` | National Endowment for the Arts | 5 | |
+| 9 | `nea_challenge` | NEA Challenge America | 4 | |
+| 10 | `generic` | Generic Federal Grant | 8 | Default fallback |
+| 11 | `artist_individual` | Artist Individual | 5 | For individual artists, not orgs |
+| 12 | `micro_grant` | Micro-Grant | 4 | Under $5K |
+| 13 | `small_business` | Small Business Grant | 5 | SBIR/STTR |
+| 14 | `community_project` | Community Project | 5 | |
+| 15 | `education` | Department of Education | 7 | |
+| 16 | `hud` | Housing and Urban Development | 7 | |
+| 17 | `nasa` | NASA | 7 | |
+| 18 | `dod` | Department of Defense | 7 | |
+| 19 | `fema` | FEMA | 7 | |
+| 20 | `dol` | Department of Labor | 8 | |
+| 21 | `doj` | Department of Justice | 8 | |
+
+### Template Structure
+
+Each template includes:
+
+```json
+{
+  "name": "National Science Foundation (NSF)",
+  "full_name": "National Science Foundation",
+  "forms": ["SF424", "NSF Cover Sheet", "..."],
+  "cfda": "47.076",
+  "system": "Research.gov / FastLane",
+  "required_sections": [
+    {
+      "id": "project_summary",
+      "name": "Project Summary",
+      "required": true,
+      "max_pages": 1,
+      "max_chars": 3000,
+      "guidance": "Must contain: (1) a statement of...",
+      "components": ["overview", "intellectual_merit", "broader_impacts"]
+    }
+  ]
+}
+```
+
+### How Templates Map to Grants
+
+1. User selects a grant from the 131-grant research database
+2. System matches the grant's `agency` field to a template key (e.g., `NSF` -> `nsf`)
+3. The template's `required_sections` define the grant application structure
+4. Each section displays guidance text, page/character limits, required badge, and AI generate button
+5. If no agency match is found, the `generic` template is used as a fallback
 
 ---
+
+## Subscription Model
+
+| Tier | Price | Grants/Month | Key Features |
+|------|-------|--------------|--------------|
+| **Free** | $0 | 0 | Search grants, save favorites, view templates, eligibility checker |
+| **Monthly** | $19.95/mo | 3 | AI writing, guided submission, paper submission, downloads, cloning |
+| **Annual** | $199.95/yr | 36 (3/mo) | Same as Monthly, save ~$40/year |
+| **Enterprise** | Custom | Unlimited | Client management, white-label, API access |
+
+### Anti-Reseller Policy
+
+- **Free/Monthly/Annual**: Only for grants submitted in the account holder's organization name
+- **Enterprise**: Required if writing grants for clients (resale permitted)
+- **Rationale**: Prevents users from purchasing a base plan and reselling access to multiple organizations
+
+### Feature Gating
+
+The `@paid_required` decorator gates these features behind a paid plan:
+- Starting a grant application (`/start-grant`)
+- AI content generation (`/grant/<id>/generate/<section>`)
+- Guided submission workflow
+- Paper submission and PDF packages
+- Grant downloads (DOCX/PDF/TXT)
+- Mark submitted / update status
+- Clone grant applications
 
 ---
 
 ## Environment Variables
 
-### Required Variables
+### Required
 
-```bash
-# .env file location: ~/.hermes/.env
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `GOOGLE_API_KEY` | Google AI (Gemini) API key | `AIzaSy...` |
+| `STRIPE_API_KEY` | Stripe secret key | `sk_live_...` |
+| `STRIPE_MONTHLY_PRICE_ID` | Stripe price ID for monthly plan | `price_...` |
+| `STRIPE_ANNUAL_PRICE_ID` | Stripe price ID for annual plan | `price_...` |
 
-# Google AI (Gemini) - required for AI generation
-GOOGLE_API_KEY=AIzaSy...
+### Optional
 
-# Stripe - required for payments
-STRIPE_API_KEY=sk_live_...
-STRIPE_MONTHLY_PRICE_ID=price_...
-STRIPE_ANNUAL_PRICE_ID=price_...
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `SECRET_KEY` | Flask session secret key | Auto-generated and persisted to `.secret_key` |
+| `RESEND_API_KEY` | Resend API key for transactional email | Console fallback |
+| `FROM_EMAIL` | Sender email address | `Grant Writer Pro <noreply@grantwriterpro.local>` |
+| `FROM_NAME` | Sender display name | `Grant Writer Pro` |
+| `BASE_URL` | Base URL for email links | `http://localhost:5001` |
+| `DOMAIN_NAME` | Production domain | `grantpro.org` |
+| `HTTPS` | Set to `true` to enable secure cookies | `false` |
 
-# Flask
-SECRET_KEY=your-random-secret-key-here
-```
+### Where to Set
 
-### Optional Variables
+Store environment variables in `~/.hermes/.env` or export them in your shell profile.
 
-```bash
-# Email (Resend API)
-RESEND_API_KEY=re_...
-
-# Domain (for production emails)
-DOMAIN_NAME=grantpro.org
-```
-
-### How to Get Keys
+### How to Get API Keys
 
 | Service | URL | Notes |
 |---------|-----|-------|
-| Google AI | https://aistudio.google.com/app/apikey | Free tier available |
-| Stripe | https://dashboard.stripe.com/apikeys | Needs account |
-| Resend | https://resend.com | 3K free emails/mo |
+| Google AI Studio | https://aistudio.google.com/app/apikey | Free tier available |
+| Stripe | https://dashboard.stripe.com/apikeys | Requires Stripe account |
+| Resend | https://resend.com | 3,000 free emails/month |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.10 or later
+- pip (Python package manager)
+
+### Step-by-Step Setup
+
+```bash
+# 1. Clone the repository
+git clone <repo-url> ~/.hermes/grant-system
+cd ~/.hermes/grant-system
+
+# 2. Install Python dependencies
+pip install -r portal/requirements.txt
+
+# 3. Set up environment variables
+# Create or edit ~/.hermes/.env with at minimum:
+export GOOGLE_API_KEY="your-gemini-api-key"
+
+# For Stripe (required for payments, not for local testing):
+export STRIPE_API_KEY="sk_test_..."
+export STRIPE_MONTHLY_PRICE_ID="price_..."
+export STRIPE_ANNUAL_PRICE_ID="price_..."
+
+# 4. Start the server (initializes database automatically on first run)
+cd portal
+python3 app.py
+
+# 5. Open in browser
+# http://localhost:5001
+```
+
+### Database Initialization
+
+The database is created automatically on first run. Both `core/grant_db.py` (`init_db()`) and `core/user_models.py` (`init_user_db()`) are called at startup. Schema migrations for new columns run automatically via `migrate_*` functions in `app.py`.
+
+### Test Credentials
+
+```
+Admin:  rusty@test.com / admin123
+Test:   hermes-test-final@example.com / testpass123 (org: Gulf Coast Community Development Corp)
+```
+
+### Creating an Admin User
+
+Sign up through `/signup`, then manually update the role in the database:
+
+```bash
+sqlite3 ~/.hermes/grant-system/tracking/grants.db \
+  "UPDATE users SET role='admin' WHERE email='your@email.com';"
+```
+
+---
+
+## Production Deployment
+
+### Requirements
+
+1. **HTTPS**: Run behind nginx or Caddy as a reverse proxy. Set `HTTPS=true` in environment to enable secure cookies.
+
+2. **Domain**: Point `grantpro.org` (or your domain) to the server.
+
+3. **Stripe**: Switch from test keys (`sk_test_`) to live keys (`sk_live_`). Configure webhook endpoint at `https://yourdomain.com/webhook/stripe`.
+
+4. **Email**: Set `RESEND_API_KEY` for transactional email (password resets, notifications). Without it, emails print to console only.
+
+5. **Cron Jobs**: Set up deadline reminder cron:
+   ```bash
+   crontab -e
+   # Add:
+   0 8 * * 1-5 /usr/bin/python3 /path/to/grant-system/core/deadline_reminder.py
+   ```
+
+6. **Secret Key**: Set a strong, persistent `SECRET_KEY` environment variable (do not rely on auto-generation in production).
+
+7. **Firewall**: Allow only ports 80 and 443. The Flask app listens on port 5001 internally.
+
+8. **Backups**: Schedule regular SQLite database backups from `tracking/`.
+
+### Production Checklist
+
+- [ ] HTTPS via reverse proxy (nginx/Caddy)
+- [ ] Strong `SECRET_KEY` set as environment variable
+- [ ] `HTTPS=true` environment variable set
+- [ ] Stripe live keys configured
+- [ ] Stripe webhook endpoint configured and verified
+- [ ] Resend API key set for email
+- [ ] Cron job for deadline reminders
+- [ ] Firewall rules (80/443 only)
+- [ ] Automated database backups
+- [ ] Log rotation for `tracking/app.log`
 
 ---
 
 ## Security
 
-### Authentication
+### Authentication & Sessions
 
-- Passwords hashed with PBKDF2 (100k iterations, SHA-256)
-- Session management via Flask sessions with secure cookies
-- CSRF protection on all forms
-- Rate limiting on login attempts
+- Passwords hashed with **PBKDF2** (100,000 iterations, SHA-256, random 32-byte salt)
+- Sessions: `HttpOnly`, `SameSite=Strict`, configurable `Secure` flag
+- 1-hour session timeout (`PERMANENT_SESSION_LIFETIME=3600`)
+- Auto-generated secret key persisted to `.secret_key` file (excluded from git)
+
+### CSRF Protection
+
+- Token generated per session (`secrets.token_hex(32)`)
+- Enforced on all POST routes via `@csrf_required` decorator
+- Token accepted from form field (`csrf_token`) or headers (`X-CSRF-Token` / `X-CSRFToken`)
+- Guest-aware variant (`@csrf_required_allow_guest`) for mixed endpoints
+
+### Rate Limiting
+
+- In-memory sliding window rate limiter
+- Default: 10 requests per 60 seconds per IP per endpoint
+- AI generation: 10 requests per 60 seconds
+- Login: rate-limited to prevent brute force
+- Returns HTTP 429 when exceeded
+
+### Security Headers (all responses)
+
+| Header | Value |
+|--------|-------|
+| `Server` | `GrantPro` (Werkzeug fingerprint stripped via WSGI middleware) |
+| `X-Powered-By` | `GrantPro` |
+| `X-Frame-Options` | `DENY` |
+| `X-Content-Type-Options` | `nosniff` |
+| `X-XSS-Protection` | `1; mode=block` |
+| `Content-Security-Policy` | Strict: `default-src 'self'`; inline scripts/styles; Google Fonts; Gemini API |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` |
+
+### Server Fingerprint Stripping
+
+A custom WSGI middleware (`_ServerHeaderStripper`) overrides the `Server` header after Werkzeug sets it, preventing server version disclosure.
 
 ### Data Privacy
 
-- All data stored locally (no cloud)
-- User owns their data
-- No third-party analytics
-- Optional: encrypted backup to local storage
+- All data stored locally (SQLite files on disk)
+- No third-party analytics or tracking
+- No cloud database dependencies
+- User owns all their data
 
-### Production Security Checklist
+### Authorization
 
-- [ ] Run behind nginx/Caddy with HTTPS
-- [ ] Set strong SECRET_KEY
-- [ ] Enable rate limiting
-- [ ] Configure firewall (allow port 80/443 only)
-- [ ] Set up automated backups
-- [ ] Enable Stripe webhook verification
-
----
-
-## Troubleshooting
-
-### Common Issues
-
-#### 1. "No API key found" error
-
-**Problem**: AI generation returns template instead of generated content
-
-**Solution**: 
-```bash
-# Check if GOOGLE_API_KEY is set
-grep GOOGLE_API_KEY ~/.hermes/.env
-
-# If it's masked (***), replace with actual key
-```
-
-#### 2. Login says "Invalid email or password" but correct
-
-**Problem**: Password hash mismatch (usually after database reset)
-
-**Solution**: Password is `admin123` for rusty@test.com, or create new user via signup
-
-#### 3. Page won't load / Connection refused
-
-**Problem**: Flask app not running
-
-**Solution**:
-```bash
-# Check if running
-lsof -i :5001
-
-# Restart
-cd ~/.hermes/grant-system/portal
-python3 app.py &
-```
-
-#### 4. Stripe payments not working
-
-**Problem**: API keys not configured
-
-**Solution**: Add STRIPE_API_KEY and price IDs to ~/.hermes/.env
-
-### Debug Mode
-
-To enable verbose debugging:
-```python
-# In app.py, change:
-app.run(debug=True, port=5001)
-```
+- `@login_required` -- must be authenticated
+- `@paid_required` -- must have active paid plan
+- `@admin_required` -- must have `role='admin'`
+- `user_owns_client()` / `user_owns_grant()` -- resource-level authorization (admin bypasses)
+- `@before_request` injects current user into `g.user` for template access
 
 ---
 
-## Cron Jobs & Background Tasks
+## File Reference
 
-### Deadline Reminders
-
-The system uses file-based triggers for deadline reminders:
-
-```bash
-# Run manually
-cd ~/.hermes/grant-system/core
-python3 deadline_reminder.py
-```
-
-### Automated Research (Optional)
-
-To set up automatic grant research updates:
-```bash
-# Add to crontab
-0 9 * * * cd ~/.hermes/grant-system && python3 -c "from research.grant_researcher import update_grants; update_grants()"
-```
-
-### Cron Setup (macOS)
-
-```bash
-crontab -e
-# Add line:
-0 8 * * 1-5 /usr/bin/python3 /Users/fbwalker4/.hermes/grant-system/core/deadline_reminder.py
-```
-
-### Active Cron Jobs
-
-The system has scheduled research tasks (Mon-Fri):
-
-| Time (CT) | Task | Description |
-|-----------|------|-------------|
-| 9am | HUD/Housing News | Latest housing and urban development news |
-| 10am | Grants Report | Matching grants for PHAs, Cities, 501c3 music/arts |
-| 1pm | AI & Robotics Update | Research updates in AI/robotics funding |
-
-View scheduled jobs:
-```bash
-# List all cron jobs
-list_cronjobs
-```
-
----
-
-## Grant Research Database
-
-### What's Included
-
-- **131 federal grants** from:
-  - Grants.gov
-  - Agency-specific solicitations
-  - CFDA-listed programs
-
-### Grant Data Fields
-
-Each grant includes:
-```json
-{
-  "id": "nsf-2024-001",
-  "name": "Smart and Connected Communities",
-  "agency": "NSF",
-  "cfda": "47.083",
-  "amount_min": 500000,
-  "amount_max": 1500000,
-  "deadline": "2025-01-15",
-  "eligibility": ["501c3", "university", "government"],
-  "focus_areas": ["smart cities", "IoT", "community resilience"],
-  "url": "https://www.nsf.gov/funding/"
-}
-```
-
-### Adding Custom Grants
-
-Edit `research/iot_grants_db.json` or use the admin panel at `/admin/grants`
-
----
-
-## Intake Form
-
-### Questions Asked (37 total)
-
-The intake form collects:
-
-1. **Organization Info**: Name, type, EIN, DUNS, year founded
-2. **Financial**: Annual budget, staff count, board size
-3. **Mission**: Statement, description, service area
-4. **Programs**: Existing programs and beneficiaries
-5. **Track Record**: Previous grants, funding history
-6. **Budget**: Personnel, supplies, travel, equipment, indirect rates
-
-### How Intake Data Drives AI
-
-The AI uses this data to generate **specific** content:
-
-| Intake Data | AI Output |
-|-------------|-----------|
-| Mission statement | Compelling need statements |
-| Program descriptions | Project descriptions |
-| Budget details | Budget narratives |
-| Service area | Geographic-specific content |
-| Previous grants | Evidence of capacity |
-
-**Without intake data**: AI generates generic placeholders like "[Your Organization Name]"
-
-**With intake data**: AI generates specific, relevant content like "Gulf Coast CDC's after-school program..."
-
----
-
-## Support
-
-- **Email**: Via contact form on site
-- **Docs**: This README, in-app help pages
-- **Issues**: Check portal error logs
-
----
-
-## AI Generation Testing Report (2026-03-18)
-
-### Test Methodology
-
-1. Created test user with full organization intake data
-2. Tested each of 21 templates with AI generation
-3. Checked for generic placeholders in generated content
-4. Verified content length and relevance
-
-### Test Results
-
-| Template | Sections Tested | Status | Notes |
-|----------|----------------|--------|-------|
-| NSF | 3 | ✅ PASS | All sections generate specific content |
-| DOE | 3 | ✅ PASS | All sections generate specific content |
-| NIH | 3 | ✅ PASS | All sections generate specific content |
-| USDA | 3 | ✅ PASS | All sections generate specific content |
-| EPA | 3 | ✅ PASS | All sections generate specific content |
-| DOT | 3 | ✅ PASS | All sections generate specific content |
-| NIST | 3 | ✅ PASS | All sections generate specific content |
-| NEA | 3 | ✅ PASS | All sections generate specific content |
-| HUD | 3 | ✅ PASS | Budget section fixed with budget data |
-| DOD | 3 | ✅ PASS | All sections generate specific content |
-| DOL | 3 | ✅ PASS | All sections generate specific content |
-| FEMA | 3 | ✅ PASS | All sections generate specific content |
-| NASA | 3 | ✅ PASS | All sections generate specific content |
-| DOJ | 3 | ✅ PASS | Retry logic handles SSL errors |
-| Education | 3 | ✅ PASS | All sections generate specific content |
-| Generic | 3 | ✅ PASS | Budget section fixed |
-| NEA Challenge | 3 | ✅ PASS | All sections generate specific content |
-| Artist Individual | 3 | ⚠️ NOTE | Requires individual (not org) budget data |
-| Micro Grant | 3 | ✅ PASS | All sections generate specific content |
-| Small Business | 3 | ✅ PASS | All sections generate specific content |
-| Community Project | 3 | ✅ PASS | All sections generate specific content |
-
-### Issues Found & Fixed
-
-#### 1. Budget Placeholders (FIXED)
-- **Problem**: Budget sections showed "[specific amount]" or similar placeholders
-- **Cause**: AI prompts didn't include budget data from intake form
-- **Fix**: Added budget_info extraction from intake_data and included in prompts
-- **Code Change**: `app.py` lines 1715-1716 and 1789-1790
-
-#### 2. SSL/Connection Errors (FIXED)
-- **Problem**: DOJ API calls failed with SSL errors intermittently
-- **Cause**: Transient network issues
-- **Fix**: Added retry logic with exponential backoff (3 retries, 2-6 second delays)
-- **Code Change**: `app.py` lines 1802-1821
-
-#### 3. Artist Individual Template (DOCUMENTED)
-- **Problem**: Budget section shows placeholders when used with org data
-- **Cause**: Template designed for individual artists, not organizations
-- **Resolution**: Working as designed - users must input personal budget details
-- **Recommendation**: Add separate intake form for individual artists
-
-### Key Findings
-
-1. **AI works correctly** when given proper organization data
-2. **Without intake data**, AI generates generic placeholders (expected)
-3. **Budget sections** require budget data in intake form
-4. **All 21 templates** generate usable content with org data
-5. **Content length**: 1.3K - 28K chars per section (substantial)
-
-### Required Intake Data for Best Results
-
-For optimal AI generation, clients should provide:
-- Mission statement
-- Organization description
-- Existing programs
-- Budget information (personnel, supplies, travel, etc.)
-- Service area and population served
-- Previous grant history
-
-### Test User Credentials
-
-```
-Email: hermes-test-final@example.com
-Password: testpass123
-Organization: Gulf Coast Community Development Corp
-```
+| File | Purpose |
+|------|---------|
+| `portal/app.py` | Main Flask application -- all routes, middleware, migrations (3,568 lines) |
+| `portal/requirements.txt` | Python package dependencies |
+| `core/user_models.py` | User CRUD, auth (PBKDF2), profiles, saved grants, onboarding |
+| `core/grant_db.py` | Grant/client/draft/document/invoice database schema and CRUD |
+| `core/stripe_payment.py` | Stripe subscription creation, cancellation, webhooks |
+| `core/email_system.py` | Transactional email via Resend API (console fallback) |
+| `core/budget_builder.py` | Federal budget category definitions and builder |
+| `core/deadline_reminder.py` | File-based deadline reminder system |
+| `core/cli.py` | Command-line interface for grant operations |
+| `research/grant_researcher.py` | Grant search engine -- search, filter, match from JSON database |
+| `research/iot_grants_db.json` | 131 federal grant opportunity records |
+| `templates/agency_templates.json` | 21 agency template definitions (sections, guidance, limits) |
+| `portal/templates/layout.html` | Base HTML template (dark theme, Inter/Playfair fonts, nav, CSS) |
+| `AI_PROMPTS.md` | Prompt templates for AI section generation |
+| `INTAKE_QUESTIONS.md` | 37 client intake questions |
+| `DOCUMENT_CHECKLIST.md` | Required documents by grant type |
+| `AGREEMENT.md` | Client service agreement template |
+| `TRACKING.md` | Pipeline stage definitions |
+| `docs/competitive-analysis.md` | Market research and competitor pricing |
+| `docs/comprehensive-testing-report.md` | Full testing results across all templates |
+| `docs/user-testing-report.md` | User testing feedback |
+| `.gitignore` | Excludes .env, .db, __pycache__, IDE files |
 
 ---
 
 ## Changelog
 
-### 2026-03-18
+### 2026-03-20 (Waves 5-8: Submission, Tracking, Cloning, Polish)
 
-- Fixed budget placeholder issue in AI generation
-- Added retry logic for transient API errors
-- Comprehensive AI testing across all 21 templates
-- Updated README with testing documentation
+- Added paper submission workflow with SF-424 PDF generation (ReportLab)
+- Added mark-submitted page with confirmation number, portal, and notes tracking
+- Added post-submission status updates (funded with amount, rejected with reason)
+- Added grant application cloning with all sections
+- Added ICS calendar export for grant deadlines
+- Added configurable deadline reminder days (7, 3, 1)
+- Added admin email management and test email sending
+- Added admin lead export to CSV
+- Added unsubscribe workflow for newsletter leads
+- Added WSGI middleware for server header stripping
+- Added Content-Security-Policy, Permissions-Policy, Referrer-Policy headers
+- Added compact mode toggle in guided submission
+- Added 7 new submission tracking columns to grants table via migration
+- Added `reminder_days` column to user_profiles via migration
+- Moved all test/utility scripts to `archive/`
 
-### 2026-03-16
+### 2026-03-18 (Waves 3-4: AI Quality, Security Hardening)
 
-- Added Stripe subscription integration
-- Created all legal pages (Terms, Privacy, Refund, FAQ)
+- Fixed budget placeholder issue in AI generation (budget data now injected into prompts)
+- Added retry logic with exponential backoff (3 retries) for API errors
+- Comprehensive AI testing across all 21 templates -- all passing
+- Added CSRF protection on all POST routes
+- Added in-memory rate limiting with sliding window
+- Added security headers (X-Frame-Options, CSP, X-Content-Type-Options, etc.)
+- Added `@paid_required` and `@admin_required` decorators
+- Added resource-level authorization (`user_owns_client`, `user_owns_grant`)
+- Added structured logging to file (`tracking/app.log`) and console
+- Session security: HttpOnly, SameSite=Strict, configurable Secure flag
+
+### 2026-03-17 (Waves 1-2: Core UX, Templates)
+
+- Expanded from 14 to 21 agency templates (added Education, HUD, NASA, DOD, FEMA, DOL, DOJ)
+- Added guided submission workflow (side-by-side, copy buttons, progress tracking)
+- Added section-by-section editing with template guidance and AI generation
+- Added multi-step onboarding wizard (org details, focus areas, grant history)
+- Added user dashboard with stats (active grants, submitted, funded)
+- Added eligibility checker with question-based filtering
+- Added grant research search with filtering
+- Added client management (add, edit, intake form)
+- Added legal pages (Terms, Privacy, Refund, FAQ)
+- Dark theme redesign with Inter + Playfair Display fonts
+
+### 2026-03-16 (Phase 2: Payments & Legal)
+
+- Added Stripe subscription integration (checkout, webhooks, management)
+- Created all legal pages (Terms of Service, Privacy Policy, Refund Policy, FAQ)
 - Added USA-only disclaimer
-- Fixed template editor (was saving to wrong field)
+- Fixed template editor saving to wrong field
 - Purchased domains: grantpro.org, grantpro.co
 
-### 2026-03-15
+### 2026-03-15 (Phase 1: Initial Build)
 
 - Initial system build
-- 131 federal grants in database
+- 131 federal grants in research database
 - 14 agency templates
 - Web portal with auth, wizard, guided submission
+- SQLite database with users, clients, grants, drafts tables
+- Email system (Resend API with console fallback)
+- Budget builder with standard federal categories
+- Deadline reminder system
+
+---
+
+## Troubleshooting
+
+### "No API key found" error
+
+AI generation returns template text instead of generated content. Verify `GOOGLE_API_KEY` is set:
+```bash
+echo $GOOGLE_API_KEY
+```
+
+### "Invalid email or password" on login
+
+Password hash mismatch after database reset. Use `admin123` for `rusty@test.com`, or create a new account via `/signup`.
+
+### Connection refused on port 5001
+
+Flask app not running. Check and restart:
+```bash
+lsof -i :5001
+cd ~/.hermes/grant-system/portal && python3 app.py
+```
+
+### Stripe payments not working
+
+Stripe API keys not configured. Add `STRIPE_API_KEY`, `STRIPE_MONTHLY_PRICE_ID`, and `STRIPE_ANNUAL_PRICE_ID` to your environment.
+
+### Debug mode
+
+```bash
+# Edit the last line of portal/app.py:
+# Change debug=False to debug=True
+app.run(debug=True, host='0.0.0.0', port=5001)
+```
+
+---
+
+## Support
+
+- **Email**: Via contact form at `/contact`
+- **Docs**: This README, in-app help at `/help`
+- **Logs**: `tracking/app.log` (structured, timestamped)
