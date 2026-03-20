@@ -1,0 +1,108 @@
+{% extends "layout.html" %}
+
+{% block title %}Upgrade - Grant Pro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Upgrade Your Plan</h1>
+        <p class="page-subtitle">Unlock full access to grant writing tools</p>
+    </div>
+</div>
+
+<!-- Current Plan Banner -->
+<div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 2rem;">
+    <strong style="color: #e2e8f0;">Current Plan: {{ user.plan.title() if user.plan else 'Free' }}</strong>
+    <p style="color: #94a3b8; margin-top: 0.5rem; font-size: 0.9rem;">
+        {% if user.plan == 'free' %}
+        You can save grants and search 131+ federal grants. Upgrade to submit applications.
+        {% else %}
+        You have {{ user.max_grants_per_month }} grant submissions per month.
+        {% endif %}
+    </p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1000px; margin: 0 auto;">
+    <!-- Monthly Plan -->
+    <div style="background: #1e293b; border: 2px solid #3b82f6; border-radius: 12px; padding: 2rem; position: relative;">
+        <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #3b82f6; color: white; padding: 0.25rem 1rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">BEST VALUE</div>
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #f8fafc;">Monthly</h2>
+        <div style="font-size: 2.5rem; font-weight: 700; color: #3b82f6;">$19.95<span style="font-size: 1rem; color: #94a3b8; font-weight: 400;">/mo</span></div>
+        <p style="color: #94a3b8; margin-bottom: 1.5rem;">Billed monthly, cancel anytime</p>
+        
+        <ul style="list-style: none; padding: 0; margin-bottom: 1.5rem; color: #e2e8f0;">
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ Everything in Free</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;"><strong>3 grant submissions/month</strong></li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ AI writing assistant</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ 131+ agency templates</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ DOCX/PDF export</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ Guided submission workflow</li>
+            <li style="padding: 0.5rem 0;">✓ Email support</li>
+        </ul>
+        
+        <form method="POST">
+            <input type="hidden" name="plan" value="monthly">
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Start Monthly</button>
+        </form>
+        <p style="text-align: center; font-size: 0.75rem; color: #64748b; margin-top: 0.5rem;">For your organization's grants only</p>
+    </div>
+    
+    <!-- Annual Plan -->
+    <div style="background: #1e293b; border: 2px solid #22c55e; border-radius: 12px; padding: 2rem; position: relative;">
+        <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #22c55e; color: white; padding: 0.25rem 1rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">SAVE $40/YR</div>
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #f8fafc;">Annual</h2>
+        <div style="font-size: 2.5rem; font-weight: 700; color: #22c55e;">$199<span style="font-size: 1rem; color: #94a3b8; font-weight: 400;">/yr</span></div>
+        <p style="color: #94a3b8; margin-bottom: 1.5rem;">Save 2 months (≈$16.58/mo)</p>
+        
+        <ul style="list-style: none; padding: 0; margin-bottom: 1.5rem; color: #e2e8f0;">
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ Everything in Monthly</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;"><strong>3 grant submissions/month</strong></li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ Priority support</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ Early access to features</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ Discounted custom tier</li>
+            <li style="padding: 0.5rem 0;">✓ 30-day money-back guarantee</li>
+        </ul>
+        
+        <form method="POST">
+            <input type="hidden" name="plan" value="annual">
+            <button type="submit" class="btn" style="width: 100%; background: #22c55e; color: white;">Start Annual</button>
+        </form>
+        <p style="text-align: center; font-size: 0.75rem; color: #64748b; margin-top: 0.5rem;">For your organization's grants only</p>
+    </div>
+    
+    <!-- Enterprise Plan -->
+    <div style="background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); border: 2px solid #2d5a87; border-radius: 12px; padding: 2rem; position: relative;">
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: white;">Enterprise</h2>
+        <div style="font-size: 2.5rem; font-weight: 700; color: white;">Custom</div>
+        <p style="color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;">For agencies & consultants</p>
+        
+        <ul style="list-style: none; padding: 0; margin-bottom: 1.5rem; color: rgba(255,255,255,0.9);">
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ Unlimited grant submissions</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ White-label options</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ API access</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ Dedicated account manager</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ Custom integrations</li>
+            <li style="padding: 0.5rem 0;">✓ Use for your clients</li>
+        </ul>
+        
+        <form method="POST">
+            <input type="hidden" name="plan" value="enterprise">
+            <button type="submit" class="btn" style="width: 100%; background: white; color: #1e3a5f;">Contact Us</button>
+        </form>
+        <p style="text-align: center; font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">Resale permitted</p>
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 2rem; color: #64748b;">
+    <p style="color: #94a3b8;">🔒 Secure payment processing via Stripe</p>
+    <p style="color: #94a3b8; margin-top: 0.5rem;">Questions? <a href="/contact" style="color: #3b82f6;">Contact support</a></p>
+</div>
+
+<div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; padding: 1rem; margin-top: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+    <p style="margin: 0; color: #94a3b8; font-size: 0.85rem; text-align: center;">
+        <strong style="color: #fca5a5;">Anti-Reseller Policy:</strong> 
+        Base plans (Monthly/Annual) are for your organization's grants only. 
+        Enterprise plan required if using for clients.
+    </p>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - Grant Pro</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+        .container { max-width: 500px; width: 100%; }
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 2rem; text-align: center; }
+        h1 { color: #22c55e; margin-bottom: 1rem; font-size: 1.75rem; }
+        .icon { font-size: 4rem; margin-bottom: 1rem; }
+        p { color: #94a3b8; margin-bottom: 1rem; line-height: 1.6; }
+        .highlight { background: #334155; padding: 1rem; border-radius: 8px; margin: 1.5rem 0; }
+        .highlight strong { color: #f8fafc; }
+        .btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 500; margin: 0.5rem; transition: all 0.2s; }
+        .btn-primary { background: #3b82f6; color: white; border: none; }
+        .btn-primary:hover { background: #2563eb; }
+    </style>
+
+    <!-- UserWay Accessibility Widget -->
+    <script async src="https://cdn.userway.org/widget.js#account=demo"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="icon">🎉</div>
+            <h1>Payment Successful!</h1>
+            
+            <div class="highlight">
+                <p>Welcome to the <strong>{{ plan.title() }} Plan</strong>!</p>
+            </div>
+            
+            <p>Your payment has been processed successfully. You now have access to:</p>
+            
+            {% if plan == 'monthly' %}
+            <ul style="text-align: left; color: #94a3b8; margin: 1rem 0 1.5rem; list-style: none;">
+                <li style="margin-bottom: 0.5rem;">✓ 3 grant submissions per month</li>
+                <li style="margin-bottom: 0.5rem;">✓ AI writing assistant</li>
+                <li style="margin-bottom: 0.5rem;">✓ 131+ agency templates</li>
+                <li style="margin-bottom: 0.5rem;">✓ DOCX/PDF export</li>
+                <li style="margin-bottom: 0.5rem;">✓ Guided submission workflow</li>
+            </ul>
+            {% elif plan == 'annual' %}
+            <ul style="text-align: left; color: #94a3b8; margin: 1rem 0 1.5rem; list-style: none;">
+                <li style="margin-bottom: 0.5rem;">✓ 3 grant submissions per month</li>
+                <li style="margin-bottom: 0.5rem;">✓ AI writing assistant</li>
+                <li style="margin-bottom: 0.5rem;">✓ 131+ agency templates</li>
+                <li style="margin-bottom: 0.5rem;">✓ Priority support</li>
+                <li style="margin-bottom: 0.5rem;">✓ Early access to features</li>
+            </ul>
+            {% endif %}
+            
+            <p>You can manage your subscription at any time from your dashboard.</p>
+            
+            <a href="/dashboard" class="btn btn-primary">Go to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>

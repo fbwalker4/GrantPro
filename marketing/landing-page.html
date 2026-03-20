@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grant Writer Pro | AI-Powered Grant Writing Services</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        header { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); color: white; padding: 20px 0; }
+        nav { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: bold; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 20px; }
+        
+        .hero { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); color: white; padding: 80px 0; text-align: center; }
+        .hero h1 { font-size: 3rem; margin-bottom: 20px; }
+        .hero p { font-size: 1.25rem; margin-bottom: 30px; opacity: 0.9; }
+        .cta-button { background: #f4a261; color: #1e3a5f; padding: 15px 40px; font-size: 1.1rem; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .cta-button:hover { background: #e76f51; }
+        
+        .features { padding: 80px 0; background: #f8f9fa; }
+        .features h2 { text-align: center; font-size: 2.5rem; margin-bottom: 50px; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .feature-card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .feature-card h3 { color: #1e3a5f; margin-bottom: 15px; font-size: 1.3rem; }
+        
+        .pricing { padding: 80px 0; }
+        .pricing h2 { text-align: center; font-size: 2.5rem; margin-bottom: 50px; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; max-width: 900px; margin: 0 auto; }
+        .pricing-card { border: 2px solid #ddd; border-radius: 10px; padding: 30px; text-align: center; }
+        .pricing-card.featured { border-color: #f4a261; background: #fffbf5; }
+        .pricing-card h3 { font-size: 1.5rem; margin-bottom: 15px; }
+        .price { font-size: 2.5rem; font-weight: bold; color: #1e3a5f; margin-bottom: 20px; }
+        .price span { font-size: 1rem; font-weight: normal; }
+        .pricing-card ul { list-style: none; text-align: left; margin-bottom: 20px; }
+        .pricing-card li { padding: 8px 0; border-bottom: 1px solid #eee; }
+        .pricing-card li:before { content: "✓"; color: #2d5a87; margin-right: 10px; }
+        
+        .process { padding: 80px 0; background: #f8f9fa; }
+        .process h2 { text-align: center; font-size: 2.5rem; margin-bottom: 50px; }
+        .process-steps { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; }
+        .step { background: white; padding: 30px; border-radius: 10px; width: 250px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .step-number { background: #1e3a5f; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-weight: bold; }
+        
+        .contact { padding: 80px 0; }
+        .contact h2 { text-align: center; font-size: 2.5rem; margin-bottom: 30px; }
+        .contact-form { max-width: 600px; margin: 0 auto; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
+        .form-group textarea { height: 150px; resize: vertical; }
+        
+        footer { background: #1e3a5f; color: white; padding: 40px 0; text-align: center; }
+        footer a { color: #f4a261; }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .feature-grid, .pricing-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">Grant Writer Pro</div>
+                <div class="nav-links">
+                    <a href="#features">Services</a>
+                    <a href="#pricing">Pricing</a>
+                    <a href="#process">How It Works</a>
+                    <a href="#contact">Contact</a>
+                    <a href="http://localhost:5001" target="_blank" style="background: #f4a261; padding: 8px 16px; border-radius: 4px; color: #1e3a5f; font-weight: bold;">Client Portal</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <div class="container">
+            <h1>Get Funded. We Write the Grants.</h1>
+            <p>AI-powered grant writing that actually works. We research, write, and submit winning proposals so you can focus on your mission.</p>
+            <a href="#contact" class="cta-button">Start Your Free Consultation</a>
+        </div>
+    </section>
+    
+    <section class="features" id="features">
+        <div class="container">
+            <h2>Our Services</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🔍 Grant Research</h3>
+                    <p>We find the perfect funding opportunities for your organization from federal, state, and private sources.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>✍️ Professional Writing</h3>
+                    <p>Our AI-assisted writers craft compelling, fundable proposals that stand out to reviewers.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📋 Full Submission Support</h3>
+                    <p>We handle the entire process from start to finish, including all required documentation.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>💰 Success-Based Pricing</h3>
+                    <p>Pay nothing upfront. We only get paid when you get funded. It's that simple.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <h2>Simple, Transparent Pricing</h2>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>Preparation</h3>
+                    <div class="price">$99</div>
+                    <ul>
+                        <li>Grant research & matching</li>
+                        <li>Eligibility verification</li>
+                        <li>Document checklist</li>
+                        <li>Strategy call</li>
+                    </ul>
+                </div>
+                <div class="pricing-card featured">
+                    <h3>Under $1M Funded</h3>
+                    <div class="price">$299</div>
+                    <ul>
+                        <li>Full grant writing</li>
+                        <li>Budget development</li>
+                        <li>Submission handling</li>
+                        <li>One revision round</li>
+                    </ul>
+                </div>
+                <div class="pricing-card">
+                    <h3>Over $1M Funded</h3>
+                    <div class="price">$499</div>
+                    <ul>
+                        <li>Everything in standard</li>
+                        <li>Multiple revision rounds</li>
+                        <li>Interview prep</li>
+                        <li>Negotiation support</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="process" id="process">
+        <div class="container">
+            <h2>How It Works</h2>
+            <div class="process-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Free Consultation</h3>
+                    <p>Tell us about your project and funding needs.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>We Research</h3>
+                    <p>We find the best grants for your specific situation.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>You Provide Docs</h3>
+                    <p>Upload your financials, board resolutions, and other materials.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>We Write & Submit</h3>
+                    <p>Professional grant written and submitted for you.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <h3>You Get Funded</h3>
+                    <p>Receive your award letter and celebrate!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="contact" id="contact">
+        <div class="container">
+            <h2>Get Started Today</h2>
+            <form class="contact-form" action="/submit" method="POST">
+                <div class="form-group">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="organization">Organization Name</label>
+                    <input type="text" id="organization" name="organization">
+                </div>
+                <div class="form-group">
+                    <label for="project">Tell Us About Your Project</label>
+                    <textarea id="project" name="project" placeholder="What are you trying to fund? What kind of organization are you?"></textarea>
+                </div>
+                <button type="submit" class="cta-button">Request Free Consultation</button>
+            </form>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Grant Writer Pro. All rights reserved.</p>
+            <p>Mississippi Gulf Coast | <a href="mailto:info@grantwriterpro.local">info@grantwriterpro.local</a></p>
+        </div>
+    </footer>
+</body>
+</html>

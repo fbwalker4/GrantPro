@@ -1,0 +1,35 @@
+{
+  "reminders": [
+    {
+      "id": "reminder_1",
+      "grant_id": "NSF-2025-001",
+      "title": "Smart and Connected Communities",
+      "deadline": "2026-03-23T00:00:00",
+      "grant_url": "https://www.grants.gov",
+      "created_at": "2026-03-16T15:02:50.008662",
+      "notifications": [],
+      "status": "active"
+    },
+    {
+      "id": "reminder_2",
+      "grant_id": "DOE-2025-001",
+      "title": "Small Business Innovation Research",
+      "deadline": "2026-03-19T00:00:00",
+      "grant_url": "https://www.grants.gov",
+      "created_at": "2026-03-16T15:02:50.008835",
+      "notifications": [],
+      "status": "active"
+    }
+  ],
+  "settings": {
+    "email_enabled": false,
+    "email_recipients": [],
+    "reminder_days": [
+      7,
+      3,
+      1
+    ],
+    "telegram_enabled": true,
+    "telegram_chat_id": null
+  }
+}

@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organization Profile - Grant Writer Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0f12;
+            --bg-secondary: #18181c;
+            --bg-tertiary: #222228;
+            --bg-card: #1c1c22;
+            --border-color: #2a2a32;
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --accent-primary: #2563eb;
+            --accent-hover: #3b82f6;
+            --accent-success: #059669;
+            --accent-warning: #d97706;
+            --accent-danger: #dc2626;
+            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            --gradient-success: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+        
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 100;
+        }
+        
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .sidebar-logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            padding: 0 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            transition: all 0.15s ease;
+            font-size: 0.9rem;
+        }
+        
+        .nav-link:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .nav-link.active {
+            background: rgba(37, 99, 235, 0.15);
+            color: #3b82f6;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 2rem;
+            max-width: 900px;
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            max-width: 600px;
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0 0 1.25rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(37, 99, 235, 0.15);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #3b82f6;
+            font-size: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-label .optional {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: border-color 0.15s;
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .form-hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.35rem;
+        }
+        
+        .form-hint a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+        
+        .form-hint a:hover {
+            text-decoration: underline;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s ease;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .skip-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .skip-link:hover {
+            color: var(--text-secondary);
+            text-decoration: underline;
+        }
+        
+        /* Checkbox group */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        
+        .checkbox-item:hover {
+            background: var(--border-color);
+        }
+        
+        .checkbox-item input {
+            accent-color: var(--accent-primary);
+        }
+        
+        .checkbox-item label {
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        /* Past grants */
+        .past-grant-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 100px 100px 80px auto;
+            gap: 0.75rem;
+            align-items: start;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.75rem;
+        }
+        
+        .past-grant-item input, .past-grant-item select {
+            padding: 0.5rem;
+            font-size: 0.85rem;
+        }
+        
+        .remove-btn {
+            background: transparent;
+            border: none;
+            color: var(--accent-danger);
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.25rem;
+            opacity: 0.7;
+        }
+        
+        .remove-btn:hover {
+            opacity: 1;
+        }
+        
+        .add-grant-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px dashed var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .add-grant-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+        
+        .flash-messages {
+            margin-bottom: 1.5rem;
+        }
+        
+        .flash {
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .flash-success {
+            background: rgba(5, 150, 105, 0.1);
+            border: 1px solid rgba(5, 150, 105, 0.3);
+            color: #10b981;
+        }
+        
+        .flash-error {
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            color: #dc2626;
+        }
+    </style>
+
+    <!-- UserWay Accessibility Widget -->
+    <script async src="https://cdn.userway.org/widget.js#account=demo"></script>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon"><img src="/static/images/gp_logo.png" alt="Grant Pro" style="width:36px;height:36px;object-fit:contain;border-radius:8px;"></div>
+                <span class="sidebar-logo-text">Grant Pro</span>
+            </div>
+            
+            <nav>
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="/dashboard" class="nav-link">
+                        <span>📊</span> Dashboard
+                    </a>
+                    <a href="/grants" class="nav-link">
+                        <span>🔍</span> Find Grants
+                    </a>
+                    <a href="/my-grants" class="nav-link">
+                        <span>📁</span> My Grants
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Manage</div>
+                    <a href="/clients" class="nav-link">
+                        <span>👥</span> Clients
+                    </a>
+                    <a href="/templates" class="nav-link">
+                        <span>📄</span> Templates
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="/profile" class="nav-link">
+                        <span>⚙️</span> Profile
+                    </a>
+                    <a href="/onboarding" class="nav-link active">
+                        <span>🏢</span> Organization
+                    </a>
+                    <a href="/logout" class="nav-link">
+                        <span>🚪</span> Logout
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash flash-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            
+            <div class="page-header">
+                <h1 class="page-title">Tell Us About Your Organization</h1>
+                <p class="page-subtitle">
+                    We save this information once so you don't have to re-enter it for every grant application. 
+                    Most grants ask for the same information — now it's all ready to go.
+                </p>
+            </div>
+            
+            <form method="POST" action="/onboarding">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <!-- Section 1: Federal Identifiers -->
+                <div class="card">
+                    <h2 class="card-title">
+                        <span class="card-icon">🏛️</span>
+                        Federal Identifiers
+                    </h2>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="ein">EIN (Employer Identification Number)</label>
+                            <input type="text" id="ein" name="ein" class="form-input" 
+                                   placeholder="XX-XXXXXXX" 
+                                   value="{{ org_details.ein or '' }}">
+                            <p class="form-hint">
+                                Required for most federal grants. 
+                                <a href="https://www.irs.gov/ein" target="_blank">Get one free from the IRS →</a>
+                            </p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="uei">UEI (Unique Entity ID) <span class="optional">(Recommended)</span></label>
+                            <input type="text" id="uei" name="uei" class="form-input" 
+                                   placeholder="XXXXXXXXXX" 
+                                   value="{{ org_details.uei or '' }}">
+                            <p class="form-hint">
+                                Required for federal grants. 
+                                <a href="https://www.sam.gov" target="_blank">Register at SAM.gov →</a> (replaces DUNS)
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="duns">DUNS Number <span class="optional">(Deprecated - UEI preferred)</span></label>
+                        <input type="text" id="duns" name="duns" class="form-input" 
+                               placeholder="XX-XXX-XXXX" 
+                               value="{{ org_details.duns or '' }}">
+                        <p class="form-hint">
+                            DUNS numbers are no longer required for federal grants. UEI has replaced it.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Section 2: Contact Information -->
+                <div class="card">
+                    <h2 class="card-title">
+                        <span class="card-icon">📍</span>
+                        Contact Information
+                    </h2>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="address_line1">Street Address</label>
+                            <input type="text" id="address_line1" name="address_line1" class="form-input" 
+                                   placeholder="123 Main Street" 
+                                   value="{{ org_details.address_line1 or '' }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="address_line2">Address Line 2 <span class="optional">(Optional)</span></label>
+                            <input type="text" id="address_line2" name="address_line2" class="form-input" 
+                                   placeholder="Suite 100" 
+                                   value="{{ org_details.address_line2 or '' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label class="form-label" for="city">City</label>
+                            <input type="text" id="city" name="city" class="form-input" 
+                                   placeholder="City" 
+                                   value="{{ org_details.city or '' }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="state">State</label>
+                            <select id="state" name="state" class="form-select">
+                                <option value="">Select...</option>
+                                <option value="AL" {% if org_details.state == 'AL' %}selected{% endif %}>Alabama</option>
+                                <option value="AK" {% if org_details.state == 'AK' %}selected{% endif %}>Alaska</option>
+                                <option value="AZ" {% if org_details.state == 'AZ' %}selected{% endif %}>Arizona</option>
+                                <option value="AR" {% if org_details.state == 'AR' %}selected{% endif %}>Arkansas</option>
+                                <option value="CA" {% if org_details.state == 'CA' %}selected{% endif %}>California</option>
+                                <option value="CO" {% if org_details.state == 'CO' %}selected{% endif %}>Colorado</option>
+                                <option value="CT" {% if org_details.state == 'CT' %}selected{% endif %}>Connecticut</option>
+                                <option value="DE" {% if org_details.state == 'DE' %}selected{% endif %}>Delaware</option>
+                                <option value="FL" {% if org_details.state == 'FL' %}selected{% endif %}>Florida</option>
+                                <option value="GA" {% if org_details.state == 'GA' %}selected{% endif %}>Georgia</option>
+                                <option value="HI" {% if org_details.state == 'HI' %}selected{% endif %}>Hawaii</option>
+                                <option value="ID" {% if org_details.state == 'ID' %}selected{% endif %}>Idaho</option>
+                                <option value="IL" {% if org_details.state == 'IL' %}selected{% endif %}>Illinois</option>
+                                <option value="IN" {% if org_details.state == 'IN' %}selected{% endif %}>Indiana</option>
+                                <option value="IA" {% if org_details.state == 'IA' %}selected{% endif %}>Iowa</option>
+                                <option value="KS" {% if org_details.state == 'KS' %}selected{% endif %}>Kansas</option>
+                                <option value="KY" {% if org_details.state == 'KY' %}selected{% endif %}>Kentucky</option>
+                                <option value="LA" {% if org_details.state == 'LA' %}selected{% endif %}>Louisiana</option>
+                                <option value="ME" {% if org_details.state == 'ME' %}selected{% endif %}>Maine</option>
+                                <option value="MD" {% if org_details.state == 'MD' %}selected{% endif %}>Maryland</option>
+                                <option value="MA" {% if org_details.state == 'MA' %}selected{% endif %}>Massachusetts</option>
+                                <option value="MI" {% if org_details.state == 'MI' %}selected{% endif %}>Michigan</option>
+                                <option value="MN" {% if org_details.state == 'MN' %}selected{% endif %}>Minnesota</option>
+                                <option value="MS" {% if org_details.state == 'MS' %}selected{% endif %}>Mississippi</option>
+                                <option value="MO" {% if org_details.state == 'MO' %}selected{% endif %}>Missouri</option>
+                                <option value="MT" {% if org_details.state == 'MT' %}selected{% endif %}>Montana</option>
+                                <option value="NE" {% if org_details.state == 'NE' %}selected{% endif %}>Nebraska</option>
+                                <option value="NV" {% if org_details.state == 'NV' %}selected{% endif %}>Nevada</option>
+                                <option value="NH" {% if org_details.state == 'NH' %}selected{% endif %}>New Hampshire</option>
+                                <option value="NJ" {% if org_details.state == 'NJ' %}selected{% endif %}>New Jersey</option>
+                                <option value="NM" {% if org_details.state == 'NM' %}selected{% endif %}>New Mexico</option>
+                                <option value="NY" {% if org_details.state == 'NY' %}selected{% endif %}>New York</option>
+                                <option value="NC" {% if org_details.state == 'NC' %}selected{% endif %}>North Carolina</option>
+                                <option value="ND" {% if org_details.state == 'ND' %}selected{% endif %}>North Dakota</option>
+                                <option value="OH" {% if org_details.state == 'OH' %}selected{% endif %}>Ohio</option>
+                                <option value="OK" {% if org_details.state == 'OK' %}selected{% endif %}>Oklahoma</option>
+                                <option value="OR" {% if org_details.state == 'OR' %}selected{% endif %}>Oregon</option>
+                                <option value="PA" {% if org_details.state == 'PA' %}selected{% endif %}>Pennsylvania</option>
+                                <option value="RI" {% if org_details.state == 'RI' %}selected{% endif %}>Rhode Island</option>
+                                <option value="SC" {% if org_details.state == 'SC' %}selected{% endif %}>South Carolina</option>
+                                <option value="SD" {% if org_details.state == 'SD' %}selected{% endif %}>South Dakota</option>
+                                <option value="TN" {% if org_details.state == 'TN' %}selected{% endif %}>Tennessee</option>
+                                <option value="TX" {% if org_details.state == 'TX' %}selected{% endif %}>Texas</option>
+                                <option value="UT" {% if org_details.state == 'UT' %}selected{% endif %}>Utah</option>
+                                <option value="VT" {% if org_details.state == 'VT' %}selected{% endif %}>Vermont</option>
+                                <option value="VA" {% if org_details.state == 'VA' %}selected{% endif %}>Virginia</option>
+                                <option value="WA" {% if org_details.state == 'WA' %}selected{% endif %}>Washington</option>
+                                <option value="WV" {% if org_details.state == 'WV' %}selected{% endif %}>West Virginia</option>
+                                <option value="WI" {% if org_details.state == 'WI' %}selected{% endif %}>Wisconsin</option>
+                                <option value="WY" {% if org_details.state == 'WY' %}selected{% endif %}>Wyoming</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="zip_code">ZIP Code</label>
+                            <input type="text" id="zip_code" name="zip_code" class="form-input" 
+                                   placeholder="12345" 
+                                   value="{{ org_details.zip_code or '' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" class="form-input" 
+                                   placeholder="(555) 123-4567" 
+                                   value="{{ org_details.phone or '' }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="website">Website <span class="optional">(Optional)</span></label>
+                            <input type="url" id="website" name="website" class="form-input" 
+                                   placeholder="https://example.org" 
+                                   value="{{ org_details.website or '' }}">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 3: Organization Profile -->
+                <div class="card">
+                    <h2 class="card-title">
+                        <span class="card-icon">📊</span>
+                        Organization Profile
+                    </h2>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="organization_type">Organization Type</label>
+                            <select id="organization_type" name="organization_type" class="form-select">
+                                <option value="">Select...</option>
+                                <option value="nonprofit" {% if org_profile.organization_type == 'nonprofit' %}selected{% endif %}>Nonprofit / 501(c)(3)</option>
+                                <option value="small_business" {% if org_profile.organization_type == 'small_business' %}selected{% endif %}>Small Business</option>
+                                <option value="government" {% if org_profile.organization_type == 'government' %}selected{% endif %}>Government / Public Entity</option>
+                                <option value="university" {% if org_profile.organization_type == 'university' %}selected{% endif %}>University / Educational Institution</option>
+                                <option value="tribal" {% if org_profile.organization_type == 'tribal' %}selected{% endif %}>Tribal Organization</option>
+                                <option value="individual" {% if org_profile.organization_type == 'individual' %}selected{% endif %}>Individual / Artist</option>
+                                <option value="other" {% if org_profile.organization_type == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="year_founded">Year Founded</label>
+                            <input type="number" id="year_founded" name="year_founded" class="form-input" 
+                                   placeholder="2000" min="1800" max="2030"
+                                   value="{{ org_profile.year_founded or '' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="annual_revenue">Annual Revenue/ Budget</label>
+                            <select id="annual_revenue" name="annual_revenue" class="form-select">
+                                <option value="">Select...</option>
+                                <option value="under_50k" {% if org_profile.annual_revenue == 'under_50k' %}selected{% endif %}>Under $50,000</option>
+                                <option value="50k_250k" {% if org_profile.annual_revenue == '50k_250k' %}selected{% endif %}>$50,000 - $250,000</option>
+                                <option value="250k_1m" {% if org_profile.annual_revenue == '250k_1m' %}selected{% endif %}>$250,000 - $1 million</option>
+                                <option value="1m_5m" {% if org_profile.annual_revenue == '1m_5m' %}selected{% endif %}>$1 million - $5 million</option>
+                                <option value="5m_10m" {% if org_profile.annual_revenue == '5m_10m' %}selected{% endif %}>$5 million - $10 million</option>
+                                <option value="over_10m" {% if org_profile.annual_revenue == 'over_10m' %}selected{% endif %}>Over $10 million</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="employees">Number of Employees</label>
+                            <select id="employees" name="employees" class="form-select">
+                                <option value="">Select...</option>
+                                <option value="1" {% if org_profile.employees == '1' %}selected{% endif %}>Just me (1)</option>
+                                <option value="2_5" {% if org_profile.employees == '2_5' %}selected{% endif %}>2-5</option>
+                                <option value="6_10" {% if org_profile.employees == '6_10' %}selected{% endif %}>6-10</option>
+                                <option value="11_25" {% if org_profile.employees == '11_25' %}selected{% endif %}>11-25</option>
+                                <option value="26_50" {% if org_profile.employees == '26_50' %}selected{% endif %}>26-50</option>
+                                <option value="51_100" {% if org_profile.employees == '51_100' %}selected{% endif %}>51-100</option>
+                                <option value="over_100" {% if org_profile.employees == 'over_100' %}selected{% endif %}>Over 100</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 4: Mission & Focus Areas -->
+                <div class="card">
+                    <h2 class="card-title">
+                        <span class="card-icon">🎯</span>
+                        Who Do You Serve?
+                    </h2>
+                    <p class="form-hint" style="margin-bottom: 1rem;">
+                        Select the populations or areas your organization focuses on. This helps us find grants that match your mission.
+                    </p>
+                    
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="focus_youth" name="focus_areas" value="Youth" {% if 'Youth' in focus_areas %}checked{% endif %}>
+                            <label for="focus_youth">Youth & Children</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="focus_seniors" name="focus_areas" value="Seniors" {% if 'Seniors' in focus_areas %}checked{% endif %}>
+                            <label for="focus_seniors">Seniors / Elderly</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="focus_veterans" name="focus_areas" value="Veterans" {% if 'Veterans' in focus_areas %}checked{% endif %}>
+                            <label for="focus_veterans">Veterans</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="focus_homeless" name="focus_areas" value="Homeless" {% if 'Homeless' in focus_areas %}checked{% endif %}>
+                            <label for="focus_homeless">Homeless / Housing</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="focus_health" name="focus_areas" value="Health" {% if 'Health' in focus_areas %}checked{% endif %}>
+                            <label for="focus_health">Health & Wellness</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="focus_education" name="focus_areas" value="Education" {% if 'Education' in focus_areas %}checked{% endif %}>
+                            <label for="focus_education">Education</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="focus_arts" name="focus_areas" value="Arts" {% if 'Arts' in focus_areas %}checked{% endif %}>
+                            <label for="focus_arts">Arts & Culture</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="focus_environment" name="focus_areas" value="Environment" {% if 'Environment' in focus_areas %}checked{% endif %}>
+                            <label for="focus_environment">Environment</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="focus_community" name="focus_areas" value="Community Development" {% if 'Community Development' in focus_areas %}checked{% endif %}>
+                            <label for="focus_community">Community Development</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="focus_disability" name="focus_areas" value="Disability" {% if 'Disability' in focus_areas %}checked{% endif %}>
+                            <label for="focus_disability">Disability Services</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="focus_small_business" name="focus_areas" value="Small Business" {% if 'Small Business' in focus_areas %}checked{% endif %}>
+                            <label for="focus_small_business">Small Business / Economic Dev</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="focus_technology" name="focus_areas" value="Technology" {% if 'Technology' in focus_areas %}checked{% endif %}>
+                            <label for="focus_technology">Technology</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 5: Past Grant Experience -->
+                <div class="card">
+                    <h2 class="card-title">
+                        <span class="card-icon">📜</span>
+                        Past Grant Experience <span class="optional">(Optional)</span>
+                    </h2>
+                    <p class="form-hint" style="margin-bottom: 1rem;">
+                        List any grants you've received in the past. This helps us highlight similar opportunities.
+                    </p>
+                    
+                    <div id="past-grants-container">
+                        {% if past_grants %}
+                            {% for grant in past_grants %}
+                            <div class="past-grant-item">
+                                <input type="text" name="grant_name" placeholder="Grant name" value="{{ grant.grant_name or '' }}">
+                                <input type="text" name="funding_organization" placeholder="Funder" value="{{ grant.funding_organization or '' }}">
+                                <input type="number" name="year_received" placeholder="Year" min="1900" max="2030" value="{{ grant.year_received or '' }}">
+                                <input type="number" name="amount_received" placeholder="Amount" value="{{ grant.amount_received or '' }}">
+                                <select name="grant_status">
+                                    <option value="completed" {% if grant.status == 'completed' %}selected{% endif %}>Completed</option>
+                                    <option value="active" {% if grant.status == 'active' %}selected{% endif %}>Active</option>
+                                </select>
+                                <button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <button type="button" class="add-grant-btn" onclick="addPastGrant()">
+                        + Add Past Grant
+                    </button>
+                </div>
+                
+                <!-- Actions -->
+                <div class="form-actions">
+                    <a href="/dashboard" class="skip-link">Skip for now</a>
+                    <button type="submit" class="btn btn-primary">Save Organization Profile</button>
+                </div>
+            </form>
+        </main>
+    </div>
+    
+    <script>
+        function addPastGrant() {
+            const container = document.getElementById('past-grants-container');
+            const div = document.createElement('div');
+            div.className = 'past-grant-item';
+            div.innerHTML = `
+                <input type="text" name="grant_name" placeholder="Grant name">
+                <input type="text" name="funding_organization" placeholder="Funder">
+                <input type="number" name="year_received" placeholder="Year" min="1900" max="2030">
+                <input type="number" name="amount_received" placeholder="Amount">
+                <select name="grant_status">
+                    <option value="completed">Completed</option>
+                    <option value="active">Active</option>
+                </select>
+                <button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(div);
+        }
+    </script>
+</body>
+</html>

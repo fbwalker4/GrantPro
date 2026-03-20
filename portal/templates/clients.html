@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Clients - Grant Writer Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0f12;
+            --bg-secondary: #18181c;
+            --bg-tertiary: #222228;
+            --bg-card: #1c1c22;
+            --border-color: #2a2a32;
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --accent-primary: #2563eb;
+            --accent-hover: #3b82f6;
+            --accent-success: #059669;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        h1 { font-family: 'Fraunces', serif; font-size: 2rem; margin-bottom: 2rem; }
+        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.2s; }
+        .btn-primary { background: var(--accent-primary); color: white; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .clients-grid { display: grid; gap: 1rem; }
+        .client-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; }
+        .client-card h3 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+        .client-card p { color: var(--text-secondary); font-size: 0.9rem; }
+        .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
+    </style>
+</head>
+<body style="background-color: #0f0f12 !important;">
+    {% extends "layout.html" %}
+    {% block content %}
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>My Clients</h1>
+            <a href="/client/new" class="btn btn-primary">+ Add Client</a>
+        </div>
+        
+        {% if clients %}
+        <div class="clients-grid">
+            {% for client in clients %}
+            <div class="client-card">
+                <h3>{{ client.name }}</h3>
+                <p>{{ client.description or 'No description' }}</p>
+                <p style="margin-top: 0.5rem; font-size: 0.85rem;">
+                    <strong>Type:</strong> {{ client.organization_type or 'Individual' }} | 
+                    <strong>Created:</strong> {{ client.created_at or 'N/A' }}
+                </p>
+                <div style="margin-top: 1rem;">
+                    <a href="/client/{{ client.id }}" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">View Details</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h2 style="margin-bottom: 1rem;">No clients yet</h2>
+            <p>Add your first client to start managing their grants.</p>
+            <a href="/client/new" class="btn btn-primary" style="margin-top: 1.5rem;">Add Your First Client</a>
+        </div>
+        {% endif %}
+    </div>
+    {% endblock %}
+</body>
+</html>

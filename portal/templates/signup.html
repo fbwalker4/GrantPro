@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Grant Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fc;
+            --bg-tertiary: #f1f3f6;
+            --bg-card: #ffffff;
+            --border-color: #e2e5ed;
+            --text-primary: #1a1f36;
+            --text-secondary: #5e6278;
+            --text-muted: #8993a4;
+            --accent-primary: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-success: #059669;
+            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .login-logo {
+            width: 64px;
+            height: 64px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .login-logo svg {
+            width: 32px;
+            height: 32px;
+            fill: white;
+        }
+        
+        .login-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-subtitle {
+            color: var(--text-secondary);
+        }
+        
+        .plan-banner {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .plan-banner h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .plan-banner p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        .login-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: border-color 0.15s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s ease;
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+        
+        .login-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .login-footer a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+        
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .flash {
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .flash-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #dc2626;
+        }
+        
+        .flash-success {
+            background: rgba(5, 150, 105, 0.1);
+            border: 1px solid rgba(5, 150, 105, 0.3);
+            color: #059669;
+        }
+    </style>
+
+    <!-- UserWay Accessibility Widget -->
+    <script async src="https://cdn.userway.org/widget.js#account=demo"></script>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="login-logo">
+                <img src="/static/images/gp_logo.png" alt="Grant Pro" style="width:56px;height:56px;object-fit:contain;border-radius:10px;background:rgba(37,99,235,0.08);padding:6px;">
+            </div>
+            <h1 class="login-title">Create Account</h1>
+            <p class="login-subtitle">Start your grant writing journey</p>
+        </div>
+        
+        <!-- Plan Banner -->
+        {% if plan == 'free' %}
+        <div class="plan-banner" style="background: #1e293b; border: 1px solid #334155;">
+            <h3 style="color: #e2e8f0;">Free Tier Selected</h3>
+            <p style="color: #94a3b8;">Search 131 grants for free. No credit card required. Upgrades available after signup.</p>
+        </div>
+        {% elif plan == 'monthly' %}
+        <div class="plan-banner" style="background: #1e3a5f; border: 1px solid #3b82f6;">
+            <h3 style="color: #60a5fa;">Monthly Plan - $19.95/mo</h3>
+            <p style="color: #93c5fd;">3 grant submissions/month. Cancel anytime.</p>
+        </div>
+        {% elif plan == 'annual' %}
+        <div class="plan-banner" style="background: #14532d; border: 1px solid #22c55e;">
+            <h3 style="color: #4ade80;">Annual Plan - $199/yr</h3>
+            <p style="color: #86efac;">Save $40/year. 3 grants/month. Best value!</p>
+        </div>
+        {% elif plan == 'enterprise' %}
+        <div class="plan-banner" style="background: #1e3a5f; border: 1px solid #2d5a87;">
+            <h3 style="color: #60a5fa;">Enterprise Plan</h3>
+            <p style="color: #93c5fd;">Unlimited submissions. White-label. For agencies & consultants.</p>
+        </div>
+        {% endif %}
+        
+        <div class="login-card">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">
+                            {% if category == 'error' %}⚠{% else %}✓{% endif %} {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST" action="/signup">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="plan" value="{{ plan }}">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="first_name">First Name</label>
+                        <input type="text" id="first_name" name="first_name" class="form-input" required placeholder="John">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="last_name">Last Name</label>
+                        <input type="text" id="last_name" name="last_name" class="form-input" required placeholder="Doe">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-input" required placeholder="you@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-input" required placeholder="Min 6 characters" minlength="6">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="organization">Organization Name</label>
+                    <input type="text" id="organization" name="organization" class="form-input" placeholder="Your Organization">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    Create Account
+                </button>
+            </form>
+            
+            <div class="divider">or</div>
+            
+            <a href="/login" class="btn" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color);">
+                Sign In Instead
+            </a>
+        </div>
+        
+        <div class="login-footer">
+            Already have an account? <a href="/login">Sign in</a>
+        </div>
+    </div>
+</body>
+</html>

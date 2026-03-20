@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}Edit: {{ section.replace('_', ' ').title() }}{% endblock %}
+
+{% block content %}
+<h1>Edit: {{ section.replace('_', ' ').title() }}</h1>
+<p><a href="/grant/{{ grant.id }}">← Back to Grant</a></p>
+
+{% if section_guidance %}
+<div class="card" style="background: #fff3cd; border-color: #ffc107; margin-bottom: 1rem;">
+    <h3 style="color: #856404; margin-top: 0;">📋 Agency Guidance</h3>
+    <p style="color: #856404;">{{ section_guidance.guidance }}</p>
+    {% if section_guidance.max_pages %}
+    <p style="color: #856404;"><strong>Max Pages:</strong> {{ section_guidance.max_pages }}</p>
+    {% endif %}
+    {% if section_guidance.max_chars %}
+    <p style="color: #856404;"><strong>Max Characters:</strong> {{ section_guidance.max_chars }}</p>
+    {% endif %}
+    {% if section_guidance.required %}
+    <p style="color: #856404;"><strong>Required:</strong> Yes</p>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="card">
+    <form method="POST">
+        <label for="content">{{ section.replace('_', ' ').title() }} Content</label>
+        <textarea id="content" name="content" style="min-height: 400px;">{{ content }}</textarea>
+        
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-primary">Save Section</button>
+            <a href="/grant/{{ grant.id }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h3>Quick Tips</h3>
+    <ul style="color: #666;">
+        <li>Write in clear, concise language appropriate for the grant agency</li>
+        <li>Avoid jargon - reviewers may not be technical experts in your field</li>
+        <li>Include specific metrics and outcomes where possible</li>
+        <li>Keep paragraphs under 200 words for readability</li>
+    </ul>
+</div>
+{% endblock %}

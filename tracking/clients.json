@@ -1,0 +1,45 @@
+{
+  "clients": [
+    {
+      "id": "client-001",
+      "organization_name": "Example Organization",
+      "contact_name": "John Smith",
+      "contact_email": "john@example.org",
+      "project_title": "Smart City IoT Initiative",
+      "status": "in_progress",
+      "current_stage": "document_collection",
+      "created_at": "2025-03-15T10:00:00Z",
+      "updated_at": "2025-03-16T14:30:00Z",
+      "assigned_grants": ["iot-2025-001", "iot-2025-003"],
+      "documents": {
+        "501c3_letter": {"status": "received", "uploaded_at": "2025-03-15"},
+        "financials": {"status": "received", "uploaded_at": "2025-03-15"},
+        "board_list": {"status": "pending", "notes": ""},
+        "project_budget": {"status": "draft", "notes": ""},
+        "audit": {"status": "not_required", "notes": "Under $750k threshold"},
+        "staff_bios": {"status": "pending", "notes": ""}
+      },
+      "intake_completed": true,
+      "agreement_signed": true,
+      "initial_payment": {"amount": 99, "status": "paid", "date": "2025-03-15"},
+      "success_fee": {"amount": 0, "status": "pending", "notes": ""},
+      "notes": [
+        {"date": "2025-03-15", "note": "Initial consultation completed"},
+        {"date": "2025-03-16", "note": "Received 501c3 letter and financials"}
+      ]
+    }
+  ],
+  "pipeline": {
+    "stages": [
+      {"id": "new", "name": "New Lead", "color": "#95a5a6"},
+      {"id": "intake", "name": "Intake In Progress", "color": "#3498db"},
+      {"id": "document_collection", "name": "Collecting Documents", "color": "#9b59b6"},
+      {"id": "research", "name": "Grant Research", "color": "#f39c12"},
+      {"id": "drafting", "name": "Writing Draft", "color": "#e67e22"},
+      {"id": "review", "name": "Client Review", "color": "#1abc9c"},
+      {"id": "submission", "name": "Submitting", "color": "#e74c3c"},
+      {"id": "awarded", "name": "Awarded", "color": "#27ae60"},
+      {"id": "rejected", "name": "Not Funded", "color": "#7f8c8d"}
+    ]
+  }
+}

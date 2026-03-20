@@ -1,0 +1,226 @@
+{% extends "layout.html" %}
+
+{% block title %}Manage Grants - Admin - Grant Writer Pro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">🏛️ Grant Management</h1>
+        <p class="page-subtitle">Add, edit, and manage grants in the database</p>
+    </div>
+    <button class="btn btn-primary" onclick="showAddForm()">➕ Add Grant</button>
+</div>
+
+<!-- Add/Edit Form Modal -->
+<div id="grantForm" class="card" style="display: none; margin-bottom: 2rem;">
+    <h2 class="card-title" id="formTitle">Add New Grant</h2>
+    <form method="POST" id="grantFormData">
+        <input type="hidden" name="action" id="formAction" value="add">
+        <input type="hidden" name="id" id="grantId">
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+            <div class="form-group">
+                <label>Grant ID (unique)</label>
+                <input type="text" name="id" id="inputId" required placeholder="e.g., nsf-2026-001">
+            </div>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" name="title" id="inputTitle" required placeholder="Grant title">
+            </div>
+            <div class="form-group">
+                <label>Agency</label>
+                <select name="agency" id="inputAgency">
+                    <option value="">Select agency...</option>
+                    {% for agency in agencies %}
+                    <option value="{{ agency }}">{{ agency }}</option>
+                    {% endfor %}
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select name="category" id="inputCategory">
+                    <option value="">Select category...</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}">{{ cat }}</option>
+                    {% endfor %}
+                    <option value="Technology">Technology</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Education">Education</option>
+                    <option value="Environment">Environment</option>
+                    <option value="Energy">Energy</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Min Amount ($)</label>
+                <input type="number" name="amount_min" id="inputAmountMin" value="0">
+            </div>
+            <div class="form-group">
+                <label>Max Amount ($)</label>
+                <input type="number" name="amount_max" id="inputAmountMax" value="0">
+            </div>
+            <div class="form-group">
+                <label>Deadline</label>
+                <input type="date" name="deadline" id="inputDeadline">
+            </div>
+            <div class="form-group">
+                <label>Template</label>
+                <select name="template" id="inputTemplate">
+                    <option value="generic">Generic</option>
+                    <option value="nsf">NSF</option>
+                    <option value="doe">DOE</option>
+                    <option value="nih">NIH</option>
+                    <option value="usda">USDA</option>
+                    <option value="epa">EPA</option>
+                    <option value="dot">DOT</option>
+                    <option value="nist">NIST</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" id="inputDescription" rows="3" placeholder="Grant description"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>Eligibility</label>
+            <input type="text" name="eligibility" id="inputEligibility" placeholder="Who is eligible">
+        </div>
+        
+        <div class="form-group">
+            <label>URL</label>
+            <input type="url" name="url" id="inputUrl" placeholder="https://...">
+        </div>
+        
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-primary">Save Grant</button>
+            <button type="button" class="btn btn-secondary" onclick="hideForm()">Cancel</button>
+        </div>
+    </form>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="stat-icon purple">📋</div>
+        <div class="stat-value">{{ grants|length }}</div>
+        <div class="stat-label">Total Grants</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">🏛️</div>
+        <div class="stat-value">{{ agencies|length }}</div>
+        <div class="stat-label">Agencies</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon amber">📅</div>
+        <div class="stat-value">{{ grants|selectattr('deadline')|list|length }}</div>
+        <div class="stat-label">With Deadlines</div>
+    </div>
+</div>
+
+<!-- Grants Table -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">All Grants</h2>
+        <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="searchGrants" placeholder="Search grants..." onkeyup="filterGrants()" style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary);">
+        </div>
+    </div>
+    
+    {% if grants %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Agency</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Deadline</th>
+                    <th>Template</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="grantsTable">
+                {% for grant in grants %}
+                <tr>
+                    <td><code style="font-size: 0.8rem;">{{ grant.id }}</code></td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">{{ grant.title }}</td>
+                    <td><span class="badge badge-purple">{{ grant.agency }}</span></td>
+                    <td>{{ grant.category or '-' }}</td>
+                    <td style="font-family: 'Fraunces', serif; color: var(--accent-success);">
+                        ${{ "{:,.0f}".format(grant.amount_max) if grant.amount_max else '-' }}
+                    </td>
+                    <td>{{ grant.deadline[:10] if grant.deadline else '-' }}</td>
+                    <td><span class="badge badge-amber">{{ grant.template }}</span></td>
+                    <td>
+                        <button class="btn btn-ghost btn-sm" onclick="editGrant('{{ grant.id }}')">Edit</button>
+                        <a href="/admin/grants/delete?id={{ grant.id }}" class="btn btn-ghost btn-sm" style="color: var(--accent-warning);" onclick="return confirm('Delete this grant?')">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <div class="empty-title">No grants in database</div>
+        <p>Add grants using the form above</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+const grantsData = {{ grants|tojson }};
+
+function showAddForm() {
+    document.getElementById('grantForm').style.display = 'block';
+    document.getElementById('formTitle').textContent = 'Add New Grant';
+    document.getElementById('formAction').value = 'add';
+    document.getElementById('grantFormData').action = '/admin/grants/add';
+    document.getElementById('grantFormData').reset();
+    document.getElementById('inputId').disabled = false;
+}
+
+function hideForm() {
+    document.getElementById('grantForm').style.display = 'none';
+}
+
+function editGrant(id) {
+    const grant = grantsData.find(g => g.id === id);
+    if (!grant) return;
+    
+    document.getElementById('grantForm').style.display = 'block';
+    document.getElementById('formTitle').textContent = 'Edit Grant';
+    document.getElementById('formAction').value = 'edit';
+    document.getElementById('grantFormData').action = '/admin/grants/edit';
+    
+    document.getElementById('inputId').value = grant.id;
+    document.getElementById('inputId').disabled = true;
+    document.getElementById('inputTitle').value = grant.title || '';
+    document.getElementById('inputAgency').value = grant.agency || '';
+    document.getElementById('inputCategory').value = grant.category || '';
+    document.getElementById('inputAmountMin').value = grant.amount_min || 0;
+    document.getElementById('inputAmountMax').value = grant.amount_max || 0;
+    document.getElementById('inputDeadline').value = grant.deadline ? grant.deadline.substring(0, 10) : '';
+    document.getElementById('inputTemplate').value = grant.template || 'generic';
+    document.getElementById('inputDescription').value = grant.description || '';
+    document.getElementById('inputEligibility').value = grant.eligibility || '';
+    document.getElementById('inputUrl').value = grant.url || '';
+}
+
+function filterGrants() {
+    const search = document.getElementById('searchGrants').value.toLowerCase();
+    const rows = document.querySelectorAll('#grantsTable tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(search) ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

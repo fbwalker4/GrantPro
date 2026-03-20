@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block title %}Grant Templates{% endblock %}
+
+{% block content %}
+<h1>📋 Agency Grant Templates</h1>
+<p style="color: #666; margin-bottom: 2rem;">These templates are based on actual requirements from each federal agency.</p>
+
+{% for template_id, template in templates.items() %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 style="margin: 0;">{{ template.name }}</h2>
+            <p style="color: #666; margin: 0.5rem 0;">{{ template.full_name }}</p>
+        </div>
+        <a href="/template/{{ template_id }}" class="btn btn-primary">View Template</a>
+    </div>
+    
+    <div style="margin-top: 1rem;">
+        <strong>Required Forms:</strong>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+            {% for form in template.forms[:6] %}
+            <span style="background: #e3f2fd; color: #1565c0; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem;">{{ form }}</span>
+            {% endfor %}
+            {% if template.forms|length > 6 %}
+            <span style="color: #666;">+{{ template.forms|length - 6 }} more</span>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div style="margin-top: 1rem;">
+        <strong>Sections:</strong> {{ template.required_sections|length }} required sections
+    </div>
+</div>
+{% endfor %}
+
+<div class="card">
+    <h2>How Templates Work</h2>
+    <ol style="color: #666;">
+        <li><strong>Search</strong> for a grant in the Research section</li>
+        <li><strong>Select</strong> a grant and choose a client</li>
+        <li><strong>System creates</strong> grant with the correct template sections</li>
+        <li><strong>Each section</strong> includes guidance on what to write</li>
+        <li><strong>Use Guided Submission</strong> to help client copy/paste into the actual grant portal</li>
+    </ol>
+</div>
+{% endblock %}

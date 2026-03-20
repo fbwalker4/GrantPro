@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Payment - Grant Pro</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+        .container { max-width: 500px; width: 100%; }
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 2rem; }
+        h1 { color: #f8fafc; margin-bottom: 1rem; font-size: 1.5rem; }
+        p { color: #94a3b8; margin-bottom: 1rem; line-height: 1.6; }
+        .highlight { background: #334155; padding: 1rem; border-radius: 8px; margin: 1.5rem 0; }
+        .highlight strong { color: #f8fafc; }
+        .btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 500; margin-right: 0.5rem; transition: all 0.2s; }
+        .btn-primary { background: #3b82f6; color: white; border: none; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-secondary { background: transparent; color: #94a3b8; border: 1px solid #475569; }
+        .btn-secondary:hover { border-color: #64748b; color: #e2e8f0; }
+        .alert { padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+        .alert-warning { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: #fcd34d; }
+    </style>
+
+    <!-- UserWay Accessibility Widget -->
+    <script async src="https://cdn.userway.org/widget.js#account=demo"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Manual Payment</h1>
+            
+            <div class="alert alert-warning">
+                Stripe is not configured. To complete your upgrade, please contact us.
+            </div>
+            
+            <div class="highlight">
+                <p><strong>Selected Plan:</strong> {{ plan.title() }}</p>
+                {% if plan == 'monthly' %}
+                <p><strong>Price:</strong> $19.95/month</p>
+                {% elif plan == 'annual' %}
+                <p><strong>Price:</strong> $199/year</p>
+                {% elif plan == 'enterprise' %}
+                <p><strong>Price:</strong> Custom pricing</p>
+                {% endif %}
+            </div>
+            
+            <p>We'll send you an invoice and payment instructions. Once payment is processed, your account will be upgraded.</p>
+            
+            <p><strong>Next steps:</strong></p>
+            <ol style="color: #94a3b8; margin-left: 1.5rem; margin-bottom: 1.5rem;">
+                <li>We'll email you an invoice</li>
+                <li>Payment can be made via check or bank transfer</li>
+                <li>Once verified, your account will be upgraded</li>
+            </ol>
+            
+            <a href="/contact?type=payment" class="btn btn-primary">Contact Us</a>
+            <a href="/" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Grant Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0f12;
+            --bg-secondary: #18181c;
+            --bg-tertiary: #222228;
+            --bg-card: #1c1c22;
+            --border-color: #2a2a32;
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --accent-primary: #2563eb;
+            --accent-hover: #3b82f6;
+            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+        .container { max-width: 600px; width: 100%; }
+        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; }
+        h1 { font-family: 'Fraunces', serif; color: var(--text-primary); margin-bottom: 0.5rem; font-size: 1.75rem; }
+        .subtitle { color: var(--text-secondary); margin-bottom: 2rem; }
+        .form-group { margin-bottom: 1.25rem; }
+        label { display: block; color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 500; }
+        input, textarea, select { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-tertiary); color: var(--text-primary); font-size: 1rem; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent-primary); }
+        textarea { min-height: 120px; resize: vertical; }
+        .btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: var(--radius-sm); text-decoration: none; font-weight: 600; transition: all 0.2s; cursor: pointer; border: none; }
+        .btn-primary { background: var(--gradient-primary); color: white; }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        .btn-secondary { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { border-color: var(--text-muted); color: var(--text-primary); }
+        .enterprise-badge { display: inline-block; background: var(--accent-primary); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-bottom: 1rem; }
+    </style>
+
+    <!-- UserWay Accessibility Widget -->
+    <script async src="https://cdn.userway.org/widget.js#account=demo"></script>
+</head>
+<body style="background-color: #0f0f12 !important; color: #f4f4f5;">
+    <div class="container">
+        <div class="card" style="background-color: #1c1c22;">
+            {% if inquiry_type == 'enterprise' %}
+            <div class="enterprise-badge">ENTERPRISE INQUIRY</div>
+            {% endif %}
+            
+            <h1>Contact Us</h1>
+            <p class="subtitle">We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+            
+            <form method="POST" action="/contact">
+                <input type="hidden" name="inquiry_type" value="{{ inquiry_type }}">
+                
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required placeholder="Your name" value="{{ user.first_name + ' ' + user.last_name if user else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required placeholder="you@company.com" value="{{ user.email if user else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="company">Organization (optional)</label>
+                    <input type="text" id="company" name="company" placeholder="Your organization name" value="{{ user.organization_name if user else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" required placeholder="Tell us about your needs..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Send Message</button>
+                <a href="/" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

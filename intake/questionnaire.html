@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grant Intake Questionnaire</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        
+        header { background: #1e3a5f; color: white; padding: 30px 0; text-align: center; margin-bottom: 30px; }
+        h1 { font-size: 2rem; }
+        
+        .form-card { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 20px rgba(0,0,0,0.1); }
+        
+        .section { margin-bottom: 40px; padding-bottom: 30px; border-bottom: 2px solid #f0f0f0; }
+        .section:last-child { border-bottom: none; }
+        .section h2 { color: #1e3a5f; font-size: 1.4rem; margin-bottom: 20px; }
+        .section p { color: #666; margin-bottom: 20px; font-size: 0.95rem; }
+        
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; }
+        .form-group label .required { color: #e74c3c; }
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group input[type="url"],
+        .form-group input[type="number"],
+        .form-group input[type="date"],
+        .form-group textarea,
+        .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #1e3a5f; }
+        
+        .checkbox-group, .radio-group { display: flex; flex-direction: column; gap: 10px; }
+        .checkbox-item, .radio-item { display: flex; align-items: center; gap: 10px; }
+        .checkbox-item input, .radio-item input { width: auto; }
+        
+        .btn-group { display: flex; gap: 15px; justify-content: center; margin-top: 30px; }
+        .btn { padding: 15px 40px; font-size: 1rem; font-weight: 600; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-primary { background: #1e3a5f; color: white; }
+        .btn-secondary { background: #95a5a6; color: white; }
+        
+        .progress { background: #e0e0e0; height: 8px; border-radius: 4px; margin-bottom: 30px; }
+        .progress-bar { background: #27ae60; height: 100%; border-radius: 4px; transition: width 0.3s; }
+        
+        .help-text { font-size: 0.85rem; color: #888; margin-top: 5px; }
+        
+        @media (max-width: 600px) {
+            .form-card { padding: 20px; }
+            .btn-group { flex-direction: column; }
+            .btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Grant Intake Questionnaire</h1>
+            <p>Tell us about your organization and funding needs</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="progress"><div class="progress-bar" style="width: 0%"></div></div>
+        
+        <div class="form-card">
+            <form id="intakeForm" action="/api/intake/submit" method="POST">
+                
+                <!-- Section 1: Organization Info -->
+                <div class="section">
+                    <h2>1. Organization Information</h2>
+                    
+                    <div class="form-group">
+                        <label>Organization Name <span class="required">*</span></label>
+                        <input type="text" name="org_name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Organization Type <span class="required">*</span></label>
+                        <select name="org_type" required>
+                            <option value="">Select type...</option>
+                            <option value="501c3">501(c)(3) Nonprofit</option>
+                            <option value="501c4">501(c)(4) Nonprofit</option>
+                            <option value="501c6">501(c)(6) Business League</option>
+                            <option value="government">Government Entity</option>
+                            <option value="tribal">Tribal Government</option>
+                            <option value="higher_ed">Higher Education</option>
+                            <option value="healthcare">Healthcare Organization</option>
+                            <option value="small_business">Small Business</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>EIN / Tax ID</label>
+                        <input type="text" name="ein" placeholder="XX-XXXXXXX">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Year Established</label>
+                        <input type="number" name="year_established" min="1800" max="2025">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Mission Statement <span class="required">*</span></label>
+                        <textarea name="mission" required placeholder="In a few sentences, what is your organization's mission?"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Organization Website</label>
+                        <input type="url" name="website" placeholder="https://">
+                    </div>
+                </div>
+                
+                <!-- Section 2: Contact Info -->
+                <div class="section">
+                    <h2>2. Primary Contact</h2>
+                    
+                    <div class="form-group">
+                        <label>Full Name <span class="required">*</span></label>
+                        <input type="text" name="contact_name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Title/Position <span class="required">*</span></label>
+                        <input type="text" name="contact_title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email Address <span class="required">*</span></label>
+                        <input type="email" name="contact_email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" name="contact_phone">
+                    </div>
+                </div>
+                
+                <!-- Section 3: Project Info -->
+                <div class="section">
+                    <h2>3. Project Information</h2>
+                    
+                    <div class="form-group">
+                        <label>Project Title</label>
+                        <input type="text" name="project_title" placeholder="What do you want to fund?">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Project Description <span class="required">*</span></label>
+                        <textarea name="project_description" required placeholder="Describe your project in detail. What will the funds be used for?"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Total Funding Amount Needed <span class="required">*</span></label>
+                        <input type="number" name="funding_amount" min="1000" required placeholder="$">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Project Duration</label>
+                        <select name="project_duration">
+                            <option value="">Select...</option>
+                            <option value="6months">6 months</option>
+                            <option value="1year">1 year</option>
+                            <option value="2years">2 years</option>
+                            <option value="3years">3 years</option>
+                            <option value="5years">5+ years</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Project Focus Areas</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item"><input type="checkbox" name="focus[]" value="technology"> Technology/IoT</div>
+                            <div class="checkbox-item"><input type="checkbox" name="focus[]" value="healthcare"> Healthcare</div>
+                            <div class="checkbox-item"><input type="checkbox" name="focus[]" value="education"> Education</div>
+                            <div class="checkbox-item"><input type="checkbox" name="focus[]" value="environment"> Environment</div>
+                            <div class="checkbox-item"><input type="checkbox" name="focus[]" value="workforce"> Workforce Development</div>
+                            <div class="checkbox-item"><input type="checkbox" name="focus[]" value="infrastructure"> Infrastructure</div>
+                            <div class="checkbox-item"><input type="checkbox" name="focus[]" value="research"> Research</div>
+                            <div class="checkbox-item"><input type="checkbox" name="focus[]" value="other"> Other</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section 4: Financial Info -->
+                <div class="section">
+                    <h2>4. Financial Information</h2>
+                    
+                    <div class="form-group">
+                        <label>Annual Operating Budget</label>
+                        <input type="number" name="annual_budget" placeholder="$">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Current Unrestricted Cash</label>
+                        <input type="number" name="cash_on_hand" placeholder="$">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Has the organization received grants before?</label>
+                        <div class="radio-group">
+                            <div class="radio-item"><input type="radio" name="prior_grants" value="yes"> Yes</div>
+                            <div class="radio-item"><input type="radio" name="prior_grants" value="no"> No</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Prior Grant Funding (if applicable)</label>
+                        <textarea name="prior_grant_details" placeholder="List sources and amounts of prior grants"></textarea>
+                    </div>
+                </div>
+                
+                <!-- Section 5: Documents -->
+                <div class="section">
+                    <h2>5. Required Documents</h2>
+                    <p>Please upload or have ready the following documents:</p>
+                    
+                    <div class="checkbox-group">
+                        <div class="checkbox-item"><input type="checkbox" name="docs_ready[]" value="501c3"> 501(c)(3) Letter</div>
+                        <div class="checkbox-item"><input type="checkbox" name="docs_ready[]" value=" financials"> Most Recent Financial Statements</div>
+                        <div class="checkbox-item"><input type="checkbox" name="docs_ready[]" value="board"> Board List/Resolution</div>
+                        <div class="checkbox-item"><input type="checkbox" name="docs_ready[]" value="budget"> Project Budget</div>
+                        <div class="checkbox-item"><input type="checkbox" name="docs_ready[]" value="audit"> Most Recent Audit</div>
+                        <div class="checkbox-item"><input type="checkbox" name="docs_ready[]" value="bio"> Key Staff Biographies</div>
+                    </div>
+                    
+                    <div class="help-text" style="margin-top: 20px;">
+                        You can upload documents after submitting this form, or email them to documents@grantwriterpro.local
+                    </div>
+                </div>
+                
+                <!-- Section 6: Additional -->
+                <div class="section">
+                    <h2>6. Additional Information</h2>
+                    
+                    <div class="form-group">
+                        <label>How did you hear about us?</label>
+                        <select name="referral_source">
+                            <option value="">Select...</option>
+                            <option value="google">Google Search</option>
+                            <option value="referral">Referral</option>
+                            <option value="social">Social Media</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Any questions or comments?</label>
+                        <textarea name="comments" placeholder="Tell us anything else we should know"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="terms" required>
+                            <label>I agree to the <a href="/terms">terms of service</a> and <a href="/privacy">privacy policy</a></label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">Submit Questionnaire</button>
+                    <button type="button" class="btn btn-secondary" onclick="saveProgress()">Save Progress</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        function saveProgress() {
+            const formData = new FormData(document.getElementById('intakeForm'));
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                if (data[key]) {
+                    if (!Array.isArray(data[key])) data[key] = [data[key]];
+                    data[key].push(value);
+                } else {
+                    data[key] = value;
+                }
+            }
+            localStorage.setItem('grantIntakeProgress', JSON.stringify(data));
+            alert('Progress saved! You can continue later.');
+        }
+        
+        // Load saved progress on page load
+        window.addEventListener('load', function() {
+            const saved = localStorage.getItem('grantIntakeProgress');
+            if (saved) {
+                const data = JSON.parse(saved);
+                for (let key in data) {
+                    const field = document.querySelector(`[name="${key}"]`);
+                    if (field) {
+                        if (field.type === 'checkbox' || field.type === 'radio') {
+                            const values = Array.isArray(data[key]) ? data[key] : [data[key]];
+                            document.querySelectorAll(`[name="${key}"]`).forEach(f => {
+                                f.checked = values.includes(f.value);
+                            });
+                        } else {
+                            field.value = data[key];
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Update progress bar
+        document.querySelectorAll('input, textarea, select').forEach(el => {
+            el.addEventListener('change', updateProgress);
+        });
+        
+        function updateProgress() {
+            const total = document.querySelectorAll('#intakeForm [required]').length;
+            const filled = Array.from(document.querySelectorAll('#intakeForm [required]')).filter(el => el.value).length;
+            const percent = Math.round((filled / total) * 100);
+            document.querySelector('.progress-bar').style.width = percent + '%';
+        }
+    </script>
+</body>
+</html>

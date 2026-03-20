@@ -1,0 +1,1121 @@
+{
+  "agencies": {
+    "nsf": {
+      "name": "National Science Foundation (NSF)",
+      "full_name": "National Science Foundation",
+      "forms": ["SF424", "NSF Cover Sheet", "Project Summary", "Project Description", "References Cited", "Biographical Sketches", "Budget", "Budget Justification", "Current and Pending Support", "Facilities", "Equipment", "Letters of Support"],
+      "cfda": "47.076",
+      "system": "Research.gov / FastLane",
+      "required_sections": [
+        {
+          "id": "project_summary",
+          "name": "Project Summary",
+          "required": true,
+          "max_pages": 1,
+          "max_chars": 3000,
+          "guidance": "Must contain: (1) a statement of the project activity, (2) an explicit statement of the intellectual merit, and (3) a statement of the broader impacts. Separate these three parts clearly.",
+          "components": ["overview", "intellectual_merit", "broader_impacts"]
+        },
+        {
+          "id": "project_description",
+          "name": "Project Description",
+          "required": true,
+          "max_pages": 15,
+          "guidance": "Describe the research plan including: (1) objectives, (2) methods, (3) expected significance, (4) relation to current knowledge, (5) plan for work, (6) results from prior NSF support. Include sufficient detail for review.",
+          "components": ["objectives", "methods", "significance", "prior_work", "work_plan", "results"]
+        },
+        {
+          "id": "references_cited",
+          "name": "References Cited",
+          "required": true,
+          "max_pages": null,
+          "guidance": "Each reference must include: author(s), publication title, book title, journal volume, page numbers, year. Use NSF bibliography format. Include only relevant citations."
+        },
+        {
+          "id": "biographical_sketches",
+          "name": "Biographical Sketches",
+          "required": true,
+          "max_pages": 2,
+          "per_person": true,
+          "guidance": "For each senior personnel: (1) professional preparation, (2) appointments, (3) publications (max 5 relevant), (4) synergistic activities. Use NSF template format."
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "forms_required": ["SF424A", "R&R Budget"],
+          "guidance": "Complete all budget categories. Justify all senior personnel time. Include fringe benefits, equipment, travel, participant support, other direct costs, and indirect costs."
+        },
+        {
+          "id": "budget_justification",
+          "name": "Budget Justification",
+          "required": true,
+          "max_pages": 2,
+          "guidance": "Explain each budget category: (1) senior personnel - role and effort, (2) other personnel - duties, (3) fringe benefits, (4) equipment - why needed, (5) travel - purpose and destination, (6) other direct costs, (7) indirect costs - rate and base."
+        },
+        {
+          "id": "current_pending",
+          "name": "Current and Pending Support",
+          "required": true,
+          "guidance": "List all current and pending funding for all senior personnel. Include: funding source, title, amount, period, and relationship to this proposal."
+        },
+        {
+          "id": "facilities",
+          "name": "Facilities and Other Resources",
+          "required": true,
+          "guidance": "Describe available facilities: (1) institutional support, (2) equipment, (3) office space, (4) computing resources, (5) student housing (if applicable). Explain why institution can do this work."
+        },
+        {
+          "id": "data_management",
+          "name": "Data Management and Sharing Plan",
+          "required": true,
+          "max_pages": 2,
+          "guidance": "Must include: (1) types of data produced, (2) standards used, (3) data access/sharing, (4) archiving and preservation. Show how you will make data available to others."
+        },
+        {
+          "id": "postdoc_mentoring",
+          "name": "Postdoctoral Mentoring Plan",
+          "required": true,
+          "max_pages": 1,
+          "conditional": "if_postdoc",
+          "guidance": "If postdocs supported, describe: (1) mentoring activities, (2) career development, (3) training in responsible research. Must be separate from project description."
+        }
+      ]
+    },
+    "doe": {
+      "name": "Department of Energy (DOE)",
+      "full_name": "Department of Energy",
+      "forms": ["SF424", "SF424A", "Budget", "Project Narrative", "Resume/CV", "Letters of Support", "Budget Justification"],
+      "cfda": "81.049",
+      "system": "Grants.gov / DOE Portal",
+      "required_sections": [
+        {
+          "id": "project_abstract",
+          "name": "Project Abstract",
+          "required": true,
+          "max_chars": 3000,
+          "guidance": "One page summary including: project objectives, methods, expected outcomes, relevance to DOE mission. Must be suitable for public release."
+        },
+        {
+          "id": "project_narrative",
+          "name": "Project Narrative",
+          "required": true,
+          "max_pages": 15,
+          "guidance": "Describe: (1) significance/objectives, (2) approach/methods, (3) innovation, (4) timeline/milestones, (5) deliverables. Address DOE policy priorities if applicable.",
+          "components": ["objectives", "approach", "innovation", "timeline", "deliverables"]
+        },
+        {
+          "id": "biographical",
+          "name": "Biographical Sketches",
+          "required": true,
+          "max_pages": 2,
+          "per_person": true,
+          "guidance": "Include for key personnel: education, experience, publications, relevant achievements. Use CV format."
+        },
+        {
+          "id": "budget_justification",
+          "name": "Budget Justification",
+          "required": true,
+          "guidance": "Detail all costs by category: personnel, equipment, travel, supplies, subcontracts. Explain why each is necessary for project success."
+        },
+        {
+          "id": "facilities",
+          "name": "Facilities",
+          "required": true,
+          "guidance": "Describe facilities available for project: lab space, equipment, computing resources, support staff."
+        },
+        {
+          "id": "letters_support",
+          "name": "Letters of Support",
+          "required": false,
+          "guidance": "Include letters from collaborators, partners, resource providers. Should explicitly state commitment to project."
+        },
+        {
+          "id": "data_plan",
+          "name": "Data Management Plan",
+          "required": true,
+          "max_pages": 2,
+          "guidance": "Describe how data will be managed: collection, storage, sharing, preservation. Include data types, standards, access provisions."
+        }
+      ]
+    },
+    "nih": {
+      "name": "National Institutes of Health (NIH)",
+      "full_name": "National Institutes of Health",
+      "forms": ["PHS398", "SF424", "Research Plan", "Specific Aims", "Strategy", "Biographical Sketch", "Budget", "Resource Sharing Plan"],
+      "cfda": "93.xxx",
+      "system": "Assit / eRA Commons",
+      "required_sections": [
+        {
+          "id": "specific_aims",
+          "name": "Specific Aims",
+          "required": true,
+          "max_pages": 1,
+          "guidance": "List 3-4 specific aims. Each should be a concrete, measurable step toward the overarching goal. State what you intend to do, not how.",
+          "structure": "bullet_points"
+        },
+        {
+          "id": "strategy",
+          "name": "Research Strategy",
+          "required": true,
+          "max_pages": 12,
+          "guidance": "Must address: (1) Significance - importance of the problem, (2) Innovation - new approaches, (3) Approach - methods, analysis, interpretation. Organize with clear headings.",
+          "components": ["significance", "innovation", "approach"]
+        },
+        {
+          "id": "biographical",
+          "name": "Biographical Sketch",
+          "required": true,
+          "max_pages": 5,
+          "per_person": true,
+          "use_template": "NIH biosketch format",
+          "guidance": "Use NIH format with personal statement, positions/employment, education, peer-reviewed publications (selected), other grant support. Include eRA Commons IDs for senior personnel."
+        },
+        {
+          "id": "budget",
+          "name": "Budget and Budget Justification",
+          "required": true,
+          "guidance": "Use PHS398 budget forms. Justify all personnel costs, explain effort percentages. Include detailed justification for equipment, travel, and other costs."
+        },
+        {
+          "id": "resources",
+          "name": "Resources and Environment",
+          "required": true,
+          "guidance": "Describe: institutional resources, equipment available, key personnel expertise, how environment supports the project."
+        },
+        {
+          "id": "resource_sharing",
+          "name": "Resource Sharing Plan",
+          "required": true,
+          "guidance": "Address: (1) data sharing, (2) model organism sharing, (3) unique research resources. State how you will make these available."
+        },
+        {
+          "id": "animals",
+          "name": "Vertebrate Animals",
+          "required": true,
+          "conditional": "uses_animals",
+          "guidance": "If using animals: describe procedures, housing, monitoring, euthanasia. Address pain management, species justification, reduction principles."
+        },
+        {
+          "id": "human_subjects",
+          "name": "Human Subjects",
+          "required": true,
+          "conditional": "uses_humans",
+          "guidance": "If using humans: describe recruitment, consent procedures, risk minimization, data protection. Include IRB plan if available."
+        }
+      ]
+    },
+    "usda": {
+      "name": "USDA (Rural Development / SBIR)",
+      "full_name": "United States Department of Agriculture",
+      "forms": ["SF424", "SF424A", "Project Narrative", "Budget", "Assurance Statements"],
+      "cfda": "10.xxx",
+      "system": "Grants.gov",
+      "required_sections": [
+        {
+          "id": "project_summary",
+          "name": "Project Summary",
+          "required": true,
+          "max_chars": 2500,
+          "guidance": "Brief summary of project: objectives, methods, expected outcomes. Include relevance to USDA priorities."
+        },
+        {
+          "id": "project_description",
+          "name": "Project Description",
+          "required": true,
+          "max_pages": 15,
+          "guidance": "Include: (1) problem statement, (2) objectives, (3) methodology, (4) expected outcomes, (5) relevance to agriculture/rural development.",
+          "components": ["problem", "objectives", "methodology", "outcomes", "relevance"]
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "forms_required": ["SF424A"],
+          "guidance": "Complete all budget categories. Justify all costs. USDA has specific allowability rules - check eligible costs."
+        },
+        {
+          "id": "budget_justification",
+          "name": "Budget Justification",
+          "required": true,
+          "guidance": "Provide detailed justification for each line item. Explain how costs relate to project objectives."
+        },
+        {
+          "id": "organizational_info",
+          "name": "Organizational Information",
+          "required": true,
+          "guidance": "Describe: organization history, mission, relevant experience, staff capabilities, governance structure."
+        },
+        {
+          "id": "letters_support",
+          "name": "Letters of Support",
+          "required": false,
+          "guidance": "Include any letters showing partnerships, market interest, or technical support."
+        }
+      ]
+    },
+    "epa": {
+      "name": "EPA (Environmental Protection Agency)",
+      "full_name": "Environmental Protection Agency",
+      "forms": ["SF424", "Project Narrative", "Budget", "Key Contacts", "Environmental Compliance"],
+      "cfda": "66.xxx",
+      "system": "Grants.gov",
+      "required_sections": [
+        {
+          "id": "project_summary",
+          "name": "Project Summary",
+          "required": true,
+          "max_pages": 1,
+          "guidance": "Brief overview: what, why, how, expected results. Include environmental outcomes."
+        },
+        {
+          "id": "project_narrative",
+          "name": "Project Narrative",
+          "required": true,
+          "max_pages": 10,
+          "guidance": "Include: (1) statement of work, (2) quality assurance if applicable, (3) timeout milestones, (4) environmental outcomes, (5) transfer/promotion plan.",
+          "components": ["work", "qa", "milestones", "outcomes", "transfer"]
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "guidance": "Detailed budget with justifications. EPA has specific cost principles - follow EPA guidance."
+        },
+        {
+          "id": "environmental_compliance",
+          "name": "Environmental Compliance",
+          "required": true,
+          "conditional": "environmental_impacts",
+          "guidance": "If project may have environmental impacts, describe compliance with all applicable environmental laws."
+        }
+      ]
+    },
+    "dot": {
+      "name": "DOT (Department of Transportation)",
+      "full_name": "Department of Transportation",
+      "forms": ["SF424", "Project Narrative", "Budget", "Standard Forms"],
+      "cfda": "20.xxx",
+      "system": "Grants.gov",
+      "required_sections": [
+        {
+          "id": "project_summary",
+          "name": "Project Summary",
+          "required": true,
+          "guidance": "Overview of project including: title, location, description, funding amount requested, match amount."
+        },
+        {
+          "id": "project_description",
+          "name": "Project Description",
+          "required": true,
+          "max_pages": 15,
+          "guidance": "Include: (1) problem/opportunity, (2) project goals, (3) scope of work, (4) methodology, (5) timeline, (6) expected outcomes, (7) how addresses DOT priorities.",
+          "components": ["problem", "goals", "scope", "methodology", "timeline", "outcomes"]
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "guidance": "Detailed line-item budget. DOT often requires cost sharing/matching - document clearly."
+        },
+        {
+          "id": "letters_support",
+          "name": "Letters of Support",
+          "required": false,
+          "guidance": "Include letters from partners, local government support, stakeholders."
+        }
+      ]
+    },
+    "nist": {
+      "name": "NIST (National Institute of Standards and Technology)",
+      "full_name": "National Institute of Standards and Technology",
+      "forms": ["SF424", "Technical Proposal", "Budget", "Management Proposal"],
+      "cfda": "11.xxx",
+      "system": "Grants.gov",
+      "required_sections": [
+        {
+          "id": "technical_proposal",
+          "name": "Technical Proposal",
+          "required": true,
+          "max_pages": 20,
+          "guidance": "Include: (1) technical objectives, (2) approach/methodology, (3) innovation, (4) work plan, (5) deliverables, (6) relevance to NIST mission.",
+          "components": ["objectives", "approach", "innovation", "work_plan", "deliverables", "relevance"]
+        },
+        {
+          "id": "management_proposal",
+          "name": "Management Proposal",
+          "required": true,
+          "guidance": "Describe: project management approach, timeline/milestones, personnel qualifications, risk management."
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "guidance": "Detailed budget with justifications. NIST often supports equipment purchases."
+        }
+      ]
+    },
+    "generic": {
+      "name": "Generic Federal Grant",
+      "full_name": "Standard Federal Grant",
+      "forms": ["SF424", "SF424A", "Project Narrative", "Budget", "Budget Justification"],
+      "cfda": null,
+      "system": "Grants.gov",
+      "required_sections": [
+        {
+          "id": "project_summary",
+          "name": "Project Summary/Abstract",
+          "required": true,
+          "max_pages": 1,
+          "guidance": "Brief overview of project: what, why, how, expected results. Make it compelling in one page."
+        },
+        {
+          "id": "project_description",
+          "name": "Project Description",
+          "required": true,
+          "max_pages": 15,
+          "guidance": "Full narrative including: statement of need, project objectives, methods/approach, expected outcomes, evaluation plan, sustainability.",
+          "components": ["need", "objectives", "methods", "outcomes", "evaluation", "sustainability"]
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "forms_required": ["SF424A"],
+          "guidance": "Complete budget forms with all categories. Ensure costs are allowable, reasonable, and allocable."
+        },
+        {
+          "id": "budget_justification",
+          "name": "Budget Justification",
+          "required": true,
+          "max_pages": 2,
+          "guidance": "Explain each budget category: why needed, how calculated, how relates to project."
+        },
+        {
+          "id": "biographical",
+          "name": "Key Personnel",
+          "required": true,
+          "guidance": "Describe qualifications of key staff: education, experience, relevant expertise, role in project."
+        },
+        {
+          "id": "facilities",
+          "name": "Facilities and Resources",
+          "required": true,
+          "guidance": "Describe available resources: equipment, space, staff, institutional support."
+        },
+        {
+          "id": "evaluation",
+          "name": "Evaluation Plan",
+          "required": false,
+          "max_pages": 2,
+          "guidance": "How will you measure success? Include metrics, data collection methods, analysis plan."
+        },
+        {
+          "id": "sustainability",
+          "name": "Sustainability Plan",
+          "required": false,
+          "guidance": "How will project continue after grant ends? Include other funding sources, revenue generation, institutional support."
+        }
+      ]
+    },
+    "nea": {
+      "name": "NEA - Grants for Arts Projects",
+      "full_name": "National Endowment for the Arts",
+      "forms": ["NEA Application", "Project Narrative", "Work Sample", "Budget", "Proof of Nonprofit Status"],
+      "cfda": "45.024",
+      "system": "NEA Applicant Portal",
+      "eligibility": "501(c)(3) nonprofits, government entities, tribal organizations. Must have 5+ years programming.",
+      "required_sections": [
+        {
+          "id": "narrative",
+          "name": "Narrative",
+          "required": true,
+          "max_chars": 6000,
+          "guidance": "Describe your project in 6000 characters or less. Include: what you will do, who will benefit, why this matters, how you will evaluate success.",
+          "components": ["what", "who_benefits", "why_matters", "evaluation"]
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "max_chars": 2000,
+          "guidance": "Provide a line-item budget. Include: personnel, supplies, travel, other costs. Show your total project cost and amount requested."
+        },
+        {
+          "id": "work_sample",
+          "name": "Work Sample",
+          "required": true,
+          "guidance": "Submit 6-10 examples of your recent work. For artists: images, video, audio. For organizations: programs, events, productions."
+        },
+        {
+          "id": "artist_bio",
+          "name": "Artist/Staff Biographies",
+          "required": false,
+          "max_chars": 1000,
+          "guidance": "Brief bios (100 words each) of key artists or staff who will work on this project."
+        },
+        {
+          "id": "letters",
+          "name": "Letters of Support",
+          "required": false,
+          "guidance": "Include 2-3 letters from partners, collaborators, or community members who support this project."
+        }
+      ]
+    },
+    "nea_challenge": {
+      "name": "NEA - Challenge America",
+      "full_name": "NEA Challenge America",
+      "forms": ["NEA Application", "Project Narrative", "Budget", "Proof of Nonprofit Status"],
+      "cfda": "45.024",
+      "system": "NEA Applicant Portal",
+      "eligibility": "Organizations with budgets under $250,000. Focus on reaching underserved communities.",
+      "required_sections": [
+        {
+          "id": "project_summary",
+          "name": "Project Summary",
+          "required": true,
+          "max_chars": 1500,
+          "guidance": "Brief description: what, who benefits, why important. 2-3 sentences."
+        },
+        {
+          "id": "narrative",
+          "name": "Narrative",
+          "required": true,
+          "max_chars": 4000,
+          "guidance": "Describe: (1) artistic merit, (2) reaching new audiences, (3) how project benefits underserved community. Be concise.",
+          "components": ["artistic_merit", "new_audiences", "community_benefit"]
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "guidance": "Simple budget. Request is fixed at $10,000. Show how funds will be used."
+        },
+        {
+          "id": "audience",
+          "name": "Audience Development",
+          "required": true,
+          "max_chars": 1000,
+          "guidance": "Describe who your current audience is and how this project will reach NEW audiences - people who don't typically attend your programs."
+        }
+      ]
+    },
+    "artist_individual": {
+      "name": "Artist Individual Grant",
+      "full_name": "Individual Artist / Creative Project",
+      "forms": ["Application Form", "Project Description", "Artist Statement", "Budget", "Work Samples"],
+      "cfda": null,
+      "system": "Various (state arts councils, private foundations)",
+      "eligibility": "Individual artists, no nonprofit required for many programs",
+      "required_sections": [
+        {
+          "id": "artist_statement",
+          "name": "Artist Statement",
+          "required": true,
+          "max_chars": 1000,
+          "guidance": "Briefly describe your work as an artist. What do you create? Why? What makes your approach unique?"
+        },
+        {
+          "id": "project_description",
+          "name": "Project Description",
+          "required": true,
+          "max_chars": 2500,
+          "guidance": "Describe your proposed project: what you will create, process, timeline, expected outcome.",
+          "components": ["what", "process", "timeline", "outcome"]
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "max_chars": 1000,
+          "guidance": "Show how you will use the grant funds. Include materials, equipment, workspace, other expenses."
+        },
+        {
+          "id": "work_samples",
+          "name": "Work Samples",
+          "required": true,
+          "guidance": "Submit 5-10 examples of your recent work that relate to this project."
+        },
+        {
+          "id": "bio",
+          "name": "Artist Biography",
+          "required": true,
+          "max_chars": 500,
+          "guidance": "Brief bio: your background, training, exhibitions, awards. Help reviewers understand your experience."
+        }
+      ]
+    },
+    "micro_grant": {
+      "name": "Micro-Grant (Under $5K)",
+      "full_name": "Micro-Grant / Quick Application",
+      "forms": ["Simple Application Form", "Project Idea", "Budget"],
+      "cfda": null,
+      "system": "Various (Awesome Foundation, local community foundations)",
+      "eligibility": "Wide open - individuals, small groups, startups",
+      "required_sections": [
+        {
+          "id": "idea",
+          "name": "Your Idea",
+          "required": true,
+          "max_chars": 500,
+          "guidance": "What do you want to do? Describe your project in plain language. What will you create or accomplish?"
+        },
+        {
+          "id": "why",
+          "name": "Why It Matters",
+          "required": true,
+          "max_chars": 300,
+          "guidance": "Why is this project important? Who will benefit? What impact will it have?"
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "max_chars": 250,
+          "guidance": "How will you use the grant? List main expenses. Keep it simple."
+        },
+        {
+          "id": "about_you",
+          "name": "About You",
+          "required": true,
+          "max_chars": 250,
+          "guidance": "Briefly: who are you? Why are you the right person to do this? Any relevant experience?"
+        }
+      ]
+    },
+    "small_business_grant": {
+      "name": "Small Business Grant",
+      "full_name": "Small Business / Startup Grant",
+      "forms": ["Application", "Business Description", "Use of Funds", "Financials"],
+      "cfda": null,
+      "system": "Various (state programs, private competitions)",
+      "eligibility": "For-profit small businesses, startups",
+      "required_sections": [
+        {
+          "id": "business_description",
+          "name": "Business Description",
+          "required": true,
+          "max_chars": 2000,
+          "guidance": "Describe your business: what you do, your target customers, what makes you unique, your experience.",
+          "components": ["what", "customers", "unique", "experience"]
+        },
+        {
+          "id": "project_proposal",
+          "name": "Project Proposal",
+          "required": true,
+          "max_chars": 2000,
+          "guidance": "What specifically will you use this grant for? Describe your project or growth plan in detail."
+        },
+        {
+          "id": "use_of_funds",
+          "name": "Use of Funds",
+          "required": true,
+          "max_chars": 1000,
+          "guidance": "Line-item budget showing exactly how you will spend the grant money. Be specific."
+        },
+        {
+          "id": "impact",
+          "name": "Expected Impact",
+          "required": true,
+          "max_chars": 1000,
+          "guidance": "What will this grant help you achieve? Include metrics if possible: revenue, customers, jobs created."
+        },
+        {
+          "id": "financials",
+          "name": "Financial Information",
+          "required": false,
+          "guidance": "Basic financial info: revenue, expenses, any existing funding. Keep it brief."
+        }
+      ]
+    },
+    "community_project": {
+      "name": "Community Project Grant",
+      "full_name": "Community Development / Neighborhood Grant",
+      "forms": ["Application", "Project Description", "Community Support", "Budget"],
+      "cfda": null,
+      "system": "Community foundations, local government",
+      "eligibility": "Nonprofits, community groups, neighborhood organizations",
+      "required_sections": [
+        {
+          "id": "need_statement",
+          "name": "Statement of Need",
+          "required": true,
+          "max_chars": 1500,
+          "guidance": "Describe the community need your project addresses. Use data if available. Why is this important NOW?",
+          "components": ["what_need", "who_affected", "why_now"]
+        },
+        {
+          "id": "project_description",
+          "name": "Project Description",
+          "required": true,
+          "max_chars": 2000,
+          "guidance": "Describe your project: what you will do, how it addresses the need, who will be involved, timeline.",
+          "components": ["what", "how", "who", "timeline"]
+        },
+        {
+          "id": "community_support",
+          "name": "Community Support",
+          "required": true,
+          "max_chars": 1000,
+          "guidance": "Show community backing: letters of support, surveys, meetings, partnerships. How do you know the community wants this?"
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "guidance": "Line-item budget. Show how funds will be used. Include any matching funds or in-kind contributions."
+        },
+        {
+          "id": "sustainability",
+          "name": "Sustainability",
+          "required": false,
+          "max_chars": 500,
+          "guidance": "How will this project continue after grant funds are spent? What ongoing resources are needed?"
+        }
+      ]
+    },
+    "education": {
+      "name": "Department of Education (ED)",
+      "full_name": "United States Department of Education",
+      "forms": ["SF424", "SF424A", "Project Abstract", "Project Narrative", "Budget", "Budget Justification", "Key Contacts", "ED Certifications"],
+      "cfda": "84.215",
+      "system": "Grants.gov / G5 Portal",
+      "eligibility": "Local education agencies (LEAs), state education agencies (SEAs), nonprofits, IHEs, community organizations",
+      "required_sections": [
+        {
+          "id": "project_abstract",
+          "name": "Project Abstract",
+          "required": true,
+          "max_pages": 1,
+          "guidance": "One-page summary: project title, absolute priority, target population, summary of activities, expected outcomes, name of subgrantees (if known)."
+        },
+        {
+          "id": "project_narrative",
+          "name": "Project Narrative",
+          "required": true,
+          "max_pages": 25,
+          "guidance": "Must address absolute, competitive and invitational priorities. Include: (1) need/population, (2) objectives, (3) methods, (4) management plan, (5) evaluation, (6) supporting documents.",
+          "components": ["need", "objectives", "methods", "management", "evaluation", "supporting"]
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "forms_required": ["SF424A"],
+          "guidance": "Complete ED Form 524. Include all costs by category. Most ED programs require cost sharing/matching - document clearly."
+        },
+        {
+          "id": "budget_justification",
+          "name": "Budget Justification",
+          "required": true,
+          "guidance": "Justify all costs: personnel (salary, fringe), travel, equipment, supplies, subcontracts, indirect costs. Show calculation methods."
+        },
+        {
+          "id": "management_plan",
+          "name": "Management Plan",
+          "required": true,
+          "max_pages": 2,
+          "guidance": "Show project governance: key personnel, timeline, milestones, responsibilities. Demonstrate capacity to implement."
+        },
+        {
+          "id": "evaluation_plan",
+          "name": "Evaluation Plan",
+          "required": true,
+          "max_pages": 3,
+          "guidance": "Describe evaluation design: logic model, research questions, data collection, analysis methods, how outcomes will be measured."
+        },
+        {
+          "id": "response_to_prior_feedback",
+          "name": "Response to Prior Feedback",
+          "required": false,
+          "conditional": "prior_award",
+          "guidance": "If you received prior ED award: explain how you addressed any weaknesses identified in prior reviews."
+        }
+      ]
+    },
+    "hud": {
+      "name": "HUD (Housing and Urban Development)",
+      "full_name": "Department of Housing and Urban Development",
+      "forms": ["SF424", "SF424A", "Project Narrative", "Budget", "Budget Justification", "HUD Form 4010", "Logic Model"],
+      "cfda": "14.218",
+      "system": "Grants.gov / HUD Exchange",
+      "eligibility": "State and local governments, public housing authorities, nonprofits, tribal entities",
+      "required_sections": [
+        {
+          "id": "need_statement",
+          "name": "Statement of Need",
+          "required": true,
+          "max_pages": 3,
+          "guidance": "Describe the housing/community development need. Use data: demographics, gaps, conditions. Explain why federal funds are needed.",
+          "components": ["data", "gaps", "conditions", "why_funding"]
+        },
+        {
+          "id": "project_description",
+          "name": "Project Description",
+          "required": true,
+          "max_pages": 10,
+          "guidance": "Describe: (1) activities/services, (2) target population, (3) expected outcomes, (4) how addresses need, (5) timeline, (6) partnerships.",
+          "components": ["activities", "population", "outcomes", "approach", "timeline", "partnerships"]
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "forms_required": ["SF424A"],
+          "guidance": "Complete detailed budget. HUD programs often require 25-50% match - document match sources clearly."
+        },
+        {
+          "id": "budget_justification",
+          "name": "Budget Justification",
+          "required": true,
+          "guidance": "Explain each line item. Show how costs are reasonable and necessary. Address any match requirements."
+        },
+        {
+          "id": "logic_model",
+          "name": "Logic Model",
+          "required": true,
+          "guidance": "Show: inputs > activities > outputs > outcomes. Connect your activities to measurable short/long-term outcomes."
+        },
+        {
+          "id": "capacity",
+          "name": "Organizational Capacity",
+          "required": true,
+          "guidance": "Describe: organizational experience, key staff qualifications, past performance, governance, ability to manage federal funds."
+        },
+        {
+          "id": "leverage",
+          "name": "Leverage/Resources",
+          "required": false,
+          "guidance": "Document other resources: matching funds, in-kind contributions, partnerships that strengthen the project."
+        }
+      ]
+    },
+    "nasa": {
+      "name": "NASA (National Aeronautics and Space Administration)",
+      "full_name": "National Aeronautics and Space Administration",
+      "forms": ["SF424", "SF424A", "Technical Proposal", "Business Proposal", "Budget", "Letter of Intent"],
+      "cfda": "43.012",
+      "system": "NSPIRES / Grants.gov",
+      "eligibility": "Universities, research institutions, nonprofits, businesses, state/local governments",
+      "required_sections": [
+        {
+          "id": "technical_abstract",
+          "name": "Technical Abstract",
+          "required": true,
+          "max_chars": 2000,
+          "guidance": "Summary of project: objectives, methods, expected results, NASA relevance. Must be suitable for public release."
+        },
+        {
+          "id": "technical_proposal",
+          "name": "Technical Proposal",
+          "required": true,
+          "max_pages": 15,
+          "guidance": "Include: (1) objectives/significance, (2) approach/methodology, (3) innovation, (4) work plan/timeline, (5) deliverables, (6) relevance to NASA mission.",
+          "components": ["objectives", "approach", "innovation", "work_plan", "deliverables", "relevance"]
+        },
+        {
+          "id": "biographical",
+          "name": "Key Personnel",
+          "required": true,
+          "guidance": "Describe qualifications: education, experience, publications, relevant NASA/applied research. Show team expertise."
+        },
+        {
+          "id": "facilities",
+          "name": "Facilities and Equipment",
+          "required": true,
+          "guidance": "List available facilities, equipment, computing resources. Explain why institution can successfully conduct this work."
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "forms_required": ["SF424A"],
+          "guidance": "Complete NASA budget forms. Justify all costs. NASA has specific policies on facilities, equipment, subcontracts."
+        },
+        {
+          "id": "data_management",
+          "name": "Data Management Plan",
+          "required": true,
+          "max_pages": 2,
+          "guidance": "Describe: data types collected, standards used, data sharing, archiving, preservation. Address any mission data requirements."
+        },
+        {
+          "id": "prior_work",
+          "name": "Prior NASA Support",
+          "required": false,
+          "conditional": "prior_nasa_award",
+          "guidance": "If you have had prior NASA awards, describe results and how this proposal builds on prior work."
+        }
+      ]
+    },
+    "dod": {
+      "name": "DOD (Department of Defense)",
+      "full_name": "Department of Defense",
+      "forms": ["SF424", "SF424A", "Technical Proposal", "Statement of Work", "Budget", "Cost Accounting Standards"],
+      "cfda": "12.300",
+      "system": "Grants.gov / Defense forms portal",
+      "eligibility": "Universities, research institutions, nonprofits, businesses - varies by program",
+      "required_sections": [
+        {
+          "id": "project_summary",
+          "name": "Project Summary",
+          "required": true,
+          "max_pages": 1,
+          "guidance": "Unclassified summary: project title, objectives, technology areas, expected deliverables. No proprietary information."
+        },
+        {
+          "id": "technical_proposal",
+          "name": "Technical Proposal",
+          "required": true,
+          "max_pages": 20,
+          "guidance": "Must address: (1) objectives/technical approach, (2) innovation/unique contributions, (3) deliverables, (4) milestones, (5) risk management, (6) dual-use potential if applicable.",
+          "components": ["objectives", "approach", "innovation", "deliverables", "milestones", "risk"]
+        },
+        {
+          "id": "statement_of_work",
+          "name": "Statement of Work",
+          "required": true,
+          "guidance": "Detailed task breakdown: tasks, subtasks, deliverables, timeline. Use standard SOW format with task numbers."
+        },
+        {
+          "id": "biographical",
+          "name": "Personnel Qualifications",
+          "required": true,
+          "guidance": "Describe key personnel: education, experience, relevant technical expertise. Show team capability to perform work."
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "forms_required": ["SF424A", "Additional DOD forms"],
+          "guidance": "Detailed budget with justifications. DOD has specific cost principles - may require certified cost/pricing data."
+        },
+        {
+          "id": "facilities",
+          "name": "Facilities",
+          "required": true,
+          "guidance": "Describe: laboratory, computing, fabrication capabilities. Show ability to handle classified work if applicable."
+        },
+        {
+          "id": "security",
+          "name": "Security Requirements",
+          "required": false,
+          "conditional": "classified_work",
+          "guidance": "If project involves classified work, describe: facility clearance level, ability to handle classified information."
+        }
+      ]
+    },
+    "fema": {
+      "name": "FEMA (Federal Emergency Management Agency)",
+      "full_name": "Federal Emergency Management Agency",
+      "forms": ["SF424", "SF424A", "Project Narrative", "Budget", "Environmental/Historic Preservation", "Narrative Justification"],
+      "cfda": "97.046",
+      "system": "Grants.gov / FEMA GO",
+      "eligibility": "State, local, tribal governments, nonprofits, some private entities",
+      "required_sections": [
+        {
+          "id": "project_abstract",
+          "name": "Project Abstract",
+          "required": true,
+          "max_chars": 2000,
+          "guidance": "Brief summary: project description, location, hazards addressed, target population, expected outcomes."
+        },
+        {
+          "id": "project_narrative",
+          "name": "Project Narrative",
+          "required": true,
+          "max_pages": 15,
+          "guidance": "Include: (1) statement of problem/need, (2) scope of work, (3) methodology, (4) timeline/milestones, (5) evaluation criteria, (6) sustainability.",
+          "components": ["problem", "scope", "methodology", "timeline", "evaluation", "sustainability"]
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "forms_required": ["SF424A"],
+          "guidance": "Detailed budget. FEMA grants require cost sharing in many programs - document match clearly. Justify all costs."
+        },
+        {
+          "id": "budget_justification",
+          "name": "Budget Justification",
+          "required": true,
+          "guidance": "Explain each line item. Show costs are reasonable, necessary, and allowable under FEMA guidelines."
+        },
+        {
+          "id": "environmental",
+          "name": "Environmental/Historic Preservation",
+          "required": true,
+          "guidance": "Complete EHP screening. Describe: project location, environmental impacts, compliance with NEPA, Section 106 (historic), floodplain/wetlands."
+        },
+        {
+          "id": "maintenance",
+          "name": "Maintenance and Sustainability",
+          "required": true,
+          "max_pages": 2,
+          "guidance": "Describe how project will be maintained after FEMA funding ends. Document long-term viability, operations costs."
+        },
+        {
+          "id": "risk_analysis",
+          "name": "Risk Analysis",
+          "required": false,
+          "guidance": "For some programs: describe hazard risk being addressed, probability, consequences, how project reduces risk."
+        }
+      ]
+    },
+    "dol": {
+      "name": "Department of Labor (DOL)",
+      "full_name": "United States Department of Labor",
+      "forms": ["SF424", "SF424A", "Project Narrative", "Budget", "Budget Justification", "Organizational Capacity"],
+      "cfda": "17.258",
+      "system": "Grants.gov / DOL EGrants",
+      "eligibility": "State workforce agencies, local governments, nonprofits, educational institutions, tribal organizations",
+      "required_sections": [
+        {
+          "id": "project_summary",
+          "name": "Project Summary",
+          "required": true,
+          "max_pages": 1,
+          "guidance": "Overview: project goals, target population, services provided, expected outcomes, geographic service area."
+        },
+        {
+          "id": "statement_of_need",
+          "name": "Statement of Need",
+          "required": true,
+          "max_pages": 3,
+          "guidance": "Describe: labor market need, target population characteristics, gaps in services, why federal intervention needed. Use data.",
+          "components": ["market_need", "population", "gaps", "data"]
+        },
+        {
+          "id": "project_description",
+          "name": "Project Description",
+          "required": true,
+          "max_pages": 15,
+          "guidance": "Include: (1) program design, (2) services/activities, (3) target population, (4) partnerships, (5) timeline, (6) expected outcomes.",
+          "components": ["design", "services", "population", "partnerships", "timeline", "outcomes"]
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "forms_required": ["SF424A"],
+          "guidance": "Detailed budget. Many DOL programs require cost sharing - document match. Follow DOL cost principles."
+        },
+        {
+          "id": "budget_justification",
+          "name": "Budget Justification",
+          "required": true,
+          "guidance": "Justify all costs. Explain how costs relate to program design and outcomes. Address any match requirements."
+        },
+        {
+          "id": "organizational_capacity",
+          "name": "Organizational Capacity",
+          "required": true,
+          "guidance": "Describe: organizational experience, staff qualifications, governance, financial management, previous grant performance."
+        },
+        {
+          "id": "evaluation_plan",
+          "name": "Evaluation Plan",
+          "required": true,
+          "max_pages": 2,
+          "guidance": "Describe: performance measures, data collection, reporting requirements. DOL has specific performance accountability requirements."
+        },
+        {
+          "id": "leveraging",
+          "name": "Leveraging Resources",
+          "required": false,
+          "guidance": "Document other resources: matching funds, in-kind, partnerships that supplement federal funds."
+        }
+      ]
+    },
+    "doj": {
+      "name": "DOJ (Department of Justice)",
+      "full_name": "United States Department of Justice",
+      "forms": ["SF424", "SF424A", "Project Narrative", "Budget", "Budget Justification", "Program Narrative", "Abstract"],
+      "cfda": "16.575",
+      "system": "Grants.gov / OJP Grants Management System",
+      "eligibility": "State and local governments, nonprofits, tribal organizations, educational institutions",
+      "required_sections": [
+        {
+          "id": "project_abstract",
+          "name": "Project Abstract",
+          "required": true,
+          "max_pages": 1,
+          "guidance": "Brief summary: project title, goals, target area/population, expected outcomes. No proprietary information."
+        },
+        {
+          "id": "statement_of_need",
+          "name": "Statement of the Problem",
+          "required": true,
+          "max_pages": 5,
+          "guidance": "Describe the crime/public safety problem: data, trends, root causes, impact on community. Show why intervention needed.",
+          "components": ["problem", "data", "trends", "impact"]
+        },
+        {
+          "id": "project_design",
+          "name": "Project Design",
+          "required": true,
+          "max_pages": 10,
+          "guidance": "Describe: (1) goals/objectives, (2) activities/services, (3) how addresses problem, (4) innovation, (5) partnerships, (6) timeline.",
+          "components": ["goals", "activities", "approach", "innovation", "partnerships", "timeline"]
+        },
+        {
+          "id": "budget",
+          "name": "Budget",
+          "required": true,
+          "forms_required": ["SF424A"],
+          "guidance": "Complete detailed budget. DOJ requires cost sharing for some programs. Justify all costs."
+        },
+        {
+          "id": "budget_justification",
+          "name": "Budget Justification",
+          "required": true,
+          "guidance": "Explain each line item. Show costs are reasonable, necessary, allowable. Address match if required."
+        },
+        {
+          "id": "organizational_capacity",
+          "name": "Organizational Capacity",
+          "required": true,
+          "guidance": "Describe: experience with similar projects, key personnel, financial management, ability to implement."
+        },
+        {
+          "id": "evaluation_plan",
+          "name": "Evaluation Plan",
+          "required": true,
+          "max_pages": 2,
+          "guidance": "Describe: performance measures, data collection, analysis, how you will measure success."
+        },
+        {
+          "id": "sustainability",
+          "name": "Sustainability",
+          "required": false,
+          "max_pages": 1,
+          "guidance": "Describe how project will continue after federal funding ends. What resources will sustain operations?"
+        }
+      ]
+    }
+  },
+  "common_requirements": {
+    "registration": [
+      "SAM.gov registration (UEI required)",
+      "Grants.gov account",
+      "DUNS/UEI number",
+      "Bank account for direct deposit"
+    ],
+    "file_formats": [
+      "PDF (preferred, text-searchable)",
+      "DOC/DOCX (some agencies)",
+      "XLS/XLSX for budgets"
+    ],
+    "file_limits": {
+      "max_per_file": "10MB",
+      "max_total": "50-100MB",
+      "filename_chars": 100,
+      "no_special_chars": true
+    },
+    "submission": {
+      "deadline": "Eastern Time - strict enforcement",
+      "confirmation": "GRANT tracking number",
+      "late_policy": "No exceptions"
+    }
+  }
+}

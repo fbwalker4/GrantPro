@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ template.name }}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <h1>{{ template.name }}</h1>
+    <a href="/templates" class="btn btn-secondary">← Back to Templates</a>
+</div>
+
+<div class="card">
+    <h2>Agency: {{ template.full_name }}</h2>
+    <p><strong>System:</strong> {{ template.system }}</p>
+    <p><strong>CFDA:</strong> {{ template.cfda or 'N/A' }}</p>
+</div>
+
+<div class="card">
+    <h2>Required Forms</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+        {% for form in template.forms %}
+        <span style="background: #e3f2fd; color: #1565c0; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.9rem;">{{ form }}</span>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="card">
+    <h2>Required Sections</h2>
+    {% for section in template.required_sections %}
+    <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0;">{{ section.name }}</h3>
+            <div>
+                {% if section.required %}
+                <span class="status-badge status-new">Required</span>
+                {% else %}
+                <span class="status-badge status-research">Optional</span>
+                {% endif %}
+                {% if section.max_pages %}
+                <span class="status-badge" style="background: #e0f7fa; color: #00838f;">Max {{ section.max_pages }} pages</span>
+                {% endif %}
+                {% if section.max_chars %}
+                <span class="status-badge" style="background: #e0f7fa; color: #00838f;">Max {{ section.max_chars }} chars</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <p style="margin: 0.75rem 0; color: #666;">{{ section.guidance }}</p>
+        
+        {% if section.components %}
+        <div style="margin-top: 0.75rem;">
+            <strong>Components:</strong>
+            <ul style="margin: 0.5rem 0 0 1.5rem;">
+                {% for comp in section.components %}
+                <li>{{ comp.replace('_', ' ').title() }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        
+        {% if section.conditional %}
+        <p style="margin: 0.5rem 0 0; color: #856404; font-size: 0.85rem;">
+            <strong>Conditional:</strong> {{ section.conditional }}
+        </p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+<div class="card">
+    <h2>Common Requirements</h2>
+    <ul style="color: #666;">
+        <li><strong>Registration:</strong> SAM.gov (UEI required), Grants.gov account</li>
+        <li><strong>File Formats:</strong> PDF (preferred), DOCX, XLSX</li>
+        <li><strong>File Size:</strong> Max 10MB per file, 50-100MB total</li>
+        <li><strong>Deadline:</strong> Strict - Eastern Time, no exceptions</li>
+    </ul>
+</div>
+{% endblock %}

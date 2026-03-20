@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grant Pro - Grant Writing Software</title>
+    <meta name="description" content="AI-powered grant research and writing tools. Search thousands of federal grants, use agency templates, and get AI assistance for your grant applications. $19.95/month.">
+    <meta name="keywords" content="grants, grant writing, grant research, federal grants, nonprofit grants, small business grants, AI writing">
+    <meta name="author" content="Futurespec Consulting">
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://grantpro.org/">
+    <meta property="og:title" content="Grant Pro - Win More Grants with AI Assistance">
+    <meta property="og:description" content="Search thousands of grants, use agency templates, and get AI writing assistance. $19.95/month. Start free.">
+    <meta property="og:image" content="https://grantpro.org/social-image.png">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Grant Pro - Win More Grants with AI Assistance">
+    <meta name="twitter:description" content="Search thousands of grants, use agency templates, and get AI writing assistance. $19.95/month.">
+    
+    <link rel="icon" type="image/png" href="/static/images/gp_logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fc;
+            --bg-tertiary: #f1f3f6;
+            --bg-card: #ffffff;
+            --border-color: #e2e5ed;
+            --text-primary: #1a1f36;
+            --text-secondary: #5e6278;
+            --text-muted: #8993a4;
+            --accent-primary: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-success: #059669;
+            --accent-warning: #d97706;
+            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            --gradient-hero: linear-gradient(180deg, #f8f9fc 0%, #ffffff 100%);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: white;
+        }
+        
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.15s;
+        }
+        
+        .nav a:hover {
+            color: var(--text-primary);
+        }
+        
+        .nav-btn {
+            background: var(--gradient-primary);
+            color: white !important;
+            padding: 0.6rem 1.25rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .nav-btn:hover {
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        /* Hero */
+        .hero {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gradient-hero);
+            position: relative;
+            padding: 7rem 2rem 5rem;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(37, 99, 235, 0.08);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: var(--accent-primary);
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+        
+        .hero h1 span {
+            color: var(--accent-primary);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.75rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            border-color: var(--text-muted);
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            background: white;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 2.5rem 0;
+        }
+        
+        .stats-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-family: 'Inter', sans-serif;
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+        
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        /* Trust Section */
+        .trust-section {
+            padding: 3rem 2rem;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .trust-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .trust-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .trust-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--accent-success);
+            fill: none;
+            stroke-width: 2;
+        }
+        
+        /* Features */
+        .features {
+            padding: 6rem 2rem;
+            background: var(--bg-secondary);
+        }
+        
+        .section-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--accent-primary);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .feature-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            transition: all 0.2s;
+        }
+        
+        .feature-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+        }
+        
+        .feature-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--accent-primary);
+            fill: none;
+            stroke-width: 2;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+        
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        /* How It Works */
+        .how-it-works {
+            padding: 6rem 2rem;
+            background: white;
+        }
+        
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+        
+        .step {
+            text-align: center;
+            position: relative;
+        }
+        
+        .step-number {
+            width: 56px;
+            height: 56px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin: 0 auto 1.5rem;
+        }
+        
+        .step h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+        
+        .step p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            padding: 6rem 2rem;
+            background: var(--bg-secondary);
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .testimonial-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            transition: all 0.2s;
+        }
+
+        .testimonial-card.featured-testimonial {
+            border: 2px solid var(--accent-primary);
+            padding: 2.5rem;
+            position: relative;
+        }
+
+        .testimonial-card.featured-testimonial::before {
+            content: 'Featured';
+            position: absolute;
+            top: -12px;
+            left: 24px;
+            background: var(--accent-primary);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.3rem 0.75rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .testimonial-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            flex-shrink: 0;
+        }
+
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-stars {
+            color: var(--accent-warning);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
+            line-height: 1.7;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .testimonial-role {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        /* Pricing */
+        .pricing {
+            padding: 6rem 2rem;
+            background: var(--bg-secondary);
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .pricing-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .pricing-card.featured {
+            border-color: var(--accent-primary);
+            border-width: 2px;
+            position: relative;
+        }
+        
+        .pricing-card.featured::before {
+            content: 'Best Value';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-primary);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.35rem 1rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .pricing-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        
+        .pricing-card .price {
+            font-family: 'Inter', sans-serif;
+            font-size: 2.75rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            color: var(--text-primary);
+        }
+        
+        .pricing-card .price span {
+            font-size: 1rem;
+            font-weight: normal;
+            color: var(--text-muted);
+        }
+        
+        .pricing-card ul {
+            list-style: none;
+            text-align: left;
+            margin: 1.5rem 0;
+        }
+        
+        .pricing-card li {
+            padding: 0.6rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+        
+        .pricing-card li::before {
+            content: '';
+            width: 18px;
+            height: 18px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23059669' stroke-width='3'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E") no-repeat center;
+            flex-shrink: 0;
+        }
+        
+        .pricing-card .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            padding: 5rem 2rem;
+            background: linear-gradient(180deg, #1e3a5f 0%, #1a3150 100%);
+            text-align: center;
+        }
+        
+        .cta-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        
+        .cta-section p {
+            color: rgba(255,255,255,0.85);
+            max-width: 500px;
+            margin: 0 auto 2rem;
+            font-size: 1.1rem;
+        }
+        
+        .cta-section .btn-primary {
+            background: white;
+            color: #1e3a5f;
+        }
+        
+        .cta-section .btn-primary:hover {
+            background: #e8eef8;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--text-primary);
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        
+        footer p {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9rem;
+        }
+        
+        footer a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Mobile Nav */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .hamburger svg {
+            width: 28px;
+            height: 28px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 65px;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            z-index: 99;
+            padding: 1rem;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .mobile-nav.open {
+            display: flex;
+        }
+
+        .mobile-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            transition: background 0.15s;
+        }
+
+        .mobile-nav a:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .mobile-nav .nav-btn {
+            background: var(--gradient-primary);
+            color: white !important;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-inner {
+                padding: 1rem;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .hero {
+                padding: 6rem 1.5rem 4rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .stats-inner {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+    <!-- Free Accessibility Widget -->
+    <style>
+    #a11y-toolbar {position:fixed;bottom:20px;right:20px;z-index:9999;font-family:Arial,sans-serif}
+    #a11y-toggle {background:#2563eb;color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:24px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.2)}
+    #a11y-panel {display:none;position:absolute;bottom:60px;right:0;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.15);padding:20px;min-width:200px}
+    #a11y-panel h3 {margin:0 0 15px;font-size:16px;color:#1e293b}
+    .a11y-btn {display:block;width:100%;padding:10px 15px;margin-bottom:8px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;font-size:14px;color:#475569;text-align:left;transition:all 0.2s}
+    .a11y-btn:hover {background:#e2e8f0}
+    .a11y-btn.active {background:#dbeafe;border-color:#2563eb;color:#2563eb}
+    body.high-contrast {filter:contrast(150%)}
+    body.grayscale {filter:grayscale(100%)}
+    body.large-cursor {cursor:50px 50px,pointer}
+    body.large-cursor * {cursor:50px 50px,pointer!important}
+    body.dyslexia-font {font-family:OpenDyslexic,Verdana,sans-serif!important}
+    </style>
+    <!-- UserWay Accessibility Widget -->
+    <script async src="https://cdn.userway.org/widget.js#account=demo"></script>
+</head>
+<body>
+<div id="a11y-toolbar">
+    <button id="a11y-toggle" aria-label="Accessibility Options" title="Accessibility Options">♿</button>
+    <div id="a11y-panel" role="dialog" aria-label="Accessibility Options">
+        <h3>Accessibility</h3>
+        <button class="a11y-btn" onclick="toggleHighContrast()" id="btn-contrast">High Contrast</button>
+        <button class="a11y-btn" onclick="toggleGrayscale()" id="btn-gray">Grayscale</button>
+        <button class="a11y-btn" onclick="toggleLargeCursor()" id="btn-cursor">Large Cursor</button>
+        <button class="a11y-btn" onclick="increaseFontSize()" id="btn-text">Larger Text</button>
+        <button class="a11y-btn" onclick="resetA11y()" id="btn-reset">Reset All</button>
+    </div>
+</div>
+<script>
+(function(){
+    var panel=document.getElementById('a11y-panel');
+    var toggle=document.getElementById('a11y-toggle');
+    toggle.onclick=function(){panel.style.display=panel.style.display==='block'?'none':'block'};
+    document.onclick=function(e){if(!panel.contains(e.target)&&e.target!==toggle){panel.style.display='none'}};
+    window.toggleHighContrast=function(){
+        document.body.classList.toggle('high-contrast');
+        document.getElementById('btn-contrast').classList.toggle('active');
+    };
+    window.toggleGrayscale=function(){
+        document.body.classList.toggle('grayscale');
+        document.getElementById('btn-gray').classList.toggle('active');
+    };
+    window.toggleLargeCursor=function(){
+        document.body.classList.toggle('large-cursor');
+        document.getElementById('btn-cursor').classList.toggle('active');
+    };
+    window.increaseFontSize=function(){
+        var current=parseFloat(getComputedStyle(document.body).fontSize)||16;
+        if(current<24){document.body.style.fontSize=(current+2)+'px';document.getElementById('btn-text').classList.add('active');}
+    };
+    window.resetA11y=function(){
+        document.body.classList.remove('high-contrast','grayscale','large-cursor');
+        document.body.style.fontSize='';
+        document.querySelectorAll('.a11y-btn').forEach(function(b){b.classList.remove('active')});
+    };
+    // Mobile nav toggle
+    var hamburger=document.getElementById('hamburger');
+    var mobileNav=document.getElementById('mobileNav');
+    if(hamburger&&mobileNav){
+        hamburger.onclick=function(){mobileNav.classList.toggle('open');};
+        document.querySelectorAll('#mobileNav a').forEach(function(a){a.onclick=function(){mobileNav.classList.remove('open');};});
+    }
+})();
+</script>
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <img src="/static/images/gp_logo.png" alt="Grant Pro" style="width:44px;height:44px;object-fit:contain;border-radius:8px;background:rgba(37,99,235,0.08);padding:4px;">
+                </div>
+                <span class="logo-text">Grant Pro</span>
+            </a>
+            <nav class="nav">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#pricing">Pricing</a>
+                <a href="/login" class="nav-btn">Sign In</a>
+            </nav>
+            <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+                <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="mobile-nav" id="mobileNav">
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#pricing">Pricing</a>
+            <a href="/login" class="nav-btn">Sign In</a>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">Grant Writing Software for Everyone</div>
+            <h1>Win More Grants with <span>AI Assistance</span></h1>
+            <p>Research, draft, and submit winning grant applications. Our AI guides you through every step of the process.</p>
+            <div class="hero-buttons">
+                <a href="/signup?tier=free" class="btn btn-primary">Start Free</a>
+                <a href="#pricing" class="btn btn-secondary">View Pricing</a>
+            </div>
+            <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+                🔥 <strong>Free tier:</strong> Search thousands of grants at no cost • No credit card required
+            </p>
+        </div>
+    </section>
+    
+    <div class="stats-bar">
+        <div class="stats-inner">
+            <div class="stat-item">
+                <div class="stat-value">$50B+</div>
+                <div class="stat-label">Funding Available</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">26</div>
+                <div class="stat-label">Federal Agencies</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">21+</div>
+                <div class="stat-label">Templates Built</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">Free</div>
+                <div class="stat-label">To Research</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Trust Badges -->
+    <div class="trust-section">
+        <div class="trust-inner">
+            <div class="trust-item">
+                <div class="trust-icon">
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </div>
+                <span>Privacy-First Design</span>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon">
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </div>
+                <span>256-bit Encryption</span>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon">
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+                <span>US-Based Support</span>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon">
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+                <span>Dedicated Support</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sticky CTA Bar -->
+    <div id="stickyCta" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; background: var(--gradient-primary); padding: 0.875rem 2rem; box-shadow: 0 -4px 16px rgba(37,99,235,0.3);">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <p style="color: white; font-size: 0.95rem; font-weight: 500; margin: 0;">Ready to find funding for your organization?</p>
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+                <a href="/signup?tier=free" style="background: white; color: var(--accent-primary); padding: 0.5rem 1.25rem; border-radius: 6px; font-weight: 600; font-size: 0.9rem; text-decoration: none;">Start Free — No Credit Card</a>
+                <button onclick="document.getElementById('stickyCta').style.display='none'" style="background: none; border: none; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 1.2rem; line-height: 1; padding: 0.25rem;" aria-label="Close">×</button>
+            </div>
+        </div>
+    </div>
+    <script>
+    (function(){
+        var sticky = document.getElementById('stickyCta');
+        var hero = document.querySelector('.hero');
+        if(sticky && hero){
+            var observer = new IntersectionObserver(function(entries){
+                entries.forEach(function(entry){
+                    if(entry.isIntersecting){
+                        sticky.style.display = 'none';
+                    } else {
+                        sticky.style.display = 'block';
+                    }
+                });
+            }, {threshold: 0.1});
+            observer.observe(hero);
+        }
+    })();
+    </script>
+    
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="section-inner">
+            <div class="section-header">
+                <div class="section-label">Success Stories</div>
+                <h2 class="section-title">Trusted by Grant Seekers</h2>
+            </div>
+            <div class="testimonial-grid">
+                <div class="testimonial-card featured-testimonial">
+                    <div class="testimonial-avatar">EK</div>
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"$19.95 per month to prepare and help submit is a no-brainer. We are on a short list for the first time ever. The guided submission made a complex process manageable."</p>
+                    <div class="testimonial-author">Emiley Kortes</div>
+                    <div class="testimonial-role">MS Roots and Blues, Board Member</div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-avatar">HH</div>
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"The lead based paint grant research saved us weeks of hunting. Found funding we'd never have discovered on our own. Grant Pro is now our first stop before any grant opportunity."</p>
+                    <div class="testimonial-author">HUD Program Client</div>
+                    <div class="testimonial-role">Mississippi Housing Authority</div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-avatar">FC</div>
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"The templates and AI suggestions were invaluable. Wrote our first grant in 3 days instead of 3 weeks. Worth every penny of the subscription."</p>
+                    <div class="testimonial-author">Futurespec Consulting Client</div>
+                    <div class="testimonial-role">Mississippi Public Agency</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="features" id="features">
+        <div class="section-inner">
+            <div class="section-header">
+                <div class="section-label">Why Choose Us</div>
+                <h2 class="section-title">Powerful Features for Every Organization</h2>
+                <p class="section-subtitle">Powerful tools to research, draft, and submit winning applications</p>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                    </div>
+                    <h3>AI-Powered Writing</h3>
+                    <p>Advanced AI assists with drafting sections based on agency-specific requirements and past successful applications.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                    <h3>Smart Grant Matching</h3>
+                    <p>AI analyzes your organization profile and identifies grants with the highest match probability. Search across all major federal agencies with advanced eligibility filters.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    </div>
+                    <h3>Cost-Effective</h3>
+                    <p>Pay per grant you write, not expensive annual subscriptions. 80-90% cheaper than competitors like Instrumentl.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    </div>
+                    <h3>Template Library</h3>
+                    <p>Pre-built templates for NSF, DOE, NIH, USDA, EPA, DOT, NIST and more with agency-specific guidance built in.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    </div>
+                    <h3>Easy Export</h3>
+                    <p>Download completed grants as DOCX/PDF, or use our guided submission mode to paste directly into grants.gov.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <h3>Secure & Private</h3>
+                    <p>Your data stays on your machine with full data ownership. Optional cloud sync with enterprise encryption.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <h3>Client Management</h3>
+                    <p>Track multiple clients and their grant applications in one unified dashboard with role-based access.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    </div>
+                    <h3>Progress Tracking</h3>
+                    <p>Never miss a deadline with built-in tracking, milestone alerts, and Kanban-style pipeline views.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                    <h3>Workflow Automation</h3>
+                    <p>Guided workflow and AI assistance cut grant writing time in half vs traditional manual methods.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                    </div>
+                    <h3>Budget Builder</h3>
+                    <p>AI-assisted budget creation with personnel, fringe, indirect costs, and narrative generation.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    </div>
+                    <h3>Deadline Reminders</h3>
+                    <p>Never miss a deadline. Calendar integration with Google Calendar, Outlook, and ICS export.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Trust/Social Proof Section -->
+    <section style="background: var(--bg-secondary); padding: 4rem 2rem;">
+        <div class="section-inner">
+            <div class="section-header">
+                <div class="section-label">Trusted By</div>
+                <h2 class="section-title">Organizations Already Getting Funded</h2>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+                <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                    <div style="color: #f59e0b; margin-bottom: 0.75rem;">★★★★★</div>
+                    <p style="font-style: italic; color: var(--text-secondary); margin-bottom: 1rem;">"Wrote our first grant in 3 days instead of 3 weeks. The templates and AI suggestions were invaluable."</p>
+                    <p style="font-weight: 600;">— Futurespec Consulting Client</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Mississippi Public Agency</p>
+                </div>
+                <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                    <div style="color: #f59e0b; margin-bottom: 0.75rem;">★★★★★</div>
+                    <p style="font-style: italic; color: var(--text-secondary); margin-bottom: 1rem;">"The lead based paint grant research saved us weeks of hunting. Found funding we'd never have discovered on our own."</p>
+                    <p style="font-weight: 600;">— MS Public Agency (HUD Program)</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Housing Authority</p>
+                </div>
+                <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                    <div style="color: #f59e0b; margin-bottom: 0.75rem;">★★★★★</div>
+                    <p style="font-style: italic; color: var(--text-secondary); margin-bottom: 1rem;">"$19.95 per month to prepare and help submit is a no-brainer. We are on a short list for the first time ever!"</p>
+                    <p style="font-weight: 600;">— Emiley Kortes</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">MS Roots and Blues, Board Member</p>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: center; gap: 3rem; margin-top: 3rem; flex-wrap: wrap; opacity: 0.7;">
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--accent-primary);">$50B+</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">Funding Available</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--accent-primary);">21+</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">Agency Templates</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--accent-primary);">26</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">Federal Agencies</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--accent-primary);">Free</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">To Start Researching</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="how-it-works" id="how-it-works">
+        <div class="section-inner">
+            <div class="section-header">
+                <div class="section-label">How It Works</div>
+                <h2 class="section-title">Research Free. Submit When Ready.</h2>
+            </div>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Research (Free)</h3>
+                    <p>Search thousands of grants from Grants.gov and beyond. Filter by agency, amount, deadline, eligibility. Save your favorites.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Request Templates</h3>
+                    <p>Don't see a template for your grant? Click "Request Template" and we'll build one for you.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Draft with AI</h3>
+                    <p>Upgrade to submit. Use guided tools to write each section with AI assistance and agency-specific templates.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Submit & Track</h3>
+                    <p>Export to DOCX/PDF or submit directly. Track progress in your centralized dashboard.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="pricing" id="pricing">
+        <div class="section-inner">
+            <div class="section-header">
+                <div class="section-label">Pricing</div>
+                <h2 class="section-title">Simple, Affordable Grant Writing</h2>
+                <p class="section-subtitle">Start free. Upgrade when ready. No hidden fees. 80-90% cheaper than competitors.</p>
+            </div>
+            
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>Free</h3>
+                    <div class="price">$0<span>/month</span></div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">No credit card required</p>
+                    <ul>
+                        <li><strong>Search thousands of grants</strong> (federal, state, private)</li>
+                        <li>Live data from Grants.gov</li>
+                        <li>Save unlimited grants</li>
+                        <li>Filter by agency, amount, deadline</li>
+                        <li><strong>Request templates</strong> for grants you want</li>
+                        <li>Community support</li>
+                    </ul>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; margin: 1rem 0;">Research thousands of grants • Upgrade to submit</p>
+                    <a href="/signup?tier=free" class="btn btn-secondary">Start Free</a>
+                </div>
+                
+                <div class="pricing-card featured">
+                    <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #f4a261; color: #1a1a2e; padding: 4px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">BEST VALUE</div>
+                    <h3>Annual</h3>
+                    <div class="price">$199<span>/year</span></div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Save $90 vs monthly billing</p>
+                    <ul>
+                        <li>Everything in Monthly</li>
+                        <li><strong>3 grant submissions/month</strong></li>
+                        <li>Priority support</li>
+                        <li>Early access to new features</li>
+                        <li>Discounted custom tier</li>
+                    </ul>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; margin: 1rem 0;">For your own organization's grants only</p>
+                    <a href="/signup?tier=annual" class="btn btn-primary">Start Annual</a>
+                </div>
+                
+                <div class="pricing-card">
+                    <h3>Monthly</h3>
+                    <div class="price">$19.95<span>/month</span></div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Billed monthly, cancel anytime</p>
+                    <ul>
+                        <li>Everything in Free</li>
+                        <li><strong>3 grant submissions/month</strong></li>
+                        <li>AI writing assistant</li>
+                        <li>21+ agency templates</li>
+                        <li>DOCX/PDF export</li>
+                        <li>Guided submission workflow</li>
+                        <li>Email support</li>
+                    </ul>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; margin: 1rem 0;">For your own organization's grants only</p>
+                    <a href="/signup?tier=monthly" class="btn btn-secondary">Start Monthly</a>
+                </div>
+                
+                <div class="pricing-card" style="border: 2px solid var(--accent-primary); background: linear-gradient(180deg, #f8f9ff 0%, #ffffff 100%);">
+                    <h3>Enterprise</h3>
+                    <div class="price">Custom<span></span></div>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">For agencies & consultants</p>
+                    <ul>
+                        <li>Unlimited grant submissions</li>
+                        <li>White-label options</li>
+                        <li>API access</li>
+                        <li>Dedicated account manager</li>
+                        <li>Custom integrations</li>
+                        <li>Team collaboration</li>
+                    </ul>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; margin: 1rem 0;">Use for your clients (resale permitted)</p>
+                    <a href="/contact?type=enterprise" class="btn btn-primary">Contact Us</a>
+                </div>
+            </div>
+            
+            <p style="text-align: center; margin-top: 2rem; color: var(--text-muted);">
+                <strong>80-90% cheaper</strong> than Instrumentl ($600+/yr) and GrantStation ($300-500/yr).
+            </p>
+            
+            <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary);">
+                    <span style="color: var(--accent-success);">✓</span> No credit card for free tier
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary);">
+                    <span style="color: var(--accent-success);">✓</span> Cancel anytime
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary);">
+                    <span style="color: var(--accent-success);">✓</span> Grants in your organization's name
+                </div>
+            </div>
+            
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; padding: 1rem; margin-top: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem; text-align: center;">
+                    <strong style="color: #fca5a5;">Anti-Reseller Policy:</strong> 
+                    Base plans (Monthly/Annual) are for your organization's grants only. 
+                    Enterprise plan required if using for clients. All grants submitted in account holder's name.
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section" style="background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);">
+        <div class="section-inner" style="text-align: center;">
+            <h2 style="color: white; font-size: 2.5rem; margin-bottom: 1rem;">Ready to Secure Funding?</h2>
+            <p style="color: rgba(255,255,255,0.8); font-size: 1.15rem; max-width: 600px; margin: 0 auto 2rem;">Join organizations that have secured millions in funding. Start free — upgrade when ready to submit.</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                <a href="/signup?tier=free" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">Start Free Now</a>
+                <a href="#pricing" class="btn btn-secondary" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); color: white; padding: 1rem 2rem; font-size: 1.1rem;">View Plans</a>
+            </div>
+                <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">No credit card required • Thousands of grants searchable free • 5 minute setup</p>
+        </div>
+    </section>
+    
+    <footer>
+        <div style="max-width: 1200px; margin: 0 auto; padding: 2rem; text-align: center;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; text-align: left; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <!-- Column 1: About -->
+                <div>
+                    <p style="font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; color: white; margin-bottom: 0.5rem;">Grant Pro</p>
+                    <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem; line-height: 1.6; margin-bottom: 0.75rem;">AI-powered grant research and writing tools for nonprofits, small businesses, and public agencies.</p>
+                    <p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; line-height: 1.6;">
+                        Grant Pro by Futurespec Consulting, LLC<br>
+                        45 Hardy Court, Box 238<br>
+                        Gulfport, MS 39507
+                    </p>
+                </div>
+                <!-- Column 2: Links -->
+                <div>
+                    <p style="color: white; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem;">PRODUCT</p>
+                    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                        <a href="#features" style="color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.85rem;">Features</a>
+                        <a href="#pricing" style="color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.85rem;">Pricing</a>
+                        <a href="/signup" style="color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.85rem;">Get Started Free</a>
+                        <a href="/contact" style="color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.85rem;">Contact Us</a>
+                    </div>
+                </div>
+                <!-- Column 3: Newsletter -->
+                <div>
+                    <p style="color: white; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem;">STAY UPDATED</p>
+                    <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-bottom: 0.75rem; line-height: 1.5;">Get grant alerts and tips delivered to your inbox. No spam.</p>
+                    <a href="/contact?type=newsletter" style="display: inline-block; background: var(--accent-primary); color: white; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-decoration: none;">Subscribe for Updates</a>
+                </div>
+            </div>
+            <!-- Bottom row -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                <p style="color: rgba(255,255,255,0.4); font-size: 0.8rem; margin: 0;">&copy; 2026 Futurespec Consulting, LLC. All rights reserved.</p>
+                <div style="display: flex; gap: 1.5rem;">
+                    <a href="/terms" style="color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.8rem;">Terms</a>
+                    <a href="/privacy" style="color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.8rem;">Privacy</a>
+                    <a href="/refund" style="color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.8rem;">Refunds</a>
+                    <a href="/help" style="color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.8rem;">Help</a>
+                </div>
+            </div>
+            <!-- Social + USA notice -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; gap: 1.5rem;">
+                    <a href="https://x.com/grantpro" target="_blank" rel="noopener" style="color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.85rem;">X (Twitter)</a>
+                    <a href="https://facebook.com/grantpro" target="_blank" rel="noopener" style="color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.85rem;">Facebook</a>
+                </div>
+                <p style="color: rgba(255,255,255,0.3); font-size: 0.75rem; margin: 0;"><strong>USA Only:</strong> Grant Pro is available only to customers located in the United States.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

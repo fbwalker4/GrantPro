@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ client.organization_name }} - Client Detail{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>{{ client.organization_name }}</h1>
+    <div style="display: flex; gap: 0.5rem;">
+        <a href="/client/{{ client.id }}/intake" class="btn btn-secondary">Intake Form</a>
+        <a href="/client/{{ client.id }}/grant/new" class="btn btn-primary">+ Assign Grant</a>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <h2>Contact Info</h2>
+        <p><strong>Contact:</strong> {{ client.contact_name }}</p>
+        <p><strong>Email:</strong> {{ client.contact_email }}</p>
+        <p><strong>Status:</strong> <span class="status-badge status-{{ client.status }}">{{ client.status }}</span></p>
+        <p><strong>Stage:</strong> {{ client.current_stage }}</p>
+        <p><strong>Created:</strong> {{ client.created_at[:10] }}</p>
+    </div>
+    
+    <div class="card">
+        <h2>Grants</h2>
+        {% if grants %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Grant</th>
+                    <th>Agency</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for grant in grants %}
+                <tr>
+                    <td><a href="/grant/{{ grant.id }}">{{ grant.grant_name }}</a></td>
+                    <td>{{ grant.agency }}</td>
+                    <td>${{ "{:,.0f}".format(grant.amount) }}</td>
+                    <td><span class="status-badge status-{{ grant.status }}">{{ grant.status }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No grants assigned yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% if invoices %}
+<div class="card">
+    <h2>Invoices</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Invoice ID</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for invoice in invoices %}
+            <tr>
+                <td>{{ invoice.id }}</td>
+                <td>{{ invoice.invoice_type }}</td>
+                <td>${{ "{:,.2f}".format(invoice.amount) }}</td>
+                <td><span class="status-badge status-{{ invoice.status }}">{{ invoice.status }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

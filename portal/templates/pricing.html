@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - Grant Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --light: #f8fafc;
+            --white: #ffffff;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--light); color: var(--dark); line-height: 1.6; }
+        .header { background: var(--white); box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1rem 2rem; }
+        .nav { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); text-decoration: none; }
+        .nav-links a { margin-left: 2rem; text-decoration: none; color: var(--gray); font-weight: 500; }
+        .nav-links a:hover { color: var(--primary); }
+        .container { max-width: 900px; margin: 3rem auto; padding: 0 2rem; }
+        h1 { font-size: 2.5rem; text-align: center; margin-bottom: 1rem; }
+        .subtitle { font-size: 1.25rem; color: var(--gray); text-align: center; margin-bottom: 3rem; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-bottom: 3rem; }
+        .plan { background: var(--white); border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative; }
+        .plan.featured { border: 2px solid var(--primary); transform: scale(1.05); }
+        .plan-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary); color: var(--white); padding: 0.25rem 1rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .plan-name { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .plan-price { font-size: 3rem; font-weight: 800; color: var(--primary); }
+        .plan-price span { font-size: 1rem; font-weight: 400; color: var(--gray); }
+        .plan-desc { color: var(--gray); margin: 1rem 0; font-size: 0.95rem; }
+        .plan-features { list-style: none; margin: 1.5rem 0; }
+        .plan-features li { padding: 0.5rem 0; font-size: 0.95rem; }
+        .plan-features li::before { content: "✓"; color: var(--secondary); font-weight: 600; margin-right: 0.5rem; }
+        .btn { display: block; width: 100%; padding: 0.875rem; border-radius: 8px; font-weight: 600; text-decoration: none; text-align: center; transition: all 0.2s; margin-top: 1rem; }
+        .btn-primary { background: var(--primary); color: var(--white); }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline { border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: var(--white); }
+        .faq { margin-top: 3rem; }
+        .faq h2 { text-align: center; margin-bottom: 2rem; }
+        .faq-item { background: var(--white); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .faq-item h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .faq-item p { color: var(--gray); font-size: 0.95rem; }
+        .footer { text-align: center; padding: 2rem; color: var(--gray); font-size: 0.875rem; margin-top: 3rem; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="/" class="logo">Grant Pro</a>
+            <div class="nav-links">
+                <a href="/grants">Grants</a>
+                <a href="/eligibility">Check Eligibility</a>
+                <a href="/login">Sign In</a>
+                <a href="/signup" style="color: var(--primary);">Get Started</a>
+            </div>
+        </nav>
+    </header>
+    
+    <main class="container">
+        <h1>Simple, Transparent Pricing</h1>
+        <p class="subtitle">No hidden fees. Cancel anytime. Research free — upgrade when you find a grant worth pursuing.</p>
+        
+        <div class="pricing-grid">
+            <div class="plan">
+                <div class="plan-name">Research</div>
+                <div class="plan-price">$0 <span>/month</span></div>
+                <p class="plan-desc">Perfect for exploring funding opportunities</p>
+                <ul class="plan-features">
+                    <li>Search federal grants</li>
+                    <li>Filter by agency, amount, deadline</li>
+                    <li>Save favorite grants</li>
+                    <li>Eligibility checker</li>
+                    <li>Request new templates</li>
+                </ul>
+                <a href="/signup" class="btn btn-outline">Get Started Free</a>
+            </div>
+            
+            <div class="plan featured">
+                <div class="plan-badge">Best Value</div>
+                <div class="plan-name">Annual Prep</div>
+                <div class="plan-price">$149 <span>/year</span></div>
+                <p class="plan-desc">Save $90 vs monthly billing</p>
+                <ul class="plan-features">
+                    <li>Everything in Prepare & Submit</li>
+                    <li>Track unlimited grants</li>
+                    <li>Priority support</li>
+                    <li>Client management (up to 10)</li>
+                </ul>
+                <a href="/signup?plan=annual" class="btn btn-primary">Start 7-Day Free Trial</a>
+            </div>
+            
+            <div class="plan">
+                <div class="plan-name">Monthly Prep</div>
+                <div class="plan-price">$19.95 <span>/month</span></div>
+                <p class="plan-desc">For organizations ready to apply</p>
+                <ul class="plan-features">
+                    <li>Everything in Research</li>
+                    <li>AI writing assistance for all sections</li>
+                    <li>21 agency-specific templates</li>
+                    <li>Guided submission workflow</li>
+                    <li>DOCX and PDF export</li>
+                    <li>Track up to 10 active grants</li>
+                </ul>
+                <a href="/signup?plan=monthly" class="btn btn-outline">Start 7-Day Free Trial</a>
+            </div>
+        </div>
+        
+        <div class="plan" style="max-width: 600px; margin: 2rem auto;">
+            <div class="plan-name">Success-Based Pricing</div>
+            <p class="plan-desc">Only pay when you win. Available for grants over $50,000.</p>
+            <ul class="plan-features">
+                <li>$99 preparation fee (applied to success fee)</li>
+                <li>$299 if funded under $1 million</li>
+                <li>$499 if funded over $1 million</li>
+            </ul>
+            <a href="/contact" class="btn btn-outline">Inquire About Success Pricing</a>
+        </div>
+        
+        <div class="faq">
+            <h2>Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <h3>What's included in the 7-day free trial?</h3>
+                <p>Full access to Prepare & Submit features — AI writing, templates, guided workflow, and exports. No credit card required.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Can I cancel anytime?</h3>
+                <p>Yes. Cancel anytime from your account settings. No cancellation fees or long-term commitments.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>What grants are in your database?</h3>
+                <p>We cover federal grants from Grants.gov, plus state programs and private foundations. Currently 131+ active opportunities with new grants added weekly.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Do you guarantee I'll get funded?</h3>
+                <p>No grant service can guarantee funding — that's determined by the agency. What we do is give you the best tools and guidance to submit the strongest application possible.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>What agencies are supported?</h3>
+                <p>NSF, DOE, NIH, USDA, HUD, EPA, DOT, NIST, ED, HHS, SAMHSA, and more. We're adding new templates weekly based on user requests.</p>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <p>&copy; 2026 Grant Pro by Futurespec Consulting. All rights reserved.</p>
+        <p><a href="/terms">Terms</a> | <a href="/privacy">Privacy</a> | <a href="/refund">Refund Policy</a> | <a href="/contact">Contact</a></p>
+    </footer>
+</body>
+</html>

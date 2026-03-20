@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; padding: 40px; max-width: 800px; margin: 0 auto; }
+        
+        .invoice-header { display: flex; justify-content: space-between; margin-bottom: 40px; border-bottom: 2px solid #1e3a5f; padding-bottom: 20px; }
+        .logo { font-size: 1.8rem; font-weight: bold; color: #1e3a5f; }
+        .invoice-title { font-size: 2rem; color: #1e3a5f; text-align: right; }
+        .invoice-number { color: #666; }
+        
+        .parties { display: flex; justify-content: space-between; margin-bottom: 40px; }
+        .party { width: 45%; }
+        .party h3 { color: #1e3a5f; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 10px; }
+        .party p { margin-bottom: 5px; }
+        
+        .invoice-details { background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 30px; }
+        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { font-weight: 600; }
+        
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th { background: #1e3a5f; color: white; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        th:last-child, td:last-child { text-align: right; }
+        
+        .totals { margin-left: auto; width: 50%; }
+        .total-row { display: flex; justify-content: space-between; padding: 10px 0; }
+        .total-row.grand-total { font-size: 1.3rem; font-weight: bold; color: #1e3a5f; border-top: 2px solid #1e3a5f; margin-top: 10px; padding-top: 15px; }
+        
+        .payment-info { background: #e8f5e9; padding: 20px; border-radius: 5px; margin-top: 30px; }
+        .payment-info h3 { color: #2e7d32; margin-bottom: 10px; }
+        
+        .notes { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 0.9rem; }
+        
+        @media print {
+            body { padding: 0; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-header">
+        <div class="logo">Grant Writer Pro</div>
+        <div>
+            <div class="invoice-title">INVOICE</div>
+            <div class="invoice-number">{{INVOICE_NUMBER}}</div>
+        </div>
+    </div>
+    
+    <div class="parties">
+        <div class="party">
+            <h3>From</h3>
+            <p><strong>Grant Writer Pro</strong></p>
+            <p>Mississippi Gulf Coast</p>
+            <p>info@grantwriterpro.local</p>
+        </div>
+        <div class="party">
+            <h3>Bill To</h3>
+            <p><strong>{{CLIENT_NAME}}</strong></p>
+            <p>{{CLIENT_ORG}}</p>
+            <p>{{CLIENT_EMAIL}}</p>
+        </div>
+    </div>
+    
+    <div class="invoice-details">
+        <div class="detail-row">
+            <span class="detail-label">Invoice Date:</span>
+            <span>{{INVOICE_DATE}}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Due Date:</span>
+            <span>{{DUE_DATE}}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Project:</span>
+            <span>{{PROJECT_TITLE}}</span>
+        </div>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{LINE_ITEMS}}
+        </tbody>
+    </table>
+    
+    <div class="totals">
+        <div class="total-row">
+            <span>Subtotal:</span>
+            <span>${{SUBTOTAL}}</span>
+        </div>
+        <div class="total-row">
+            <span>Tax (0%):</span>
+            <span>$0.00</span>
+        </div>
+        <div class="total-row grand-total">
+            <span>Total Due:</span>
+            <span>${{TOTAL}}</span>
+        </div>
+    </div>
+    
+    <div class="payment-info">
+        <h3>Payment Information</h3>
+        <p>Payment is due within 30 days of invoice date.</p>
+        <p><strong>Payment Options:</strong></p>
+        <p>• Bank Transfer: Request details</p>
+        <p>• Check: Payable to Grant Writer Pro</p>
+        <p>• PayPal: info@grantwriterpro.local</p>
+    </div>
+    
+    <div class="notes">
+        <p><strong>Notes:</strong></p>
+        <p>{{NOTES}}</p>
+        <p style="margin-top: 10px;">Thank you for your business!</p>
+    </div>
+    
+    <div class="no-print" style="margin-top: 30px; text-align: center;">
+        <button onclick="window.print()" style="padding: 10px 30px; background: #1e3a5f; color: white; border: none; border-radius: 5px; cursor: pointer;">Print Invoice</button>
+    </div>
+</body>
+</html>

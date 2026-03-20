@@ -1,0 +1,240 @@
+{% extends "layout.html" %}
+
+{% block title %}Grant Research{% endblock %}
+
+{% block extra %}
+<style>
+    .grant-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .grant-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+    .grant-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+    }
+    .grant-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1a1a2e;
+    }
+    .grant-agency {
+        font-size: 0.9rem;
+        color: #4361ee;
+        font-weight: 500;
+    }
+    .grant-amount {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #2ec4b6;
+    }
+    .grant-meta {
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.75rem;
+        font-size: 0.85rem;
+        color: #666;
+    }
+    .grant-meta span {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    .grant-actions {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+        display: flex;
+        gap: 0.5rem;
+    }
+    .search-filters {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .filter-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    .filter-row input, .filter-row select {
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+    .search-btn {
+        background: #4361ee;
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 1rem;
+    }
+    .search-btn:hover {
+        background: #3451db;
+    }
+    .results-count {
+        margin-bottom: 1rem;
+        color: #666;
+    }
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+    }
+    .template-badge {
+        display: inline-block;
+        background: #e8f5e9;
+        color: #2e7d32;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>🔍 Grant Research</h1>
+    <a href="/templates" class="btn btn-secondary">📋 View Templates</a>
+</div>
+
+<div class="search-filters">
+    <form id="searchForm">
+        <div class="filter-row">
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Search Keywords</label>
+                <input type="text" id="keyword" name="keyword" placeholder="e.g., energy, AI, healthcare, IoT" style="width: 100%;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Agency</label>
+                <select id="agency" name="agency" style="width: 100%;">
+                    <option value="">All Agencies</option>
+                    <option value="NSF">National Science Foundation</option>
+                    <option value="DOE">Department of Energy</option>
+                    <option value="NIH">National Institutes of Health</option>
+                    <option value="USDA">USDA</option>
+                    <option value="EPA">EPA</option>
+                    <option value="DOT">Department of Transportation</option>
+                    <option value="NIST">NIST</option>
+                    <option value="DHS">Homeland Security</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Category</label>
+                <select id="category" name="category" style="width: 100%;">
+                    <option value="">All Categories</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Energy">Energy</option>
+                    <option value="Health">Health</option>
+                    <option value="Environment">Environment</option>
+                    <option value="Manufacturing">Manufacturing</option>
+                    <option value="Transportation">Transportation</option>
+                    <option value="AI">AI/ML</option>
+                </select>
+            </div>
+        </div>
+        <div class="filter-row" style="margin-top: 1rem;">
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Min Amount ($)</label>
+                <input type="number" id="minAmount" name="min_amount" placeholder="50000" style="width: 100%;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Max Amount ($)</label>
+                <input type="number" id="maxAmount" name="max_amount" placeholder="1000000" style="width: 100%;">
+            </div>
+            <div style="display: flex; align-items: flex-end;">
+                <button type="submit" class="search-btn">Search Grants</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="results-count" id="resultsCount"></div>
+
+<div id="results">
+    <div class="loading">Loading grants...</div>
+</div>
+
+<script>
+let grants = [];
+
+function searchGrants() {
+    const params = new URLSearchParams({
+        keyword: document.getElementById('keyword').value,
+        agency: document.getElementById('agency').value,
+        category: document.getElementById('category').value,
+        min_amount: document.getElementById('minAmount').value || '',
+        max_amount: document.getElementById('maxAmount').value || ''
+    });
+    
+    document.getElementById('results').innerHTML = '<div class="loading">Searching...</div>';
+    
+    fetch('/api/search-grants?' + params)
+        .then(res => res.json())
+        .then(data => {
+            grants = data.grants;
+            displayResults(grants);
+        })
+        .catch(err => {
+            document.getElementById('results').innerHTML = '<div class="loading">Error loading grants</div>';
+        });
+}
+
+function displayResults(grants) {
+    const container = document.getElementById('results');
+    document.getElementById('resultsCount').textContent = `Found ${grants.length} grants`;
+    
+    if (grants.length === 0) {
+        container.innerHTML = '<div class="loading">No grants found. Try different search criteria.</div>';
+        return;
+    }
+    
+    container.innerHTML = grants.map(grant => `
+        <div class="grant-card">
+            <div class="grant-header">
+                <div>
+                    <div class="grant-title">${grant.title}</div>
+                    <div class="grant-agency">${grant.agency}</div>
+                </div>
+                <div class="grant-amount">$${grant.amount_min.toLocaleString()} - $${grant.amount_max.toLocaleString()}</div>
+            </div>
+            <p style="color: #666; margin: 0.75rem 0;">${grant.description}</p>
+            <div class="grant-meta">
+                <span>📅 Deadline: ${new Date(grant.deadline).toLocaleDateString()}</span>
+                <span>🏷️ ${grant.category}</span>
+                <span>📋 CFDA: ${grant.cfda || 'N/A'}</span>
+                <span class="template-badge">${grant.template.toUpperCase()} Template</span>
+            </div>
+            <div class="grant-actions">
+                <a href="/grant/${grant.id}/use-template" class="btn btn-primary btn-small">+ Create Grant</a>
+                <button onclick="showDetails('${grant.id}')" class="btn btn-secondary btn-small">View Details</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+document.getElementById('searchForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    searchGrants();
+});
+
+// Load initial results
+searchGrants();
+</script>
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+
+{% block title %}Leads - Admin - Grant Writer Pro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">👥 Lead Management</h1>
+        <p class="page-subtitle">Manage email subscribers and leads</p>
+    </div>
+    <a href="/admin/export-leads" class="btn btn-primary">📥 Export CSV</a>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="stat-icon green">📧</div>
+        <div class="stat-value">{{ total }}</div>
+        <div class="stat-label">Total Leads</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple">✅</div>
+        <div class="stat-value">{{ leads|selectattr('status', 'equalto', 'active')|list|length }}</div>
+        <div class="stat-label">Active</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon amber">📅</div>
+        <div class="stat-value">{{ leads|length }}</div>
+        <div class="stat-label">This Month</div>
+    </div>
+</div>
+
+<!-- Leads Table -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">All Leads</h2>
+    </div>
+    
+    {% if leads %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Source</th>
+                    <th>Status</th>
+                    <th>Subscribed</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lead in leads %}
+                <tr>
+                    <td>{{ lead.id }}</td>
+                    <td style="font-weight: 500;">{{ lead.email }}</td>
+                    <td><span class="badge badge-purple">{{ lead.source }}</span></td>
+                    <td>
+                        {% if lead.status == 'active' %}
+                        <span class="badge badge-green">Active</span>
+                        {% else %}
+                        <span class="badge badge-amber">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td style="color: var(--text-muted);">{{ lead.created_at[:19] if lead.created_at else '-' }}</td>
+                    <td>
+                        <a href="mailto:{{ lead.email }}" class="btn btn-ghost btn-sm">✉️ Email</a>
+                        <a href="/admin/leads/delete/{{ lead.id }}" class="btn btn-ghost btn-sm" style="color: var(--accent-warning);" onclick="return confirm('Delete this lead?')">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <div class="empty-title">No leads yet</div>
+        <p>Leads will appear here when people subscribe via the landing page</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Quick Actions -->
+<div class="grid-2" style="margin-top: 2rem;">
+    <div class="card">
+        <h3 class="card-title">📧 Email All Leads</h3>
+        <form action="/admin/emails/send-test" method="POST">
+            <div class="form-group">
+                <label>Send test to yourself, then forward</label>
+                <input type="email" name="email" placeholder="your@email.com" required>
+            </div>
+            <input type="hidden" name="template" value="welcome">
+            <button type="submit" class="btn btn-primary">Send Test Email</button>
+        </form>
+    </div>
+    
+    <div class="card">
+        <h3 class="card-title">🔄 Sync with External</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+            Connect to external email services for bulk sending
+        </p>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="badge badge-purple">Resend</span>
+            <span class="badge badge-amber">Mailchimp</span>
+            <span class="badge badge-green">SendGrid</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

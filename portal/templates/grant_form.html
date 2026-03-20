@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+
+{% block title %}Assign Grant{% endblock %}
+
+{% block content %}
+<h1>Assign Grant to {{ client.organization_name }}</h1>
+
+<div class="card">
+    <form method="POST">
+        <label for="grant_name">Grant Name</label>
+        <input type="text" id="grant_name" name="grant_name" required placeholder="e.g., NSF Smart & Connected Communities">
+        
+        <label for="agency">Funding Agency</label>
+        <input type="text" id="agency" name="agency" required placeholder="e.g., National Science Foundation">
+        
+        <label for="amount">Requested Amount ($)</label>
+        <input type="number" id="amount" name="amount" required placeholder="500000">
+        
+        <label for="deadline">Deadline</label>
+        <input type="date" id="deadline" name="deadline" required>
+        
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-primary">Assign Grant</button>
+            <a href="/client/{{ client.id }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+{% if available_grants %}
+<div class="card">
+    <h2>Available Grants from Research Database</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Grant</th>
+                <th>Agency</th>
+                <th>Amount Range</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for g in available_grants %}
+            <tr>
+                <td>{{ g.title }}</td>
+                <td>{{ g.agency }}</td>
+                <td>${{ "{:,.0f}".format(g.min_amount) }} - ${{ "{:,.0f}".format(g.max_amount) }}</td>
+                <td>
+                    <button type="button" class="btn btn-small btn-secondary" 
+                            onclick="fillGrant('{{ g.title }}', '{{ g.agency }}', {{ g.max_amount }})">
+                        Use This
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+function fillGrant(name, agency, amount) {
+    document.getElementById('grant_name').value = name;
+    document.getElementById('agency').value = agency;
+    document.getElementById('amount').value = amount;
+}
+</script>
+{% endif %}
+{% endblock %}

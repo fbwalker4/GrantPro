@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block title %}Select Client{% endblock %}
+
+{% block content %}
+<h1>Select Client for Grant</h1>
+
+<div class="card">
+    <h2>{{ grant.title }}</h2>
+    <p><strong>Agency:</strong> {{ grant.agency }}</p>
+    <p><strong>Amount:</strong> ${{ "{:,.0f}".format(grant.amount_min) }} - ${{ "{:,.0f}".format(grant.amount_max) }}</p>
+    <p><strong>Deadline:</strong> {{ grant.deadline }}</p>
+    <p><strong>Template:</strong> {{ grant.template }}</p>
+</div>
+
+<div class="card">
+    <h2>Select a Client</h2>
+    {% if clients %}
+    <table>
+        <thead>
+            <tr>
+                <th>Organization</th>
+                <th>Contact</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for client in clients %}
+            <tr>
+                <td>{{ client.organization_name }}</td>
+                <td>{{ client.contact_name }}</td>
+                <td><span class="status-badge status-{{ client.status }}">{{ client.status }}</span></td>
+                <td>
+                    <a href="/grant/{{ grant.id }}/use-template?client_id={{ client.id }}" class="btn btn-primary btn-small">
+                        Use This Client
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No clients found. <a href="/client/new">Create a client first</a></p>
+    {% endif %}
+</div>
+{% endblock %}

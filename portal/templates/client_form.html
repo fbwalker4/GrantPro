@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block title %}{% if client %}Edit Client{% else %}New Client{% endif %}{% endblock %}
+
+{% block content %}
+<h1>{% if client %}Edit Client{% else %}New Client{% endif %}</h1>
+
+<div class="card">
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        
+        <label for="organization_name">Organization Name</label>
+        <input type="text" id="organization_name" name="organization_name" required 
+               value="{{ client.organization_name if client else '' }}">
+        
+        <label for="contact_name">Contact Name</label>
+        <input type="text" id="contact_name" name="contact_name" required
+               value="{{ client.contact_name if client else '' }}">
+        
+        <label for="contact_email">Contact Email</label>
+        <input type="email" id="contact_email" name="contact_email" required
+               value="{{ client.contact_email if client else '' }}">
+        
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-primary">Save Client</button>
+            <a href="/" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

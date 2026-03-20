@@ -1,0 +1,210 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard - Grant Pro{% endblock %}
+
+{% block content %}
+<!-- Upgrade Banner for Free Users -->
+{% if not user.plan or user.plan == 'free' %}
+<div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 1px solid #f59e0b; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+        <span style="font-size: 1.5rem;">🎉</span>
+        <div>
+            <strong>You're on the Free Tier</strong>
+            <p style="margin: 0; font-size: 0.9rem; color: #92400e;">Unlock full grant applications, AI writing, and submit to funders for only $19.95/month</p>
+        </div>
+    </div>
+    <a href="/upgrade" class="btn btn-primary" style="background: #b45309; white-space: nowrap;">Upgrade to Standard</a>
+</div>
+{% endif %}
+
+<!-- Onboarding Prompt - Show if not completed -->
+{% if not user.onboarding_completed or user.onboarding_completed == 0 %}
+<div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border: 1px solid #3b82f6; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+        <span style="font-size: 1.5rem;">📋</span>
+        <div>
+            <strong>Complete Your Profile for Better Matches</strong>
+            <p style="margin: 0; font-size: 0.9rem; color: #1e40af;">Save your EIN, address, mission area, and organization details once — we'll auto-fill every grant application. More grants become available with proper identifiers.</p>
+        </div>
+    </div>
+    <a href="/onboarding" class="btn btn-primary" style="background: #2563eb; white-space: nowrap;">Complete Profile →</a>
+</div>
+{% endif %}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Welcome back, {{ user.first_name or 'there' }} 👋</h1>
+        <p class="page-subtitle">Here's what's happening with your grant applications</p>
+    </div>
+    <a href="/wizard" class="btn btn-primary">
+        <span>🔍</span> Find Grants
+    </a>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon purple">📋</div>
+        <div class="stat-value">{{ saved_grants|length }}</div>
+        <div class="stat-label">Saved Grants</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">📝</div>
+        <div class="stat-value">{{ active_grants|default(0) }}</div>
+        <div class="stat-label">In Progress</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon amber">📤</div>
+        <div class="stat-value">{{ submitted|default(0) }}</div>
+        <div class="stat-label">Submitted</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">💰</div>
+        <div class="stat-value">${{ total_funded|default(0)|int }}</div>
+        <div class="stat-label">Total Funded</div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">⚡ Quick Actions</h2>
+    </div>
+    <div class="actions-row">
+        <a href="/wizard" class="btn btn-primary">🔍 Grant Wizard</a>
+        <a href="/client/new" class="btn btn-secondary">➕ New Client</a>
+        <a href="/grants" class="btn btn-secondary">📋 Browse Grants</a>
+        <a href="/eligibility" class="btn btn-secondary">✓ Eligibility Check</a>
+    </div>
+</div>
+
+<!-- Saved Grants -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">💾 Saved Grants</h2>
+        <a href="/grants" class="btn btn-ghost">View All →</a>
+    </div>
+    
+    {% if saved_grants %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Grant</th>
+                        <th>Agency</th>
+                        <th>Amount</th>
+                        <th>Category</th>
+                        <th>Saved</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for grant in saved_grants %}
+                    <tr>
+                        <td>
+                            <div style="font-weight: 500;">{{ grant.title }}</div>
+                        </td>
+                        <td><span class="badge badge-purple">{{ grant.agency }}</span></td>
+                        <td style="font-family: 'Fraunces', serif; font-weight: 600; color: var(--accent-success);">
+                            ${{ "{:,.0f}".format(grant.amount_min) }} - ${{ "{:,.0f}".format(grant.amount_max) }}
+                        </td>
+                        <td>{{ grant.category }}</td>
+                        <td style="color: var(--text-muted);">{{ grant.saved_at[:10] if grant.saved_at else 'Recently' }}</td>
+                        <td>
+                            <a href="/grant/{{ grant.id }}" class="btn btn-ghost btn-sm">View →</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <div class="empty-title">No saved grants yet</div>
+            <div class="empty-text">Use our grant wizard to find grants that match your organization</div>
+            <a href="/wizard" class="btn btn-primary">🔍 Find Grants</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Active Projects -->
+{% if active_grants_list and active_grants_list|length > 0 %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📝 Active Projects</h2>
+    </div>
+    
+    {% for project in active_grants_list %}
+    <div class="grant-card">
+        <div class="grant-card-header">
+            <div>
+                <h3 class="grant-card-title">{{ project.grant.title }}</h3>
+                <div class="grant-card-agency">{{ project.grant.agency }}</div>
+            </div>
+            <span class="badge 
+                {% if project.status == 'intake' %}badge-amber
+                {% elif project.status == 'drafting' %}badge-purple
+                {% elif project.status == 'review' %}badge-red
+                {% else %}badge-green{% endif %}">
+                {{ project.status|title }}
+            </span>
+        </div>
+        <div class="grant-card-meta">
+            <span>📅 Started: {{ project.created_at[:10] }}</span>
+            <span>👤 Client: {{ project.client.name }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Recent Activity -->
+<div class="grid-2">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">📊 Grant Categories</h2>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            {% set categories = [
+                ('Technology', saved_grants|selectattr('category', 'equalto', 'Technology')|list|length),
+                ('Healthcare', saved_grants|selectattr('category', 'equalto', 'Healthcare')|list|length),
+                ('Education', saved_grants|selectattr('category', 'equalto', 'Education')|list|length),
+                ('Environment', saved_grants|selectattr('category', 'equalto', 'Environment')|list|length),
+                ('Energy', saved_grants|selectattr('category', 'equalto', 'Energy')|list|length)
+            ] %}
+            {% for cat, count in categories %}
+                {% if count > 0 %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--border-color);">
+                    <span>{{ cat }}</span>
+                    <span class="badge badge-purple">{{ count }}</span>
+                </div>
+                {% endif %}
+            {% endfor %}
+            {% if saved_grants|length == 0 %}
+                <p style="color: var(--text-muted); text-align: center; padding: 1rem;">No saved grants to categorize</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">🎯 Upcoming Deadlines</h2>
+        </div>
+        {% set upcoming = saved_grants|selectattr('deadline')|sort(attribute='deadline')|list %}
+        {% if upcoming %}
+            {% for grant in upcoming[:3] %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color);">
+                <div>
+                    <div style="font-weight: 500; font-size: 0.9rem;">{{ grant.title }}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ grant.agency }}</div>
+                </div>
+                <span class="badge badge-amber">📅 {{ grant.deadline[:10] }}</span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="color: var(--text-muted); text-align: center; padding: 1rem;">No upcoming deadlines</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

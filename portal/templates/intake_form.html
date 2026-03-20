@@ -1,0 +1,130 @@
+{% extends "layout.html" %}
+
+{% block title %}Intake Form - {{ client.organization_name }}{% endblock %}
+
+{% block content %}
+<h1>Client Intake Questionnaire</h1>
+<p>Organization: <strong>{{ client.organization_name }}</strong></p>
+
+<div class="card">
+    <form method="POST">
+        <h3>Organization Basics</h3>
+        
+        <label for="org_legal_name">Legal Organization Name</label>
+        <input type="text" id="org_legal_name" name="org_legal_name">
+        
+        <label for="org_dba">DBA (Doing Business As)</label>
+        <input type="text" id="org_dba" name="org_dba">
+        
+        <label for="org_tax_id">Tax ID (EIN)</label>
+        <input type="text" id="org_tax_id" name="org_tax_id" placeholder="XX-XXXXXXX">
+        
+        <label for="org_year_founded">Year Founded</label>
+        <input type="number" id="org_year_founded" name="org_year_founded">
+        
+        <label for="org_structure">Organization Structure</label>
+        <select id="org_structure" name="org_structure">
+            <option value="">Select...</option>
+            <option value="nonprofit">Nonprofit 501(c)(3)</option>
+            <option value="nonprofit_other">Nonprofit (other)</option>
+            <option value="small_business">Small Business</option>
+            <option value="university">University/Research Institution</option>
+            <option value="government">Government Agency</option>
+            <option value="other">Other</option>
+        </select>
+        
+        <hr style="margin: 2rem 0; border: none; border-top: 1px solid #eee;">
+        
+        <h3>Contact Information</h3>
+        
+        <label for="contact_primary">Primary Contact Name</label>
+        <input type="text" id="contact_primary" name="contact_primary" value="{{ client.contact_name }}">
+        
+        <label for="contact_email">Primary Contact Email</label>
+        <input type="email" id="contact_email" name="contact_email" value="{{ client.contact_email }}">
+        
+        <label for="contact_phone">Phone Number</label>
+        <input type="tel" id="contact_phone" name="contact_phone">
+        
+        <hr style="margin: 2rem 0; border: none; border-top: 1px solid #eee;">
+        
+        <h3>Project Information</h3>
+        
+        <label for="project_title">Project Title (if known)</label>
+        <input type="text" id="project_title" name="project_title">
+        
+        <label for="project_description">Brief Project Description</label>
+        <textarea id="project_description" name="project_description" rows="4" placeholder="What problem are you solving? What is the goal?"></textarea>
+        
+        <label for="project_field">Field/Industry</label>
+        <select id="project_field" name="project_field">
+            <option value="">Select...</option>
+            <option value="technology">Technology/Software</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="energy">Energy/Clean Tech</option>
+            <option value="agriculture">Agriculture</option>
+            <option value="manufacturing">Manufacturing</option>
+            <option value="education">Education</option>
+            <option value="environment">Environment</option>
+            <option value="infrastructure">Infrastructure</option>
+            <option value="other">Other</option>
+        </select>
+        
+        <label for="project_amount">Funding Amount Needed</label>
+        <input type="text" id="project_amount" name="project_amount" placeholder="$50,000 - $500,000">
+        
+        <hr style="margin: 2rem 0; border: none; border-top: 1px solid #eee;">
+        
+        <h3>Grant History</h3>
+        
+        <label for="prior_grants">Have you applied for grants before?</label>
+        <select id="prior_grants" name="prior_grants">
+            <option value="">Select...</option>
+            <option value="yes_funded">Yes, we were funded</option>
+            <option value="yes_unfunded">Yes, but not funded</option>
+            <option value="no">No, this is our first time</option>
+        </select>
+        
+        <label for="grant_agencies">Which agencies have you applied to? (if any)</label>
+        <textarea id="grant_agencies" name="grant_agencies" rows="2" placeholder="e.g., NSF, DOE, USDA"></textarea>
+        
+        <label for="similar_grants">Are there specific grants you're targeting?</label>
+        <textarea id="similar_grants" name="similar_grants" rows="2" placeholder="List any specific grants you're interested in"></textarea>
+        
+        <hr style="margin: 2rem 0; border: none; border-top: 1px solid #eee;">
+        
+        <h3>Supporting Documents</h3>
+        <p style="color: #666; margin-bottom: 1rem;">These can be uploaded later through the client portal.</p>
+        
+        <label for="docs_budget">Do you have a budget?</label>
+        <select id="docs_budget" name="docs_budget">
+            <option value="">Select...</option>
+            <option value="yes">Yes</option>
+            <option value="no">No, need help</option>
+            <option value="partial">Partially</option>
+        </select>
+        
+        <label for="docs_resumes">Do you have key personnel resumes?</label>
+        <select id="docs_resumes" name="docs_resumes">
+            <option value="">Select...</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+        </select>
+        
+        <label for="docs_letters">Do you have letters of support?</label>
+        <select id="docs_letters" name="docs_letters">
+            <option value="">Select...</option>
+            <option value="yes">Yes</option>
+            <option value="no">No, need help</option>
+        </select>
+        
+        <label for="notes">Additional Notes</label>
+        <textarea id="notes" name="notes" rows="3" placeholder="Anything else we should know?"></textarea>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary">Save Intake Data</button>
+            <a href="/client/{{ client.id }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

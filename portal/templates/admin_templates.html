@@ -1,0 +1,146 @@
+{% extends "layout.html" %}
+
+{% block title %}Templates - Admin - Grant Writer Pro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">📝 Template Management</h1>
+        <p class="page-subtitle">Manage agency grant templates and sections</p>
+    </div>
+    <button class="btn btn-primary" onclick="showAddForm()">➕ Add Template</button>
+</div>
+
+<!-- Add/Edit Form -->
+<div id="templateForm" class="card" style="display: none; margin-bottom: 2rem;">
+    <h2 class="card-title" id="formTitle">Add New Template</h2>
+    <form method="POST">
+        <input type="hidden" name="action" id="formAction" value="add">
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+            <div class="form-group">
+                <label>Template Name (ID)</label>
+                <input type="text" name="template_name" id="inputName" required placeholder="e.g., nsf, doe, custom">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <input type="text" name="description" id="inputDesc" placeholder="Brief description">
+            </div>
+            <div class="form-group">
+                <label>Page Limit</label>
+                <input type="number" name="page_limit" id="inputLimit" value="15">
+            </div>
+            <div class="form-group">
+                <label>Required Forms (comma-separated)</label>
+                <input type="text" name="forms" id="inputForms" placeholder="SF424, SF424A, ...">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Sections (JSON array)</label>
+            <textarea name="sections" id="inputSections" rows="4" placeholder='[{"name": "Project Summary", "limit": 2}, ...]'></textarea>
+            <small style="color: var(--text-muted);">Enter as JSON array</small>
+        </div>
+        
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-primary">Save Template</button>
+            <button type="button" class="btn btn-secondary" onclick="hideForm()">Cancel</button>
+        </div>
+    </form>
+</div>
+
+<!-- Templates Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
+    {% for name, template in templates.items() %}
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+            <div>
+                <h3 style="font-size: 1.25rem; font-weight: 600;">{{ name|upper }}</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">{{ template.description or 'No description' }}</p>
+            </div>
+            <span class="badge badge-purple">{{ name }}</span>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+            <div style="text-align: center;">
+                <div style="font-weight: 600; font-size: 1.25rem;">{{ template.required_sections|length }}</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Sections</div>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-weight: 600; font-size: 1.25rem;">{{ template.page_limit or 15 }}</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Page Limit</div>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-weight: 600; font-size: 1.25rem;">{{ template.forms|length if template.forms else 0 }}</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Forms</div>
+            </div>
+        </div>
+        
+        {% if template.required_sections %}
+        <div style="margin-bottom: 1rem;">
+            <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Sections:</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+                {% for section in template.required_sections[:5] %}
+                <span class="badge badge-amber">{{ section.name if section.name else section }}</span>
+                {% endfor %}
+                {% if template.required_sections|length > 5 %}
+                <span class="badge" style="background: var(--bg-tertiary);">+{{ template.required_sections|length - 5 }} more</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-ghost btn-sm" onclick="editTemplate('{{ name }}')">Edit</button>
+            <form method="POST" style="display: inline;">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="template_name" value="{{ name }}">
+                <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--accent-warning);" onclick="return confirm('Delete template {{ name }}?')">Delete</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not templates %}
+<div class="card">
+    <div class="empty-state">
+        <div class="empty-icon">📝</div>
+        <div class="empty-title">No templates</div>
+        <button class="btn btn-primary" onclick="showAddForm()">Add First Template</button>
+    </div>
+</div>
+{% endif %}
+
+<script>
+const templatesData = {{ templates|tojson }};
+
+function showAddForm() {
+    document.getElementById('templateForm').style.display = 'block';
+    document.getElementById('formTitle').textContent = 'Add New Template';
+    document.getElementById('formAction').value = 'add';
+    document.getElementById('inputName').disabled = false;
+    document.querySelector('#templateForm form').reset();
+}
+
+function hideForm() {
+    document.getElementById('templateForm').style.display = 'none';
+}
+
+function editTemplate(name) {
+    const template = templatesData[name];
+    if (!template) return;
+    
+    document.getElementById('templateForm').style.display = 'block';
+    document.getElementById('formTitle').textContent = 'Edit Template: ' + name.toUpperCase();
+    document.getElementById('formAction').value = 'edit';
+    
+    document.getElementById('inputName').value = name;
+    document.getElementById('inputName').disabled = true;
+    document.getElementById('inputDesc').value = template.description || '';
+    document.getElementById('inputLimit').value = template.page_limit || 15;
+    document.getElementById('inputForms').value = template.forms ? template.forms.join(', ') : '';
+    document.getElementById('inputSections').value = JSON.stringify(template.required_sections || [], null, 2);
+}
+</script>
+{% endblock %}

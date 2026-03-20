@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guided Submission - {{ grant.grant_name }}</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0; 
+            background: #1a1a2e;
+        }
+        
+        .guided-container {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 1.5rem;
+            overflow-y: auto;
+            border-right: 1px solid #2a2a4a;
+        }
+        
+        .sidebar h2 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            color: #4361ee;
+        }
+        
+        .sidebar h3 {
+            font-size: 1rem;
+            margin: 1.5rem 0 0.5rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .step {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .step:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #4361ee;
+        }
+        
+        .step.active {
+            background: #4361ee;
+            border-color: #4361ee;
+        }
+        
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .step-badge {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .step.active .step-badge {
+            background: white;
+            color: #4361ee;
+        }
+        
+        .step-desc {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin: 0;
+        }
+        
+        .content-area {
+            background: #f5f5f5;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .content-header {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .content-header h1 {
+            margin: 0 0 0.5rem 0;
+            color: #1a1a2e;
+        }
+        
+        .content-header p {
+            margin: 0;
+            color: #666;
+        }
+        
+        .download-box {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: transform 0.2s;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .download-docx {
+            background: #4361ee;
+            color: white;
+        }
+        
+        .download-pdf {
+            background: #e63946;
+            color: white;
+        }
+        
+        .download-txt {
+            background: #2ec4b6;
+            color: white;
+        }
+        
+        .copy-block {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .copy-block h3 {
+            margin: 0 0 1rem 0;
+            color: #1a1a2e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .copy-block pre {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 350px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 0;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #2ec4b6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .copy-btn:hover {
+            background: #25a89c;
+        }
+        
+        .copy-btn.copied {
+            background: #28a745;
+        }
+        
+        .guidance-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .guidance-box h4 {
+            margin: 0 0 0.5rem 0;
+            color: #856404;
+        }
+        
+        .guidance-box p {
+            margin: 0;
+            color: #856404;
+            font-size: 0.9rem;
+        }
+        
+        .instructions {
+            background: #e7f3ff;
+            border: 1px solid #0066cc;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .instructions h4 {
+            margin: 0 0 0.5rem 0;
+            color: #0066cc;
+        }
+        
+        .instructions ol {
+            margin: 0;
+            padding-left: 1.25rem;
+            color: #0066cc;
+        }
+        
+        .instructions li {
+            margin-bottom: 0.25rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .empty-state h3 {
+            color: #333;
+        }
+        
+        .portal-link {
+            background: #1a1a2e;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .portal-link code {
+            background: rgba(255,255,255,0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        
+        .template-badge {
+            background: #4361ee;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+    </style>
+
+    <!-- UserWay Accessibility Widget -->
+    <script async src="https://cdn.userway.org/widget.js#account=demo"></script>
+</head>
+<body>
+    <div class="guided-container">
+        <div class="sidebar">
+            <h2>🎯 Guided Submission</h2>
+            <p style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 1.5rem;">
+                {{ grant.grant_name }}<br>
+                {{ grant.organization_name }}
+            </p>
+            
+            {% if template_sections %}
+            <span class="template-badge">📋 {{ template_sections|length }} Sections</span>
+            {% endif %}
+            
+            <h3>📋 Step-by-Step</h3>
+            
+            <div class="step active" onclick="scrollToSection('downloads')">
+                <div class="step-header">
+                    <span class="step-title">1. Download Files</span>
+                    <span class="step-badge">START</span>
+                </div>
+                <p class="step-desc">Download the grant files to upload</p>
+            </div>
+            
+            {# Use template_sections for navigation in the correct order #}
+            {% set ns = namespace(counter=2) %}
+            {% for section in template_sections %}
+            <div class="step" onclick="scrollToSection('section-{{ loop.index0 }}')">
+                <div class="step-header">
+                    <span class="step-title">{{ ns.counter }}. {{ section.name or section.id.replace('_', ' ').title() }}</span>
+                    <span class="step-badge">{% if section.id in existing_sections_by_id %}DONE{% else %}COPY{% endif %}</span>
+                </div>
+                <p class="step-desc">{{ section.guidance[:60] if section.guidance else 'Copy and paste into the portal' }}...</p>
+            </div>
+            {% set ns.counter = ns.counter + 1 %}
+            {% endfor %}
+            
+            {% set final_step = template_sections|length + 2 %}
+            <div class="step" onclick="scrollToSection('finished')">
+                <div class="step-header">
+                    <span class="step-title">{{ final_step }}. Submit</span>
+                    <span class="step-badge">DONE</span>
+                </div>
+                <p class="step-desc">Review and submit your application</p>
+            </div>
+            
+            <div class="portal-link">
+                <h4 style="margin: 0 0 0.5rem 0;">Grant Portal</h4>
+                <p style="font-size: 0.8rem; margin: 0 0 0.5rem 0; opacity: 0.8;">
+                    Open the grant portal in another tab:
+                </p>
+                <code>grants.gov</code> or your agency's portal
+            </div>
+        </div>
+        
+        <div class="content-area">
+            <div class="content-header" id="downloads">
+                <h1>{{ grant.grant_name }}</h1>
+                <p>{{ grant.agency }} | Deadline: {{ grant.deadline }}</p>
+                
+                <div class="download-box">
+                    <a href="/grant/{{ grant.id }}/download/docx" class="download-btn download-docx">
+                        📝 Download DOCX
+                    </a>
+                    <a href="/grant/{{ grant.id }}/download/pdf" class="download-btn download-pdf">
+                        📑 Download PDF
+                    </a>
+                    <a href="/grant/{{ grant.id }}/download/txt" class="download-btn download-txt">
+                        📄 Download TXT
+                    </a>
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h4>📌 How This Works</h4>
+                <ol>
+                    <li>Open the grant portal (Grants.gov, etc.) in another browser tab</li>
+                    <li>Click "Copy" on each section below and paste into the corresponding field in the portal</li>
+                    <li>Or download the DOCX/PDF and upload it if the portal accepts file uploads</li>
+                    <li>Follow the guidance provided for each section</li>
+                </ol>
+            </div>
+            
+            {# Create a map of section IDs to drafts for quick lookup #}
+            {% set existing_sections_by_id = {} %}
+            {% for draft in drafts %}
+            {% set _ = existing_sections_by_id.update({draft.section: draft}) %}
+            {% endfor %}
+            
+            {# Use template_sections in the correct order #}
+            {% if template_sections %}
+                {% for section in template_sections %}
+                <div class="copy-block" id="section-{{ loop.index0 }}">
+                    <h3>
+                        {{ section.name or section.id.replace('_', ' ').title() }}
+                        {% if section.id in existing_sections_by_id %}
+                        <button class="copy-btn" onclick="copyToClipboard(this, '{{ section.id }}')">
+                            📋 Copy
+                        </button>
+                        {% endif %}
+                    </h3>
+                    
+                    {# Show guidance if available #}
+                    {% if section.guidance %}
+                    <div class="guidance-box">
+                        <h4>📋 Agency Guidance</h4>
+                        <p>{{ section.guidance }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {# Show max pages/characters if available #}
+                    {% if section.max_pages or section.max_chars %}
+                    <div style="margin-bottom: 1rem; font-size: 0.8rem; color: #666;">
+                        {% if section.max_pages %}📄 Max {{ section.max_pages }} pages{% endif %}
+                        {% if section.max_chars %}📝 Max {{ section.max_chars }} characters{% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    {% if section.id in existing_sections_by_id %}
+                    <pre id="content-{{ section.id }}">{{ existing_sections_by_id[section.id].content }}</pre>
+                    {% else %}
+                    <p style="color: #999; font-style: italic;">No content yet. Go back to the grant and add content to this section.</p>
+                    <a href="/grant/{{ grant.id }}/section/{{ section.id }}" class="download-btn download-docx">
+                        ➕ Add Content
+                    </a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% elif drafts %}
+                {# Fallback to drafts if no template sections #}
+                {% for draft in drafts %}
+                <div class="copy-block" id="section-{{ loop.index0 }}">
+                    <h3>
+                        {{ draft.section.replace('_', ' ').title() }}
+                        <button class="copy-btn" onclick="copyToClipboard(this, '{{ draft.section }}')">
+                            📋 Copy
+                        </button>
+                    </h3>
+                    <pre id="content-{{ draft.section }}">{{ draft.content }}</pre>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <h3>No Content Yet</h3>
+                <p>Go back to the grant and add content to each section first.</p>
+                <a href="/grant/{{ grant.id }}" class="download-btn download-docx">← Back to Grant</a>
+            </div>
+            {% endif %}
+            
+            <div class="copy-block" id="finished">
+                <h3>✅ Ready to Submit</h3>
+                <p style="color: #666;">Once you've copied all sections and/or uploaded the files, review your application and submit.</p>
+                <p style="color: #666;"><strong>Don't forget:</strong></p>
+                <ul style="color: #666;">
+                    <li>Double-check all required fields</li>
+                    <li>Verify the deadline (early submission recommended)</li>
+                    <li>Save confirmation numbers</li>
+                    <li>Take screenshots of submission confirmation</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function scrollToSection(id) {
+            // Update active step
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            // Scroll
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        function copyToClipboard(btn, section) {
+            const content = document.getElementById('content-' + section).textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                const original = btn.textContent;
+                btn.textContent = '✓ Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = original;
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
