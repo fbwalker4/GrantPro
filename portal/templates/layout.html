@@ -797,5 +797,39 @@
         closeBtn.addEventListener('click', closeSidebar);
     })();
     </script>
+    <script>
+    // Session timeout warning (60-minute session, warn at 55 minutes)
+    (function() {
+        var SESSION_MINUTES = 60;
+        var WARN_BEFORE_MINUTES = 5;
+        var warnAt = (SESSION_MINUTES - WARN_BEFORE_MINUTES) * 60 * 1000;
+        var toastShown = false;
+
+        setTimeout(function() {
+            if (toastShown) return;
+            toastShown = true;
+
+            var toast = document.createElement('div');
+            toast.id = 'session-timeout-toast';
+            toast.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;align-items:center;justify-content:center;gap:1rem;padding:0.85rem 1.5rem;background:#d97706;color:#fff;font-family:Inter,sans-serif;font-size:0.9rem;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,0.4);animation:slideDown 0.3s ease;';
+
+            var style = document.createElement('style');
+            style.textContent = '@keyframes slideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}';
+            document.head.appendChild(style);
+
+            var msg = document.createElement('span');
+            msg.textContent = 'Your session will expire in 5 minutes. Save your work.';
+
+            var btn = document.createElement('button');
+            btn.textContent = 'Dismiss';
+            btn.style.cssText = 'background:rgba(0,0,0,0.25);color:#fff;border:none;padding:0.4rem 0.9rem;border-radius:4px;cursor:pointer;font-size:0.8rem;font-weight:500;';
+            btn.addEventListener('click', function() { toast.remove(); });
+
+            toast.appendChild(msg);
+            toast.appendChild(btn);
+            document.body.appendChild(toast);
+        }, warnAt);
+    })();
+    </script>
 </body>
 </html>

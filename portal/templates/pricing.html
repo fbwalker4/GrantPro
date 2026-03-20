@@ -49,13 +49,30 @@
         .faq-item h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
         .faq-item p { color: var(--gray); font-size: 0.95rem; }
         .footer { text-align: center; padding: 2rem; color: var(--gray); font-size: 0.875rem; margin-top: 3rem; }
+
+        /* Mobile nav toggle */
+        .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 0.5rem; }
+        .nav-toggle span { display: block; width: 24px; height: 2px; background: var(--dark); margin: 5px 0; border-radius: 2px; transition: all 0.3s; }
+
+        @media (max-width: 768px) {
+            .nav-toggle { display: block; }
+            .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: var(--white); box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 1rem 2rem; z-index: 100; }
+            .nav-links.open { display: flex; }
+            .nav-links a { margin-left: 0; padding: 0.65rem 0; border-bottom: 1px solid #e2e8f0; }
+            .nav-links a:last-child { border-bottom: none; }
+            .nav { position: relative; }
+            .plan.featured { transform: none; }
+        }
     </style>
 </head>
 <body>
     <header class="header">
         <nav class="nav">
             <a href="/" class="logo">Grant Pro</a>
-            <div class="nav-links">
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span><span></span><span></span>
+            </button>
+            <div class="nav-links" id="navLinks">
                 <a href="/grants">Grants</a>
                 <a href="/eligibility">Check Eligibility</a>
                 <a href="/login">Sign In</a>
@@ -159,5 +176,10 @@
         <p>&copy; 2026 Grant Pro by Futurespec Consulting. All rights reserved.</p>
         <p><a href="/terms">Terms</a> | <a href="/privacy">Privacy</a> | <a href="/refund">Refund Policy</a> | <a href="/contact">Contact</a></p>
     </footer>
+    <script>
+    document.getElementById('navToggle').addEventListener('click', function() {
+        document.getElementById('navLinks').classList.toggle('open');
+    });
+    </script>
 </body>
 </html>

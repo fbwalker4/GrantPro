@@ -5,12 +5,12 @@
 {% block content %}
 <!-- Upgrade Banner for Free Users -->
 {% if not user.plan or user.plan == 'free' %}
-<div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 1px solid #f59e0b; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+<div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
     <div style="display: flex; align-items: center; gap: 1rem;">
         <span style="font-size: 1.5rem;">🎉</span>
         <div>
             <strong>You're on the Free Tier</strong>
-            <p style="margin: 0; font-size: 0.9rem; color: #92400e;">Unlock full grant applications, AI writing, and submit to funders for only $19.95/month</p>
+            <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">Unlock full grant applications, AI writing, and submit to funders for only $19.95/month</p>
         </div>
     </div>
     <a href="/upgrade" class="btn btn-primary" style="background: #b45309; white-space: nowrap;">Upgrade to Standard</a>
@@ -19,15 +19,56 @@
 
 <!-- Onboarding Prompt - Show if not completed -->
 {% if not user.onboarding_completed or user.onboarding_completed == 0 %}
-<div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border: 1px solid #3b82f6; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+<div style="background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.3); border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
     <div style="display: flex; align-items: center; gap: 1rem;">
         <span style="font-size: 1.5rem;">📋</span>
         <div>
             <strong>Complete Your Profile for Better Matches</strong>
-            <p style="margin: 0; font-size: 0.9rem; color: #1e40af;">Save your EIN, address, mission area, and organization details once — we'll auto-fill every grant application. More grants become available with proper identifiers.</p>
+            <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">Save your EIN, address, mission area, and organization details once — we'll auto-fill every grant application. More grants become available with proper identifiers.</p>
         </div>
     </div>
     <a href="/onboarding" class="btn btn-primary" style="background: #2563eb; white-space: nowrap;">Complete Profile →</a>
+</div>
+{% endif %}
+
+<!-- Getting Started Checklist - Show for new users with no grants -->
+{% if saved_grants|length == 0 %}
+<div class="card" style="margin-bottom: 1.5rem; border: 1px solid rgba(37, 99, 235, 0.2); background: var(--bg-card);">
+    <div class="card-header">
+        <h2 class="card-title">🚀 Getting Started</h2>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1rem; padding: 0.5rem 0;">
+        <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 0.75rem 1rem; background: rgba(37, 99, 235, 0.05); border-radius: 8px;">
+            <span style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(37, 99, 235, 0.15); color: var(--accent-primary, #4361ee); font-weight: 700; font-size: 0.85rem; flex-shrink: 0;">1</span>
+            <div>
+                <strong style="display: block; margin-bottom: 0.2rem;">Complete your organization profile</strong>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Add your EIN, mission, and contact info so we can auto-fill applications.</span>
+                <a href="/onboarding" style="display: inline-block; margin-top: 0.3rem; font-size: 0.85rem; color: var(--accent-primary, #4361ee);">Go to Profile →</a>
+            </div>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 0.75rem 1rem; background: rgba(37, 99, 235, 0.05); border-radius: 8px;">
+            <span style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(37, 99, 235, 0.15); color: var(--accent-primary, #4361ee); font-weight: 700; font-size: 0.85rem; flex-shrink: 0;">2</span>
+            <div>
+                <strong style="display: block; margin-bottom: 0.2rem;">Find grants with the wizard</strong>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Answer a few questions and we'll match you with relevant funding opportunities.</span>
+                <a href="/wizard" style="display: inline-block; margin-top: 0.3rem; font-size: 0.85rem; color: var(--accent-primary, #4361ee);">Open Wizard →</a>
+            </div>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 0.75rem 1rem; background: rgba(37, 99, 235, 0.05); border-radius: 8px;">
+            <span style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(37, 99, 235, 0.15); color: var(--accent-primary, #4361ee); font-weight: 700; font-size: 0.85rem; flex-shrink: 0;">3</span>
+            <div>
+                <strong style="display: block; margin-bottom: 0.2rem;">Select a grant and start writing</strong>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Save a grant, then use AI-assisted writing to draft each section.</span>
+            </div>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 0.75rem 1rem; background: rgba(37, 99, 235, 0.05); border-radius: 8px;">
+            <span style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(37, 99, 235, 0.15); color: var(--accent-primary, #4361ee); font-weight: 700; font-size: 0.85rem; flex-shrink: 0;">4</span>
+            <div>
+                <strong style="display: block; margin-bottom: 0.2rem;">Use guided submission to apply</strong>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Our step-by-step submission mode walks you through the application process.</span>
+            </div>
+        </div>
+    </div>
 </div>
 {% endif %}
 
@@ -105,7 +146,7 @@
                             <div style="font-weight: 500;">{{ grant.title }}</div>
                         </td>
                         <td><span class="badge badge-purple">{{ grant.agency }}</span></td>
-                        <td style="font-family: 'Fraunces', serif; font-weight: 600; color: var(--accent-success);">
+                        <td style="font-family: 'Playfair Display', serif; font-weight: 600; color: var(--accent-success);">
                             ${{ "{:,.0f}".format(grant.amount_min) }} - ${{ "{:,.0f}".format(grant.amount_max) }}
                         </td>
                         <td>{{ grant.category }}</td>

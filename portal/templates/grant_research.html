@@ -5,16 +5,17 @@
 {% block extra %}
 <style>
     .grant-card {
-        background: white;
+        background: var(--bg-card);
         border-radius: 12px;
         padding: 1.5rem;
         margin-bottom: 1rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         transition: transform 0.2s, box-shadow 0.2s;
     }
     .grant-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.3);
     }
     .grant-header {
         display: flex;
@@ -25,24 +26,24 @@
     .grant-title {
         font-size: 1.1rem;
         font-weight: 600;
-        color: #1a1a2e;
+        color: var(--text-primary);
     }
     .grant-agency {
         font-size: 0.9rem;
-        color: #4361ee;
+        color: var(--accent-primary, #4361ee);
         font-weight: 500;
     }
     .grant-amount {
         font-size: 1.25rem;
         font-weight: 700;
-        color: #2ec4b6;
+        color: var(--accent-success, #2ec4b6);
     }
     .grant-meta {
         display: flex;
         gap: 1rem;
         margin-top: 0.75rem;
         font-size: 0.85rem;
-        color: #666;
+        color: var(--text-muted);
     }
     .grant-meta span {
         display: flex;
@@ -52,16 +53,17 @@
     .grant-actions {
         margin-top: 1rem;
         padding-top: 1rem;
-        border-top: 1px solid #eee;
+        border-top: 1px solid var(--border-color);
         display: flex;
         gap: 0.5rem;
     }
     .search-filters {
-        background: white;
+        background: var(--bg-card);
         border-radius: 12px;
         padding: 1.5rem;
         margin-bottom: 1.5rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
     .filter-row {
         display: grid;
@@ -70,9 +72,11 @@
     }
     .filter-row input, .filter-row select {
         padding: 0.75rem;
-        border: 1px solid #ddd;
+        border: 1px solid var(--border-color);
         border-radius: 8px;
         font-size: 1rem;
+        background: var(--bg-primary, #1a1a2e);
+        color: var(--text-primary);
     }
     .search-btn {
         background: #4361ee;
@@ -89,17 +93,17 @@
     }
     .results-count {
         margin-bottom: 1rem;
-        color: #666;
+        color: var(--text-muted);
     }
     .loading {
         text-align: center;
         padding: 2rem;
-        color: #666;
+        color: var(--text-muted);
     }
     .template-badge {
         display: inline-block;
-        background: #e8f5e9;
-        color: #2e7d32;
+        background: rgba(46, 125, 50, 0.15);
+        color: var(--accent-success, #2ec4b6);
         padding: 0.25rem 0.5rem;
         border-radius: 4px;
         font-size: 0.75rem;
@@ -214,7 +218,7 @@ function displayResults(grants) {
                 </div>
                 <div class="grant-amount">$${grant.amount_min.toLocaleString()} - $${grant.amount_max.toLocaleString()}</div>
             </div>
-            <p style="color: #666; margin: 0.75rem 0;">${grant.description}</p>
+            <p style="color: var(--text-secondary); margin: 0.75rem 0;">${grant.description}</p>
             <div class="grant-meta">
                 <span>📅 Deadline: ${new Date(grant.deadline).toLocaleDateString()}</span>
                 <span>🏷️ ${grant.category}</span>
