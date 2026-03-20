@@ -5,6 +5,7 @@ Local Flask app for managing clients, grants, and guided submission
 """
 
 import json
+import logging
 import os
 import sqlite3
 from datetime import datetime
@@ -13,6 +14,19 @@ from pathlib import Path
 from flask import Flask, render_template, request, redirect, url_for, send_file, jsonify, flash, session, g
 from werkzeug.utils import secure_filename
 import secrets
+
+# Configure logging
+LOG_DIR = Path.home() / ".hermes" / "grant-system" / "tracking"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(name)s: %(message)s',
+    handlers=[
+        logging.FileHandler(LOG_DIR / 'app.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger('grantpro')
 
 # Import grant researcher
 import sys
@@ -365,14 +379,16 @@ def login():
             session['user_id'] = user['id']
             session['user_name'] = user['first_name'] or user['email']
             user_models.update_last_login(user['id'])
+            logger.info(f'User login: {email}')
             flash(f'Welcome back, {session["user_name"]}!', 'success')
-            
+
             # Redirect to dashboard
             next_url = request.args.get('next')
             if next_url:
                 return redirect(next_url)
             return redirect(url_for('dashboard'))
         else:
+            logger.warning(f'Failed login attempt for: {email} from {ip}')
             flash('Invalid email or password', 'error')
     
     return render_template('login.html')
@@ -425,6 +441,7 @@ def signup():
         if error:
             flash(error, 'error')
         else:
+            logger.info(f'New user registered: {email} (plan: {selected_plan})')
             # If they selected a paid plan, redirect to payment
             if selected_plan in ['monthly', 'annual']:
                 session['user_id'] = user_id
@@ -514,7 +531,7 @@ def payment_success():
                     flash(f'Payment successful! You are now on the {plan.title()} plan.', 'success')
                     return render_template('payment_success.html', user=user, plan=plan)
         except Exception as e:
-            app.logger.warning(f'Stripe session verification failed: {e}')
+            logger.warning(f'Stripe session verification failed: {e}')
 
     flash('Payment successful!', 'success')
     return redirect(url_for('dashboard'))
@@ -574,7 +591,7 @@ def stripe_webhook():
     result, error = stripe_payment.handle_webhook(payload, sig_header)
 
     if error:
-        app.logger.error(f'Stripe webhook error: {error}')
+        logger.error(f'Stripe webhook error: {error}')
         return jsonify({'error': error}), 400
 
     return jsonify(result), 200
@@ -604,6 +621,7 @@ def contact():
 @app.route('/logout')
 def logout():
     """Logout"""
+    logger.info(f'User logout: {session.get("user_id")}')
     session.clear()
     flash('You have been logged out', 'info')
     return redirect(url_for('index'))
@@ -617,7 +635,7 @@ def forgot_password():
         email = request.form.get('email')
         token = user_models.create_password_reset(email)
         if token:
-            app.logger.info(f'Password reset token generated for {email}')
+            logger.info(f'Password reset token generated for {email}')
         # Same message whether email exists or not (prevents email enumeration)
         flash('If that email exists, a password reset link has been sent.', 'info')
         return redirect(url_for('login'))
@@ -1836,7 +1854,7 @@ def generate_section_content(grant_id, section_id):
         try:
             client_info = json.loads(grant['intake_data'])
         except (json.JSONDecodeError, TypeError) as e:
-            app.logger.warning(f'Failed to parse intake data for grant {grant.get("id")}: {e}')
+            logger.warning(f'Failed to parse intake data for grant {grant.get("id")}: {e}')
     
     # Build prompt for AI - include ALL grant-specific info
     agency = grant['agency'] if 'agency' in grant.keys() and grant['agency'] else 'Unknown'
@@ -1858,7 +1876,7 @@ def generate_section_content(grant_id, section_id):
                 research_grant_info = rg
                 break
     except Exception as e:
-        app.logger.warning(f'Research grant lookup failed: {e}')
+        logger.warning(f'Research grant lookup failed: {e}')
     
     if research_grant_info:
         amount_min = research_grant_info.get('amount_min', amount_val)
