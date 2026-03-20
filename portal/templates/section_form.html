@@ -25,8 +25,9 @@
 <div class="card">
     <form method="POST">
         <label for="content">{{ section.replace('_', ' ').title() }} Content</label>
-        <textarea id="content" name="content" style="min-height: 400px;">{{ content }}</textarea>
-        
+        <textarea id="content" name="content" class="form-textarea" style="min-height: 400px;">{{ content }}</textarea>
+        <div id="content-counter" style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 1rem 0;"></div>
+
         <div style="display: flex; gap: 1rem;">
             <button type="submit" class="btn btn-primary">Save Section</button>
             <a href="/grant/{{ grant.id }}" class="btn btn-secondary">Cancel</a>
@@ -43,4 +44,60 @@
         <li>Keep paragraphs under 200 words for readability</li>
     </ul>
 </div>
+
+<script>
+(function() {
+    var textarea = document.getElementById('content');
+    var counter = document.getElementById('content-counter');
+    var maxChars = {{ section_guidance.max_chars|default(0)|int }};
+    var maxPages = {{ section_guidance.max_pages|default(0)|int }};
+    var charsPerPage = 3000;
+
+    function updateCounter() {
+        var text = textarea.value;
+        var charCount = text.length;
+        var wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+        var parts = [];
+
+        // Character count
+        if (maxChars > 0) {
+            var charLabel = charCount + ' / ' + maxChars + ' characters';
+            var ratio = charCount / maxChars;
+            var charColor;
+            if (ratio > 1) {
+                charColor = 'var(--accent-danger)';
+            } else if (ratio >= 0.9) {
+                charColor = 'var(--accent-warning)';
+            } else {
+                charColor = 'var(--text-muted)';
+            }
+            parts.push('<span style="color:' + charColor + '">' + charLabel + '</span>');
+        } else {
+            parts.push('<span>' + charCount + ' characters</span>');
+        }
+
+        // Word count
+        parts.push('<span>' + wordCount + ' words</span>');
+
+        // Estimated page count
+        if (maxPages > 0) {
+            var estPages = Math.ceil(charCount / charsPerPage) || 0;
+            var pageColor;
+            if (estPages > maxPages) {
+                pageColor = 'var(--accent-danger)';
+            } else if (estPages >= maxPages) {
+                pageColor = 'var(--accent-warning)';
+            } else {
+                pageColor = 'var(--text-muted)';
+            }
+            parts.push('<span style="color:' + pageColor + '">~' + estPages + ' / ' + maxPages + ' pages</span>');
+        }
+
+        counter.innerHTML = parts.join(' &nbsp;|&nbsp; ');
+    }
+
+    textarea.addEventListener('input', updateCounter);
+    updateCounter();
+})();
+</script>
 {% endblock %}

@@ -280,6 +280,153 @@
             display: inline-block;
             margin-top: 0.5rem;
         }
+
+        /* Progress bar */
+        .progress-bar-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+        }
+        .progress-bar-container .progress-label {
+            font-size: 0.8rem;
+            color: #ccc;
+            margin-bottom: 0.4rem;
+        }
+        .progress-bar-track {
+            background: rgba(255,255,255,0.15);
+            border-radius: 6px;
+            height: 8px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            background: #2ec4b6;
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        /* Sidebar badge colors */
+        .step-badge.badge-done {
+            background: #28a745;
+            color: white;
+        }
+        .step-badge.badge-copy {
+            background: #4361ee;
+            color: white;
+        }
+        .step-badge.badge-empty {
+            background: #6c757d;
+            color: white;
+        }
+        .step-badge.badge-copied {
+            background: #2ec4b6;
+            color: white;
+        }
+
+        /* Open portal button */
+        .open-portal-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #4361ee;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-top: 0.5rem;
+        }
+        .open-portal-btn:hover {
+            background: #3451de;
+            transform: translateY(-1px);
+        }
+
+        /* Compact mode toggle */
+        .compact-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .compact-toggle:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .compact-toggle.active {
+            background: #4361ee;
+            border-color: #4361ee;
+        }
+
+        /* Compact mode styles */
+        body.compact-mode .copy-block {
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        body.compact-mode .copy-block h3 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        body.compact-mode .copy-block pre {
+            font-size: 0.8rem;
+            padding: 0.6rem;
+            line-height: 1.4;
+            max-height: 250px;
+        }
+        body.compact-mode .content-area {
+            padding: 1rem;
+        }
+        body.compact-mode .content-header {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        body.compact-mode .content-header h1 {
+            font-size: 1.3rem;
+        }
+        body.compact-mode .guidance-box {
+            padding: 0.6rem;
+            margin-bottom: 0.5rem;
+        }
+        body.compact-mode .guidance-box p {
+            font-size: 0.8rem;
+        }
+        body.compact-mode .instructions {
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        body.compact-mode .instructions ol {
+            font-size: 0.85rem;
+        }
+        body.compact-mode .sidebar {
+            padding: 1rem;
+        }
+        body.compact-mode .step {
+            padding: 0.6rem;
+            margin-bottom: 0.5rem;
+        }
+        body.compact-mode .step-title {
+            font-size: 0.85rem;
+        }
+        body.compact-mode .step-desc {
+            font-size: 0.7rem;
+        }
+
+        /* Copied checkmark on step */
+        .step-badge .checkmark {
+            margin-right: 0.2rem;
+        }
     </style>
 
     <!-- UserWay Accessibility Widget -->
@@ -288,12 +435,25 @@
 <body>
     <div class="guided-container">
         <div class="sidebar">
-            <h2>🎯 Guided Submission</h2>
-            <p style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <h2 style="margin-bottom: 0;">🎯 Guided Submission</h2>
+                <button class="compact-toggle" id="compactToggle" onclick="toggleCompactMode()">
+                    ⊟ Compact
+                </button>
+            </div>
+            <p style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 1rem;">
                 {{ grant.grant_name }}<br>
                 {{ grant.organization_name }}
             </p>
-            
+
+            <!-- Progress Bar -->
+            <div class="progress-bar-container">
+                <div class="progress-label" id="progressLabel">0 of 0 sections copied</div>
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill" id="progressFill"></div>
+                </div>
+            </div>
+
             {% if template_sections %}
             <span class="template-badge">📋 {{ template_sections|length }} Sections</span>
             {% endif %}
@@ -311,10 +471,14 @@
             {# Use template_sections for navigation in the correct order #}
             {% set ns = namespace(counter=2) %}
             {% for section in template_sections %}
-            <div class="step" onclick="scrollToSection('section-{{ loop.index0 }}')">
+            <div class="step" onclick="scrollToSection('section-{{ loop.index0 }}')" data-section-id="{{ section.id }}">
                 <div class="step-header">
                     <span class="step-title">{{ ns.counter }}. {{ section.name or section.id.replace('_', ' ').title() }}</span>
-                    <span class="step-badge">{% if section.id in existing_sections_by_id %}DONE{% else %}COPY{% endif %}</span>
+                    {% if section.id in existing_sections_by_id %}
+                    <span class="step-badge badge-copy" id="badge-{{ section.id }}">COPY</span>
+                    {% else %}
+                    <span class="step-badge badge-empty" id="badge-{{ section.id }}">EMPTY</span>
+                    {% endif %}
                 </div>
                 <p class="step-desc">{{ section.guidance[:60] if section.guidance else 'Copy and paste into the portal' }}...</p>
             </div>
@@ -335,7 +499,9 @@
                 <p style="font-size: 0.8rem; margin: 0 0 0.5rem 0; opacity: 0.8;">
                     Open the grant portal in another tab:
                 </p>
-                <code>grants.gov</code> or your agency's portal
+                <a href="https://www.grants.gov" target="_blank" rel="noopener noreferrer" class="open-portal-btn" style="margin-top: 0.5rem; display: inline-flex;">
+                    🌐 Open Grants.gov
+                </a>
             </div>
         </div>
         
@@ -365,6 +531,11 @@
                     <li>Or download the DOCX/PDF and upload it if the portal accepts file uploads</li>
                     <li>Follow the guidance provided for each section</li>
                 </ol>
+                <div style="margin-top: 0.75rem;">
+                    <a href="https://www.grants.gov" target="_blank" rel="noopener noreferrer" class="open-portal-btn">
+                        🌐 Open Grants.gov
+                    </a>
+                </div>
             </div>
             
             {# Create a map of section IDs to drafts for quick lookup #}
@@ -448,30 +619,110 @@
     </div>
     
     <script>
+        const GRANT_ID = '{{ grant.id }}';
+        const STORAGE_KEY = 'guided_copied_' + GRANT_ID;
+
+        // Load copied sections from localStorage
+        function getCopiedSections() {
+            try {
+                return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function saveCopiedSections(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function markSectionCopied(sectionId) {
+            const data = getCopiedSections();
+            data[sectionId] = true;
+            saveCopiedSections(data);
+            updateBadge(sectionId);
+            updateProgressBar();
+        }
+
+        function updateBadge(sectionId) {
+            const badge = document.getElementById('badge-' + sectionId);
+            if (!badge) return;
+            const copied = getCopiedSections();
+            if (copied[sectionId]) {
+                badge.className = 'step-badge badge-copied';
+                badge.innerHTML = '<span class="checkmark">&#10003;</span> DONE';
+            }
+        }
+
+        function updateProgressBar() {
+            const copied = getCopiedSections();
+            // Count only sections that have a COPY or DONE badge (i.e., have content)
+            const copyableBadges = document.querySelectorAll('.step-badge.badge-copy, .step-badge.badge-copied');
+            const totalCopyable = copyableBadges.length;
+            const copiedCount = Object.keys(copied).length;
+
+            const label = document.getElementById('progressLabel');
+            const fill = document.getElementById('progressFill');
+            if (label && fill) {
+                label.textContent = copiedCount + ' of ' + totalCopyable + ' sections copied';
+                const pct = totalCopyable > 0 ? (copiedCount / totalCopyable) * 100 : 0;
+                fill.style.width = Math.min(pct, 100) + '%';
+            }
+        }
+
         function scrollToSection(id) {
             // Update active step
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
             event.currentTarget.classList.add('active');
-            
+
             // Scroll
             const el = document.getElementById(id);
             if (el) {
                 el.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
-        
+
         function copyToClipboard(btn, section) {
-            const content = document.getElementById('content-' + section).textContent;
+            const content = document.getElementById('content-' + section).innerText;
             navigator.clipboard.writeText(content).then(() => {
-                const original = btn.textContent;
-                btn.textContent = '✓ Copied!';
+                btn.innerHTML = '&#10003; Copied!';
                 btn.classList.add('copied');
+                markSectionCopied(section);
                 setTimeout(() => {
-                    btn.textContent = original;
+                    btn.innerHTML = '📋 Copy';
                     btn.classList.remove('copied');
                 }, 2000);
             });
         }
+
+        // Compact mode toggle
+        function toggleCompactMode() {
+            document.body.classList.toggle('compact-mode');
+            const btn = document.getElementById('compactToggle');
+            const isCompact = document.body.classList.contains('compact-mode');
+            btn.classList.toggle('active', isCompact);
+            btn.innerHTML = isCompact ? '⊞ Normal' : '⊟ Compact';
+            localStorage.setItem('guided_compact_mode', isCompact ? '1' : '0');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Restore copied states
+            const copied = getCopiedSections();
+            for (const sectionId of Object.keys(copied)) {
+                updateBadge(sectionId);
+            }
+            updateProgressBar();
+
+            // Restore compact mode
+            if (localStorage.getItem('guided_compact_mode') === '1') {
+                document.body.classList.add('compact-mode');
+                const btn = document.getElementById('compactToggle');
+                if (btn) {
+                    btn.classList.add('active');
+                    btn.innerHTML = '⊞ Normal';
+                }
+            }
+        });
     </script>
 </body>
 </html>
