@@ -3181,33 +3181,52 @@ def download_grant(grant_id, fmt):
             from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
             from reportlab.lib.enums import TA_CENTER, TA_LEFT
             
-            buffer = io.BufferedReader(io.BytesIO())
-            doc = SimpleDocTemplate(buffer, pagesize=letter)
+            buffer = io.BytesIO()
+            doc = SimpleDocTemplate(buffer, pagesize=letter,
+                leftMargin=0.9*inch, rightMargin=0.9*inch,
+                topMargin=0.7*inch, bottomMargin=0.7*inch)
             styles = getSampleStyleSheet()
-            
-            # Custom styles
-            title_style = ParagraphStyle(
-                'CustomTitle',
-                parent=styles['Heading1'],
-                alignment=TA_CENTER,
-                fontSize=18,
-                spaceAfter=20
-            )
-            
+
+            title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'],
+                alignment=TA_CENTER, fontSize=18, spaceAfter=20)
+            body_style = ParagraphStyle('Body', parent=styles['Normal'],
+                fontSize=10.5, leading=14, spaceAfter=6)
+
+            # Check for draft watermark
+            is_draft = request.args.get('draft') == '1'
+
             story = []
-            
+
+            # Draft watermark notice
+            if is_draft:
+                story.append(Paragraph(
+                    '<font color="#dc2626" size="14"><b>DRAFT — NOT FOR SUBMISSION</b></font>',
+                    ParagraphStyle('Draft', parent=styles['Normal'], alignment=TA_CENTER, spaceAfter=20)))
+
             # Title
-            story.append(Paragraph(grant['grant_name'], title_style))
+            story.append(Paragraph(
+                grant['grant_name'].replace('&','&amp;').replace('<','&lt;'),
+                title_style))
             story.append(Paragraph(f"Agency: {grant['agency']}", styles['Normal']))
             story.append(Paragraph(f"Organization: {grant['organization_name']}", styles['Normal']))
-            story.append(Paragraph(f"Amount: ${grant['amount']:,.2f}", styles['Normal']))
-            story.append(Paragraph(f"Deadline: {grant['deadline']}", styles['Normal']))
+            amt = grant.get('amount', 0) or 0
+            story.append(Paragraph(f"Amount: ${float(amt):,.0f}", styles['Normal']))
+            story.append(Paragraph(f"Deadline: {grant.get('deadline', 'TBD')}", styles['Normal']))
             story.append(Spacer(1, 0.3*inch))
-            
+
             # Sections
             for draft in drafts:
-                story.append(Paragraph(draft['section'].replace('_', ' ').title(), styles['Heading2']))
-                story.append(Paragraph(draft['content'].replace('\n', '<br/>'), styles['Normal']))
+                section_title = draft['section'].replace('_', ' ').title()
+                story.append(Paragraph(section_title, styles['Heading2']))
+                # Process content safely — escape HTML, handle paragraphs
+                content = draft['content'] or ''
+                content = content.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+                for para in content.split('\n\n'):
+                    para = para.strip()
+                    if para:
+                        # Convert single newlines to <br/> within paragraphs
+                        para = para.replace('\n', '<br/>')
+                        story.append(Paragraph(para, body_style))
                 story.append(Spacer(1, 0.2*inch))
 
             from pdf_utils import get_footer_callback
