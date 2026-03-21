@@ -1430,27 +1430,26 @@ def api_save_grant():
         ip = request.remote_addr or 'unknown'
         logger.info(f'Guest save: email={email}, grant_id={grant_id}, ip={ip}')
 
-        # Save to guest_saves table (already created in Supabase)
-        conn = get_db()
-        
-        # Check if this grant already saved for this email
-        existing = conn.execute(
-            'SELECT id FROM guest_saves WHERE email = ? AND grant_id = ?',
-            (email, grant_id)
-        ).fetchone()
-        
-        if existing:
+        # Save to guest_saves table
+        try:
+            conn = get_db()
+            existing = conn.execute(
+                'SELECT id FROM guest_saves WHERE email = ? AND grant_id = ?',
+                (email, grant_id)
+            ).fetchone()
+            if existing:
+                conn.close()
+                return jsonify({'success': True, 'logged_in': False, 'message': 'Grant already saved'})
+            conn.execute(
+                'INSERT INTO guest_saves (email, grant_id, notes) VALUES (?, ?, ?)',
+                (email, grant_id, notes)
+            )
+            conn.commit()
             conn.close()
-            return jsonify({'success': True, 'logged_in': False, 'message': 'Grant already saved'})
-        
-        conn.execute(
-            'INSERT INTO guest_saves (email, grant_id, notes) VALUES (?, ?, ?)',
-            (email, grant_id, notes)
-        )
-        conn.commit()
-        conn.close()
-        
-        return jsonify({'success': True, 'logged_in': False, 'message': 'Grant saved! Create an account to manage all your saved grants.'})
+            return jsonify({'success': True, 'logged_in': False, 'message': 'Grant saved! Create an account to manage all your saved grants.'})
+        except Exception as e:
+            logger.warning(f'Guest save failed: {e}')
+            return jsonify({'success': False, 'error': 'save_failed', 'message': 'Could not save grant. Please try again.'}), 500
 
 
 @app.route('/api/unsave-grant', methods=['POST'])
