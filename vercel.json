@@ -12,10 +12,6 @@
   ],
   "routes": [
     {
-      "src": "/static/(.*)",
-      "dest": "portal/static/$1"
-    },
-    {
       "src": "/api/health",
       "dest": "api/health.py"
     },
