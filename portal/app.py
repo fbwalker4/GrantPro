@@ -402,6 +402,12 @@ def search_public():
     return render_template('search_public.html', grants=all_grants)
 
 
+@app.route('/guide')
+def guide():
+    """Federal Grant Writing 101 guide and glossary - public"""
+    return render_template('guide.html')
+
+
 @app.route('/help')
 @app.route('/faq')
 def help():

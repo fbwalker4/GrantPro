@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Federal Grant Writing 101 - Grant Pro</title>
+    <meta name="description" content="A step-by-step guide to writing and submitting federal grant applications. Includes glossary of common grant terms.">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%232563eb'/%3E%3Cstop offset='100%25' stop-color='%231d4ed8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='20' y='26' text-anchor='middle' fill='white' font-family='Inter,Helvetica,Arial,sans-serif' font-weight='700' font-size='16'%3EGP%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fc;
+            --bg-tertiary: #f1f3f6;
+            --border-color: #e2e5ed;
+            --text-primary: #1a1f36;
+            --text-secondary: #5e6278;
+            --text-muted: #8993a4;
+            --accent-primary: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-success: #059669;
+            --accent-warning: #d97706;
+            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.875rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg { width: 20px; height: 20px; fill: white; }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 1.75rem;
+        }
+
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.15s;
+        }
+
+        .nav a:hover { color: var(--text-primary); }
+        .nav a.active { color: var(--accent-primary); font-weight: 600; }
+
+        .nav-btn {
+            background: var(--gradient-primary);
+            color: white !important;
+            padding: 0.5rem 1.1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .nav-btn:hover { box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+
+        /* Hamburger */
+        .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 0.5rem; }
+        .hamburger svg { width: 24px; height: 24px; stroke: var(--text-primary); stroke-width: 2; stroke-linecap: round; fill: none; }
+
+        .mobile-nav {
+            display: none;
+            flex-direction: column;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 2rem 1rem;
+        }
+
+        .mobile-nav.open { display: flex; }
+        .mobile-nav a { padding: 0.6rem 0; color: var(--text-secondary); text-decoration: none; font-weight: 500; font-size: 0.95rem; border-bottom: 1px solid var(--border-color); }
+        .mobile-nav a:last-child { border-bottom: none; }
+
+        /* Content */
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem 4rem;
+        }
+
+        .page-hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .page-hero h1 span { color: var(--accent-primary); }
+
+        .page-hero p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Table of contents */
+        .toc {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .toc h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .toc-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem 2rem;
+        }
+
+        .toc a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .toc a:hover { text-decoration: underline; }
+
+        /* Section cards */
+        .guide-section {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .guide-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-hover);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--bg-tertiary);
+        }
+
+        .guide-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.5rem;
+        }
+
+        .guide-section p {
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .guide-section ul, .guide-section ol {
+            margin: 0.5rem 0 1rem 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .guide-section li {
+            margin-bottom: 0.4rem;
+        }
+
+        .guide-section li strong {
+            color: var(--text-primary);
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-right: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .step-heading {
+            display: flex;
+            align-items: center;
+            margin: 1.75rem 0 0.75rem;
+        }
+
+        .step-heading h3 {
+            margin: 0;
+        }
+
+        .tip-box {
+            background: rgba(37, 99, 235, 0.05);
+            border-left: 3px solid var(--accent-primary);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .tip-box strong {
+            color: var(--accent-primary);
+        }
+
+        /* Glossary */
+        .glossary-grid {
+            display: grid;
+            gap: 0;
+        }
+
+        .glossary-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--bg-tertiary);
+        }
+
+        .glossary-item:last-child { border-bottom: none; }
+
+        .glossary-term {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .glossary-abbr {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .glossary-def {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        /* CTA */
+        .cta-box {
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            padding: 2.5rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .cta-box h2 {
+            color: white;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .cta-box p {
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-box .btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            background: white;
+            color: var(--accent-primary);
+            border-radius: 8px;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: box-shadow 0.2s;
+        }
+
+        .cta-box .btn:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--text-primary);
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+
+        footer p { color: rgba(255,255,255,0.6); font-size: 0.85rem; }
+        footer a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.8rem; }
+        footer a:hover { color: white; }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 0.75rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav { display: none; }
+            .hamburger { display: block; }
+            .container { padding: 1.5rem 1rem 3rem; }
+            .page-hero h1 { font-size: 1.75rem; }
+            .guide-section { padding: 1.5rem; }
+            .toc-columns { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo" aria-label="Grant Pro home">
+                <div class="logo-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" role="img" aria-label="Grant Pro logo"><defs><linearGradient id="gp-hdr" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2563eb"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs><rect width="40" height="40" rx="8" fill="url(#gp-hdr)"/><text x="20" y="26" text-anchor="middle" fill="white" font-family="Inter,Helvetica,Arial,sans-serif" font-weight="700" font-size="16">GP</text></svg>
+                </div>
+                <span class="logo-text">Grant Pro</span>
+            </a>
+            <nav class="nav" role="navigation" aria-label="Main navigation">
+                <a href="/">Home</a>
+                <a href="/search">Search Grants</a>
+                <a href="/guide" class="active">Grant Writing Guide</a>
+                <a href="/pricing">Pricing</a>
+                <a href="/login">Sign In</a>
+                <a href="/signup?plan=monthly" class="nav-btn">Get Started</a>
+            </nav>
+            <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileNav">
+                <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="mobile-nav" id="mobileNav" role="navigation" aria-label="Mobile navigation">
+            <a href="/">Home</a>
+            <a href="/search">Search Grants</a>
+            <a href="/guide">Grant Writing Guide</a>
+            <a href="/pricing">Pricing</a>
+            <a href="/login">Sign In</a>
+            <a href="/signup?plan=monthly" class="nav-btn">Get Started</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="page-hero">
+                <h1>Federal Grant Writing <span>101</span></h1>
+                <p>A step-by-step guide for first-time applicants, plus a plain-English glossary of every term you will encounter.</p>
+            </div>
+
+            <!-- Table of Contents -->
+            <div class="toc">
+                <h2>In This Guide</h2>
+                <div class="toc-columns">
+                    <div>
+                        <a href="#before-you-start">1. Before You Start</a><br>
+                        <a href="#finding-the-right-grant">2. Finding the Right Grant</a><br>
+                        <a href="#writing-the-application">3. Writing the Application</a><br>
+                    </div>
+                    <div>
+                        <a href="#submitting">4. Submitting Your Application</a><br>
+                        <a href="#if-you-win">5. If You Win</a><br>
+                        <a href="#glossary">Glossary of Grant Terms</a><br>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 1: Before You Start -->
+            <section class="guide-section" id="before-you-start">
+                <h2>1. Before You Start</h2>
+                <p>Before you can apply for a federal grant, your organization needs a few things in place. Start these early because some steps take weeks to complete.</p>
+
+                <h3>Register at SAM.gov</h3>
+                <p><strong>SAM.gov</strong> (System for Award Management) is the federal government's official registration system for organizations that want to do business with the government, including receiving grants. Every applicant must have an active SAM.gov registration before submitting a federal grant application. Registration is free but takes <strong>7 to 10 business days</strong> to process, so do not wait until the last minute.</p>
+
+                <h3>Get Your UEI</h3>
+                <p>The <strong>Unique Entity Identifier (UEI)</strong> is a 12-character alphanumeric ID assigned to your organization during the SAM.gov registration process. It replaced the old DUNS number in 2022. You do not need to apply separately -- it is generated automatically when you register at SAM.gov.</p>
+
+                <h3>Have Your EIN Ready</h3>
+                <p>Your <strong>Employer Identification Number (EIN)</strong> is a 9-digit number issued by the IRS. It identifies your organization for tax purposes. If you do not have one, you can apply for free on the IRS website (Form SS-4). Most nonprofits and businesses already have an EIN.</p>
+
+                <h3>Create a Grants.gov Account</h3>
+                <p><strong>Grants.gov</strong> is the central portal where most federal grant opportunities are posted and where many applications are submitted. Create an account, link it to your SAM.gov registration, and designate an Authorized Organization Representative (AOR) who can officially submit applications on behalf of your organization.</p>
+
+                <h3>Get Board Authorization</h3>
+                <p>Most organizations need formal authorization from their board of directors (or equivalent governing body) to apply for and accept federal funds. This often takes the form of a board resolution. Check your bylaws and get this in place before you begin writing.</p>
+
+                <div class="tip-box">
+                    <strong>Tip:</strong> Start your SAM.gov registration and Grants.gov account setup at least 4 weeks before any grant deadline. Technical issues and processing delays are common.
+                </div>
+            </section>
+
+            <!-- Step 2: Finding the Right Grant -->
+            <section class="guide-section" id="finding-the-right-grant">
+                <h2>2. Finding the Right Grant</h2>
+
+                <h3>What Is a NOFO / FOA?</h3>
+                <p>A <strong>Notice of Funding Opportunity (NOFO)</strong>, also called a <strong>Funding Opportunity Announcement (FOA)</strong>, is the official document published by a federal agency that describes a grant program. Think of it as the "job posting" for grant money. It contains everything you need to know: who can apply, how much money is available, what the agency is looking for, how applications will be scored, and the deadline.</p>
+
+                <h3>Types of Federal Grants</h3>
+                <ul>
+                    <li><strong>Competitive grants</strong> -- The most common type. Organizations submit applications that are reviewed and scored by a panel. The highest-scoring applications receive funding. Most grants on Grants.gov are competitive.</li>
+                    <li><strong>Formula grants</strong> -- Funding is distributed to eligible recipients (usually state or local governments) based on a formula set by law, such as population or poverty rates. There is no competitive review; you qualify or you don't.</li>
+                    <li><strong>Entitlement grants</strong> -- Similar to formula grants, these provide funding to any entity that meets the eligibility criteria defined in the authorizing legislation. Medicaid is an example at the state level.</li>
+                </ul>
+
+                <h3>Matching Your Organization to Eligible Grants</h3>
+                <p>Not every organization can apply for every grant. Eligibility is typically restricted by organization type (nonprofit, government, tribal, university, small business), geographic location, and project focus area. Use Grant Pro's <a href="/search" style="color: var(--accent-primary); font-weight: 600;">grant search</a> and <a href="/eligibility" style="color: var(--accent-primary); font-weight: 600;">eligibility checker</a> to find grants that match your organization.</p>
+
+                <h3>Reading the Fine Print</h3>
+                <p>Before you invest weeks writing an application, carefully review the NOFO for:</p>
+                <ul>
+                    <li><strong>Eligibility requirements</strong> -- Confirm your organization type qualifies</li>
+                    <li><strong>Application deadline</strong> -- Note both the submission deadline and any letter-of-intent deadlines</li>
+                    <li><strong>Match requirements</strong> -- Many grants require "cost share" or "match," meaning your organization must contribute a percentage of the total project cost (cash or in-kind)</li>
+                    <li><strong>Funding ceiling and floor</strong> -- The minimum and maximum award amounts</li>
+                    <li><strong>Period of performance</strong> -- How long the grant funds the project (typically 1-5 years)</li>
+                </ul>
+
+                <div class="tip-box">
+                    <strong>Tip:</strong> If a NOFO requires a 25% match on a $200,000 grant, your organization needs to contribute $50,000 in cash or in-kind resources. Make sure you can commit those resources before applying.
+                </div>
+            </section>
+
+            <!-- Step 3: Writing the Application -->
+            <section class="guide-section" id="writing-the-application">
+                <h2>3. Writing the Application</h2>
+
+                <h3>Standard Sections Every Federal Grant Requires</h3>
+                <p>While every NOFO is different, most federal grant applications include these core sections:</p>
+                <ul>
+                    <li><strong>Project Abstract / Summary</strong> -- A 1-page overview of your project: what you will do, who benefits, how much it costs, and the expected outcomes. Reviewers read this first.</li>
+                    <li><strong>Statement of Need</strong> -- Make the case for why this project matters. Use data, statistics, and community context to demonstrate the problem your project addresses.</li>
+                    <li><strong>Project Description / Narrative</strong> -- The heart of the application. Describe your approach, activities, timeline, staffing, and how you will achieve the stated objectives. This is typically 10-15 pages.</li>
+                    <li><strong>Budget and Budget Justification</strong> -- A detailed, line-by-line budget showing how every dollar will be spent, plus a narrative explaining why each cost is necessary.</li>
+                    <li><strong>Evaluation Plan</strong> -- How you will measure whether the project is successful. Include specific metrics, data collection methods, and reporting plans.</li>
+                </ul>
+
+                <h3>The Budget: Standard Cost Categories</h3>
+                <p>Federal budgets follow a standard format with these categories:</p>
+                <ul>
+                    <li><strong>Personnel</strong> -- Salaries and wages for staff working on the project</li>
+                    <li><strong>Fringe Benefits</strong> -- Health insurance, retirement, FICA, workers' comp, etc. (typically 25-40% of salaries)</li>
+                    <li><strong>Travel</strong> -- Project-related travel for staff, including conferences if required</li>
+                    <li><strong>Equipment</strong> -- Items costing $5,000+ per unit with a useful life of one year or more</li>
+                    <li><strong>Supplies</strong> -- Consumable items under $5,000 per unit</li>
+                    <li><strong>Contractual</strong> -- Subcontracts, consultants, and contracted services</li>
+                    <li><strong>Other</strong> -- Anything that does not fit the categories above (rent, utilities, printing, etc.)</li>
+                    <li><strong>Indirect Costs</strong> -- Overhead expenses (see below)</li>
+                </ul>
+
+                <h3>What Is an Indirect Cost Rate?</h3>
+                <p><strong>Indirect costs</strong> (also called Facilities & Administrative costs, or F&A) are expenses that support your organization's operations but cannot be tied to a single project -- things like rent, utilities, accounting, and IT. The federal government allows you to recover a portion of these costs on grants.</p>
+                <p>If your organization has never negotiated an indirect cost rate with the federal government, you can use the <strong>de minimis rate of 15%</strong> of your Modified Total Direct Costs (MTDC). Larger organizations often negotiate higher rates through a <strong>NICRA</strong> (Negotiated Indirect Cost Rate Agreement).</p>
+
+                <h3>What Is MTDC?</h3>
+                <p><strong>Modified Total Direct Cost (MTDC)</strong> is the base used to calculate indirect costs. It includes all direct costs except equipment, capital expenditures, rental costs of $25,000+, subawards beyond the first $25,000, and participant support costs. In simple terms: add up your direct costs, subtract the exclusions, and multiply by your indirect cost rate.</p>
+
+                <h3>Letters of Support and MOUs</h3>
+                <p><strong>Letters of support</strong> are written by partner organizations, community leaders, or elected officials endorsing your project. A <strong>Memorandum of Understanding (MOU)</strong> is a more formal document that spells out the roles and responsibilities of each partner.</p>
+                <p>Who to ask: partner agencies, local government officials, school districts, community organizations, and anyone who will collaborate on the project. Each letter should specifically describe how the writer will support or benefit from the project -- generic endorsements carry little weight with reviewers.</p>
+
+                <div class="tip-box">
+                    <strong>Tip:</strong> Draft the letters of support yourself and send them to your partners for review. This saves them time and ensures the letters address what the NOFO is looking for.
+                </div>
+            </section>
+
+            <!-- Step 4: Submitting -->
+            <section class="guide-section" id="submitting">
+                <h2>4. Submitting Your Application</h2>
+
+                <h3>Online Submission</h3>
+                <p>Most federal grants are submitted online through one of these portals:</p>
+                <ul>
+                    <li><strong>Grants.gov</strong> -- The main portal for most federal agencies</li>
+                    <li><strong>JustGrants</strong> -- Used by DOJ (Department of Justice) programs</li>
+                    <li><strong>Research.gov</strong> -- Used by NSF (National Science Foundation)</li>
+                    <li><strong>eRA Commons</strong> -- Used by NIH (National Institutes of Health) and some HHS programs</li>
+                </ul>
+                <p>Check your NOFO carefully for which portal to use. Each has its own account setup, file format requirements, and submission procedures.</p>
+
+                <h3>Paper Submission</h3>
+                <p>A small number of programs still accept or require paper applications, usually mailed to the funding agency. The NOFO will specify the mailing address, number of copies required, and whether originals or copies are needed. When in doubt, submit electronically -- paper submission is increasingly rare.</p>
+
+                <h3>What Happens After You Submit</h3>
+                <p>After submission, your application goes through several stages:</p>
+                <ol>
+                    <li><strong>Validation</strong> -- The portal checks that your application is complete and properly formatted (1-2 business days)</li>
+                    <li><strong>Agency receipt</strong> -- You receive a confirmation email with a tracking number</li>
+                    <li><strong>Peer review</strong> -- A panel of reviewers scores your application against the evaluation criteria in the NOFO (typically 2-6 months after the deadline)</li>
+                    <li><strong>Award decisions</strong> -- The agency makes final funding decisions based on reviewer scores and programmatic priorities</li>
+                    <li><strong>Notification</strong> -- You are notified whether your application was selected or not (typically 3-9 months after the deadline, depending on the agency)</li>
+                </ol>
+
+                <div class="tip-box">
+                    <strong>Tip:</strong> Submit at least 48 hours before the deadline. Technical issues with Grants.gov are common on deadline day, and late submissions are almost never accepted.
+                </div>
+            </section>
+
+            <!-- Step 5: If You Win -->
+            <section class="guide-section" id="if-you-win">
+                <h2>5. If You Win</h2>
+
+                <h3>Award Notification and Negotiation</h3>
+                <p>If your application is selected, you will receive a <strong>Notice of Award (NOA)</strong> from the funding agency. This document specifies the award amount, project period, terms and conditions, and reporting requirements. In some cases, the agency may negotiate modifications to your budget or project scope before finalizing the award. You may not receive the full amount you requested.</p>
+
+                <h3>Reporting Requirements</h3>
+                <p>Federal grants come with significant reporting obligations:</p>
+                <ul>
+                    <li><strong>Financial reports</strong> -- Typically quarterly, using the SF-425 (Federal Financial Report)</li>
+                    <li><strong>Performance / progress reports</strong> -- Usually semi-annual or annual, describing what you accomplished with the funds</li>
+                    <li><strong>Final report</strong> -- A comprehensive summary due at the end of the project period</li>
+                </ul>
+                <p>Keep meticulous records from day one. Track every expense, maintain timesheets for grant-funded staff, and document all project activities.</p>
+
+                <h3>Single Audit Requirement</h3>
+                <p>Organizations that spend <strong>$1,000,000 or more in federal funds</strong> in a fiscal year are required to undergo a <strong>Single Audit</strong> (also called an A-133 audit, after the old OMB Circular). This is an organization-wide audit of your financial statements and federal award expenditures, conducted by an independent auditor. It is a significant compliance requirement -- plan and budget for it if you expect to cross the threshold.</p>
+
+                <div class="tip-box">
+                    <strong>Tip:</strong> Start tracking time and expenses from day one of the award period. Retroactive record-keeping is painful and risks audit findings.
+                </div>
+            </section>
+
+            <!-- Glossary -->
+            <section class="guide-section" id="glossary">
+                <h2>Glossary of Federal Grant Terms</h2>
+                <p>Common terms you will encounter in federal grant applications, explained in plain English.</p>
+
+                <div class="glossary-grid">
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">AOR</span> -- Authorized Organization Representative</div>
+                        <div class="glossary-def">The person in your organization who has legal authority to submit grant applications and sign off on federal awards. This person must be registered and authorized in Grants.gov. Typically an executive director, CEO, or designated official.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">BCA</span> -- Benefit-Cost Analysis</div>
+                        <div class="glossary-def">A quantitative analysis comparing the expected benefits of a project to its costs. Some agencies (especially FEMA and DOT) require a BCA as part of the application to show that the project's benefits justify the federal investment.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">CFDA / Assistance Listing Number</span></div>
+                        <div class="glossary-def">A unique 5-digit number (like 84.010) assigned to each federal assistance program. Formerly known as the CFDA (Catalog of Federal Domestic Assistance) number. You will see this on every NOFO -- it identifies which specific program the funding comes from.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">CHDO</span> -- Community Housing Development Organization</div>
+                        <div class="glossary-def">A nonprofit organization that meets specific HUD requirements and is eligible for set-aside HOME program funds to develop affordable housing. CHDOs must have a board with at least one-third low-income community representation.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">Cost Share / Match</span></div>
+                        <div class="glossary-def">The portion of project costs that your organization must pay from non-federal sources. "Match" and "cost share" mean the same thing. It can be cash (actual spending) or in-kind (donated goods, services, or volunteer time). For example, a 20% match on a $100,000 grant means you contribute $25,000.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">Davis-Bacon Act</span></div>
+                        <div class="glossary-def">A federal law requiring that workers on federally funded construction projects be paid the local prevailing wage. If your grant involves construction or renovation, you may need to comply with Davis-Bacon wage requirements and submit certified payroll records.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">De Minimis Rate</span></div>
+                        <div class="glossary-def">A flat 15% indirect cost rate that any organization can use if it has never had a negotiated indirect cost rate agreement (NICRA) with the federal government. It is calculated on your Modified Total Direct Costs (MTDC). No negotiation or documentation of actual indirect costs is required.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">EIN</span> -- Employer Identification Number</div>
+                        <div class="glossary-def">A 9-digit number (like 12-3456789) issued by the IRS that identifies your organization for tax purposes. Required for virtually all federal grant applications. Also called a Federal Tax ID number.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">F&A</span> -- Facilities & Administrative Costs</div>
+                        <div class="glossary-def">Another name for indirect costs. These are overhead expenses (rent, utilities, administrative salaries, IT) that support the organization broadly and cannot be attributed to a single grant. Universities and research institutions commonly use the term F&A.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">FERPA</span> -- Family Educational Rights and Privacy Act</div>
+                        <div class="glossary-def">A federal law that protects the privacy of student education records. If your grant project involves schools or student data, you must comply with FERPA. This affects how you collect, store, and share data about students.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">FOA</span> -- Funding Opportunity Announcement</div>
+                        <div class="glossary-def">The formal announcement by a federal agency that grant funding is available. Synonymous with NOFO (Notice of Funding Opportunity). Different agencies use different terms, but they all mean the same thing: "we have money, here is how to apply."</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">Fringe Benefits</span></div>
+                        <div class="glossary-def">Employer-paid benefits for grant-funded staff, including health insurance, retirement contributions, Social Security (FICA), Medicare, unemployment insurance, and workers' compensation. Typically calculated as a percentage of salaries (often 25-40%).</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">Grants.gov</span></div>
+                        <div class="glossary-def">The central federal website where grant opportunities are posted and applications are submitted. Nearly all federal agencies use Grants.gov to publish their NOFOs. You need an account linked to your SAM.gov registration to submit applications.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">Indirect Cost Rate</span></div>
+                        <div class="glossary-def">A percentage applied to your direct costs to recover overhead expenses. Organizations can use the 15% de minimis rate or negotiate a higher rate with their cognizant federal agency. The rate is multiplied by your MTDC base to calculate the indirect cost amount you can charge to a grant.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">IRB</span> -- Institutional Review Board</div>
+                        <div class="glossary-def">A committee that reviews and approves research involving human subjects to ensure ethical treatment and informed consent. If your grant-funded project involves human subjects research (surveys, interviews, clinical trials), you will need IRB approval before the research begins.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">JustGrants</span></div>
+                        <div class="glossary-def">The Department of Justice's grants management system, used for submitting applications and managing awards for DOJ programs (BJA, OJP, COPS, OVW). It replaced the old GMS system. If you are applying for a DOJ grant, you will use JustGrants instead of Grants.gov for submission.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">Logic Model</span></div>
+                        <div class="glossary-def">A visual diagram (usually a table) showing the logical relationship between your project's resources (inputs), activities, outputs, and outcomes. Many federal agencies require a logic model as part of the application. It answers: "If we do X activities with Y resources, we expect Z results."</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">MBE/WBE</span> -- Minority/Women Business Enterprise</div>
+                        <div class="glossary-def">Businesses owned and controlled by minorities (MBE) or women (WBE). Some federal grants encourage or require applicants to use MBE/WBE firms as subcontractors. You may need to document your outreach to these businesses and report on their participation.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">MTDC</span> -- Modified Total Direct Cost</div>
+                        <div class="glossary-def">The cost base used to calculate indirect costs. It includes all direct costs except: equipment ($5,000+), capital expenditures, rental costs over $25,000, the portion of subawards exceeding $25,000 each, and participant support costs. Your indirect cost rate is multiplied by this number.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">NEPA</span> -- National Environmental Policy Act</div>
+                        <div class="glossary-def">A federal law requiring agencies to assess the environmental impact of projects receiving federal funding. If your grant involves construction, land use, or other activities that could affect the environment, the funding agency must complete a NEPA review before you can begin those activities.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">NICRA</span> -- Negotiated Indirect Cost Rate Agreement</div>
+                        <div class="glossary-def">A formal agreement between your organization and a federal agency establishing your indirect cost rate. The rate is based on your actual overhead costs relative to your direct costs. Larger organizations and universities typically have NICRAs with rates well above the 15% de minimis rate.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">NOFO</span> -- Notice of Funding Opportunity</div>
+                        <div class="glossary-def">The official announcement published by a federal agency describing a grant program and inviting applications. It contains all the details: eligibility, evaluation criteria, deadlines, award amounts, and application instructions. NOFO is the current standard term, though some agencies still use FOA or RFA.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">OMB</span> -- Office of Management and Budget</div>
+                        <div class="glossary-def">A division of the Executive Office of the President that sets government-wide policies for grants management. OMB issues the Uniform Guidance (2 CFR 200), which establishes the rules all federal grant recipients must follow for spending, reporting, and audits.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">PII</span> -- Personally Identifiable Information</div>
+                        <div class="glossary-def">Any data that could identify a specific individual, such as names, Social Security numbers, addresses, or email addresses. Federal grants that involve collecting PII have strict requirements for data security, storage, and reporting. You must describe how you will protect PII in your application.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">QAPP</span> -- Quality Assurance Project Plan</div>
+                        <div class="glossary-def">A document describing the procedures and quality controls for data collection and analysis in your project. EPA grants commonly require a QAPP. It ensures that the data you collect is accurate, consistent, and scientifically defensible.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">SAM.gov</span> -- System for Award Management</div>
+                        <div class="glossary-def">The federal government's official registration system. All organizations must register at SAM.gov (for free) before they can receive federal grants or contracts. Registration includes getting a UEI, verifying your organization's identity, and providing banking information for payments. Registration must be renewed annually.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">Section 3</span></div>
+                        <div class="glossary-def">A provision of the Housing and Urban Development Act requiring that HUD-funded projects provide employment and contracting opportunities to low-income residents and businesses in the project area. If your grant is from HUD, you may need to comply with Section 3 hiring and subcontracting requirements.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">SF-424</span> -- Standard Form 424</div>
+                        <div class="glossary-def">The standard cover page for federal grant applications. It collects basic information: applicant name, address, EIN, UEI, project title, requested amount, and project dates. There are several variations (SF-424A for budgets, SF-424B for assurances). Nearly every federal grant requires an SF-424.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">Single Audit</span></div>
+                        <div class="glossary-def">An organization-wide audit required for entities that spend $1,000,000 or more in federal funds in a single fiscal year (per the Uniform Guidance). An independent auditor examines your financial statements and tests compliance with federal award requirements. Results are reported to the Federal Audit Clearinghouse.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">SMART Objectives</span></div>
+                        <div class="glossary-def">Goals that are Specific, Measurable, Achievable, Relevant, and Time-bound. Federal reviewers expect your project objectives to follow the SMART framework. Instead of "improve literacy," write "increase reading proficiency scores by 15% among 200 third-graders in County X within 24 months."</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">Subaward</span></div>
+                        <div class="glossary-def">A portion of your grant funds passed through to another organization (a "subrecipient") to carry out part of the project. For example, a lead nonprofit might subaward funds to a university partner to conduct the research component. Subawards come with monitoring and reporting obligations.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">UEI</span> -- Unique Entity Identifier</div>
+                        <div class="glossary-def">A 12-character alphanumeric ID assigned to organizations through SAM.gov. It replaced the DUNS number in April 2022. Required on all federal grant applications. You receive your UEI automatically when you register at SAM.gov.</div>
+                    </div>
+
+                    <div class="glossary-item">
+                        <div class="glossary-term"><span class="glossary-abbr">Uniform Guidance</span> (2 CFR 200)</div>
+                        <div class="glossary-def">The master set of federal rules governing grants, officially titled "Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards." Published by OMB, it covers everything from allowable costs to procurement standards to audit requirements. If you receive a federal grant, 2 CFR 200 is the rulebook you must follow.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA -->
+            <div class="cta-box">
+                <h2>Ready to Find Your First Grant?</h2>
+                <p>Search thousands of federal grants from 21 agencies. No account required to browse.</p>
+                <a href="/search" class="btn">Search Grants Now</a>
+            </div>
+        </div>
+    </main>
+
+    <footer role="contentinfo">
+        <div class="footer-inner">
+            <p>&copy; 2026 Grant Pro by Futurespec Consulting, LLC. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="/terms">Terms</a>
+                <a href="/privacy">Privacy</a>
+                <a href="/refund">Refunds</a>
+                <a href="/help">Help</a>
+                <a href="/contact">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    document.getElementById('hamburger').addEventListener('click', function() {
+        var nav = document.getElementById('mobileNav');
+        nav.classList.toggle('open');
+        this.setAttribute('aria-expanded', nav.classList.contains('open'));
+    });
+    </script>
+</body>
+</html>
