@@ -477,6 +477,10 @@
             
             <form method="POST" action="/onboarding" role="form" aria-label="Organization profile">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <p style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+                    🔒 Your data is stored securely and never shared with third parties or used to train AI models. See our <a href="/privacy" style="color: var(--accent-hover); text-decoration: none; font-weight: 600;">Privacy Policy</a> for details.
+                </p>
                 
                 <!-- Section 0: Organization Identity (Required) -->
                 <div class="card" style="border: 1px solid rgba(37, 99, 235, 0.3);">
