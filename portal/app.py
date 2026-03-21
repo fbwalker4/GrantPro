@@ -3075,79 +3075,7 @@ def paper_download(grant_id):
         story.append(Paragraph(f"Generated: {gen_date}", subtitle_style))
         story.append(PageBreak())
 
-        # ---- SF-424 ----
-        story.append(Paragraph("STANDARD FORM 424 (SF-424)", form_title_style))
-        story.append(Paragraph("Application for Federal Assistance", styles['Normal']))
-        story.append(Spacer(1, 0.2*inch))
-        story.append(HRFlowable(width="100%", thickness=0.5, color=colors.grey))
-        story.append(Spacer(1, 0.15*inch))
-
-        org_name = user.get('organization_name', '') or grant['organization_name']
-        addr_parts = [org_details.get('address_line1', ''), org_details.get('address_line2', ''),
-                      ', '.join(filter(None, [org_details.get('city', ''),
-                                               org_details.get('state', ''),
-                                               org_details.get('zip_code', '')]))]
-        full_address = ', '.join(filter(None, addr_parts)) or 'N/A'
-
-        sf424_rows = [
-            ['1. Type of Submission:', 'Application'],
-            ['2. Type of Application:', 'New'],
-            ['3. Date Received:', gen_date],
-            ['4. Applicant Identifier:', org_details.get('uei', 'N/A')],
-            ['5. Federal Agency:', grant['agency']],
-            ['7. Project Title:', grant['grant_name']],
-            ['8a. Applicant Legal Name:', org_name],
-            ['8b. EIN/TIN:', org_details.get('ein', 'N/A')],
-            ['8c. UEI:', org_details.get('uei', 'N/A')],
-            ['8d. Address:', full_address],
-            ['8e. Phone:', org_details.get('phone', '') or 'N/A'],
-            ['9. Contact Person:', grant.get('contact_name', 'N/A')],
-            ['10. Contact Email:', grant.get('contact_email', 'N/A')],
-            ['15. Estimated Federal Funding:', f"${grant['amount']:,.2f}" if grant['amount'] else 'N/A'],
-        ]
-        sf_table = Table(sf424_rows, colWidths=[2.5*inch, 3.5*inch])
-        sf_table.setStyle(TableStyle([
-            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-            ('TOPPADDING', (0, 0), (-1, -1), 4),
-            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cccccc')),
-            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f0f4f8')),
-        ]))
-        story.append(sf_table)
-        story.append(PageBreak())
-
-        # ---- SF-424A BUDGET ----
-        story.append(Paragraph("STANDARD FORM 424A (SF-424A)", form_title_style))
-        story.append(Paragraph("Budget Information - Non-Construction Programs", styles['Normal']))
-        story.append(Spacer(1, 0.2*inch))
-        story.append(HRFlowable(width="100%", thickness=0.5, color=colors.grey))
-        story.append(Spacer(1, 0.15*inch))
-
-        budget_rows = [['Category', 'Federal ($)', 'Non-Federal ($)', 'Total ($)']]
-        for cat in ['Personnel', 'Fringe Benefits', 'Travel', 'Equipment',
-                     'Supplies', 'Contractual', 'Other', 'Indirect Costs']:
-            budget_rows.append([cat, '', '', ''])
-        budget_rows.append(['TOTAL', '', '', ''])
-
-        bt = Table(budget_rows, colWidths=[2*inch, 1.5*inch, 1.5*inch, 1.5*inch])
-        bt.setStyle(TableStyle([
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cccccc')),
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a365d')),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-            ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#f0f4f8')),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-            ('TOPPADDING', (0, 0), (-1, -1), 6),
-            ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
-        ]))
-        story.append(bt)
-        story.append(PageBreak())
-
-        # ---- WRITTEN SECTIONS ----
+        # ---- WRITTEN SECTIONS (narrative) ----
         for draft in drafts:
             section_title = draft['section'].replace('_', ' ').title()
             story.append(Paragraph(section_title, section_head))
@@ -3161,8 +3089,80 @@ def paper_download(grant_id):
         _footer = get_footer_callback()
         doc.build(story, onFirstPage=_footer, onLaterPages=_footer)
         buffer.seek(0)
+
+        # ---- Generate real SF-424 form pages and merge ----
+        from form_generator import generate_sf424_pages
+        from pypdf import PdfReader, PdfWriter
+
+        org_name = user.get('organization_name', '') or grant['organization_name']
+
+        # Load budget data for this grant
+        _pkg_budget_row = None
+        try:
+            _pkg_bconn = get_db()
+            _pkg_budget_row = _pkg_bconn.execute(
+                'SELECT * FROM grant_budget WHERE grant_id = ?',
+                (grant_id,)
+            ).fetchone()
+            _pkg_bconn.close()
+        except Exception:
+            pass
+
+        sf424_org = {
+            'legal_name': org_name,
+            'ein': org_details.get('ein', ''),
+            'uei': org_details.get('uei', ''),
+            'address': org_details.get('address_line1', ''),
+            'city': org_details.get('city', ''),
+            'state': org_details.get('state', ''),
+            'zip': org_details.get('zip_code', ''),
+            'contact_name': grant.get('contact_name', ''),
+            'contact_title': org_details.get('title', ''),
+            'contact_phone': org_details.get('phone', ''),
+            'contact_email': grant.get('contact_email', ''),
+        }
+        sf424_grant = {
+            'grant_name': grant['grant_name'],
+            'agency': grant['agency'],
+            'amount': grant.get('amount', 0) or 0,
+            'deadline': grant.get('deadline', ''),
+            'template': grant.get('template', ''),
+        }
+        sf424_budget = {}
+        if _pkg_budget_row:
+            sf424_budget = {
+                'grand_total': _pkg_budget_row['grand_total'] if 'grand_total' in _pkg_budget_row.keys() else 0,
+                'match_total': _pkg_budget_row['match_total'] if 'match_total' in _pkg_budget_row.keys() else 0,
+                'total_direct': _pkg_budget_row['total_direct'] if 'total_direct' in _pkg_budget_row.keys() else 0,
+                'indirect_total': _pkg_budget_row['indirect_total'] if 'indirect_total' in _pkg_budget_row.keys() else 0,
+            }
+
+        form_buf = generate_sf424_pages(sf424_grant, sf424_org, sf424_budget)
+
+        # Merge: cover page from narrative buffer first page,
+        # then SF-424 form pages, then remaining narrative pages
+        writer = PdfWriter()
+        narrative_reader = PdfReader(buffer)
+        form_reader = PdfReader(form_buf)
+
+        # First page = cover page from narrative
+        if len(narrative_reader.pages) > 0:
+            writer.add_page(narrative_reader.pages[0])
+
+        # SF-424 form pages
+        for page in form_reader.pages:
+            writer.add_page(page)
+
+        # Remaining narrative pages (sections)
+        for page in narrative_reader.pages[1:]:
+            writer.add_page(page)
+
+        merged_buf = io.BytesIO()
+        writer.write(merged_buf)
+        merged_buf.seek(0)
+
         safe_name = grant['grant_name'].replace(' ', '_').replace('/', '-')
-        return send_file(buffer, mimetype='application/pdf', as_attachment=True,
+        return send_file(merged_buf, mimetype='application/pdf', as_attachment=True,
                          download_name=f"{safe_name}_Paper_Package.pdf")
 
     except ImportError:
@@ -3222,32 +3222,50 @@ def paper_download_form(grant_id, form_name):
         normalized = form_name.upper().replace('-', '').replace('_', '').replace(' ', '')
 
         if normalized in ('SF424',):
-            story.append(Paragraph("STANDARD FORM 424 (SF-424)", form_title_style))
-            story.append(Paragraph("Application for Federal Assistance", styles['Normal']))
-            story.append(Spacer(1, 0.3*inch))
-            rows = [
-                ['1. Type of Submission:', 'Application'],
-                ['2. Type of Application:', 'New'],
-                ['3. Date Received:', gen_date],
-                ['5. Federal Agency:', grant['agency']],
-                ['7. Project Title:', grant['grant_name']],
-                ['8a. Applicant Legal Name:', org_name],
-                ['8b. EIN/TIN:', org_details.get('ein', 'N/A')],
-                ['8c. UEI:', org_details.get('uei', 'N/A')],
-                ['8d. Address:', full_address],
-                ['8e. Phone:', org_details.get('phone', '') or 'N/A'],
-                ['15. Estimated Federal Funding:', f"${grant['amount']:,.2f}" if grant['amount'] else 'N/A'],
-            ]
-            t = Table(rows, colWidths=[2.5*inch, 3.5*inch])
-            t.setStyle(TableStyle([
-                ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, -1), 10),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cccccc')),
-                ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f0f4f8')),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-                ('TOPPADDING', (0, 0), (-1, -1), 4),
-            ]))
-            story.append(t)
+            # Use the real SF-424 form generator with canvas-drawn fields
+            from form_generator import generate_sf424_pages
+
+            _form_budget_row = None
+            try:
+                _fbconn = get_db()
+                _form_budget_row = _fbconn.execute(
+                    'SELECT * FROM grant_budget WHERE grant_id = ?',
+                    (grant_id,)
+                ).fetchone()
+                _fbconn.close()
+            except Exception:
+                pass
+
+            sf424_org = {
+                'legal_name': org_name,
+                'ein': org_details.get('ein', ''),
+                'uei': org_details.get('uei', ''),
+                'address': org_details.get('address_line1', ''),
+                'city': org_details.get('city', ''),
+                'state': org_details.get('state', ''),
+                'zip': org_details.get('zip_code', ''),
+                'contact_name': grant.get('contact_name', ''),
+                'contact_title': org_details.get('title', ''),
+                'contact_phone': org_details.get('phone', ''),
+                'contact_email': grant.get('contact_email', ''),
+            }
+            sf424_grant = {
+                'grant_name': grant['grant_name'],
+                'agency': grant['agency'],
+                'amount': grant.get('amount', 0) or 0,
+                'deadline': grant.get('deadline', ''),
+            }
+            sf424_budget = {}
+            if _form_budget_row:
+                sf424_budget = {
+                    'grand_total': _form_budget_row['grand_total'] if 'grand_total' in _form_budget_row.keys() else 0,
+                    'match_total': _form_budget_row['match_total'] if 'match_total' in _form_budget_row.keys() else 0,
+                }
+
+            form_buf = generate_sf424_pages(sf424_grant, sf424_org, sf424_budget)
+            safe_fname = grant['grant_name'].replace(' ', '_').replace('/', '-')
+            return send_file(form_buf, mimetype='application/pdf', as_attachment=True,
+                             download_name=f"{safe_fname}_SF424.pdf")
 
         elif normalized in ('SF424A',):
             story.append(Paragraph("STANDARD FORM 424A (SF-424A)", form_title_style))
@@ -3731,6 +3749,74 @@ def download_grant(grant_id, fmt):
             doc.build(story, onFirstPage=_footer, onLaterPages=_footer)
             buffer.seek(0)
 
+            # --- Prepend SF-424 form pages if org data is available ---
+            try:
+                from form_generator import generate_sf424_pages
+                from pypdf import PdfReader, PdfWriter
+
+                user = get_current_user()
+                _org_data = user_models.get_organization_details(user['id']) if user else {}
+                _org_details = _org_data.get('organization_details') or {}
+
+                _budget_row = None
+                try:
+                    _bconn = get_db()
+                    _budget_row = _bconn.execute(
+                        'SELECT * FROM grant_budget WHERE grant_id = ?',
+                        (grant_id,)
+                    ).fetchone()
+                    _bconn.close()
+                except Exception:
+                    pass
+
+                sf424_org = {
+                    'legal_name': user.get('organization_name', '') if user else grant['organization_name'],
+                    'ein': _org_details.get('ein', ''),
+                    'uei': _org_details.get('uei', ''),
+                    'address': _org_details.get('address_line1', ''),
+                    'city': _org_details.get('city', ''),
+                    'state': _org_details.get('state', ''),
+                    'zip': _org_details.get('zip_code', ''),
+                    'contact_name': grant.get('contact_name', ''),
+                    'contact_title': _org_details.get('title', ''),
+                    'contact_phone': _org_details.get('phone', ''),
+                    'contact_email': grant.get('contact_email', ''),
+                }
+                sf424_grant = {
+                    'grant_name': grant['grant_name'],
+                    'agency': grant['agency'],
+                    'amount': grant.get('amount', 0) or 0,
+                    'deadline': grant.get('deadline', ''),
+                    'template': grant.get('template', ''),
+                }
+                sf424_budget = {}
+                if _budget_row:
+                    sf424_budget = {
+                        'grand_total': _budget_row['grand_total'] if 'grand_total' in _budget_row.keys() else 0,
+                        'match_total': _budget_row['match_total'] if 'match_total' in _budget_row.keys() else 0,
+                        'total_direct': _budget_row['total_direct'] if 'total_direct' in _budget_row.keys() else 0,
+                        'indirect_total': _budget_row['indirect_total'] if 'indirect_total' in _budget_row.keys() else 0,
+                    }
+
+                form_buf = generate_sf424_pages(sf424_grant, sf424_org, sf424_budget)
+
+                # Merge: SF-424 pages first, then narrative pages
+                writer = PdfWriter()
+                form_reader = PdfReader(form_buf)
+                narrative_reader = PdfReader(buffer)
+                for page in form_reader.pages:
+                    writer.add_page(page)
+                for page in narrative_reader.pages:
+                    writer.add_page(page)
+
+                merged_buf = io.BytesIO()
+                writer.write(merged_buf)
+                merged_buf.seek(0)
+                buffer = merged_buf
+            except Exception:
+                # If form generation fails, fall back to narrative-only PDF
+                pass
+
             return send_file(
                 buffer,
                 mimetype='application/pdf',
@@ -3740,7 +3826,7 @@ def download_grant(grant_id, fmt):
         except ImportError:
             flash('reportlab not installed, downloading as txt', 'warning')
             return download_grant(grant_id, 'txt')
-    
+
     return "Unknown format", 400
 
 # ============ API ROUTES ============
