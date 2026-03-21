@@ -738,6 +738,9 @@ def calculate_profile_completion(user):
     focus_areas = org_data.get('focus_areas') or []
     past_grants = org_data.get('past_grants') or []
 
+    # Get grant readiness data
+    readiness = user_models.get_grant_readiness(user['id'])
+
     fields = [
         (bool(user.get('organization_name')), 'Organization Name'),
         (bool(user.get('organization_type')), 'Organization Type'),
@@ -753,6 +756,11 @@ def calculate_profile_completion(user):
         (bool(org_profile.get('employees')), 'Number of Employees'),
         (len(focus_areas) > 0, 'Focus Areas'),
         (len(past_grants) > 0, 'Past Grant Experience'),
+        # Grant readiness fields
+        (bool(readiness.get('applicant_category')), 'Applicant Type (Readiness)'),
+        (readiness.get('sam_gov_status', 'unknown') != 'unknown', 'SAM.gov Registration'),
+        (bool(readiness.get('has_uei')), 'UEI Confirmation (Readiness)'),
+        (bool(readiness.get('funding_purposes')), 'Funding Preferences'),
     ]
 
     filled = sum(1 for complete, _ in fields if complete)
@@ -939,7 +947,38 @@ def onboarding():
             'focus_areas': focus_areas,
             'past_grants': past_grants,
         })
-        
+
+        # Save grant readiness data
+        funding_purposes_list = request.form.getlist('funding_purposes')
+        readiness_data = {
+            'applicant_category': request.form.get('applicant_category', '').strip(),
+            'is_501c3': request.form.get('applicant_category') == '501c3',
+            'is_government': request.form.get('applicant_category') in ('city_county', 'state_gov', 'tribal'),
+            'government_type': request.form.get('government_type', '').strip(),
+            'is_pha': request.form.get('applicant_category') == 'pha',
+            'is_chdo': request.form.get('applicant_category') == 'chdo',
+            'is_university': request.form.get('applicant_category') == 'university',
+            'is_small_business': request.form.get('applicant_category') == 'small_business',
+            'employee_count': request.form.get('employee_count', '').strip(),
+            'sam_gov_status': request.form.get('sam_gov_status', 'unknown').strip(),
+            'sam_gov_expiry': request.form.get('sam_gov_expiry', '').strip(),
+            'has_uei': request.form.get('has_uei') == 'yes',
+            'has_grants_gov': request.form.get('has_grants_gov') == 'yes',
+            'has_indirect_rate': request.form.get('has_indirect_rate') == 'yes',
+            'indirect_rate_type': request.form.get('indirect_rate_type', '').strip(),
+            'indirect_rate_pct': request.form.get('indirect_rate_pct', '').strip(),
+            'cognizant_agency': request.form.get('cognizant_agency', '').strip(),
+            'had_single_audit': request.form.get('had_single_audit') == 'yes',
+            'annual_federal_funding': request.form.get('annual_federal_funding', '0').strip(),
+            'largest_federal_grant': request.form.get('largest_federal_grant', '0').strip(),
+            'has_construction_experience': request.form.get('has_construction_experience') == 'yes',
+            'has_grants_administrator': request.form.get('has_grants_administrator') == 'yes',
+            'funding_purposes': ','.join(funding_purposes_list),
+            'funding_range_min': request.form.get('funding_range_min', '0').strip(),
+            'funding_range_max': request.form.get('funding_range_max', '0').strip(),
+        }
+        user_models.save_grant_readiness(user['id'], readiness_data)
+
         flash('Organization profile saved! This information will be auto-filled in future grant applications.', 'success')
         return redirect(url_for('dashboard'))
     
@@ -948,13 +987,15 @@ def onboarding():
     org_profile = org_data.get('organization_profile') or {}
     focus_areas = org_data.get('focus_areas') or []
     past_grants = org_data.get('past_grants') or []
-    
+    grant_readiness = user_models.get_grant_readiness(user['id'])
+
     return render_template('onboarding.html',
                          user=user,
                          org_details=org_details,
                          org_profile=org_profile,
                          focus_areas=focus_areas,
-                         past_grants=past_grants)
+                         past_grants=past_grants,
+                         readiness=grant_readiness)
 
 
 # ============ GRANT FINDER WIZARD ============
@@ -1191,7 +1232,103 @@ def grants():
     
     # Use filtered list if any filters applied
     display_grants = filtered_grants if (org_type or category or agency or amount_min) else all_grants
-    
+
+    # Load user's grant readiness profile for eligibility checking
+    readiness = user_models.get_grant_readiness(user['id']) if user else {}
+
+    # Load agency templates for structured eligibility data
+    template_eligibility = {}
+    try:
+        template_file = Path.home() / ".hermes" / "grant-system" / "templates" / "agency_templates.json"
+        with open(template_file) as f:
+            templates_data = json.load(f)
+        for agency_key, agency_data in templates_data.get('agencies', {}).items():
+            elig = agency_data.get('eligibility', {})
+            if elig:
+                template_eligibility[agency_key] = elig
+    except Exception:
+        pass
+
+    # Map user applicant_category to template eligibility values
+    CATEGORY_TO_ELIGIBLE = {
+        '501c3': ['nonprofit', 'nonprofit_research', 'community_organization'],
+        'city_county': ['local_government', 'government'],
+        'state_gov': ['state_government', 'government'],
+        'tribal': ['tribal_nation', 'tribal_government'],
+        'pha': ['public_housing_authority', 'local_government', 'government'],
+        'chdo': ['nonprofit', 'community_organization'],
+        'university': ['university', 'nonprofit_research'],
+        'small_business': ['small_business', 'for_profit', 'startup'],
+        'individual': ['individual', 'artist'],
+    }
+
+    user_category = readiness.get('applicant_category', '') if readiness else ''
+    user_eligible_types = CATEGORY_TO_ELIGIBLE.get(user_category, [])
+    has_sam = readiness.get('sam_gov_status') == 'active' if readiness else False
+    has_construction = readiness.get('has_construction_experience', False) if readiness else False
+
+    # Annotate grants with eligibility info
+    eligible_grants = []
+    ineligible_grants = []
+
+    for grant in display_grants:
+        grant_copy = grant.copy() if isinstance(grant, dict) else dict(grant)
+        grant_copy['eligibility_warnings'] = []
+        grant_copy['is_eligible'] = True
+
+        # Check template-based eligibility
+        grant_template = grant_copy.get('template', 'generic')
+        tmpl_elig = template_eligibility.get(grant_template, {})
+        eligible_applicants = tmpl_elig.get('eligible_applicants', [])
+        ineligible_applicants = tmpl_elig.get('ineligible_applicants', [])
+        prerequisites = tmpl_elig.get('prerequisites', [])
+
+        # Check applicant type eligibility
+        if user_category and eligible_applicants:
+            is_match = any(t in eligible_applicants for t in user_eligible_types)
+            is_blocked = any(t in ineligible_applicants for t in user_eligible_types)
+            if is_blocked or (not is_match and eligible_applicants):
+                grant_copy['is_eligible'] = False
+                # Build human-readable eligible types
+                type_labels = {
+                    'nonprofit': 'nonprofits', 'university': 'universities',
+                    'state_government': 'state government', 'local_government': 'local government',
+                    'tribal_nation': 'tribal organizations', 'for_profit': 'for-profit businesses',
+                    'small_business': 'small businesses', 'individual': 'individuals',
+                    'government': 'government entities',
+                }
+                eligible_names = [type_labels.get(t, t) for t in eligible_applicants[:3]]
+                grant_copy['eligibility_warnings'].append(
+                    f"Not eligible - open to {', '.join(eligible_names)}"
+                )
+
+        # Check SAM.gov requirement
+        if not has_sam and prerequisites:
+            needs_sam = any(p.get('id') == 'sam_gov' and p.get('required') for p in prerequisites)
+            if needs_sam:
+                grant_copy['eligibility_warnings'].append('Requires SAM.gov registration')
+
+        # Check construction experience for grants with davis_bacon
+        if not has_construction and grant_template in template_eligibility:
+            compliance = {}
+            try:
+                template_file = Path.home() / ".hermes" / "grant-system" / "templates" / "agency_templates.json"
+                with open(template_file) as f:
+                    td = json.load(f)
+                compliance = td.get('agencies', {}).get(grant_template, {}).get('compliance', {})
+            except Exception:
+                pass
+            if compliance.get('davis_bacon', {}).get('applies'):
+                grant_copy['eligibility_warnings'].append('Requires construction/Davis-Bacon experience')
+
+        if grant_copy['is_eligible']:
+            eligible_grants.append(grant_copy)
+        else:
+            ineligible_grants.append(grant_copy)
+
+    # Sort: eligible first, then ineligible
+    display_grants = eligible_grants + ineligible_grants
+
     # Get saved grant IDs
     saved = []
     saved_ids = []
@@ -1200,10 +1337,11 @@ def grants():
         saved_ids = [s['grant_id'] for s in saved]
     except Exception:
         pass
-    
-    return render_template('grants.html', 
-                         grants=display_grants, 
+
+    return render_template('grants.html',
+                         grants=display_grants,
                          saved_ids=saved_ids,
+                         readiness=readiness,
                          filters={'org_type': org_type, 'category': category, 'agency': agency, 'amount_min': amount_min},
                          user=user)
 

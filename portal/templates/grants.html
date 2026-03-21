@@ -63,14 +63,31 @@
 <!-- Grants List -->
 <div id="grantsList">
     {% for grant in grants %}
-    <div class="grant-card" data-title="{{ grant.title.lower() }}" data-agency="{{ grant.agency }}" data-category="{{ grant.category }}" data-amount="{{ grant.amount_max }}" data-eligibility="{{ grant.eligibility|lower }}">
+    <div class="grant-card{% if not grant.is_eligible %} grant-ineligible{% endif %}" data-title="{{ grant.title.lower() }}" data-agency="{{ grant.agency }}" data-category="{{ grant.category }}" data-amount="{{ grant.amount_max }}" data-eligibility="{{ grant.eligibility|lower }}" data-eligible="{{ grant.is_eligible|default(true) }}">
         <div class="grant-card-header">
             <div>
-                <h3 class="grant-card-title">{{ grant.title }}</h3>
+                <h3 class="grant-card-title"{% if not grant.is_eligible %} style="opacity: 0.5;"{% endif %}>{{ grant.title }}</h3>
                 <div class="grant-card-agency">{{ grant.agency }}</div>
             </div>
-            <span class="badge badge-purple">{{ grant.agency }}</span>
+            <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                <span class="badge badge-purple">{{ grant.agency }}</span>
+                {% if not grant.is_eligible %}
+                <span class="badge" style="background: rgba(220,38,38,0.15); color: #ef4444; font-size: 0.7rem;">Ineligible</span>
+                {% endif %}
+            </div>
         </div>
+        {% if grant.eligibility_warnings %}
+        <div style="margin-bottom: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            {% for warning in grant.eligibility_warnings %}
+            <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.65rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;
+                {% if 'Not eligible' in warning %}background: rgba(220,38,38,0.1); color: #f87171; border: 1px solid rgba(220,38,38,0.2);
+                {% elif 'Requires SAM' in warning %}background: rgba(217,119,6,0.1); color: #fbbf24; border: 1px solid rgba(217,119,6,0.2);
+                {% else %}background: rgba(217,119,6,0.1); color: #fbbf24; border: 1px solid rgba(217,119,6,0.2);{% endif %}">
+                {% if 'Not eligible' in warning %}&#10005;{% else %}&#9888;{% endif %} {{ warning }}
+            </span>
+            {% endfor %}
+        </div>
+        {% endif %}
         
         <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem; line-height: 1.6;">
             {{ grant.description[:200] }}{% if grant.description|length > 200 %}...{% endif %}

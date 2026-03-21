@@ -162,6 +162,38 @@ def init_db():
             updated_at TEXT
         )''')
 
+        # Grant readiness profile - eligibility screening data
+        c.execute('''CREATE TABLE IF NOT EXISTS grant_readiness (
+            user_id TEXT PRIMARY KEY,
+            applicant_category TEXT,
+            is_501c3 BOOLEAN DEFAULT FALSE,
+            is_government BOOLEAN DEFAULT FALSE,
+            government_type TEXT,
+            is_pha BOOLEAN DEFAULT FALSE,
+            is_chdo BOOLEAN DEFAULT FALSE,
+            is_university BOOLEAN DEFAULT FALSE,
+            is_small_business BOOLEAN DEFAULT FALSE,
+            employee_count INTEGER,
+            sam_gov_status TEXT DEFAULT 'unknown',
+            sam_gov_expiry TEXT,
+            has_uei BOOLEAN DEFAULT FALSE,
+            has_grants_gov BOOLEAN DEFAULT FALSE,
+            has_indirect_rate BOOLEAN DEFAULT FALSE,
+            indirect_rate_type TEXT,
+            indirect_rate_pct REAL,
+            cognizant_agency TEXT,
+            had_single_audit BOOLEAN DEFAULT FALSE,
+            annual_federal_funding INTEGER DEFAULT 0,
+            largest_federal_grant INTEGER DEFAULT 0,
+            has_construction_experience BOOLEAN DEFAULT FALSE,
+            has_grants_administrator BOOLEAN DEFAULT FALSE,
+            funding_purposes TEXT,
+            funding_range_min INTEGER DEFAULT 0,
+            funding_range_max INTEGER DEFAULT 0,
+            created_at TEXT,
+            updated_at TEXT
+        )''')
+
         # Grant checklist table - submission readiness checklist items
         c.execute('''CREATE TABLE IF NOT EXISTS grant_checklist (
             id TEXT PRIMARY KEY,

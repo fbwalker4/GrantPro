@@ -778,3 +778,128 @@ def is_onboarding_complete(user_id):
     row = c.fetchone()
     conn.close()
     return row[0] == 1 if row else False
+
+
+# ============ GRANT READINESS PROFILE ============
+
+GRANT_READINESS_COLUMNS = [
+    'user_id', 'applicant_category', 'is_501c3', 'is_government',
+    'government_type', 'is_pha', 'is_chdo', 'is_university',
+    'is_small_business', 'employee_count', 'sam_gov_status',
+    'sam_gov_expiry', 'has_uei', 'has_grants_gov', 'has_indirect_rate',
+    'indirect_rate_type', 'indirect_rate_pct', 'cognizant_agency',
+    'had_single_audit', 'annual_federal_funding', 'largest_federal_grant',
+    'has_construction_experience', 'has_grants_administrator',
+    'funding_purposes', 'funding_range_min', 'funding_range_max',
+    'created_at', 'updated_at'
+]
+
+
+def get_grant_readiness(user_id):
+    """Get grant readiness profile for a user"""
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute('SELECT * FROM grant_readiness WHERE user_id = ?', (user_id,))
+    row = c.fetchone()
+    conn.close()
+
+    if row:
+        return dict(row) if hasattr(row, 'keys') else dict(zip(GRANT_READINESS_COLUMNS, row))
+    return {}
+
+
+def save_grant_readiness(user_id, data):
+    """Save or update grant readiness profile for a user"""
+    conn = get_connection()
+    c = conn.cursor()
+    now = datetime.now().isoformat()
+
+    # Check if record exists
+    c.execute('SELECT user_id FROM grant_readiness WHERE user_id = ?', (user_id,))
+    exists = c.fetchone()
+
+    # Parse boolean values from form data
+    def to_bool(val):
+        if isinstance(val, bool):
+            return val
+        if isinstance(val, str):
+            return val.lower() in ('true', '1', 'yes', 'on')
+        return bool(val)
+
+    def to_int(val, default=0):
+        try:
+            return int(val) if val else default
+        except (ValueError, TypeError):
+            return default
+
+    def to_float(val, default=None):
+        try:
+            return float(val) if val else default
+        except (ValueError, TypeError):
+            return default
+
+    params = {
+        'applicant_category': data.get('applicant_category', ''),
+        'is_501c3': to_bool(data.get('is_501c3')),
+        'is_government': to_bool(data.get('is_government')),
+        'government_type': data.get('government_type', ''),
+        'is_pha': to_bool(data.get('is_pha')),
+        'is_chdo': to_bool(data.get('is_chdo')),
+        'is_university': to_bool(data.get('is_university')),
+        'is_small_business': to_bool(data.get('is_small_business')),
+        'employee_count': to_int(data.get('employee_count')),
+        'sam_gov_status': data.get('sam_gov_status', 'unknown'),
+        'sam_gov_expiry': data.get('sam_gov_expiry', ''),
+        'has_uei': to_bool(data.get('has_uei')),
+        'has_grants_gov': to_bool(data.get('has_grants_gov')),
+        'has_indirect_rate': to_bool(data.get('has_indirect_rate')),
+        'indirect_rate_type': data.get('indirect_rate_type', ''),
+        'indirect_rate_pct': to_float(data.get('indirect_rate_pct')),
+        'cognizant_agency': data.get('cognizant_agency', ''),
+        'had_single_audit': to_bool(data.get('had_single_audit')),
+        'annual_federal_funding': to_int(data.get('annual_federal_funding')),
+        'largest_federal_grant': to_int(data.get('largest_federal_grant')),
+        'has_construction_experience': to_bool(data.get('has_construction_experience')),
+        'has_grants_administrator': to_bool(data.get('has_grants_administrator')),
+        'funding_purposes': data.get('funding_purposes', ''),
+        'funding_range_min': to_int(data.get('funding_range_min')),
+        'funding_range_max': to_int(data.get('funding_range_max')),
+    }
+
+    if exists:
+        set_clause = ', '.join(f"{k} = ?" for k in params.keys())
+        values = list(params.values()) + [now, user_id]
+        c.execute(f'UPDATE grant_readiness SET {set_clause}, updated_at = ? WHERE user_id = ?', values)
+    else:
+        cols = ['user_id'] + list(params.keys()) + ['created_at', 'updated_at']
+        placeholders = ', '.join(['?'] * len(cols))
+        values = [user_id] + list(params.values()) + [now, now]
+        c.execute(f'INSERT INTO grant_readiness ({", ".join(cols)}) VALUES ({placeholders})', values)
+
+    conn.commit()
+    conn.close()
+    return True
+
+
+def get_readiness_completion(readiness):
+    """Calculate grant readiness completion score.
+    Returns (percentage, list_of_missing_labels).
+    """
+    if not readiness:
+        return 0, ['Applicant Type', 'SAM.gov Status', 'UEI Number', 'Grants.gov Account',
+                    'Federal Funding History', 'Funding Preferences']
+
+    fields = [
+        (bool(readiness.get('applicant_category')), 'Applicant Type'),
+        (readiness.get('sam_gov_status', 'unknown') != 'unknown', 'SAM.gov Status'),
+        (bool(readiness.get('has_uei')), 'UEI Number'),
+        (bool(readiness.get('has_grants_gov')), 'Grants.gov Account'),
+        (readiness.get('largest_federal_grant', 0) > 0, 'Federal Funding History'),
+        (bool(readiness.get('funding_purposes')), 'Funding Preferences'),
+    ]
+
+    filled = sum(1 for complete, _ in fields if complete)
+    total = len(fields)
+    pct = int(round(filled / total * 100)) if total else 0
+    missing = [label for complete, label in fields if not complete]
+    return pct, missing

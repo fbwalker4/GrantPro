@@ -826,6 +826,217 @@
                     </button>
                 </div>
                 
+                <!-- Section 6: Grant Readiness Profile -->
+                <div class="card" style="border: 1px solid rgba(5, 150, 105, 0.3);">
+                    <h2 class="card-title">
+                        <span class="card-icon" style="background: rgba(5, 150, 105, 0.15); color: #10b981;">&#9989;</span>
+                        Grant Readiness Profile
+                    </h2>
+                    <p class="form-hint" style="margin-bottom: 1.25rem;">
+                        This helps us screen which grants you are actually eligible for, so you never waste time on ones you cannot win.
+                        All fields are optional -- skip for now and come back anytime.
+                    </p>
+
+                    <!-- Applicant Type -->
+                    <div class="form-group">
+                        <label class="form-label" for="applicant_category">What type of organization are you? <span class="optional">(Optional)</span></label>
+                        <select id="applicant_category" name="applicant_category" class="form-select" onchange="showApplicantFollowUp()">
+                            <option value="">Select...</option>
+                            <option value="501c3" {% if readiness.applicant_category == '501c3' %}selected{% endif %}>501(c)(3) Nonprofit</option>
+                            <option value="city_county" {% if readiness.applicant_category == 'city_county' %}selected{% endif %}>City or County Government</option>
+                            <option value="state_gov" {% if readiness.applicant_category == 'state_gov' %}selected{% endif %}>State Government</option>
+                            <option value="tribal" {% if readiness.applicant_category == 'tribal' %}selected{% endif %}>Tribal Government / Organization</option>
+                            <option value="pha" {% if readiness.applicant_category == 'pha' %}selected{% endif %}>Public Housing Authority (PHA)</option>
+                            <option value="chdo" {% if readiness.applicant_category == 'chdo' %}selected{% endif %}>Community Housing Development Organization (CHDO)</option>
+                            <option value="university" {% if readiness.applicant_category == 'university' %}selected{% endif %}>University or Research Institution</option>
+                            <option value="small_business" {% if readiness.applicant_category == 'small_business' %}selected{% endif %}>Small Business (for-profit, under 500 employees)</option>
+                            <option value="individual" {% if readiness.applicant_category == 'individual' %}selected{% endif %}>Individual / Artist</option>
+                        </select>
+                        <p class="form-hint">Different grant programs are restricted to specific applicant types. We use this to filter out grants you cannot apply for.</p>
+                    </div>
+
+                    <!-- Applicant type helper text -->
+                    <div id="applicant-pha-hint" style="display: none; margin-bottom: 1rem;">
+                        <p class="form-hint" style="background: rgba(37,99,235,0.08); padding: 0.75rem; border-radius: 6px; border-left: 3px solid var(--accent-primary);">
+                            <strong>Public Housing Authority (PHA)</strong> -- Manages public housing or Section 8 Housing Choice Vouchers on behalf of HUD.
+                        </p>
+                    </div>
+                    <div id="applicant-chdo-hint" style="display: none; margin-bottom: 1rem;">
+                        <p class="form-hint" style="background: rgba(37,99,235,0.08); padding: 0.75rem; border-radius: 6px; border-left: 3px solid var(--accent-primary);">
+                            <strong>Community Housing Development Org (CHDO)</strong> -- A nonprofit certified by your local jurisdiction to develop affordable housing. Required for HOME set-aside funds.
+                        </p>
+                    </div>
+
+                    <!-- Small business follow-up -->
+                    <div id="employee-count-group" class="form-group" style="display: none;">
+                        <label class="form-label" for="employee_count">Number of Employees <span class="optional">(Optional)</span></label>
+                        <input type="number" id="employee_count" name="employee_count" class="form-input"
+                               placeholder="e.g. 25" min="1" max="10000"
+                               value="{{ readiness.employee_count or '' }}">
+                        <p class="form-hint">SBA size standards vary by industry. Under 500 employees typically qualifies as "small business" for most federal programs.</p>
+                    </div>
+
+                    <!-- Government type follow-up -->
+                    <div id="government-type-group" class="form-group" style="display: none;">
+                        <label class="form-label" for="government_type">Government Entity Type <span class="optional">(Optional)</span></label>
+                        <input type="text" id="government_type" name="government_type" class="form-input"
+                               placeholder="e.g. City of Springfield, County Health Department"
+                               value="{{ readiness.government_type or '' }}">
+                        <p class="form-hint">Some grants target specific government functions (e.g. transit authorities, school districts).</p>
+                    </div>
+
+                    <hr style="border-color: var(--border-color); margin: 1.5rem 0;">
+
+                    <!-- Federal Registrations -->
+                    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem;">Federal Registrations</h3>
+                    <p class="form-hint" style="margin-bottom: 1rem;">These are required for ALL federal grants. Knowing your status helps us warn you before you start an application you cannot submit.</p>
+
+                    <div class="form-group">
+                        <label class="form-label" for="sam_gov_status">SAM.gov Registration <span class="optional">(Optional)</span></label>
+                        <select id="sam_gov_status" name="sam_gov_status" class="form-select">
+                            <option value="unknown" {% if not readiness.sam_gov_status or readiness.sam_gov_status == 'unknown' %}selected{% endif %}>Not sure</option>
+                            <option value="active" {% if readiness.sam_gov_status == 'active' %}selected{% endif %}>Active</option>
+                            <option value="expired" {% if readiness.sam_gov_status == 'expired' %}selected{% endif %}>Expired</option>
+                            <option value="none" {% if readiness.sam_gov_status == 'none' %}selected{% endif %}>Don't have one</option>
+                        </select>
+                        <p class="form-hint">Required for ALL federal grants. Register at <a href="https://sam.gov" target="_blank">sam.gov</a>. Takes 7-10 business days to process. Must be renewed annually.</p>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="has_uei">UEI Number <span class="optional">(Optional)</span></label>
+                            <select id="has_uei" name="has_uei" class="form-select">
+                                <option value="" {% if not readiness.has_uei %}selected{% endif %}>Not sure</option>
+                                <option value="yes" {% if readiness.has_uei %}selected{% endif %}>Have it</option>
+                                <option value="no">Don't have one</option>
+                            </select>
+                            <p class="form-hint">Your Unique Entity Identifier, assigned when you register at SAM.gov. Replaced DUNS numbers in April 2022.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="has_grants_gov">Grants.gov Account <span class="optional">(Optional)</span></label>
+                            <select id="has_grants_gov" name="has_grants_gov" class="form-select">
+                                <option value="" {% if not readiness.has_grants_gov %}selected{% endif %}>Not sure</option>
+                                <option value="yes" {% if readiness.has_grants_gov %}selected{% endif %}>Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                            <p class="form-hint">The main portal for finding and applying to federal grants. Free to register at <a href="https://grants.gov" target="_blank">grants.gov</a>.</p>
+                        </div>
+                    </div>
+
+                    <hr style="border-color: var(--border-color); margin: 1.5rem 0;">
+
+                    <!-- Capacity -->
+                    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem;">Capacity & Experience</h3>
+                    <p class="form-hint" style="margin-bottom: 1rem;">Helps us match you with appropriately-sized opportunities and flag compliance requirements.</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="largest_federal_grant">Largest federal grant ever received ($) <span class="optional">(Optional)</span></label>
+                            <input type="number" id="largest_federal_grant" name="largest_federal_grant" class="form-input"
+                                   placeholder="e.g. 250000" min="0"
+                                   value="{{ readiness.largest_federal_grant or '' }}">
+                            <p class="form-hint">Helps us match you with appropriately-sized opportunities. Enter 0 if you have never received federal funding.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="annual_federal_funding">Total annual federal funding ($) <span class="optional">(Optional)</span></label>
+                            <input type="number" id="annual_federal_funding" name="annual_federal_funding" class="form-input"
+                                   placeholder="e.g. 500000" min="0"
+                                   value="{{ readiness.annual_federal_funding or '' }}">
+                            <p class="form-hint">If over $1,000,000, you will need a Single Audit -- an independent audit that meets specific federal requirements under 2 CFR 200.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Have you managed construction projects with federal funds before? <span class="optional">(Optional)</span></label>
+                            <select name="has_construction_experience" class="form-select">
+                                <option value="" {% if not readiness.has_construction_experience %}selected{% endif %}>Not sure</option>
+                                <option value="yes" {% if readiness.has_construction_experience %}selected{% endif %}>Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                            <p class="form-hint">Some grants require Davis-Bacon prevailing wage compliance -- paying construction workers the local prevailing wage rate set by the Department of Labor.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Do you have a grants administrator on staff? <span class="optional">(Optional)</span></label>
+                            <select name="has_grants_administrator" class="form-select">
+                                <option value="" {% if not readiness.has_grants_administrator %}selected{% endif %}>Not sure</option>
+                                <option value="yes" {% if readiness.has_grants_administrator %}selected{% endif %}>Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                            <p class="form-hint">Someone who manages federal grant compliance, reporting, and financial tracking. Larger grants typically require dedicated staff.</p>
+                        </div>
+                    </div>
+
+                    <hr style="border-color: var(--border-color); margin: 1.5rem 0;">
+
+                    <!-- What are you looking for? -->
+                    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem;">What Are You Looking For?</h3>
+                    <p class="form-hint" style="margin-bottom: 1rem;">Tell us what kinds of funding you need so we can prioritize the best matches.</p>
+
+                    <div class="form-group">
+                        <label class="form-label">Funding Purpose <span class="optional">(Select all that apply)</span></label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="fp_programs" name="funding_purposes" value="programs"
+                                       {% if readiness.funding_purposes and 'programs' in readiness.funding_purposes %}checked{% endif %}>
+                                <label for="fp_programs">Programs / Services</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="fp_research" name="funding_purposes" value="research"
+                                       {% if readiness.funding_purposes and 'research' in readiness.funding_purposes %}checked{% endif %}>
+                                <label for="fp_research">Research</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="fp_construction" name="funding_purposes" value="construction"
+                                       {% if readiness.funding_purposes and 'construction' in readiness.funding_purposes %}checked{% endif %}>
+                                <label for="fp_construction">Construction / Renovation</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="fp_equipment" name="funding_purposes" value="equipment"
+                                       {% if readiness.funding_purposes and 'equipment' in readiness.funding_purposes %}checked{% endif %}>
+                                <label for="fp_equipment">Equipment</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="fp_training" name="funding_purposes" value="training"
+                                       {% if readiness.funding_purposes and 'training' in readiness.funding_purposes %}checked{% endif %}>
+                                <label for="fp_training">Training / Education</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="fp_planning" name="funding_purposes" value="planning"
+                                       {% if readiness.funding_purposes and 'planning' in readiness.funding_purposes %}checked{% endif %}>
+                                <label for="fp_planning">Planning / Capacity Building</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="funding_range_min">Funding Range - Minimum ($) <span class="optional">(Optional)</span></label>
+                            <select id="funding_range_min" name="funding_range_min" class="form-select">
+                                <option value="0" {% if not readiness.funding_range_min or readiness.funding_range_min == 0 %}selected{% endif %}>Any amount</option>
+                                <option value="10000" {% if readiness.funding_range_min == 10000 %}selected{% endif %}>$10,000+</option>
+                                <option value="50000" {% if readiness.funding_range_min == 50000 %}selected{% endif %}>$50,000+</option>
+                                <option value="250000" {% if readiness.funding_range_min == 250000 %}selected{% endif %}>$250,000+</option>
+                                <option value="1000000" {% if readiness.funding_range_min == 1000000 %}selected{% endif %}>$1,000,000+</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="funding_range_max">Funding Range - Maximum ($) <span class="optional">(Optional)</span></label>
+                            <select id="funding_range_max" name="funding_range_max" class="form-select">
+                                <option value="0" {% if not readiness.funding_range_max or readiness.funding_range_max == 0 %}selected{% endif %}>No limit</option>
+                                <option value="50000" {% if readiness.funding_range_max == 50000 %}selected{% endif %}>Up to $50,000</option>
+                                <option value="250000" {% if readiness.funding_range_max == 250000 %}selected{% endif %}>Up to $250,000</option>
+                                <option value="1000000" {% if readiness.funding_range_max == 1000000 %}selected{% endif %}>Up to $1,000,000</option>
+                                <option value="5000000" {% if readiness.funding_range_max == 5000000 %}selected{% endif %}>Up to $5,000,000</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Actions -->
                 <div class="form-actions">
                     <a href="/dashboard" class="skip-link">Skip for now</a>
@@ -836,6 +1047,27 @@
     </div>
     
     <script>
+        function showApplicantFollowUp() {
+            var cat = document.getElementById('applicant_category').value;
+            // Hide all conditional sections
+            document.getElementById('employee-count-group').style.display = 'none';
+            document.getElementById('government-type-group').style.display = 'none';
+            document.getElementById('applicant-pha-hint').style.display = 'none';
+            document.getElementById('applicant-chdo-hint').style.display = 'none';
+
+            if (cat === 'small_business') {
+                document.getElementById('employee-count-group').style.display = 'block';
+            } else if (cat === 'city_county' || cat === 'state_gov') {
+                document.getElementById('government-type-group').style.display = 'block';
+            } else if (cat === 'pha') {
+                document.getElementById('applicant-pha-hint').style.display = 'block';
+            } else if (cat === 'chdo') {
+                document.getElementById('applicant-chdo-hint').style.display = 'block';
+            }
+        }
+        // Run on page load to show follow-ups for pre-selected values
+        document.addEventListener('DOMContentLoaded', showApplicantFollowUp);
+
         function addPastGrant() {
             const container = document.getElementById('past-grants-container');
             const div = document.createElement('div');
