@@ -114,6 +114,33 @@ def init_db():
         updated_at TEXT
     )''')
 
+    # Award matches table - tracks grant awards matched to our users
+    c.execute('''CREATE TABLE IF NOT EXISTS award_matches (
+        id TEXT PRIMARY KEY,
+        user_id TEXT,
+        grant_id TEXT,
+        grant_name TEXT,
+        award_amount REAL,
+        award_date TEXT,
+        source TEXT,
+        notified INTEGER DEFAULT 0,
+        testimonial_token TEXT UNIQUE,
+        created_at TEXT
+    )''')
+
+    # Testimonials table - user-submitted testimonials linked to awards
+    c.execute('''CREATE TABLE IF NOT EXISTS testimonials (
+        id TEXT PRIMARY KEY,
+        user_id TEXT,
+        award_match_id TEXT,
+        rating INTEGER,
+        text TEXT,
+        org_name TEXT,
+        contact_name TEXT,
+        approved INTEGER DEFAULT 0,
+        created_at TEXT
+    )''')
+
     conn.commit()
     conn.close()
     return DB_PATH

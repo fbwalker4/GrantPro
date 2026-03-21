@@ -981,6 +981,17 @@
                     <div class="testimonial-author">Futurespec Consulting Client</div>
                     <div class="testimonial-role">Mississippi Public Agency</div>
                 </div>
+                {% if approved_testimonials %}
+                {% for t in approved_testimonials %}
+                <div class="testimonial-card">
+                    <div class="testimonial-avatar">{{ (t.org_name or 'GP')[:2]|upper }}</div>
+                    <div class="testimonial-stars">{% for i in range(t.rating or 5) %}★{% endfor %}{% for i in range(5 - (t.rating or 5)) %}☆{% endfor %}</div>
+                    <p class="testimonial-text">"{{ t.text }}"</p>
+                    <div class="testimonial-author">{{ t.contact_name or 'Grant Pro Client' }}</div>
+                    <div class="testimonial-role">{{ t.org_name or '' }}</div>
+                </div>
+                {% endfor %}
+                {% endif %}
             </div>
         </div>
     </section>

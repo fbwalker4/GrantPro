@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+
+{% block title %}Testimonials - Admin - Grant Pro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Testimonials</h1>
+        <p class="page-subtitle">Review and approve user testimonials</p>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="stat-icon green">&#9733;</div>
+        <div class="stat-value">{{ testimonials|length }}</div>
+        <div class="stat-label">Total</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple">&#10003;</div>
+        <div class="stat-value">{{ testimonials|selectattr('approved', 'equalto', 1)|list|length }}</div>
+        <div class="stat-label">Approved</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon amber">&#8987;</div>
+        <div class="stat-value">{{ testimonials|selectattr('approved', 'equalto', 0)|list|length }}</div>
+        <div class="stat-label">Pending</div>
+    </div>
+</div>
+
+{% if testimonials %}
+<div class="card" style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+        <thead>
+            <tr style="border-bottom: 2px solid #e2e5ed; text-align: left;">
+                <th style="padding: 0.75rem;">Org / Contact</th>
+                <th style="padding: 0.75rem;">Rating</th>
+                <th style="padding: 0.75rem;">Testimonial</th>
+                <th style="padding: 0.75rem;">Grant</th>
+                <th style="padding: 0.75rem;">Status</th>
+                <th style="padding: 0.75rem;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for t in testimonials %}
+            <tr style="border-bottom: 1px solid #f1f3f6;">
+                <td style="padding: 0.75rem;">
+                    <strong>{{ t.org_name or 'N/A' }}</strong>
+                    {% if t.contact_name %}<br><span style="color: #5e6278; font-size: 0.85rem;">{{ t.contact_name }}</span>{% endif %}
+                </td>
+                <td style="padding: 0.75rem; color: #f59e0b;">
+                    {% for i in range(t.rating or 0) %}&#9733;{% endfor %}{% for i in range(5 - (t.rating or 0)) %}<span style="color:#d1d5db;">&#9733;</span>{% endfor %}
+                </td>
+                <td style="padding: 0.75rem; max-width: 300px;">
+                    <div style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
+                        {{ t.text }}
+                    </div>
+                </td>
+                <td style="padding: 0.75rem; font-size: 0.85rem; color: #5e6278;">
+                    {{ t.grant_name or '' }}
+                    {% if t.award_amount %}<br>${{ "{:,.0f}".format(t.award_amount) }}{% endif %}
+                </td>
+                <td style="padding: 0.75rem;">
+                    {% if t.approved == 1 %}
+                        <span style="background: #ecfdf5; color: #059669; padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Approved</span>
+                    {% else %}
+                        <span style="background: #fef9c3; color: #a16207; padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">Pending</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 0.75rem; white-space: nowrap;">
+                    {% if t.approved != 1 %}
+                    <form method="POST" action="/admin/testimonials/{{ t.id }}/approve" style="display: inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" style="background: #059669; color: #fff; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">Approve</button>
+                    </form>
+                    {% else %}
+                    <form method="POST" action="/admin/testimonials/{{ t.id }}/reject" style="display: inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" style="background: #dc2626; color: #fff; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">Reject</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card" style="text-align: center; padding: 3rem;">
+    <p style="color: #5e6278;">No testimonials yet. Testimonials will appear here when users submit them via award notification emails.</p>
+</div>
+{% endif %}
+{% endblock %}

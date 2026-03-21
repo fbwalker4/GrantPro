@@ -521,6 +521,72 @@ def get_email_stats() -> Dict:
     }
 
 
+def get_award_congratulations_email(grant_name: str, org_name: str, testimonial_url: str) -> Dict:
+    """Get award congratulations email content"""
+    subject = f"Congratulations on your {grant_name} award!"
+    preheader = f"Great news for {org_name} - share your experience with GrantPro"
+
+    body = f"""
+    <h2 style="margin: 0 0 20px; color: #10b981; font-size: 24px; font-weight: 700;">
+        Congratulations, {org_name}!
+    </h2>
+
+    <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+        We are thrilled to see that your organization has been awarded the
+        <strong>{grant_name}</strong> grant. This is a tremendous achievement and
+        a testament to the hard work you put into your application.
+    </p>
+
+    <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+        Your success story can inspire other organizations seeking funding.
+        Would you take a moment to share your experience with Grant Writer Pro?
+    </p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+        <tr>
+            <td align="center">
+                <a href="{testimonial_url}" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: #ffffff; padding: 14px 32px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px;">
+                    Share Your Experience
+                </a>
+            </td>
+        </tr>
+    </table>
+
+    <p style="margin: 20px 0 0; font-size: 14px; color: #666;">
+        Thank you for choosing Grant Writer Pro. We look forward to helping you
+        with future grant opportunities!
+    </p>
+
+    <p style="margin: 10px 0 0; font-size: 16px; color: #333;">
+        Best,<br>
+        <strong>The Grant Writer Pro Team</strong>
+    </p>
+    """
+
+    return {
+        "subject": subject,
+        "html": wrap_in_html(body, subject, preheader)
+    }
+
+
+def send_award_congratulations(email: str, grant_name: str, org_name: str, testimonial_url: str) -> Dict:
+    """Send award congratulations email with testimonial link.
+
+    If Resend is not configured the email content is logged to the console
+    so the message is never silently lost.
+    """
+    content = get_award_congratulations_email(grant_name, org_name, testimonial_url)
+    result = send_email(email, content["subject"], content["html"], "award_congratulations")
+
+    if result.get("method") == "queued":
+        # Resend unavailable — print to console so the operator can see it
+        print(f"[EMAIL] To: {email}")
+        print(f"[EMAIL] Subject: {content['subject']}")
+        print(f"[EMAIL] Testimonial URL: {testimonial_url}")
+
+    return result
+
+
 # ============ CONVENIENCE FUNCTIONS ============
 
 def send_welcome_email(email: str, first_name: str = "there") -> Dict:

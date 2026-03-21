@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "portal/app.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "portal/static/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "portal/app.py"
+    }
+  ]
+}

@@ -26,3 +26,8 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Vercel
+.vercel/
+node_modules/
+.env.local

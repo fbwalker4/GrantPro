@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Your Experience - Grant Pro</title>
+    <link rel="icon" type="image/png" href="/static/images/gp_logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8f9fc;
+            color: #1a1f36;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            max-width: 560px;
+            width: 100%;
+            padding: 2.5rem;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .logo span {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2563eb;
+        }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #5e6278;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+        .award-info {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #0c4a6e;
+        }
+        .award-info strong { display: block; margin-bottom: 0.25rem; }
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.4rem;
+            color: #1a1f36;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 0.7rem 0.9rem;
+            border: 1px solid #e2e5ed;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: #1a1f36;
+            transition: border-color 0.15s;
+        }
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        /* Star rating */
+        .star-rating {
+            display: flex;
+            gap: 0.35rem;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+        .star-rating input {
+            display: none;
+        }
+        .star-rating label {
+            font-size: 2rem;
+            color: #d1d5db;
+            cursor: pointer;
+            transition: color 0.1s;
+            margin-bottom: 0;
+            font-weight: normal;
+        }
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label {
+            color: #f59e0b;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .checkbox-group input[type="checkbox"] {
+            margin-top: 0.25rem;
+            width: 16px;
+            height: 16px;
+        }
+        .checkbox-group span {
+            font-size: 0.85rem;
+            color: #5e6278;
+        }
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 0.85rem;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+        }
+        .btn-submit:hover {
+            box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+        }
+        .flash-msg {
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        .flash-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        .flash-success {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo"><span>Grant Pro</span></div>
+        <h1>Share Your Experience</h1>
+        <p class="subtitle">Your story helps others discover grant funding opportunities.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash-msg flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="award-info">
+            <strong>{{ match.grant_name or 'Federal Award' }}</strong>
+            {% if match.award_amount %}
+            Award amount: ${{ "{:,.2f}".format(match.award_amount) }}<br>
+            {% endif %}
+            {% if match.award_date %}
+            Date: {{ match.award_date }}
+            {% endif %}
+        </div>
+
+        <form method="POST" action="/testimonial/{{ match.testimonial_token }}">
+            <div class="form-group">
+                <label>Your Rating</label>
+                <div class="star-rating">
+                    <input type="radio" id="star5" name="rating" value="5" checked>
+                    <label for="star5" title="5 stars">&#9733;</label>
+                    <input type="radio" id="star4" name="rating" value="4">
+                    <label for="star4" title="4 stars">&#9733;</label>
+                    <input type="radio" id="star3" name="rating" value="3">
+                    <label for="star3" title="3 stars">&#9733;</label>
+                    <input type="radio" id="star2" name="rating" value="2">
+                    <label for="star2" title="2 stars">&#9733;</label>
+                    <input type="radio" id="star1" name="rating" value="1">
+                    <label for="star1" title="1 star">&#9733;</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="org_name">Organization Name</label>
+                <input type="text" id="org_name" name="org_name" value="{{ match.grant_name or '' }}" placeholder="Your organization">
+            </div>
+
+            <div class="form-group">
+                <label for="contact_name">Your Name (optional)</label>
+                <input type="text" id="contact_name" name="contact_name" placeholder="Jane Smith">
+            </div>
+
+            <div class="form-group">
+                <label for="text">Your Experience</label>
+                <textarea id="text" name="text" placeholder="Tell us how Grant Pro helped you win this grant..." required></textarea>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="permission" name="permission" required>
+                <span>I give permission to display this testimonial on GrantPro.org</span>
+            </div>
+
+            <button type="submit" class="btn-submit">Submit Testimonial</button>
+        </form>
+    </div>
+</body>
+</html>

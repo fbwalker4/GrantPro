@@ -353,7 +353,20 @@ def index():
     """Landing page - redirect logged-in users to dashboard"""
     if 'user_id' in session:
         return redirect(url_for('dashboard'))
-    return render_template('landing.html')
+
+    # Load approved testimonials for the landing page
+    approved_testimonials = []
+    try:
+        conn = get_db()
+        rows = conn.execute(
+            'SELECT org_name, rating, text, contact_name FROM testimonials WHERE approved = 1 ORDER BY created_at DESC LIMIT 6'
+        ).fetchall()
+        conn.close()
+        approved_testimonials = [dict(r) for r in rows]
+    except Exception:
+        pass  # Table may not exist yet on first run
+
+    return render_template('landing.html', approved_testimonials=approved_testimonials)
 
 
 @app.route('/about')
@@ -3624,6 +3637,108 @@ def clone_grant(grant_id):
 
     flash(f'Grant cloned: {new_name}', 'success')
     return redirect(url_for('grant_detail', grant_id=new_grant_id))
+
+
+# ============ TESTIMONIALS ============
+
+@app.route('/testimonial/<token>', methods=['GET'])
+def testimonial_form(token):
+    """Public testimonial form - no login required."""
+    conn = get_db()
+    match = conn.execute(
+        'SELECT * FROM award_matches WHERE testimonial_token = ?', (token,)
+    ).fetchone()
+    conn.close()
+
+    if not match:
+        flash('Invalid or expired testimonial link.', 'error')
+        return redirect(url_for('index'))
+
+    return render_template('testimonial_form.html', match=dict(match))
+
+
+@app.route('/testimonial/<token>', methods=['POST'])
+def testimonial_submit(token):
+    """Save a submitted testimonial."""
+    conn = get_db()
+    match = conn.execute(
+        'SELECT * FROM award_matches WHERE testimonial_token = ?', (token,)
+    ).fetchone()
+
+    if not match:
+        conn.close()
+        flash('Invalid or expired testimonial link.', 'error')
+        return redirect(url_for('index'))
+
+    match = dict(match)
+
+    rating = safe_int(request.form.get('rating'), 5)
+    text = (request.form.get('text') or '').strip()
+    org_name = (request.form.get('org_name') or '').strip()
+    contact_name = (request.form.get('contact_name') or '').strip()
+
+    if not text:
+        flash('Please enter your testimonial.', 'error')
+        return render_template('testimonial_form.html', match=match)
+
+    testimonial_id = f"test-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
+    now = datetime.now().isoformat()
+
+    conn.execute(
+        '''INSERT INTO testimonials
+           (id, user_id, award_match_id, rating, text, org_name, contact_name, approved, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)''',
+        (testimonial_id, match.get('user_id'), match['id'], rating, text, org_name, contact_name, now),
+    )
+    conn.commit()
+    conn.close()
+
+    flash('Thank you for sharing your experience!', 'success')
+    return render_template('testimonial_thankyou.html', org_name=org_name)
+
+
+@app.route('/admin/testimonials')
+@login_required
+@admin_required
+def admin_testimonials():
+    """Admin view of all testimonials."""
+    conn = get_db()
+    testimonials = conn.execute(
+        '''SELECT t.*, a.grant_name, a.award_amount, a.award_date
+           FROM testimonials t
+           LEFT JOIN award_matches a ON t.award_match_id = a.id
+           ORDER BY t.created_at DESC'''
+    ).fetchall()
+    conn.close()
+    return render_template('admin_testimonials.html', testimonials=[dict(t) for t in testimonials])
+
+
+@app.route('/admin/testimonials/<tid>/approve', methods=['POST'])
+@login_required
+@admin_required
+@csrf_required
+def admin_approve_testimonial(tid):
+    """Approve a testimonial for public display."""
+    conn = get_db()
+    conn.execute('UPDATE testimonials SET approved = 1 WHERE id = ?', (tid,))
+    conn.commit()
+    conn.close()
+    flash('Testimonial approved.', 'success')
+    return redirect(url_for('admin_testimonials'))
+
+
+@app.route('/admin/testimonials/<tid>/reject', methods=['POST'])
+@login_required
+@admin_required
+@csrf_required
+def admin_reject_testimonial(tid):
+    """Reject (un-approve) a testimonial."""
+    conn = get_db()
+    conn.execute('UPDATE testimonials SET approved = 0 WHERE id = ?', (tid,))
+    conn.commit()
+    conn.close()
+    flash('Testimonial rejected.', 'success')
+    return redirect(url_for('admin_testimonials'))
 
 
 # ============ MAIN ============
