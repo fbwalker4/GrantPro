@@ -3100,25 +3100,43 @@ def download_grant(grant_id, fmt):
     ''', (grant_id,)).fetchone()
     
     drafts = conn.execute('''
-        SELECT section, content FROM drafts 
+        SELECT section, content FROM drafts
         WHERE grant_id = ? AND content IS NOT NULL
         ORDER BY section
     ''', (grant_id,)).fetchall()
-    
+
     conn.close()
-    
+
+    # --- Section ordering: use template required_sections order ---
+    template_name = grant['template'] if 'template' in grant.keys() and grant['template'] else 'generic'
+    template_section_order = []
+    try:
+        template_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates', 'agency_templates.json')
+        with open(template_path) as _tf:
+            _tdata = json.load(_tf)
+        tmpl_secs = _tdata.get('agencies', {}).get(template_name, {}).get('required_sections', [])
+        template_section_order = [s.get('id', '') for s in tmpl_secs]
+    except Exception:
+        pass
+
+    if template_section_order:
+        # Sort drafts by template order; sections not in template go last
+        order_map = {sid: idx for idx, sid in enumerate(template_section_order)}
+        drafts = sorted(drafts, key=lambda d: order_map.get(d['section'], 9999))
+
     # Format content as plain text for now
+    amt = grant.get('amount', 0) or 0
     content_parts = [f"# {grant['grant_name']}\n"]
     content_parts.append(f"Agency: {grant['agency']}\n")
     content_parts.append(f"Organization: {grant['organization_name']}\n")
-    content_parts.append(f"Requested Amount: ${grant['amount']:,.2f}\n")
+    content_parts.append(f"Requested Amount: ${float(amt):,.2f}\n")
     content_parts.append(f"Deadline: {grant['deadline']}\n")
     content_parts.append("\n" + "="*60 + "\n\n")
-    
+
     for draft in drafts:
         content_parts.append(f"## {draft['section'].replace('_', ' ').title()}\n\n")
         content_parts.append(draft['content'] + "\n\n")
-    
+
     full_content = "\n".join(content_parts)
     
     if fmt == 'txt':
@@ -3174,14 +3192,14 @@ def download_grant(grant_id, fmt):
             return download_grant(grant_id, 'txt')
     
     elif fmt == 'pdf':
-        # PDF generation - basic text version
+        # PDF generation - with markdown cleanup and proper formatting
         try:
             from reportlab.lib.pagesizes import letter
             from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
             from reportlab.lib.units import inch
             from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
             from reportlab.lib.enums import TA_CENTER, TA_LEFT
-            
+
             buffer = io.BytesIO()
             doc = SimpleDocTemplate(buffer, pagesize=letter,
                 leftMargin=0.9*inch, rightMargin=0.9*inch,
@@ -3190,13 +3208,25 @@ def download_grant(grant_id, fmt):
 
             title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'],
                 alignment=TA_CENTER, fontSize=18, spaceAfter=20)
+            cover_meta_style = ParagraphStyle('CoverMeta', parent=styles['Normal'],
+                alignment=TA_CENTER, fontSize=12, spaceAfter=8)
+            cover_amount_style = ParagraphStyle('CoverAmount', parent=styles['Normal'],
+                alignment=TA_CENTER, fontSize=14, spaceAfter=8, fontName='Helvetica-Bold')
             body_style = ParagraphStyle('Body', parent=styles['Normal'],
                 fontSize=10.5, leading=14, spaceAfter=6)
+            heading3_style = ParagraphStyle('SubHeading', parent=styles['Heading3'],
+                fontSize=12, spaceAfter=8, spaceBefore=10)
 
-            # Check for draft watermark
+            # Check for draft watermark and branding toggle
             is_draft = request.args.get('draft') == '1'
+            show_branding = request.args.get('branded', '1') != '0'
+
+            from pdf_utils import get_footer_callback, clean_markdown, split_markdown_sections
 
             story = []
+
+            # --- Cover Page ---
+            story.append(Spacer(1, 1.5*inch))
 
             # Draft watermark notice
             if is_draft:
@@ -3204,34 +3234,75 @@ def download_grant(grant_id, fmt):
                     '<font color="#dc2626" size="14"><b>DRAFT — NOT FOR SUBMISSION</b></font>',
                     ParagraphStyle('Draft', parent=styles['Normal'], alignment=TA_CENTER, spaceAfter=20)))
 
-            # Title
-            story.append(Paragraph(
-                grant['grant_name'].replace('&','&amp;').replace('<','&lt;'),
-                title_style))
-            story.append(Paragraph(f"Agency: {grant['agency']}", styles['Normal']))
-            story.append(Paragraph(f"Organization: {grant['organization_name']}", styles['Normal']))
-            amt = grant.get('amount', 0) or 0
-            story.append(Paragraph(f"Amount: ${float(amt):,.0f}", styles['Normal']))
-            story.append(Paragraph(f"Deadline: {grant.get('deadline', 'TBD')}", styles['Normal']))
+            # Grant name (from grant record)
+            safe_name = grant['grant_name'].replace('&', '&amp;').replace('<', '&lt;')
+            story.append(Paragraph(safe_name, title_style))
             story.append(Spacer(1, 0.3*inch))
 
-            # Sections
+            # Agency (from grant record)
+            story.append(Paragraph(
+                f"Submitted to: {grant['agency']}",
+                cover_meta_style))
+
+            # Organization name (from grant record)
+            story.append(Paragraph(
+                f"Prepared by: {grant['organization_name']}",
+                cover_meta_style))
+
+            # Amount from grant record amount field
+            cover_amt = grant.get('amount', 0) or 0
+            story.append(Paragraph(
+                f"Requested Amount: ${float(cover_amt):,.0f}",
+                cover_amount_style))
+
+            # Deadline
+            story.append(Paragraph(
+                f"Deadline: {grant.get('deadline', 'TBD')}",
+                cover_meta_style))
+
+            story.append(Spacer(1, 0.5*inch))
+            story.append(PageBreak())
+
+            # --- Content Sections (ordered by template) ---
             for draft in drafts:
                 section_title = draft['section'].replace('_', ' ').title()
                 story.append(Paragraph(section_title, styles['Heading2']))
-                # Process content safely — escape HTML, handle paragraphs
+
+                # Process content with markdown cleanup
                 content = draft['content'] or ''
-                content = content.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-                for para in content.split('\n\n'):
-                    para = para.strip()
-                    if para:
-                        # Convert single newlines to <br/> within paragraphs
-                        para = para.replace('\n', '<br/>')
-                        story.append(Paragraph(para, body_style))
+
+                # Split on markdown headings within the section content
+                md_parts = split_markdown_sections(content)
+
+                if md_parts and any(level > 0 for level, _, _ in md_parts):
+                    # Content has sub-headings — render them properly
+                    for level, heading, body in md_parts:
+                        if heading and level > 0:
+                            safe_heading = heading.replace('&', '&amp;').replace('<', '&lt;')
+                            if level <= 2:
+                                story.append(Paragraph(safe_heading, styles['Heading3']))
+                            else:
+                                story.append(Paragraph(safe_heading, heading3_style))
+                        # Clean markdown from body text
+                        cleaned = clean_markdown(body)
+                        for para in cleaned.split('\n\n'):
+                            para = para.strip()
+                            if para:
+                                para = para.replace('\n', '<br/>')
+                                story.append(Paragraph(para, body_style))
+                else:
+                    # No sub-headings — clean and render as paragraphs
+                    cleaned = clean_markdown(content)
+                    for para in cleaned.split('\n\n'):
+                        para = para.strip()
+                        if para:
+                            para = para.replace('\n', '<br/>')
+                            story.append(Paragraph(para, body_style))
+
                 story.append(Spacer(1, 0.2*inch))
 
-            from pdf_utils import get_footer_callback
-            _footer = get_footer_callback()
+            # Build with branding toggle
+            _footer = get_footer_callback(show_branding=show_branding)
             doc.build(story, onFirstPage=_footer, onLaterPages=_footer)
             buffer.seek(0)
 
@@ -4188,6 +4259,14 @@ def validate_budget_consistency(grant_id):
                         'message': f'Estimated {est_pages:.1f} pages but limit is {max_pages}. Reduce content.',
                         'severity': 'warning'
                     })
+    except Exception:
+        pass
+
+    # Check 9: Redundant content — flag sentences appearing in multiple sections
+    try:
+        from pdf_utils import detect_redundant_sentences
+        redundancy_issues = detect_redundant_sentences(sections, min_words=20)
+        issues.extend(redundancy_issues)
     except Exception:
         pass
 
