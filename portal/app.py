@@ -226,11 +226,18 @@ def add_security_headers(response):
 grant_researcher = GrantResearcher()
 
 # Database path
-DB_PATH = Path.home() / ".hermes" / "grant-system" / "tracking" / "grants.db"
-OUTPUT_DIR = Path.home() / ".hermes" / "grant-system" / "output"
+from db_connection import LOCAL_DB_PATH as DB_PATH
+if os.environ.get('VERCEL'):
+    OUTPUT_DIR = Path('/tmp/output')
+else:
+    OUTPUT_DIR = Path.home() / ".hermes" / "grant-system" / "output"
 
 # Ensure directories exist
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+try:
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+except OSError:
+    OUTPUT_DIR = Path('/tmp/output')
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Initialize databases (including grants_catalog table + seed migration)
 from grant_db import init_db as _init_grant_db, seed_grants_catalog as _seed_catalog
@@ -1227,8 +1234,11 @@ def api_save_grant():
             return jsonify({'success': False, 'error': 'email_required', 'message': 'Please provide your email to save grants'})
         
         # Save to guest_saves table
-        guest_db = Path.home() / ".hermes" / "grant-system" / "tracking" / "guests.db"
-        guest_db.parent.mkdir(parents=True, exist_ok=True)
+        guest_db = DB_PATH.parent / "guests.db"
+        try:
+            guest_db.parent.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            guest_db = Path('/tmp/guests.db')
         
         conn = sqlite3.connect(str(guest_db))
         conn.execute('''
@@ -1308,8 +1318,14 @@ def api_request_template():
     import json
     from pathlib import Path
     
-    requests_file = Path.home() / ".hermes" / "grant-system" / "data" / "template_requests.json"
-    requests_file.parent.mkdir(parents=True, exist_ok=True)
+    if os.environ.get('VERCEL'):
+        requests_file = Path('/tmp/template_requests.json')
+    else:
+        requests_file = Path.home() / ".hermes" / "grant-system" / "data" / "template_requests.json"
+        try:
+            requests_file.parent.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            requests_file = Path('/tmp/template_requests.json')
     
     # Load existing requests
     if requests_file.exists():
@@ -3085,8 +3101,11 @@ def subscribe():
         return redirect(url_for('index'))
     
     # Save to leads database
-    leads_db = Path.home() / ".hermes" / "grant-system" / "tracking" / "leads.db"
-    leads_db.parent.mkdir(parents=True, exist_ok=True)
+    leads_db = DB_PATH.parent / "leads.db"
+    try:
+        leads_db.parent.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        leads_db = Path('/tmp/leads.db')
     
     conn = sqlite3.connect(str(leads_db))
     conn.execute('''
