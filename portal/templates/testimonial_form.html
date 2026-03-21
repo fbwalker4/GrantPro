@@ -188,6 +188,7 @@
         </div>
 
         <form method="POST" action="/testimonial/{{ match.testimonial_token }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="form-group">
                 <label>Your Rating</label>
                 <div class="star-rating">

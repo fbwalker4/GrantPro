@@ -158,7 +158,11 @@
                     <td><span class="badge badge-amber">{{ grant.template }}</span></td>
                     <td>
                         <button class="btn btn-ghost btn-sm" onclick="editGrant('{{ grant.id }}')">Edit</button>
-                        <a href="/admin/grants/delete?id={{ grant.id }}" class="btn btn-ghost btn-sm" style="color: var(--accent-warning);" onclick="return confirm('Delete this grant?')">Delete</a>
+                        <form method="POST" action="/admin/grants/delete" style="display:inline;" onsubmit="return confirm('Delete this grant?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="id" value="{{ grant.id }}">
+                            <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--accent-warning);">Delete</button>
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}

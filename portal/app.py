@@ -476,6 +476,7 @@ def login():
 
 @app.route('/signup', methods=['GET', 'POST'])
 @csrf_required
+@require_rate_limit('signup', max_requests=5, window=60)
 def signup():
     """Signup page"""
     # Get plan from query string (supports both 'plan' and 'tier' for compatibility)
@@ -680,6 +681,7 @@ def stripe_webhook():
 
 @app.route('/contact', methods=['GET', 'POST'])
 @csrf_required
+@require_rate_limit('contact', max_requests=5, window=60)
 def contact():
     """Contact page for enterprise inquiries"""
     user = get_current_user()
@@ -710,6 +712,7 @@ def logout():
 
 @app.route('/forgot-password', methods=['GET', 'POST'])
 @csrf_required
+@require_rate_limit('forgot_password', max_requests=3, window=60)
 def forgot_password():
     """Forgot password page"""
     if request.method == 'POST':
@@ -1367,11 +1370,12 @@ def grants():
 
 @app.route('/api/save-grant', methods=['POST'])
 @csrf_required_allow_guest
+@require_rate_limit('api_save_grant', max_requests=10, window=60)
 def api_save_grant():
     """Save a grant to favorites - works for logged in users and guest users with email"""
     # CSRF enforced for logged-in users via csrf_required_allow_guest
     # Guests (no user_id in session) skip CSRF since they have no persistent session
-    
+
     data = request.json or {}
     grant_id = data.get('grant_id') or request.form.get('grant_id')
     notes = data.get('notes', '') or request.form.get('notes', '')
@@ -1390,7 +1394,16 @@ def api_save_grant():
         if not email or '@' not in email:
             # Need email to save as guest
             return jsonify({'success': False, 'error': 'email_required', 'message': 'Please provide your email to save grants'})
-        
+
+        # Validate email format more strictly
+        import re
+        if not re.match(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$', email):
+            return jsonify({'success': False, 'error': 'invalid_email', 'message': 'Please provide a valid email address'})
+
+        # Log guest save for monitoring suspicious patterns
+        ip = request.remote_addr or 'unknown'
+        logger.info(f'Guest save: email={email}, grant_id={grant_id}, ip={ip}')
+
         # Save to guest_saves table (main DB on Supabase)
         conn = get_connection()
         try:
@@ -4061,6 +4074,7 @@ def view_template(template_name):
 @app.route('/admin/grants/<action>', methods=['GET', 'POST'])
 @login_required
 @admin_required
+@csrf_required
 def admin_grants(action=None):
     """Admin CMS - manage grants"""
     user = get_current_user()
@@ -4108,8 +4122,8 @@ def admin_grants(action=None):
         flash(f'Grant "{updated_grant["title"]}" updated successfully', 'success')
         return redirect(url_for('admin_grants'))
     
-    if action == 'delete':
-        grant_id = request.args.get('id')
+    if action == 'delete' and request.method == 'POST':
+        grant_id = request.form.get('id')
         grant_researcher.delete_grant(grant_id)
         flash('Grant deleted successfully', 'success')
         return redirect(url_for('admin_grants'))
@@ -4130,6 +4144,7 @@ def admin_grants(action=None):
 @app.route('/admin/templates', methods=['GET', 'POST'])
 @login_required
 @admin_required
+@csrf_required
 def admin_templates():
     """Admin CMS - manage templates"""
     user = get_current_user()
@@ -4217,16 +4232,17 @@ def admin_leads():
     return render_template('admin_leads.html', leads=[dict(l) for l in leads], total=total)
 
 
-@app.route('/admin/leads/delete/<int:lead_id>')
+@app.route('/admin/leads/delete/<int:lead_id>', methods=['POST'])
 @login_required
 @admin_required
+@csrf_required
 def admin_delete_lead(lead_id):
     """Delete a lead"""
     user = get_current_user()
     if not user or user.get('role') != 'admin':
         flash('Admin access required', 'error')
         return redirect(url_for('index'))
-    
+
     try:
         conn = get_connection()
         conn.execute('DELETE FROM leads WHERE id = ?', (lead_id,))
@@ -4261,6 +4277,7 @@ def admin_emails():
 @app.route('/admin/emails/send-test', methods=['POST'])
 @login_required
 @admin_required
+@csrf_required
 def admin_send_test_email():
     """Send a test email"""
     user = get_current_user()
@@ -5310,6 +5327,14 @@ def upload_document(grant_id):
         return redirect(url_for('grant_checklist', grant_id=grant_id))
 
     filename = secure_filename(file.filename)
+
+    # Validate file extension
+    ALLOWED_EXTENSIONS = {'.pdf', '.docx', '.xlsx', '.doc', '.xls', '.png', '.jpg', '.jpeg', '.gif', '.txt', '.csv'}
+    file_ext = os.path.splitext(filename)[1].lower()
+    if file_ext not in ALLOWED_EXTENSIONS:
+        flash(f'File type "{file_ext}" is not allowed. Accepted types: {", ".join(sorted(ALLOWED_EXTENSIONS))}', 'error')
+        return redirect(url_for('grant_checklist', grant_id=grant_id))
+
     file_data = file.read()
 
     user = get_current_user()
@@ -5696,6 +5721,19 @@ def shared_grant_view(token):
                            budget=budget,
                            sharer_name=sharer_name,
                            recipient_name=share['recipient_name'])
+
+
+# ============ ERROR HANDLERS ============
+
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('message.html', title='Page Not Found',
+        message='The page you are looking for does not exist.'), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    return render_template('message.html', title='Server Error',
+        message='Something went wrong. Please try again later.'), 500
 
 
 # ============ MAIN ============

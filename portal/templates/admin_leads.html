@@ -65,7 +65,10 @@
                     <td style="color: var(--text-muted);">{{ lead.created_at[:19] if lead.created_at else '-' }}</td>
                     <td>
                         <a href="mailto:{{ lead.email }}" class="btn btn-ghost btn-sm" aria-label="Send email to {{ lead.email }}">✉️ Email</a>
-                        <a href="/admin/leads/delete/{{ lead.id }}" class="btn btn-ghost btn-sm" style="color: var(--accent-warning);" onclick="return confirm('Delete this lead?')">Delete</a>
+                        <form method="POST" action="/admin/leads/delete/{{ lead.id }}" style="display:inline;" onsubmit="return confirm('Delete this lead?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--accent-warning);">Delete</button>
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}
