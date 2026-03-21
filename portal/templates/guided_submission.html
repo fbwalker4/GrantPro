@@ -505,8 +505,8 @@
                 <p style="font-size: 0.8rem; margin: 0 0 0.5rem 0; opacity: 0.8;">
                     Open the grant portal in another tab:
                 </p>
-                <a href="https://www.grants.gov" target="_blank" rel="noopener noreferrer" class="open-portal-btn" style="margin-top: 0.5rem; display: inline-flex;">
-                    🌐 Open Grants.gov
+                <a href="{{ submission_portal.url|default('https://www.grants.gov') }}" target="_blank" rel="noopener noreferrer" class="open-portal-btn" style="margin-top: 0.5rem; display: inline-flex;">
+                    🌐 Open {{ submission_portal.name|default('Grants.gov') }}
                 </a>
             </div>
         </div>
@@ -532,14 +532,14 @@
             <div class="instructions">
                 <h4>📌 How This Works</h4>
                 <ol>
-                    <li>Open the grant portal (Grants.gov, etc.) in another browser tab</li>
+                    <li>Open {{ submission_portal.name|default('the grant portal') }} in another browser tab</li>
                     <li>Click "Copy" on each section below and paste into the corresponding field in the portal</li>
                     <li>Or download the DOCX/PDF and upload it if the portal accepts file uploads</li>
                     <li>Follow the guidance provided for each section</li>
                 </ol>
                 <div style="margin-top: 0.75rem;">
-                    <a href="https://www.grants.gov" target="_blank" rel="noopener noreferrer" class="open-portal-btn">
-                        🌐 Open Grants.gov
+                    <a href="{{ submission_portal.url|default('https://www.grants.gov') }}" target="_blank" rel="noopener noreferrer" class="open-portal-btn">
+                        🌐 Open {{ submission_portal.name|default('Grants.gov') }}
                     </a>
                 </div>
             </div>

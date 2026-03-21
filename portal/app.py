@@ -3380,10 +3380,23 @@ def guided_submission(grant_id):
             {'id': 'timeline', 'name': 'Timeline'}
         ]
     
-    return render_template('guided_submission.html', 
-                         grant=grant, 
+    # Load submission portal info from template
+    submission_portal = {'name': 'Grants.gov', 'url': 'https://www.grants.gov', 'notes': ''}
+    try:
+        with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates', 'agency_templates.json')) as tf:
+            _tdata = json.load(tf)
+        _tmpl = _tdata.get('agencies', {}).get(template_name, {})
+        portal_data = _tmpl.get('submission_portal', {})
+        if portal_data and portal_data.get('name'):
+            submission_portal = portal_data
+    except Exception:
+        pass
+
+    return render_template('guided_submission.html',
+                         grant=grant,
                          drafts=drafts,
-                         template_sections=template_sections)
+                         template_sections=template_sections,
+                         submission_portal=submission_portal)
 
 @app.route('/grant/<grant_id>/mark-submitted', methods=['GET', 'POST'])
 @login_required
