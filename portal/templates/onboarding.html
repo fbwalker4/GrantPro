@@ -478,41 +478,75 @@
             <form method="POST" action="/onboarding" role="form" aria-label="Organization profile">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 
+                <!-- Section 0: Organization Identity (Required) -->
+                <div class="card" style="border: 1px solid rgba(37, 99, 235, 0.3);">
+                    <h2 class="card-title">
+                        <span class="card-icon">🏢</span>
+                        Organization Identity <span style="color: var(--accent-danger); font-size: 0.8rem; font-weight: 400;">* Required</span>
+                    </h2>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="organization_name">Organization Name <span style="color: var(--accent-danger);">*</span></label>
+                            <input type="text" id="organization_name" name="organization_name" class="form-input"
+                                   placeholder="Your Organization Name" required
+                                   value="{{ user.organization_name or '' }}">
+                            <p class="form-hint">Required — used in every grant application.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="organization_type">Organization Type <span style="color: var(--accent-danger);">*</span></label>
+                            <select id="organization_type" name="organization_type" class="form-select" required>
+                                <option value="">Select...</option>
+                                <option value="nonprofit" {% if org_profile.organization_type == 'nonprofit' %}selected{% endif %}>Nonprofit / 501(c)(3)</option>
+                                <option value="small_business" {% if org_profile.organization_type == 'small_business' %}selected{% endif %}>Small Business</option>
+                                <option value="government" {% if org_profile.organization_type == 'government' %}selected{% endif %}>Government / Public Entity</option>
+                                <option value="university" {% if org_profile.organization_type == 'university' %}selected{% endif %}>University / Educational Institution</option>
+                                <option value="tribal" {% if org_profile.organization_type == 'tribal' %}selected{% endif %}>Tribal Organization</option>
+                                <option value="individual" {% if org_profile.organization_type == 'individual' %}selected{% endif %}>Individual / Artist</option>
+                                <option value="other" {% if org_profile.organization_type == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                            <p class="form-hint">Required — used in every grant application.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Section 1: Federal Identifiers -->
                 <div class="card">
                     <h2 class="card-title">
                         <span class="card-icon">🏛️</span>
                         Federal Identifiers
                     </h2>
-                    
+                    <p class="form-hint" style="margin-bottom: 1rem;">Skip for now — you can add this later from your profile.</p>
+
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label" for="ein">EIN (Employer Identification Number)</label>
-                            <input type="text" id="ein" name="ein" class="form-input" 
-                                   placeholder="XX-XXXXXXX" 
+                            <input type="text" id="ein" name="ein" class="form-input"
+                                   placeholder="XX-XXXXXXX"
                                    value="{{ org_details.ein or '' }}">
                             <p class="form-hint">
-                                Required for most federal grants. 
+                                Required on every federal grant form (SF-424). Enter once, auto-filled on all applications.
                                 <a href="https://www.irs.gov/ein" target="_blank">Get one free from the IRS →</a>
                             </p>
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label" for="uei">UEI (Unique Entity ID) <span class="optional">(Recommended)</span></label>
-                            <input type="text" id="uei" name="uei" class="form-input" 
-                                   placeholder="XXXXXXXXXX" 
+                            <input type="text" id="uei" name="uei" class="form-input"
+                                   placeholder="XXXXXXXXXX"
                                    value="{{ org_details.uei or '' }}">
                             <p class="form-hint">
-                                Required for federal grants. 
+                                Mandatory for all federal grants since April 2022. Without this, you cannot submit.
                                 <a href="https://www.sam.gov" target="_blank">Register at SAM.gov →</a> (replaces DUNS)
                             </p>
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="form-label" for="duns">DUNS Number <span class="optional">(Deprecated - UEI preferred)</span></label>
-                        <input type="text" id="duns" name="duns" class="form-input" 
-                               placeholder="XX-XXX-XXXX" 
+                        <input type="text" id="duns" name="duns" class="form-input"
+                               placeholder="XX-XXX-XXXX"
                                value="{{ org_details.duns or '' }}">
                         <p class="form-hint">
                             DUNS numbers are no longer required for federal grants. UEI has replaced it.
@@ -526,7 +560,8 @@
                         <span class="card-icon">📍</span>
                         Contact Information
                     </h2>
-                    
+                    <p class="form-hint" style="margin-bottom: 1rem;">Required on SF-424 and most agency forms. Skip for now — you can add this later from your profile.</p>
+
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label" for="address_line1">Street Address</label>
@@ -639,44 +674,23 @@
                         <span class="card-icon">📊</span>
                         Organization Profile
                     </h2>
-                    
+                    <p class="form-hint" style="margin-bottom: 1rem;">Skip for now — you can add this later from your profile.</p>
+
+                    <div class="form-group">
+                        <label class="form-label" for="mission_statement">Mission Statement</label>
+                        <textarea id="mission_statement" name="mission_statement" class="form-textarea"
+                                  placeholder="Describe your organization's mission and purpose...">{{ org_profile.mission_statement or '' }}</textarea>
+                        <p class="form-hint">Feeds our AI to generate compelling project narratives specific to your organization.</p>
+                    </div>
+
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label" for="organization_type">Organization Type</label>
-                            <select id="organization_type" name="organization_type" class="form-select">
-                                <option value="">Select...</option>
-                                <option value="nonprofit" {% if org_profile.organization_type == 'nonprofit' %}selected{% endif %}>Nonprofit / 501(c)(3)</option>
-                                <option value="small_business" {% if org_profile.organization_type == 'small_business' %}selected{% endif %}>Small Business</option>
-                                <option value="government" {% if org_profile.organization_type == 'government' %}selected{% endif %}>Government / Public Entity</option>
-                                <option value="university" {% if org_profile.organization_type == 'university' %}selected{% endif %}>University / Educational Institution</option>
-                                <option value="tribal" {% if org_profile.organization_type == 'tribal' %}selected{% endif %}>Tribal Organization</option>
-                                <option value="individual" {% if org_profile.organization_type == 'individual' %}selected{% endif %}>Individual / Artist</option>
-                                <option value="other" {% if org_profile.organization_type == 'other' %}selected{% endif %}>Other</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
                             <label class="form-label" for="year_founded">Year Founded</label>
-                            <input type="number" id="year_founded" name="year_founded" class="form-input" 
+                            <input type="number" id="year_founded" name="year_founded" class="form-input"
                                    placeholder="2000" min="1800" max="2030"
                                    value="{{ org_profile.year_founded or '' }}">
                         </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label" for="annual_revenue">Annual Revenue/ Budget</label>
-                            <select id="annual_revenue" name="annual_revenue" class="form-select">
-                                <option value="">Select...</option>
-                                <option value="under_50k" {% if org_profile.annual_revenue == 'under_50k' %}selected{% endif %}>Under $50,000</option>
-                                <option value="50k_250k" {% if org_profile.annual_revenue == '50k_250k' %}selected{% endif %}>$50,000 - $250,000</option>
-                                <option value="250k_1m" {% if org_profile.annual_revenue == '250k_1m' %}selected{% endif %}>$250,000 - $1 million</option>
-                                <option value="1m_5m" {% if org_profile.annual_revenue == '1m_5m' %}selected{% endif %}>$1 million - $5 million</option>
-                                <option value="5m_10m" {% if org_profile.annual_revenue == '5m_10m' %}selected{% endif %}>$5 million - $10 million</option>
-                                <option value="over_10m" {% if org_profile.annual_revenue == 'over_10m' %}selected{% endif %}>Over $10 million</option>
-                            </select>
-                        </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label" for="employees">Number of Employees</label>
                             <select id="employees" name="employees" class="form-select">
@@ -691,6 +705,29 @@
                             </select>
                         </div>
                     </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="annual_revenue">Annual Revenue / Budget</label>
+                            <select id="annual_revenue" name="annual_revenue" class="form-select">
+                                <option value="">Select...</option>
+                                <option value="under_50k" {% if org_profile.annual_revenue == 'under_50k' %}selected{% endif %}>Under $50,000</option>
+                                <option value="50k_250k" {% if org_profile.annual_revenue == '50k_250k' %}selected{% endif %}>$50,000 - $250,000</option>
+                                <option value="250k_1m" {% if org_profile.annual_revenue == '250k_1m' %}selected{% endif %}>$250,000 - $1 million</option>
+                                <option value="1m_5m" {% if org_profile.annual_revenue == '1m_5m' %}selected{% endif %}>$1 million - $5 million</option>
+                                <option value="5m_10m" {% if org_profile.annual_revenue == '5m_10m' %}selected{% endif %}>$5 million - $10 million</option>
+                                <option value="over_10m" {% if org_profile.annual_revenue == 'over_10m' %}selected{% endif %}>Over $10 million</option>
+                            </select>
+                            <p class="form-hint">Helps AI generate realistic budget narratives. Agencies evaluate fiscal capacity.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="programs_description">Key Programs / Services</label>
+                            <textarea id="programs_description" name="programs_description" class="form-textarea"
+                                      placeholder="Describe your main programs, services, or products...">{{ org_profile.programs_description or '' }}</textarea>
+                            <p class="form-hint">The more specific you are, the better our grant matching and eligibility scoring.</p>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Section 4: Mission & Focus Areas -->
@@ -699,9 +736,10 @@
                         <span class="card-icon">🎯</span>
                         Who Do You Serve?
                     </h2>
-                    <p class="form-hint" style="margin-bottom: 1rem;">
+                    <p class="form-hint" style="margin-bottom: 0.5rem;">
                         Select the populations or areas your organization focuses on. This helps us find grants that match your mission.
                     </p>
+                    <p class="form-hint" style="margin-bottom: 1rem;">The more specific you are, the better our grant matching and eligibility scoring. Skip for now — you can add this later from your profile.</p>
                     
                     <div class="checkbox-group">
                         <div class="checkbox-item">
@@ -762,7 +800,7 @@
                         Past Grant Experience <span class="optional">(Optional)</span>
                     </h2>
                     <p class="form-hint" style="margin-bottom: 1rem;">
-                        List any grants you've received in the past. This helps us highlight similar opportunities.
+                        Demonstrates track record to agencies. AI uses this to write capacity statements. Skip for now — you can add this later from your profile.
                     </p>
                     
                     <div id="past-grants-container">

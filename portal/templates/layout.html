@@ -712,7 +712,7 @@
             
             <nav class="nav-section" aria-label="Manage">
                 <div class="nav-section-title">Manage</div>
-                {% if user and user.plan in ['monthly', 'annual', 'enterprise'] %}
+                {% if user and user.plan in ['monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_unlimited'] %}
                 <a href="/clients" class="nav-link {% if request.path.startswith('/client') %}active{% endif %}">
                     <span class="nav-link-icon">👥</span>
                     Clients

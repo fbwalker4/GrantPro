@@ -125,8 +125,20 @@ def init_user_db():
         year_founded INTEGER,
         employees TEXT,
         organization_type TEXT,
+        mission_statement TEXT,
+        programs_description TEXT,
         FOREIGN KEY (user_id) REFERENCES users(id)
     )''')
+
+    # Migrate existing tables: add mission_statement and programs_description if missing
+    try:
+        c.execute('ALTER TABLE organization_profile ADD COLUMN mission_statement TEXT')
+    except Exception:
+        pass
+    try:
+        c.execute('ALTER TABLE organization_profile ADD COLUMN programs_description TEXT')
+    except Exception:
+        pass
     
     # Mission and focus areas - who do you serve
     c.execute('''CREATE TABLE IF NOT EXISTS mission_focus (
@@ -196,10 +208,12 @@ def create_user(email, password, first_name=None, last_name=None, organization_n
     
     # Set limits based on plan
     plan_limits = {
-        'free': (0, 0),           # Free: search only, no grants
-        'monthly': (3, 19.95),   # Monthly: 3 grants, $19.95/mo
-        'annual': (3, 199),      # Annual: 3 grants, $199/yr
-        'enterprise': (999, 0),   # Enterprise: unlimited, custom pricing
+        'free': (0, 0),                    # Free: search only, no grants
+        'monthly': (3, 19.95),            # Monthly: 3 grants, $19.95/mo
+        'annual': (3, 199),               # Annual: 3 grants, $199/yr
+        'enterprise_5': (999, 44.95),     # Enterprise 5: unlimited grants, 5 clients
+        'enterprise_10': (999, 74.95),    # Enterprise 10: unlimited grants, 10 clients
+        'enterprise_unlimited': (999, 99.95),  # Enterprise Unlimited: unlimited everything
     }
     
     max_grants = plan_limits.get(plan, (0, 0))[0]
@@ -254,10 +268,12 @@ def update_user_plan(user_id, plan, stripe_customer_id=None, stripe_subscription
     
     # Set limits based on plan
     plan_limits = {
-        'free': (0, 'inactive'),           # Free: search only, no grants
-        'monthly': (3, 'active'),          # Monthly: 3 grants/mo, $19.95
-        'annual': (3, 'active'),           # Annual: 3 grants/mo, $199/yr
-        'enterprise': (999, 'active'),     # Enterprise: unlimited
+        'free': (0, 'inactive'),                    # Free: search only, no grants
+        'monthly': (3, 'active'),                   # Monthly: 3 grants/mo, $19.95
+        'annual': (3, 'active'),                    # Annual: 3 grants/mo, $199/yr
+        'enterprise_5': (999, 'active'),            # Enterprise 5: unlimited, 5 clients
+        'enterprise_10': (999, 'active'),           # Enterprise 10: unlimited, 10 clients
+        'enterprise_unlimited': (999, 'active'),    # Enterprise Unlimited
     }
     
     max_grants, sub_status = plan_limits.get(plan, (0, 'inactive'))
@@ -548,8 +564,8 @@ def check_grant_limit(user_id):
     if plan == 'free' or max_allowed == 0:
         return False, "Upgrade to submit grant applications. Free tier is for research only.", 0
     
-    # Enterprise/team plan = unlimited
-    if plan == 'enterprise':
+    # Enterprise plans = unlimited grants
+    if plan in ('enterprise_5', 'enterprise_10', 'enterprise_unlimited'):
         return True, "Unlimited grants", 999
     
     remaining = max_allowed - used
@@ -602,6 +618,21 @@ def get_user_plan(user_id):
     }
 
 
+def get_client_limit(plan):
+    """Return the maximum number of client agencies allowed for a plan.
+    Returns: 0 for free, 1 for monthly/annual, 5/10/None for enterprise tiers.
+    None means unlimited."""
+    limits = {
+        'free': 0,
+        'monthly': 1,
+        'annual': 1,
+        'enterprise_5': 5,
+        'enterprise_10': 10,
+        'enterprise_unlimited': None,  # Unlimited
+    }
+    return limits.get(plan, 0)
+
+
 if __name__ == '__main__':
     init_user_db()
     print("User database initialized")
@@ -630,7 +661,10 @@ def get_organization_details(user_id):
     
     org_profile = None
     if row:
-        org_profile = dict(zip(['user_id', 'annual_revenue', 'year_founded', 'employees', 'organization_type'], row))
+        cols = ['user_id', 'annual_revenue', 'year_founded', 'employees', 'organization_type',
+                'mission_statement', 'programs_description']
+        # Handle DBs that may not have new columns yet
+        org_profile = dict(zip(cols[:len(row)], row))
     
     # Get focus areas
     c.execute('SELECT focus_area FROM mission_focus WHERE user_id = ?', (user_id,))
@@ -689,12 +723,14 @@ def save_organization_details(user_id, data):
                 now, now))
     
     # Save organization profile
-    c.execute('''INSERT OR REPLACE INTO organization_profile 
-                 (user_id, annual_revenue, year_founded, employees, organization_type)
-                 VALUES (?, ?, ?, ?, ?)''',
-               (user_id, 
+    c.execute('''INSERT OR REPLACE INTO organization_profile
+                 (user_id, annual_revenue, year_founded, employees, organization_type,
+                  mission_statement, programs_description)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)''',
+               (user_id,
                 org_profile.get('annual_revenue'), org_profile.get('year_founded'),
-                org_profile.get('employees'), org_profile.get('organization_type')))
+                org_profile.get('employees'), org_profile.get('organization_type'),
+                org_profile.get('mission_statement'), org_profile.get('programs_description')))
     
     # Clear and re-insert focus areas
     c.execute('DELETE FROM mission_focus WHERE user_id = ?', (user_id,))

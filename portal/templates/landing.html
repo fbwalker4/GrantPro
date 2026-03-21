@@ -867,7 +867,7 @@
                 <a href="/signup?tier=free" class="btn btn-secondary">Explore Free</a>
             </div>
             <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
-                Search 131+ federal grants free • AI writing + guided submission from $19.95/mo • Cancel anytime
+                Search {{ grants_count|default('thousands of') }}+ federal grants free &bull; AI writing + guided submission from $19.95/mo &bull; Cancel anytime
             </p>
         </div>
     </section>
@@ -1215,20 +1215,49 @@
                     <a href="/signup?tier=monthly" class="btn btn-secondary">Start Monthly</a>
                 </div>
                 
-                <div class="pricing-card" style="border: 2px solid var(--accent-primary); background: linear-gradient(180deg, #f8f9ff 0%, #ffffff 100%);">
-                    <h3>Enterprise</h3>
-                    <div class="price">Custom<span></span></div>
-                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">For agencies & consultants</p>
+                <div class="pricing-card">
+                    <h3>Enterprise 5</h3>
+                    <div class="price">$44.95<span>/month</span></div>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">Up to 5 client agencies</p>
                     <ul>
                         <li>Unlimited grant submissions</li>
+                        <li>Manage up to 5 clients</li>
+                        <li>Client management tools</li>
+                        <li>All templates included</li>
+                        <li>Priority support</li>
+                    </ul>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; margin: 1rem 0;">Write grants for your clients</p>
+                    <a href="/signup?tier=enterprise_5" class="btn btn-secondary">Start Enterprise 5</a>
+                </div>
+
+                <div class="pricing-card" style="border: 2px solid var(--accent-primary); background: linear-gradient(180deg, #f8f9ff 0%, #ffffff 100%);">
+                    <h3>Enterprise 10</h3>
+                    <div class="price">$74.95<span>/month</span></div>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">Up to 10 client agencies</p>
+                    <ul>
+                        <li>Unlimited grant submissions</li>
+                        <li>Manage up to 10 clients</li>
+                        <li>White-label options</li>
+                        <li>All templates included</li>
+                        <li>Priority support</li>
+                    </ul>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; margin: 1rem 0;">Most popular for consultants</p>
+                    <a href="/signup?tier=enterprise_10" class="btn btn-primary">Start Enterprise 10</a>
+                </div>
+
+                <div class="pricing-card">
+                    <h3>Enterprise Unlimited</h3>
+                    <div class="price">$99.95<span>/month</span></div>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">Unlimited client agencies</p>
+                    <ul>
+                        <li>Unlimited grant submissions</li>
+                        <li>Unlimited client agencies</li>
                         <li>White-label options</li>
                         <li>API access</li>
-                        <li>Dedicated account manager</li>
-                        <li>Custom integrations</li>
-                        <li>Team collaboration</li>
+                        <li>Priority support</li>
                     </ul>
-                    <p style="color: var(--text-muted); font-size: 0.8rem; margin: 1rem 0;">Use for your clients (resale permitted)</p>
-                    <a href="/contact?type=enterprise" class="btn btn-primary">Contact Us</a>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; margin: 1rem 0;">For large consulting firms</p>
+                    <a href="/signup?tier=enterprise_unlimited" class="btn btn-secondary">Start Unlimited</a>
                 </div>
             </div>
             
@@ -1252,7 +1281,7 @@
                 <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem; text-align: center;">
                     <strong style="color: #fca5a5;">Anti-Reseller Policy:</strong> 
                     Base plans (Monthly/Annual) are for your organization's grants only. 
-                    Enterprise plan required if using for clients. All grants submitted in account holder's name.
+                    Enterprise plan required if writing grants for clients. All grants submitted in account holder's name.
                 </p>
             </div>
         </div>

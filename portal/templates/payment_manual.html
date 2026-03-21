@@ -40,8 +40,12 @@
                 <p><strong>Price:</strong> $19.95/month</p>
                 {% elif plan == 'annual' %}
                 <p><strong>Price:</strong> $199/year</p>
-                {% elif plan == 'enterprise' %}
-                <p><strong>Price:</strong> Custom pricing</p>
+                {% elif plan == 'enterprise_5' %}
+                <p><strong>Price:</strong> $44.95/month (up to 5 clients)</p>
+                {% elif plan == 'enterprise_10' %}
+                <p><strong>Price:</strong> $74.95/month (up to 10 clients)</p>
+                {% elif plan == 'enterprise_unlimited' %}
+                <p><strong>Price:</strong> $99.95/month (unlimited clients)</p>
                 {% endif %}
             </div>
             

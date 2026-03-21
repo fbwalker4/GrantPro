@@ -232,7 +232,7 @@
         {% if plan == 'free' %}
         <div class="plan-banner" style="background: #1e293b; border: 1px solid #334155;">
             <h3 style="color: #e2e8f0;">Free Tier Selected</h3>
-            <p style="color: #94a3b8;">Search 131 grants for free. No credit card required. Upgrades available after signup.</p>
+            <p style="color: #94a3b8;">Search {{ grants_count|default('thousands of') }} grants for free. No credit card required. Upgrades available after signup.</p>
         </div>
         {% elif plan == 'monthly' %}
         <div class="plan-banner" style="background: #1e3a5f; border: 1px solid #3b82f6;">
@@ -244,10 +244,20 @@
             <h3 style="color: #4ade80;">Annual Plan - $199.95/yr</h3>
             <p style="color: #86efac;">Save $39.45/year. 3 grants/month. Best value!</p>
         </div>
-        {% elif plan == 'enterprise' %}
+        {% elif plan == 'enterprise_5' %}
         <div class="plan-banner" style="background: #1e3a5f; border: 1px solid #2d5a87;">
-            <h3 style="color: #60a5fa;">Enterprise Plan</h3>
-            <p style="color: #93c5fd;">Unlimited submissions. White-label. For agencies & consultants.</p>
+            <h3 style="color: #60a5fa;">Enterprise 5 - $44.95/mo</h3>
+            <p style="color: #93c5fd;">Unlimited grants. Up to 5 client agencies.</p>
+        </div>
+        {% elif plan == 'enterprise_10' %}
+        <div class="plan-banner" style="background: #1e3a5f; border: 1px solid #3b82f6;">
+            <h3 style="color: #60a5fa;">Enterprise 10 - $74.95/mo</h3>
+            <p style="color: #93c5fd;">Unlimited grants. Up to 10 client agencies.</p>
+        </div>
+        {% elif plan == 'enterprise_unlimited' %}
+        <div class="plan-banner" style="background: #14532d; border: 1px solid #22c55e;">
+            <h3 style="color: #4ade80;">Enterprise Unlimited - $99.95/mo</h3>
+            <p style="color: #86efac;">Unlimited grants. Unlimited client agencies.</p>
         </div>
         {% endif %}
         

@@ -58,7 +58,7 @@
         <div class="faq-answer">
             <p>After signing up, you can:</p>
             <ul>
-                <li>Search and filter through 130+ federal grants</li>
+                <li>Search and filter through {{ grants_count|default('thousands of') }}+ federal grants</li>
                 <li>Use the Grant Finder Wizard to find matching grants</li>
                 <li>Check eligibility for specific grants</li>
                 <li>Save grants to your favorites</li>
@@ -94,7 +94,7 @@
     <div class="faq-item">
         <div class="faq-question">What grants are available?</div>
         <div class="faq-answer">
-            <p>We have 130+ grants from federal agencies including:</p>
+            <p>We have {{ grants_count|default('thousands of') }}+ grants from federal agencies including:</p>
             <ul>
                 <li><strong>NSF</strong> - National Science Foundation (research, education)</li>
                 <li><strong>DOE</strong> - Department of Energy (energy, technology)</li>
@@ -215,7 +215,7 @@
     <div class="faq-item">
         <div class="faq-question">Is there a free tier?</div>
         <div class="faq-answer">
-            <p>Yes! Sign up for free to search 131+ federal grants, check eligibility, and use the Grant Finder Wizard. Upgrade when you're ready to start writing and submitting applications.</p>
+            <p>Yes! Sign up for free to search {{ grants_count|default('thousands of') }}+ federal grants, check eligibility, and use the Grant Finder Wizard. Upgrade when you're ready to start writing and submitting applications.</p>
         </div>
     </div>
 

@@ -130,16 +130,57 @@
             </div>
         </div>
         
-        <div class="plan" style="max-width: 600px; margin: 2rem auto;">
-            <div class="plan-name">Enterprise</div>
-            <p class="plan-desc">For agencies and consultants writing grants for clients.</p>
-            <ul class="plan-features">
-                <li>Unlimited grant submissions</li>
-                <li>Client management tools</li>
-                <li>White-label options</li>
-                <li>API access</li>
-            </ul>
-            <a href="/contact?type=enterprise" class="btn btn-outline">Contact for Custom Pricing</a>
+        <div style="text-align: center; margin: 2rem 0 1rem;">
+            <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem;">Enterprise Plans</h2>
+            <p style="color: var(--gray); max-width: 600px; margin: 0 auto;">Basic plans are for your own organization. Enterprise plans let you write grants for multiple client agencies.</p>
+        </div>
+
+        <div class="pricing-grid" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="plan">
+                <div class="plan-name">Enterprise 5</div>
+                <div class="plan-price">$44.95 <span>/month</span></div>
+                <p class="plan-desc">Up to 5 client agencies</p>
+                <ul class="plan-features">
+                    <li>Unlimited grant submissions</li>
+                    <li>Manage up to 5 client agencies</li>
+                    <li>Client management tools</li>
+                    <li>All templates included</li>
+                    <li>Priority support</li>
+                </ul>
+                <a href="/signup?plan=enterprise_5" class="btn btn-primary">Get Started</a>
+            </div>
+
+            <div class="plan featured">
+                <div class="plan-badge">Most Popular</div>
+                <div class="plan-name">Enterprise 10</div>
+                <div class="plan-price">$74.95 <span>/month</span></div>
+                <p class="plan-desc">Up to 10 client agencies</p>
+                <ul class="plan-features">
+                    <li>Unlimited grant submissions</li>
+                    <li>Manage up to 10 client agencies</li>
+                    <li>Client management tools</li>
+                    <li>All templates included</li>
+                    <li>Priority support</li>
+                    <li>White-label options</li>
+                </ul>
+                <a href="/signup?plan=enterprise_10" class="btn btn-primary">Get Started</a>
+            </div>
+
+            <div class="plan">
+                <div class="plan-name">Enterprise Unlimited</div>
+                <div class="plan-price">$99.95 <span>/month</span></div>
+                <p class="plan-desc">Unlimited client agencies</p>
+                <ul class="plan-features">
+                    <li>Unlimited grant submissions</li>
+                    <li>Unlimited client agencies</li>
+                    <li>Client management tools</li>
+                    <li>All templates included</li>
+                    <li>Priority support</li>
+                    <li>White-label options</li>
+                    <li>API access</li>
+                </ul>
+                <a href="/signup?plan=enterprise_unlimited" class="btn btn-primary">Get Started</a>
+            </div>
         </div>
         
         <div class="faq">
@@ -157,7 +198,7 @@
             
             <div class="faq-item">
                 <h3>What grants are in your database?</h3>
-                <p>We cover federal grants from Grants.gov, plus state programs and private foundations. Currently 131+ active opportunities with new grants added weekly.</p>
+                <p>We cover federal grants from Grants.gov, plus state programs and private foundations. Currently {{ grants_count|default('thousands of') }}+ active opportunities with new grants added weekly.</p>
             </div>
             
             <div class="faq-item">

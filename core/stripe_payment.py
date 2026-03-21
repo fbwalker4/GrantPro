@@ -25,18 +25,35 @@ PLAN_PRICING = {
         'amount': 19.95,
         'interval': 'month',
         'grants': 3,
+        'client_limit': 1,
     },
     'annual': {
         'stripe_price_id_annual': os.getenv('STRIPE_ANNUAL_PRICE_ID', 'price_annual_placeholder'),
         'amount': 199.00,
         'interval': 'year',
         'grants': 3,
+        'client_limit': 1,
     },
-    'enterprise': {
-        'stripe_price_id_enterprise': os.getenv('STRIPE_ENTERPRISE_PRICE_ID', 'price_enterprise_placeholder'),
-        'amount': 0,  # Custom pricing
-        'interval': 'year',
+    'enterprise_5': {
+        'stripe_price_id_enterprise_5': os.getenv('STRIPE_ENTERPRISE_5_PRICE_ID', 'price_enterprise_5_placeholder'),
+        'amount': 44.95,
+        'interval': 'month',
         'grants': 999,
+        'client_limit': 5,
+    },
+    'enterprise_10': {
+        'stripe_price_id_enterprise_10': os.getenv('STRIPE_ENTERPRISE_10_PRICE_ID', 'price_enterprise_10_placeholder'),
+        'amount': 74.95,
+        'interval': 'month',
+        'grants': 999,
+        'client_limit': 10,
+    },
+    'enterprise_unlimited': {
+        'stripe_price_id_enterprise_unlimited': os.getenv('STRIPE_ENTERPRISE_UNLIMITED_PRICE_ID', 'price_enterprise_unlimited_placeholder'),
+        'amount': 99.95,
+        'interval': 'month',
+        'grants': 999,
+        'client_limit': None,  # Unlimited
     }
 }
 

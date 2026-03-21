@@ -17,17 +17,35 @@
 </div>
 {% endif %}
 
-<!-- Onboarding Prompt - Show if not completed -->
-{% if not user.onboarding_completed or user.onboarding_completed == 0 %}
-<div style="background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.3); border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-    <div style="display: flex; align-items: center; gap: 1rem;">
-        <span style="font-size: 1.5rem;">📋</span>
-        <div>
-            <strong>Complete Your Profile for Better Matches</strong>
-            <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">Save your EIN, address, mission area, and organization details once — we'll auto-fill every grant application. More grants become available with proper identifiers.</p>
+<!-- Profile Completion Progress Bar -->
+{% if profile_pct is defined and profile_pct < 100 %}
+<div style="background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.3); border-radius: 8px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span style="font-size: 1.5rem;">📋</span>
+            <div>
+                <strong>Your profile is {{ profile_pct }}% complete</strong>
+                <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">
+                    {% if profile_pct < 30 %}
+                        A complete profile unlocks better grant matches and auto-fills every application.
+                    {% elif profile_pct < 70 %}
+                        Great start! Fill in a few more fields to improve your grant matching.
+                    {% else %}
+                        Almost there! Just a few more details to maximize your grant eligibility.
+                    {% endif %}
+                </p>
+            </div>
         </div>
+        <a href="/onboarding" class="btn btn-primary" style="background: #2563eb; white-space: nowrap;" aria-label="Continue filling out your organization profile">Continue Profile →</a>
     </div>
-    <a href="/onboarding" class="btn btn-primary" style="background: #2563eb; white-space: nowrap;" aria-label="Complete your organization profile">Complete Profile →</a>
+    <div style="background: var(--bg-tertiary); border-radius: 4px; height: 8px; overflow: hidden;">
+        <div style="background: linear-gradient(90deg, #2563eb, #3b82f6); height: 100%; width: {{ profile_pct }}%; border-radius: 4px; transition: width 0.5s ease;"></div>
+    </div>
+    {% if profile_missing %}
+    <p style="margin: 0.5rem 0 0; font-size: 0.8rem; color: var(--text-muted);">
+        Missing: {{ profile_missing[:4]|join(', ') }}{% if profile_missing|length > 4 %} and {{ profile_missing|length - 4 }} more{% endif %}
+    </p>
+    {% endif %}
 </div>
 {% endif %}
 

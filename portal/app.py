@@ -226,6 +226,11 @@ OUTPUT_DIR = Path.home() / ".hermes" / "grant-system" / "output"
 # Ensure directories exist
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
+# Initialize databases (including grants_catalog table + seed migration)
+from grant_db import init_db as _init_grant_db, seed_grants_catalog as _seed_catalog
+_init_grant_db()
+_seed_catalog()
+
 # Initialize user database
 user_models.init_user_db()
 
@@ -257,7 +262,7 @@ def paid_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         user = get_current_user()
-        if not user or user.get('plan') not in ('monthly', 'annual', 'enterprise'):
+        if not user or user.get('plan') not in ('monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_unlimited'):
             flash('This feature requires a paid plan. Upgrade to get started.', 'info')
             return redirect(url_for('upgrade'))
         return f(*args, **kwargs)
@@ -333,6 +338,12 @@ def before_request():
 def inject_user():
     """Make user available in all templates"""
     return dict(user=getattr(g, 'user', None))
+
+
+@app.context_processor
+def inject_grants_count():
+    """Make grants_count available in all templates"""
+    return dict(grants_count=grant_researcher.get_grants_count())
 
 
 # ============ PUBLIC ROUTES ============
@@ -430,7 +441,9 @@ def signup():
         'free': 'free',
         'monthly': 'monthly',
         'annual': 'annual',
-        'enterprise': 'enterprise',
+        'enterprise_5': 'enterprise_5',
+        'enterprise_10': 'enterprise_10',
+        'enterprise_unlimited': 'enterprise_unlimited',
     }
     plan = tier_mapping.get(plan, 'free')
     
@@ -466,7 +479,7 @@ def signup():
         else:
             logger.info(f'New user registered: {email} (plan: {selected_plan})')
             # If they selected a paid plan, redirect to payment
-            if selected_plan in ['monthly', 'annual']:
+            if selected_plan in ['monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_unlimited']:
                 session['user_id'] = user_id
                 session['selected_plan'] = selected_plan
                 return redirect(url_for('payment_checkout'))
@@ -488,16 +501,12 @@ def upgrade():
     user = user_models.get_user_by_id(session['user_id'])
     
     # If already on paid plan, redirect to dashboard
-    if user.get('plan') in ['monthly', 'annual', 'enterprise']:
+    if user.get('plan') in ['monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_unlimited']:
         flash('You are already on a paid plan!', 'info')
         return redirect(url_for('dashboard'))
     
     if request.method == 'POST':
         selected_plan = request.form.get('plan', 'monthly')
-        
-        # If enterprise, redirect to contact page
-        if selected_plan == 'enterprise':
-            return redirect(url_for('contact'))
         
         # Redirect to payment checkout
         session['selected_plan'] = selected_plan
@@ -690,6 +699,42 @@ def reset_password(token):
     return render_template('reset_password.html', token=token)
 
 
+# ============ PROFILE COMPLETION ============
+
+def calculate_profile_completion(user):
+    """Calculate profile completion percentage based on which fields are filled.
+    Returns (percentage, list_of_missing_field_labels).
+    """
+    org_data = user_models.get_organization_details(user['id'])
+    org_details = org_data.get('organization_details') or {}
+    org_profile = org_data.get('organization_profile') or {}
+    focus_areas = org_data.get('focus_areas') or []
+    past_grants = org_data.get('past_grants') or []
+
+    fields = [
+        (bool(user.get('organization_name')), 'Organization Name'),
+        (bool(user.get('organization_type')), 'Organization Type'),
+        (bool(org_details.get('ein')), 'EIN'),
+        (bool(org_details.get('uei')), 'UEI'),
+        (bool(org_details.get('address_line1')), 'Street Address'),
+        (bool(org_details.get('city')), 'City'),
+        (bool(org_details.get('state')), 'State'),
+        (bool(org_details.get('phone')), 'Phone'),
+        (bool(org_profile.get('mission_statement')), 'Mission Statement'),
+        (bool(org_profile.get('annual_revenue')), 'Annual Revenue / Budget'),
+        (bool(org_profile.get('year_founded')), 'Year Founded'),
+        (bool(org_profile.get('employees')), 'Number of Employees'),
+        (len(focus_areas) > 0, 'Focus Areas'),
+        (len(past_grants) > 0, 'Past Grant Experience'),
+    ]
+
+    filled = sum(1 for complete, _ in fields if complete)
+    total = len(fields)
+    pct = int(round(filled / total * 100)) if total else 0
+    missing = [label for complete, label in fields if not complete]
+    return pct, missing
+
+
 # ============ USER DASHBOARD ============
 
 @app.route('/dashboard')
@@ -698,11 +743,11 @@ def dashboard():
     """User dashboard"""
     user = get_current_user()
     saved_grants = user_models.get_saved_grants(user['id'])
-    
+
     # Get full grant details for saved grants
     all_grants = grant_researcher.get_all_grants()
     saved_details = []
-    
+
     for saved in saved_grants:
         for grant in all_grants:
             if grant['id'] == saved['grant_id']:
@@ -711,40 +756,44 @@ def dashboard():
                 grant_copy['saved_at'] = saved.get('saved_at')
                 saved_details.append(grant_copy)
                 break
-    
+
     # Get active grants (in progress)
     active_grants_list = user_models.get_user_grants(user['id'])
-    
+
     # Enhance with grant details
     all_grants = grant_researcher.get_all_grants()
     enhanced_list = []
     for app in active_grants_list:
-        # Find grant details
         grant_detail = None
         for g in all_grants:
             if g['id'] == app.get('grant_id'):
                 grant_detail = g
                 break
-        
+
         if grant_detail:
             app['grant'] = grant_detail
             app['client'] = {'name': 'Direct'}
             enhanced_list.append(app)
-    
+
     active_grants_list = enhanced_list
-    
+
     # Calculate stats
     active_grants = len([g for g in active_grants_list if g.get('status') in ['intake', 'drafting', 'review']])
     submitted = len([g for g in active_grants_list if g.get('status') == 'submitted'])
     total_funded = sum(g.get('amount', 0) for g in active_grants_list if g.get('status') == 'funded')
-    
-    return render_template('dashboard.html', 
-                         user=user, 
+
+    # Profile completion
+    profile_pct, profile_missing = calculate_profile_completion(user)
+
+    return render_template('dashboard.html',
+                         user=user,
                          saved_grants=saved_details,
                          active_grants=active_grants,
                          submitted=submitted,
                          total_funded=total_funded,
-                         active_grants_list=active_grants_list)
+                         active_grants_list=active_grants_list,
+                         profile_pct=profile_pct,
+                         profile_missing=profile_missing)
 
 
 @app.route('/profile', methods=['GET', 'POST'])
@@ -807,6 +856,15 @@ def onboarding():
     org_data = user_models.get_organization_details(user['id'])
     
     if request.method == 'POST':
+        # Save organization name and type to user record (required fields)
+        org_name = request.form.get('organization_name', '').strip()
+        org_type = request.form.get('organization_type', '').strip()
+        if org_name or org_type:
+            user_models.update_user(user['id'], {
+                'organization_name': org_name,
+                'organization_type': org_type,
+            })
+
         # Parse form data
         org_details = {
             'ein': request.form.get('ein', '').strip(),
@@ -821,12 +879,14 @@ def onboarding():
             'phone': request.form.get('phone', '').strip(),
             'website': request.form.get('website', '').strip(),
         }
-        
+
         org_profile = {
-            'organization_type': request.form.get('organization_type', '').strip(),
+            'organization_type': org_type,
             'year_founded': request.form.get('year_founded', '').strip(),
             'annual_revenue': request.form.get('annual_revenue', '').strip(),
             'employees': request.form.get('employees', '').strip(),
+            'mission_statement': request.form.get('mission_statement', '').strip(),
+            'programs_description': request.form.get('programs_description', '').strip(),
         }
         
         # Get focus areas (checkboxes)
@@ -862,7 +922,8 @@ def onboarding():
     focus_areas = org_data.get('focus_areas') or []
     past_grants = org_data.get('past_grants') or []
     
-    return render_template('onboarding.html', 
+    return render_template('onboarding.html',
+                         user=user,
                          org_details=org_details,
                          org_profile=org_profile,
                          focus_areas=focus_areas,
@@ -1448,12 +1509,28 @@ def settings():
 @csrf_required
 def new_client():
     """Create new client"""
+    user = get_current_user()
+
+    # Check client limit based on plan
+    client_limit = user_models.get_client_limit(user.get('plan', 'free'))
+    if client_limit is not None:  # None = unlimited
+        conn = get_db()
+        existing_count = conn.execute(
+            'SELECT COUNT(*) FROM clients WHERE user_id = ?', (user['id'],)
+        ).fetchone()[0]
+        conn.close()
+        if existing_count >= client_limit:
+            if client_limit <= 1:
+                flash('Your plan only supports your own organization. Upgrade to an Enterprise plan to manage client agencies.', 'error')
+            else:
+                flash(f'You have reached your plan limit of {client_limit} client agencies. Upgrade your Enterprise plan for more.', 'error')
+            return redirect(url_for('upgrade'))
+
     if request.method == 'POST':
         org_name = request.form.get('organization_name')
         contact_name = request.form.get('contact_name')
         contact_email = request.form.get('contact_email')
-        
-        user = get_current_user()
+
         conn = get_db()
         client_id = f"client-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
         now = datetime.now().isoformat()
@@ -1538,13 +1615,8 @@ def new_grant(client_id):
     conn = get_db()
     client = conn.execute('SELECT * FROM clients WHERE id = ?', (client_id,)).fetchone()
     
-    # Load grant research database
-    grants_db_path = Path.home() / ".hermes" / "grant-system" / "research" / "iot_grants_db.json"
-    available_grants = []
-    if grants_db_path.exists():
-        with open(grants_db_path) as f:
-            data = json.load(f)
-            available_grants = data.get('grants', [])
+    # Load grant research database (from DB-backed catalog)
+    available_grants = grant_researcher.get_all_grants()
     
     if request.method == 'POST':
         grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
@@ -2456,7 +2528,9 @@ def paper_download(grant_id):
             story.append(Paragraph(content_html, styles['Normal']))
             story.append(Spacer(1, 0.3*inch))
 
-        doc.build(story)
+        from pdf_utils import get_footer_callback
+        _footer = get_footer_callback()
+        doc.build(story, onFirstPage=_footer, onLaterPages=_footer)
         buffer.seek(0)
         safe_name = grant['grant_name'].replace(' ', '_').replace('/', '-')
         return send_file(buffer, mimetype='application/pdf', as_attachment=True,
@@ -2596,7 +2670,9 @@ def paper_download_form(grant_id, form_name):
             story.append(Paragraph(form_name, form_title_style))
             story.append(Paragraph("This form must be completed manually.", styles['Normal']))
 
-        doc.build(story)
+        from pdf_utils import get_footer_callback
+        _footer = get_footer_callback()
+        doc.build(story, onFirstPage=_footer, onLaterPages=_footer)
         buffer.seek(0)
         safe_name = form_name.replace(' ', '_').replace('/', '-')
         return send_file(buffer, mimetype='application/pdf', as_attachment=True,
@@ -2885,10 +2961,12 @@ def download_grant(grant_id, fmt):
                 story.append(Paragraph(draft['section'].replace('_', ' ').title(), styles['Heading2']))
                 story.append(Paragraph(draft['content'].replace('\n', '<br/>'), styles['Normal']))
                 story.append(Spacer(1, 0.2*inch))
-            
-            doc.build(story)
+
+            from pdf_utils import get_footer_callback
+            _footer = get_footer_callback()
+            doc.build(story, onFirstPage=_footer, onLaterPages=_footer)
             buffer.seek(0)
-            
+
             return send_file(
                 buffer,
                 mimetype='application/pdf',

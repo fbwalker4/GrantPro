@@ -1,0 +1,9 @@
+2026-03-20 19:26:45,639 INFO sync_grants_gov: === Grants.gov Sync Started ===
+2026-03-20 19:26:46,129 ERROR sync_grants_gov: API request failed on page 1: 401 Client Error: Unauthorized for url: https://api.grants.gov/v1/api/search
+2026-03-20 19:26:46,132 INFO sync_grants_gov: No new grants fetched from API
+2026-03-20 19:27:32,773 INFO sync_grants_gov: === Grants.gov Sync Started ===
+2026-03-20 19:27:32,951 ERROR sync_grants_gov: API request failed on page 1: 401 Client Error: Unauthorized for url: https://api.grants.gov/v1/api/search
+2026-03-20 19:27:32,954 INFO sync_grants_gov: No new grants fetched from API
+2026-03-20 19:27:32,959 INFO sync_grants_gov: Archived 45 expired grants
+2026-03-20 19:27:32,960 INFO sync_grants_gov: Total active grants in catalog: 95
+2026-03-20 19:27:32,960 INFO sync_grants_gov: === Grants.gov Sync Complete ===

@@ -15,7 +15,7 @@
     <strong style="color: #e2e8f0;">Current Plan: {{ user.plan.title() if user.plan else 'Free' }}</strong>
     <p style="color: #94a3b8; margin-top: 0.5rem; font-size: 0.9rem;">
         {% if user.plan == 'free' %}
-        You can save grants and search 131+ federal grants. Upgrade to submit applications.
+        You can save grants and search {{ grants_count|default('hundreds of') }}+ federal grants. Upgrade to submit applications.
         {% else %}
         You have {{ user.max_grants_per_month }} grant submissions per month.
         {% endif %}
@@ -34,7 +34,7 @@
             <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ Everything in Free</li>
             <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;"><strong>3 grant submissions/month</strong></li>
             <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ AI writing assistant</li>
-            <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ 131+ agency templates</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ {{ grants_count|default('hundreds of') }}+ agency templates</li>
             <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ DOCX/PDF export</li>
             <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ Guided submission workflow</li>
             <li style="padding: 0.5rem 0;">✓ Email support</li>
@@ -70,26 +70,72 @@
         <p style="text-align: center; font-size: 0.75rem; color: #64748b; margin-top: 0.5rem;">For your organization's grants only</p>
     </div>
     
-    <!-- Enterprise Plan -->
+    <!-- Enterprise 5 Plan -->
     <div style="background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); border: 2px solid #2d5a87; border-radius: 12px; padding: 2rem; position: relative;">
-        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: white;">Enterprise</h2>
-        <div style="font-size: 2.5rem; font-weight: 700; color: white;">Custom</div>
-        <p style="color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;">For agencies & consultants</p>
-        
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: white;">Enterprise 5</h2>
+        <div style="font-size: 2.5rem; font-weight: 700; color: white;">$44.95<span style="font-size: 1rem; color: rgba(255,255,255,0.7); font-weight: 400;">/mo</span></div>
+        <p style="color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;">Up to 5 client agencies</p>
+
         <ul style="list-style: none; padding: 0; margin-bottom: 1.5rem; color: rgba(255,255,255,0.9);">
             <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ Unlimited grant submissions</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ Manage up to 5 clients</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ Client management tools</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ All templates included</li>
+            <li style="padding: 0.5rem 0;">✓ Priority support</li>
+        </ul>
+
+        <form method="POST">
+            <input type="hidden" name="plan" value="enterprise_5">
+            <button type="submit" class="btn" style="width: 100%; background: white; color: #1e3a5f;">Start Enterprise 5</button>
+        </form>
+        <p style="text-align: center; font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">Write grants for your clients</p>
+    </div>
+</div>
+
+<div style="text-align: center; margin: 1.5rem 0 0.75rem; color: #94a3b8; font-size: 0.95rem;">
+    <strong style="color: #e2e8f0;">Need more clients?</strong> Enterprise plans let you write grants for multiple client agencies.
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 700px; margin: 0 auto;">
+    <!-- Enterprise 10 Plan -->
+    <div style="background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 2rem; position: relative;">
+        <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #3b82f6; color: white; padding: 0.25rem 1rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">POPULAR</div>
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: white;">Enterprise 10</h2>
+        <div style="font-size: 2.5rem; font-weight: 700; color: white;">$74.95<span style="font-size: 1rem; color: rgba(255,255,255,0.7); font-weight: 400;">/mo</span></div>
+        <p style="color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;">Up to 10 client agencies</p>
+
+        <ul style="list-style: none; padding: 0; margin-bottom: 1.5rem; color: rgba(255,255,255,0.9);">
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ Unlimited grant submissions</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ Manage up to 10 clients</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ White-label options</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ All templates included</li>
+            <li style="padding: 0.5rem 0;">✓ Priority support</li>
+        </ul>
+
+        <form method="POST">
+            <input type="hidden" name="plan" value="enterprise_10">
+            <button type="submit" class="btn" style="width: 100%; background: #3b82f6; color: white;">Start Enterprise 10</button>
+        </form>
+    </div>
+
+    <!-- Enterprise Unlimited Plan -->
+    <div style="background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); border: 2px solid #22c55e; border-radius: 12px; padding: 2rem; position: relative;">
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: white;">Enterprise Unlimited</h2>
+        <div style="font-size: 2.5rem; font-weight: 700; color: white;">$99.95<span style="font-size: 1rem; color: rgba(255,255,255,0.7); font-weight: 400;">/mo</span></div>
+        <p style="color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;">Unlimited client agencies</p>
+
+        <ul style="list-style: none; padding: 0; margin-bottom: 1.5rem; color: rgba(255,255,255,0.9);">
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ Unlimited grant submissions</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ Unlimited client agencies</li>
             <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ White-label options</li>
             <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ API access</li>
-            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ Dedicated account manager</li>
-            <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2);">✓ Custom integrations</li>
-            <li style="padding: 0.5rem 0;">✓ Use for your clients</li>
+            <li style="padding: 0.5rem 0;">✓ Priority support</li>
         </ul>
-        
+
         <form method="POST">
-            <input type="hidden" name="plan" value="enterprise">
-            <button type="submit" class="btn" style="width: 100%; background: white; color: #1e3a5f;">Contact Us</button>
+            <input type="hidden" name="plan" value="enterprise_unlimited">
+            <button type="submit" class="btn" style="width: 100%; background: #22c55e; color: white;">Start Unlimited</button>
         </form>
-        <p style="text-align: center; font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">Resale permitted</p>
     </div>
 </div>
 
@@ -102,7 +148,7 @@
     <p style="margin: 0; color: #94a3b8; font-size: 0.85rem; text-align: center;">
         <strong style="color: #fca5a5;">Anti-Reseller Policy:</strong> 
         Base plans (Monthly/Annual) are for your organization's grants only. 
-        Enterprise plan required if using for clients.
+        Enterprise plan required if writing grants for clients.
     </p>
 </div>
 {% endblock %}
