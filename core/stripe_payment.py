@@ -17,6 +17,7 @@ if STRIPE_API_KEY:
     stripe.api_key = STRIPE_API_KEY
 
 from db_connection import LOCAL_DB_PATH as DB_PATH
+from db_connection import get_connection
 
 # Plan pricing
 PLAN_PRICING = {
@@ -168,8 +169,6 @@ def handle_webhook(payload, sig_header):
 
 def handle_checkout_complete(session):
     """Handle successful checkout"""
-    import sqlite3
-    
     user_id = session.get('metadata', {}).get('user_id')
     customer_id = session.get('customer')
     subscription_id = session.get('subscription')
@@ -186,7 +185,7 @@ def handle_checkout_complete(session):
         plan_type = 'monthly'  # Default
     
     # Update user in database
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     now = datetime.now().isoformat()
     
@@ -217,8 +216,6 @@ def handle_checkout_complete(session):
 
 def handle_subscription_update(subscription):
     """Handle subscription updates (plan changes, etc.)"""
-    import sqlite3
-    
     customer_id = subscription.get('customer')
     status = subscription.get('status')
     plan_interval = subscription['items']['data'][0]['price']['recurring']['interval']
@@ -231,7 +228,7 @@ def handle_subscription_update(subscription):
     except (KeyError, TypeError, ValueError, OSError):
         sub_end = None
     
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     now = datetime.now().isoformat()
     
@@ -252,11 +249,9 @@ def handle_subscription_update(subscription):
 
 def handle_subscription_cancel(subscription):
     """Handle subscription cancellation"""
-    import sqlite3
-    
     customer_id = subscription.get('customer')
     
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     now = datetime.now().isoformat()
     
@@ -278,11 +273,9 @@ def handle_subscription_cancel(subscription):
 
 def handle_payment_failed(invoice):
     """Handle failed payment"""
-    import sqlite3
-    
     customer_id = invoice.get('customer')
     
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     now = datetime.now().isoformat()
     
@@ -300,9 +293,7 @@ def handle_payment_failed(invoice):
 
 def get_subscription_status(user_id):
     """Get current subscription status for a user"""
-    import sqlite3
-    
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     c.execute('''SELECT plan, subscription_status, subscription_start, subscription_end, 
                   grants_this_month, max_grants_per_month
@@ -324,9 +315,7 @@ def get_subscription_status(user_id):
 
 def cancel_subscription(user_id):
     """Cancel user's subscription"""
-    import sqlite3
-    
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     c.execute('SELECT stripe_subscription_id, stripe_customer_id FROM users WHERE id = ?', (user_id,))
     row = c.fetchone()
@@ -339,7 +328,7 @@ def cancel_subscription(user_id):
     
     if not STRIPE_API_KEY:
         # Just update locally
-        conn = sqlite3.connect(str(DB_PATH))
+        conn = get_connection()
         c = conn.cursor()
         c.execute('''UPDATE users SET 
                       plan = 'free',
@@ -357,7 +346,7 @@ def cancel_subscription(user_id):
         stripe.Subscription.modify(subscription_id, cancel_at_period_end=True)
         
         # Update locally
-        conn = sqlite3.connect(str(DB_PATH))
+        conn = get_connection()
         c = conn.cursor()
         c.execute('''UPDATE users SET 
                       subscription_status = 'canceling',

@@ -19,6 +19,7 @@ BASE_URL = os.environ.get('BASE_URL', 'http://localhost:5001')
 
 # Database path
 from db_connection import LOCAL_DB_PATH as DB_PATH
+from db_connection import get_connection
 EMAIL_LOG_PATH = Path.home() / ".hermes" / "grant-system" / "tracking" / "email_log.db"
 LEADS_PATH = Path.home() / ".hermes" / "grant-system" / "tracking" / "leads.db"
 
@@ -434,39 +435,48 @@ def send_email(to_email: str, subject: str, html_body: str, template_name: str =
 # ============ EMAIL LOGGING ============
 
 def init_email_db():
-    """Initialize email database"""
+    """Initialize email database.
+
+    On Postgres the tables are created via supabase_migration.sql.
+    """
     EMAIL_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-    
-    conn = sqlite3.connect(str(EMAIL_LOG_PATH))
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS email_log (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            to_email TEXT NOT NULL,
-            subject TEXT NOT NULL,
-            template_name TEXT,
-            status TEXT DEFAULT 'sent',
-            method TEXT,
-            resend_id TEXT,
-            error_message TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            sent_at TIMESTAMP
-        )
-    ''')
-    
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS email_queue (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            to_email TEXT NOT NULL,
-            subject TEXT NOT NULL,
-            body TEXT NOT NULL,
-            template_name TEXT,
-            scheduled_for TIMESTAMP,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            status TEXT DEFAULT 'pending'
-        )
-    ''')
-    
-    conn.commit()
+
+    conn = get_connection()
+    try:
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS email_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                to_email TEXT NOT NULL,
+                subject TEXT NOT NULL,
+                template_name TEXT,
+                status TEXT DEFAULT 'sent',
+                method TEXT,
+                resend_id TEXT,
+                error_message TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                sent_at TIMESTAMP
+            )
+        ''')
+
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS email_queue (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                to_email TEXT NOT NULL,
+                subject TEXT NOT NULL,
+                body TEXT NOT NULL,
+                template_name TEXT,
+                scheduled_for TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                status TEXT DEFAULT 'pending'
+            )
+        ''')
+    except Exception:
+        pass  # Tables already exist on Postgres
+
+    try:
+        conn.commit()
+    except Exception:
+        pass
     conn.close()
 
 
@@ -474,7 +484,7 @@ def log_email(to_email: str, subject: str, template_name: str, result: Dict):
     """Log email to database"""
     init_email_db()
     
-    conn = sqlite3.connect(str(EMAIL_LOG_PATH))
+    conn = get_connection()
     conn.execute('''
         INSERT INTO email_log (to_email, subject, template_name, status, method, resend_id, error_message, sent_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -496,9 +506,9 @@ def get_email_stats() -> Dict:
     """Get email statistics"""
     init_email_db()
     
-    conn = sqlite3.connect(str(EMAIL_LOG_PATH))
+    conn = get_connection()
     
-    total = conn.execute('SELECT COUNT(*) FROM email_log WHERE status = "sent"').fetchone()[0]
+    total = conn.execute("SELECT COUNT(*) FROM email_log WHERE status = 'sent'").fetchone()[0]
     
     by_template = conn.execute('''
         SELECT template_name, COUNT(*) as count 
@@ -597,15 +607,11 @@ def send_welcome_email(email: str, first_name: str = "there") -> Dict:
 
 def send_weekly_alerts(grants: List[Dict]) -> Dict:
     """Send weekly alerts to all leads"""
-    from pathlib import Path
-    
-    leads_db = Path.home() / ".hermes" / "grant-system" / "tracking" / "leads.db"
-    
-    if not leads_db.exists():
-        return {"sent": 0, "message": "No leads database"}
-    
-    conn = sqlite3.connect(str(leads_db))
-    leads = conn.execute('SELECT * FROM leads WHERE status = "active"').fetchall()
+    try:
+        conn = get_connection()
+        leads = conn.execute('SELECT * FROM leads WHERE status = ?', ('active',)).fetchall()
+    except Exception:
+        return {"sent": 0, "message": "No leads table"}
     conn.close()
     
     if not leads:
@@ -649,13 +655,12 @@ if __name__ == "__main__":
             print(f"Total sent: {stats['total_sent']}")
             
         elif cmd == "leads":
-            from pathlib import Path
-            leads_db = Path.home() / ".hermes" / "grant-system" / "tracking" / "leads.db"
-            if leads_db.exists():
-                conn = sqlite3.connect(str(leads_db))
+            try:
+                conn = get_connection()
                 leads = conn.execute('SELECT * FROM leads').fetchall()
                 print(f"Active leads: {len(leads)}")
                 for lead in leads:
                     print(f"  - {lead['email']}")
-            else:
-                print("No leads database")
+                conn.close()
+            except Exception:
+                print("No leads table")

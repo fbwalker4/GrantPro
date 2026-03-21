@@ -227,6 +227,7 @@ grant_researcher = GrantResearcher()
 
 # Database path
 from db_connection import LOCAL_DB_PATH as DB_PATH
+from db_connection import get_connection
 if os.environ.get('VERCEL'):
     OUTPUT_DIR = Path('/tmp/output')
 else:
@@ -1233,23 +1234,20 @@ def api_save_grant():
             # Need email to save as guest
             return jsonify({'success': False, 'error': 'email_required', 'message': 'Please provide your email to save grants'})
         
-        # Save to guest_saves table
-        guest_db = DB_PATH.parent / "guests.db"
+        # Save to guest_saves table (main DB on Supabase)
+        conn = get_connection()
         try:
-            guest_db.parent.mkdir(parents=True, exist_ok=True)
-        except OSError:
-            guest_db = Path('/tmp/guests.db')
-        
-        conn = sqlite3.connect(str(guest_db))
-        conn.execute('''
-            CREATE TABLE IF NOT EXISTS guest_saves (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                email TEXT NOT NULL,
-                grant_id TEXT NOT NULL,
-                notes TEXT,
-                saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS guest_saves (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    email TEXT NOT NULL,
+                    grant_id TEXT NOT NULL,
+                    notes TEXT,
+                    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+        except Exception:
+            pass  # Table already exists on Postgres
         
         # Check if this grant already saved for this email
         existing = conn.execute(
@@ -1354,9 +1352,7 @@ def api_request_template():
 
 def get_db():
     """Get database connection"""
-    conn = sqlite3.connect(str(DB_PATH))
-    conn.row_factory = sqlite3.Row
-    return conn
+    return get_connection()
 
 
 # Add user_id column to clients table if it doesn't exist (run once)
@@ -1733,7 +1729,7 @@ def start_application(grant_id):
         self_client_id = f"client-self-{user_id}"
         conn2 = get_db()
         conn2.execute(
-            'INSERT OR IGNORE INTO clients (id, user_id, organization_name, contact_name, contact_email, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+            'INSERT INTO clients (id, user_id, organization_name, contact_name, contact_email, created_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO NOTHING',
             (self_client_id, user_id, org_name,
              f"{user.get('first_name', '')} {user.get('last_name', '')}".strip(),
              user.get('email', ''), datetime.now().isoformat())
@@ -3100,29 +3096,26 @@ def subscribe():
         flash('Please enter a valid email address', 'error')
         return redirect(url_for('index'))
     
-    # Save to leads database
-    leads_db = DB_PATH.parent / "leads.db"
+    # Save to leads table (main DB on Supabase)
+    conn = get_connection()
     try:
-        leads_db.parent.mkdir(parents=True, exist_ok=True)
-    except OSError:
-        leads_db = Path('/tmp/leads.db')
-    
-    conn = sqlite3.connect(str(leads_db))
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS leads (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT UNIQUE NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            status TEXT DEFAULT 'active',
-            source TEXT DEFAULT 'landing_page'
-        )
-    ''')
-    
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS leads (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT UNIQUE NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                status TEXT DEFAULT 'active',
+                source TEXT DEFAULT 'landing_page'
+            )
+        ''')
+    except Exception:
+        pass  # Table already exists on Postgres
+
     try:
         conn.execute('INSERT INTO leads (email, source) VALUES (?, ?)', (email, 'landing_page'))
         conn.commit()
         flash('Thanks! You\'ll receive grant alerts at ' + email, 'success')
-    except sqlite3.IntegrityError:
+    except Exception:
         flash('You\'re already subscribed! We\'ll keep you posted.', 'info')
     finally:
         conn.close()
@@ -3380,18 +3373,15 @@ def admin_leads():
         flash('Admin access required', 'error')
         return redirect(url_for('index'))
     
-    leads_db = Path.home() / ".hermes" / "grant-system" / "tracking" / "leads.db"
-    
-    if leads_db.exists():
-        conn = sqlite3.connect(str(leads_db))
-        conn.row_factory = sqlite3.Row
+    try:
+        conn = get_connection()
         leads = conn.execute('SELECT * FROM leads ORDER BY created_at DESC').fetchall()
         total = conn.execute('SELECT COUNT(*) FROM leads').fetchone()[0]
         conn.close()
-    else:
+    except Exception:
         leads = []
         total = 0
-    
+
     return render_template('admin_leads.html', leads=[dict(l) for l in leads], total=total)
 
 
@@ -3405,14 +3395,15 @@ def admin_delete_lead(lead_id):
         flash('Admin access required', 'error')
         return redirect(url_for('index'))
     
-    leads_db = Path.home() / ".hermes" / "grant-system" / "tracking" / "leads.db"
-    if leads_db.exists():
-        conn = sqlite3.connect(str(leads_db))
+    try:
+        conn = get_connection()
         conn.execute('DELETE FROM leads WHERE id = ?', (lead_id,))
         conn.commit()
         conn.close()
         flash('Lead deleted', 'success')
-    
+    except Exception:
+        flash('Could not delete lead', 'error')
+
     return redirect(url_for('admin_leads'))
 
 
@@ -3474,18 +3465,18 @@ def admin_export_leads():
     import csv
     from io import StringIO
     
-    leads_db = Path.home() / ".hermes" / "grant-system" / "tracking" / "leads.db"
-    
     output = StringIO()
     writer = csv.writer(output)
     writer.writerow(['ID', 'Email', 'Created At', 'Status', 'Source'])
-    
-    if leads_db.exists():
-        conn = sqlite3.connect(str(leads_db))
+
+    try:
+        conn = get_connection()
         leads = conn.execute('SELECT * FROM leads ORDER BY created_at DESC').fetchall()
         for lead in leads:
             writer.writerow([lead['id'], lead['email'], lead['created_at'], lead['status'], lead['source']])
         conn.close()
+    except Exception:
+        pass  # No leads table yet
     
     output.seek(0)
     
@@ -3506,12 +3497,13 @@ def unsubscribe():
     
     if email and '@' in email:
         # Update lead status
-        leads_db = Path.home() / ".hermes" / "grant-system" / "tracking" / "leads.db"
-        if leads_db.exists():
-            conn = sqlite3.connect(str(leads_db))
+        try:
+            conn = get_connection()
             conn.execute('UPDATE leads SET status = ? WHERE email = ?', ('unsubscribed', email))
             conn.commit()
             conn.close()
+        except Exception:
+            pass  # No leads table yet
         
         # Send confirmation
         sys.path.insert(0, str(Path(__file__).parent.parent / "core"))

@@ -13,143 +13,155 @@ from pathlib import Path
 
 # Database setup
 from db_connection import LOCAL_DB_PATH as DB_PATH
+from db_connection import get_connection
 
 def init_db():
-    """Initialize the grants database"""
+    """Initialize the grants database.
+
+    On Postgres (Supabase) the schema is applied via supabase_migration.sql,
+    so CREATE TABLE may fail.  Wrapped in try/except for graceful handling.
+    """
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
-    
-    # Clients table
-    c.execute('''CREATE TABLE IF NOT EXISTS clients (
-        id TEXT PRIMARY KEY,
-        organization_name TEXT,
-        contact_name TEXT,
-        contact_email TEXT,
-        status TEXT DEFAULT 'new',
-        current_stage TEXT DEFAULT 'new',
-        created_at TEXT,
-        updated_at TEXT,
-        intake_data TEXT,
-        notes TEXT
-    )''')
-    
-    # Grants table
-    c.execute('''CREATE TABLE IF NOT EXISTS grants (
-        id TEXT PRIMARY KEY,
-        client_id TEXT,
-        grant_name TEXT,
-        agency TEXT,
-        amount REAL,
-        deadline TEXT,
-        status TEXT DEFAULT 'research',
-        assigned_at TEXT,
-        submitted_at TEXT,
-        result TEXT,
-        opportunity_number TEXT,
-        cfda TEXT,
-        template TEXT,
-        FOREIGN KEY (client_id) REFERENCES clients(id)
-    )''')
-    
-    # Documents table
-    c.execute('''CREATE TABLE IF NOT EXISTS documents (
-        id TEXT PRIMARY KEY,
-        client_id TEXT,
-        doc_type TEXT,
-        file_path TEXT,
-        uploaded_at TEXT,
-        status TEXT DEFAULT 'pending',
-        FOREIGN KEY (client_id) REFERENCES clients(id)
-    )''')
-    
-    # Invoices table
-    c.execute('''CREATE TABLE IF NOT EXISTS invoices (
-        id TEXT PRIMARY KEY,
-        client_id TEXT,
-        invoice_type TEXT,
-        amount REAL,
-        status TEXT DEFAULT 'pending',
-        created_at TEXT,
-        paid_at TEXT,
-        grant_id TEXT,
-        FOREIGN KEY (client_id) REFERENCES clients(id)
-    )''')
-    
-    # Drafts table
-    c.execute('''CREATE TABLE IF NOT EXISTS drafts (
-        id TEXT PRIMARY KEY,
-        client_id TEXT,
-        grant_id TEXT,
-        section TEXT,
-        content TEXT,
-        version INTEGER DEFAULT 1,
-        created_at TEXT,
-        updated_at TEXT,
-        status TEXT DEFAULT 'draft',
-        FOREIGN KEY (client_id) REFERENCES clients(id),
-        FOREIGN KEY (grant_id) REFERENCES grants(id)
-    )''')
-    
-    # Grants catalog table - unified grants directory (seed + Grants.gov)
-    c.execute('''CREATE TABLE IF NOT EXISTS grants_catalog (
-        id TEXT PRIMARY KEY,
-        opportunity_number TEXT,
-        title TEXT NOT NULL,
-        agency TEXT,
-        agency_code TEXT,
-        cfda TEXT,
-        category TEXT,
-        amount_min INTEGER DEFAULT 0,
-        amount_max INTEGER DEFAULT 0,
-        open_date TEXT,
-        close_date TEXT,
-        description TEXT,
-        eligibility TEXT,
-        url TEXT,
-        template TEXT DEFAULT 'generic',
-        source TEXT DEFAULT 'seed',
-        status TEXT DEFAULT 'active',
-        created_at TEXT,
-        updated_at TEXT
-    )''')
 
-    # Award matches table - tracks grant awards matched to our users
-    c.execute('''CREATE TABLE IF NOT EXISTS award_matches (
-        id TEXT PRIMARY KEY,
-        user_id TEXT,
-        grant_id TEXT,
-        grant_name TEXT,
-        award_amount REAL,
-        award_date TEXT,
-        source TEXT,
-        notified INTEGER DEFAULT 0,
-        testimonial_token TEXT UNIQUE,
-        created_at TEXT
-    )''')
+    try:
+        # Clients table
+        c.execute('''CREATE TABLE IF NOT EXISTS clients (
+            id TEXT PRIMARY KEY,
+            organization_name TEXT,
+            contact_name TEXT,
+            contact_email TEXT,
+            status TEXT DEFAULT 'new',
+            current_stage TEXT DEFAULT 'new',
+            created_at TEXT,
+            updated_at TEXT,
+            intake_data TEXT,
+            notes TEXT
+        )''')
 
-    # Testimonials table - user-submitted testimonials linked to awards
-    c.execute('''CREATE TABLE IF NOT EXISTS testimonials (
-        id TEXT PRIMARY KEY,
-        user_id TEXT,
-        award_match_id TEXT,
-        rating INTEGER,
-        text TEXT,
-        org_name TEXT,
-        contact_name TEXT,
-        approved INTEGER DEFAULT 0,
-        created_at TEXT
-    )''')
+        # Grants table
+        c.execute('''CREATE TABLE IF NOT EXISTS grants (
+            id TEXT PRIMARY KEY,
+            client_id TEXT,
+            grant_name TEXT,
+            agency TEXT,
+            amount REAL,
+            deadline TEXT,
+            status TEXT DEFAULT 'research',
+            assigned_at TEXT,
+            submitted_at TEXT,
+            result TEXT,
+            opportunity_number TEXT,
+            cfda TEXT,
+            template TEXT,
+            FOREIGN KEY (client_id) REFERENCES clients(id)
+        )''')
 
-    conn.commit()
+        # Documents table
+        c.execute('''CREATE TABLE IF NOT EXISTS documents (
+            id TEXT PRIMARY KEY,
+            client_id TEXT,
+            doc_type TEXT,
+            file_path TEXT,
+            uploaded_at TEXT,
+            status TEXT DEFAULT 'pending',
+            FOREIGN KEY (client_id) REFERENCES clients(id)
+        )''')
+
+        # Invoices table
+        c.execute('''CREATE TABLE IF NOT EXISTS invoices (
+            id TEXT PRIMARY KEY,
+            client_id TEXT,
+            invoice_type TEXT,
+            amount REAL,
+            status TEXT DEFAULT 'pending',
+            created_at TEXT,
+            paid_at TEXT,
+            grant_id TEXT,
+            FOREIGN KEY (client_id) REFERENCES clients(id)
+        )''')
+
+        # Drafts table
+        c.execute('''CREATE TABLE IF NOT EXISTS drafts (
+            id TEXT PRIMARY KEY,
+            client_id TEXT,
+            grant_id TEXT,
+            section TEXT,
+            content TEXT,
+            version INTEGER DEFAULT 1,
+            created_at TEXT,
+            updated_at TEXT,
+            status TEXT DEFAULT 'draft',
+            FOREIGN KEY (client_id) REFERENCES clients(id),
+            FOREIGN KEY (grant_id) REFERENCES grants(id)
+        )''')
+
+        # Grants catalog table - unified grants directory (seed + Grants.gov)
+        c.execute('''CREATE TABLE IF NOT EXISTS grants_catalog (
+            id TEXT PRIMARY KEY,
+            opportunity_number TEXT,
+            title TEXT NOT NULL,
+            agency TEXT,
+            agency_code TEXT,
+            cfda TEXT,
+            category TEXT,
+            amount_min INTEGER DEFAULT 0,
+            amount_max INTEGER DEFAULT 0,
+            open_date TEXT,
+            close_date TEXT,
+            description TEXT,
+            eligibility TEXT,
+            url TEXT,
+            template TEXT DEFAULT 'generic',
+            source TEXT DEFAULT 'seed',
+            status TEXT DEFAULT 'active',
+            created_at TEXT,
+            updated_at TEXT
+        )''')
+
+        # Award matches table - tracks grant awards matched to our users
+        c.execute('''CREATE TABLE IF NOT EXISTS award_matches (
+            id TEXT PRIMARY KEY,
+            user_id TEXT,
+            grant_id TEXT,
+            grant_name TEXT,
+            award_amount REAL,
+            award_date TEXT,
+            source TEXT,
+            notified INTEGER DEFAULT 0,
+            testimonial_token TEXT UNIQUE,
+            created_at TEXT
+        )''')
+
+        # Testimonials table - user-submitted testimonials linked to awards
+        c.execute('''CREATE TABLE IF NOT EXISTS testimonials (
+            id TEXT PRIMARY KEY,
+            user_id TEXT,
+            award_match_id TEXT,
+            rating INTEGER,
+            text TEXT,
+            org_name TEXT,
+            contact_name TEXT,
+            approved INTEGER DEFAULT 0,
+            created_at TEXT
+        )''')
+    except Exception as e:
+        # On Postgres the schema is managed by supabase_migration.sql
+        import logging
+        logging.getLogger(__name__).info("init_db migration note (expected on Postgres): %s", e)
+
+    try:
+        conn.commit()
+    except Exception:
+        pass
     conn.close()
     return DB_PATH
 
 
 def seed_grants_catalog():
     """Seed grants_catalog from iot_grants_db.json and hardcoded grants if table is empty."""
-    import sqlite3
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
 
     count = c.execute('SELECT COUNT(*) FROM grants_catalog').fetchone()[0]
@@ -222,7 +234,7 @@ def seed_grants_catalog():
 
 def get_catalog_grants(status='active'):
     """Return all grants from grants_catalog with given status."""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     conn.row_factory = sqlite3.Row
     if status:
         rows = conn.execute(
@@ -236,12 +248,14 @@ def get_catalog_grants(status='active'):
 
 def get_catalog_grants_count(status='active'):
     """Return count of active grants in catalog."""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     row = conn.execute(
         'SELECT COUNT(*) FROM grants_catalog WHERE status = ?', (status,)
     ).fetchone()
     conn.close()
-    return row[0] if row else 0
+    if not row:
+        return 0
+    return row.get('count', row[0]) if hasattr(row, 'get') else row[0]
 
 
 def _guess_agency_code(agency_name):
@@ -273,7 +287,7 @@ def _guess_agency_code(agency_name):
 
 def add_client(org_name, contact_name, contact_email, intake_data=None):
     """Add a new client to the system"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     
     client_id = f"client-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
@@ -289,7 +303,7 @@ def add_client(org_name, contact_name, contact_email, intake_data=None):
 
 def add_grant(client_id, grant_info):
     """Assign a grant to a client"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     
     grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
@@ -306,7 +320,7 @@ def add_grant(client_id, grant_info):
 
 def save_draft(client_id, grant_id, section, content, version=1):
     """Save a grant draft section"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     
     draft_id = f"draft-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
@@ -322,7 +336,7 @@ def save_draft(client_id, grant_id, section, content, version=1):
 
 def create_invoice(client_id, invoice_type, amount, grant_id=None):
     """Create an invoice"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     
     invoice_id = f"inv-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
@@ -338,16 +352,18 @@ def create_invoice(client_id, invoice_type, amount, grant_id=None):
 
 def get_client(client_id):
     """Get client details"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     c.execute('SELECT * FROM clients WHERE id = ?', (client_id,))
     row = c.fetchone()
     conn.close()
-    return dict(zip(['id', 'organization_name', 'contact_name', 'contact_email', 'status', 'current_stage', 'created_at', 'updated_at', 'intake_data', 'notes'], row)) if row else None
+    if not row:
+        return None
+    return dict(row) if hasattr(row, 'keys') else dict(zip(['id', 'organization_name', 'contact_name', 'contact_email', 'status', 'current_stage', 'created_at', 'updated_at', 'intake_data', 'notes'], row))
 
 def list_clients(status=None):
     """List all clients, optionally filtered by status"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     if status:
         c.execute('SELECT * FROM clients WHERE status = ? ORDER BY updated_at DESC', (status,))
@@ -355,11 +371,11 @@ def list_clients(status=None):
         c.execute('SELECT * FROM clients ORDER BY updated_at DESC')
     rows = c.fetchall()
     conn.close()
-    return [dict(zip(['id', 'organization_name', 'contact_name', 'contact_email', 'status', 'current_stage', 'created_at', 'updated_at', 'intake_data', 'notes'], row)) for row in rows]
+    return [dict(row) if hasattr(row, 'keys') else dict(zip(['id', 'organization_name', 'contact_name', 'contact_email', 'status', 'current_stage', 'created_at', 'updated_at', 'intake_data', 'notes'], row)) for row in rows]
 
 def update_client_status(client_id, status, stage=None):
     """Update client status"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     now = datetime.now().isoformat()
     if stage:

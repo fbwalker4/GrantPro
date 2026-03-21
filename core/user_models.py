@@ -11,6 +11,7 @@ from datetime import datetime
 from pathlib import Path
 
 from db_connection import LOCAL_DB_PATH as DB_PATH
+from db_connection import get_connection
 
 # Column order must match the CREATE TABLE + ALTER TABLE schema exactly
 USER_COLUMNS = [
@@ -23,152 +24,165 @@ USER_COLUMNS = [
 ]
 
 def init_user_db():
-    """Initialize user-related database tables"""
-    conn = sqlite3.connect(str(DB_PATH))
-    c = conn.cursor()
-    
-    # Users table - expanded for subscriptions
-    c.execute('''CREATE TABLE IF NOT EXISTS users (
-        id TEXT PRIMARY KEY,
-        email TEXT UNIQUE NOT NULL,
-        password_hash TEXT NOT NULL,
-        first_name TEXT,
-        last_name TEXT,
-        organization_name TEXT,
-        organization_type TEXT,
-        phone TEXT,
-        role TEXT DEFAULT 'user',
-        plan TEXT DEFAULT 'free',
-        grants_this_month INTEGER DEFAULT 0,
-        max_grants_per_month INTEGER DEFAULT 0,
-        subscription_status TEXT DEFAULT 'inactive',
-        stripe_customer_id TEXT,
-        stripe_subscription_id TEXT,
-        subscription_start TEXT,
-        subscription_end TEXT,
-        created_at TEXT,
-        updated_at TEXT,
-        last_login TEXT
-    )''')
-    
-    # User profiles (additional info)
-    c.execute('''CREATE TABLE IF NOT EXISTS user_profiles (
-        user_id TEXT PRIMARY KEY,
-        bio TEXT,
-        interests TEXT,
-        eligible_entities TEXT,
-        funding_amount_min INTEGER,
-        funding_amount_max INTEGER,
-        preferred_categories TEXT,
-        notify_deadlines INTEGER DEFAULT 1,
-        notify_new_grants INTEGER DEFAULT 1,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )''')
-    
-    # Saved grants (favorites)
-    c.execute('''CREATE TABLE IF NOT EXISTS saved_grants (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id TEXT NOT NULL,
-        grant_id TEXT NOT NULL,
-        notes TEXT,
-        saved_at TEXT,
-        FOREIGN KEY (user_id) REFERENCES users(id),
-        UNIQUE(user_id, grant_id)
-    )''')
-    
-    # User applications (tracking)
-    c.execute('''CREATE TABLE IF NOT EXISTS user_applications (
-        id TEXT PRIMARY KEY,
-        user_id TEXT NOT NULL,
-        grant_id TEXT NOT NULL,
-        status TEXT DEFAULT 'draft',
-        progress INTEGER DEFAULT 0,
-        started_at TEXT,
-        updated_at TEXT,
-        submitted_at TEXT,
-        notes TEXT,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )''')
-    
-    # Password reset tokens
-    c.execute('''CREATE TABLE IF NOT EXISTS password_resets (
-        email TEXT NOT NULL,
-        token TEXT NOT NULL,
-        created_at TEXT,
-        expires_at TEXT,
-        used INTEGER DEFAULT 0
-    )''')
-    
-    # Organization details - federal identifiers and contact info
-    c.execute('''CREATE TABLE IF NOT EXISTS organization_details (
-        user_id TEXT PRIMARY KEY,
-        ein TEXT,
-        duns TEXT,
-        uei TEXT,
-        address_line1 TEXT,
-        address_line2 TEXT,
-        city TEXT,
-        state TEXT,
-        zip_code TEXT,
-        country TEXT DEFAULT 'USA',
-        phone TEXT,
-        website TEXT,
-        created_at TEXT,
-        updated_at TEXT,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )''')
-    
-    # Organization profile - size and history
-    c.execute('''CREATE TABLE IF NOT EXISTS organization_profile (
-        user_id TEXT PRIMARY KEY,
-        annual_revenue TEXT,
-        year_founded INTEGER,
-        employees TEXT,
-        organization_type TEXT,
-        mission_statement TEXT,
-        programs_description TEXT,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )''')
+    """Initialize user-related database tables.
 
-    # Migrate existing tables: add mission_statement and programs_description if missing
+    On Postgres (Supabase) the schema is applied via supabase_migration.sql,
+    so CREATE TABLE / ALTER TABLE may fail with 'already exists'.  We wrap
+    the entire block in try/except so the app starts cleanly either way.
+    """
+    conn = get_connection()
+    c = conn.cursor()
+
     try:
-        c.execute('ALTER TABLE organization_profile ADD COLUMN mission_statement TEXT')
+        # Users table - expanded for subscriptions
+        c.execute('''CREATE TABLE IF NOT EXISTS users (
+            id TEXT PRIMARY KEY,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            first_name TEXT,
+            last_name TEXT,
+            organization_name TEXT,
+            organization_type TEXT,
+            phone TEXT,
+            role TEXT DEFAULT 'user',
+            plan TEXT DEFAULT 'free',
+            grants_this_month INTEGER DEFAULT 0,
+            max_grants_per_month INTEGER DEFAULT 0,
+            subscription_status TEXT DEFAULT 'inactive',
+            stripe_customer_id TEXT,
+            stripe_subscription_id TEXT,
+            subscription_start TEXT,
+            subscription_end TEXT,
+            created_at TEXT,
+            updated_at TEXT,
+            last_login TEXT
+        )''')
+
+        # User profiles (additional info)
+        c.execute('''CREATE TABLE IF NOT EXISTS user_profiles (
+            user_id TEXT PRIMARY KEY,
+            bio TEXT,
+            interests TEXT,
+            eligible_entities TEXT,
+            funding_amount_min INTEGER,
+            funding_amount_max INTEGER,
+            preferred_categories TEXT,
+            notify_deadlines INTEGER DEFAULT 1,
+            notify_new_grants INTEGER DEFAULT 1,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )''')
+
+        # Saved grants (favorites)
+        c.execute('''CREATE TABLE IF NOT EXISTS saved_grants (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            grant_id TEXT NOT NULL,
+            notes TEXT,
+            saved_at TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            UNIQUE(user_id, grant_id)
+        )''')
+
+        # User applications (tracking)
+        c.execute('''CREATE TABLE IF NOT EXISTS user_applications (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            grant_id TEXT NOT NULL,
+            status TEXT DEFAULT 'draft',
+            progress INTEGER DEFAULT 0,
+            started_at TEXT,
+            updated_at TEXT,
+            submitted_at TEXT,
+            notes TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )''')
+
+        # Password reset tokens
+        c.execute('''CREATE TABLE IF NOT EXISTS password_resets (
+            email TEXT NOT NULL,
+            token TEXT NOT NULL,
+            created_at TEXT,
+            expires_at TEXT,
+            used INTEGER DEFAULT 0
+        )''')
+
+        # Organization details - federal identifiers and contact info
+        c.execute('''CREATE TABLE IF NOT EXISTS organization_details (
+            user_id TEXT PRIMARY KEY,
+            ein TEXT,
+            duns TEXT,
+            uei TEXT,
+            address_line1 TEXT,
+            address_line2 TEXT,
+            city TEXT,
+            state TEXT,
+            zip_code TEXT,
+            country TEXT DEFAULT 'USA',
+            phone TEXT,
+            website TEXT,
+            created_at TEXT,
+            updated_at TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )''')
+
+        # Organization profile - size and history
+        c.execute('''CREATE TABLE IF NOT EXISTS organization_profile (
+            user_id TEXT PRIMARY KEY,
+            annual_revenue TEXT,
+            year_founded INTEGER,
+            employees TEXT,
+            organization_type TEXT,
+            mission_statement TEXT,
+            programs_description TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )''')
+
+        # Migrate existing tables: add mission_statement and programs_description if missing
+        try:
+            c.execute('ALTER TABLE organization_profile ADD COLUMN mission_statement TEXT')
+        except Exception:
+            pass
+        try:
+            c.execute('ALTER TABLE organization_profile ADD COLUMN programs_description TEXT')
+        except Exception:
+            pass
+
+        # Mission and focus areas - who do you serve
+        c.execute('''CREATE TABLE IF NOT EXISTS mission_focus (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            focus_area TEXT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            UNIQUE(user_id, focus_area)
+        )''')
+
+        # Past grant experience
+        c.execute('''CREATE TABLE IF NOT EXISTS past_grant_experience (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            grant_name TEXT,
+            funding_organization TEXT,
+            year_received INTEGER,
+            amount_received INTEGER,
+            status TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )''')
+
+        # Track if user has completed onboarding
+        try:
+            c.execute('''ALTER TABLE users ADD COLUMN onboarding_completed INTEGER DEFAULT 0''')
+        except Exception:
+            pass  # Column already exists (Postgres or repeated SQLite run)
+    except Exception as e:
+        # On Postgres the schema is managed by supabase_migration.sql
+        # so failures here (e.g. AUTOINCREMENT syntax) are expected.
+        import logging
+        logging.getLogger(__name__).info("init_user_db migration note (expected on Postgres): %s", e)
+
+    try:
+        conn.commit()
     except Exception:
         pass
-    try:
-        c.execute('ALTER TABLE organization_profile ADD COLUMN programs_description TEXT')
-    except Exception:
-        pass
-    
-    # Mission and focus areas - who do you serve
-    c.execute('''CREATE TABLE IF NOT EXISTS mission_focus (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id TEXT NOT NULL,
-        focus_area TEXT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id),
-        UNIQUE(user_id, focus_area)
-    )''')
-    
-    # Past grant experience
-    c.execute('''CREATE TABLE IF NOT EXISTS past_grant_experience (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id TEXT NOT NULL,
-        grant_name TEXT,
-        funding_organization TEXT,
-        year_received INTEGER,
-        amount_received INTEGER,
-        status TEXT,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )''')
-    
-    # Track if user has completed onboarding
-    try:
-        c.execute('''ALTER TABLE users ADD COLUMN onboarding_completed INTEGER DEFAULT 0''')
-    except sqlite3.OperationalError as e:
-        if "duplicate column name" not in str(e):
-            raise
-    
-    conn.commit()
     conn.close()
     return True
 
@@ -193,7 +207,7 @@ def verify_password(password, stored):
 
 def create_user(email, password, first_name=None, last_name=None, organization_name=None, plan='free'):
     """Create a new user"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     
     # Check if email exists
@@ -236,33 +250,33 @@ def create_user(email, password, first_name=None, last_name=None, organization_n
 
 def get_user_by_email(email):
     """Get user by email"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     c.execute('SELECT * FROM users WHERE email = ?', (email,))
     row = c.fetchone()
     conn.close()
     
     if row:
-        return dict(zip(USER_COLUMNS, row))
+        return dict(row) if hasattr(row, 'keys') else dict(zip(USER_COLUMNS, row))
     return None
 
 
 def get_user_by_id(user_id):
     """Get user by ID"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     c.execute('SELECT * FROM users WHERE id = ?', (user_id,))
     row = c.fetchone()
     conn.close()
 
     if row:
-        return dict(zip(USER_COLUMNS, row))
+        return dict(row) if hasattr(row, 'keys') else dict(zip(USER_COLUMNS, row))
     return None
 
 
 def update_user_plan(user_id, plan, stripe_customer_id=None, stripe_subscription_id=None):
     """Update user's subscription plan"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     now = datetime.now().isoformat()
     
@@ -294,7 +308,7 @@ def update_user_plan(user_id, plan, stripe_customer_id=None, stripe_subscription
 
 def get_user_profile(user_id):
     """Get user profile"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     c.execute('SELECT * FROM user_profiles WHERE user_id = ?', (user_id,))
     row = c.fetchone()
@@ -302,14 +316,13 @@ def get_user_profile(user_id):
     
     if row:
         # Use column names from cursor description for forward compatibility
-        columns = [desc[0] for desc in c.description]
-        return dict(zip(columns, row))
+        return dict(row) if hasattr(row, 'keys') else dict(zip([desc[0] for desc in c.description], row))
     return None
 
 
 def update_user_profile(user_id, profile_data):
     """Update user profile"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     now = datetime.now().isoformat()
     
@@ -354,7 +367,7 @@ def update_user_profile(user_id, profile_data):
 
 def save_grant(user_id, grant_id, notes=None):
     """Save a grant to user's favorites"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     now = datetime.now().isoformat()
     
@@ -371,7 +384,7 @@ def save_grant(user_id, grant_id, notes=None):
 
 def unsave_grant(user_id, grant_id):
     """Remove a grant from favorites"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     c.execute('DELETE FROM saved_grants WHERE user_id = ? AND grant_id = ?', (user_id, grant_id))
     conn.commit()
@@ -380,7 +393,7 @@ def unsave_grant(user_id, grant_id):
 
 def get_saved_grants(user_id):
     """Get all saved grants for a user"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     c.execute('''SELECT s.grant_id, s.notes, s.saved_at 
                  FROM saved_grants s 
@@ -388,12 +401,12 @@ def get_saved_grants(user_id):
                  ORDER BY s.saved_at DESC''', (user_id,))
     rows = c.fetchall()
     conn.close()
-    return [dict(zip(['grant_id', 'notes', 'saved_at'], row)) for row in rows]
+    return [dict(row) if hasattr(row, 'keys') else dict(zip(['grant_id', 'notes', 'saved_at'], row)) for row in rows]
 
 
 def get_user_grants(user_id):
     """Get all applications/grants for a user"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     c.execute('''SELECT a.id, a.grant_id, a.status, a.progress, a.started_at, a.updated_at, a.submitted_at, a.notes
                  FROM user_applications a 
@@ -401,12 +414,12 @@ def get_user_grants(user_id):
                  ORDER BY a.updated_at DESC''', (user_id,))
     rows = c.fetchall()
     conn.close()
-    return [dict(zip(['id', 'grant_id', 'status', 'progress', 'started_at', 'updated_at', 'submitted_at', 'notes'], row)) for row in rows]
+    return [dict(row) if hasattr(row, 'keys') else dict(zip(['id', 'grant_id', 'status', 'progress', 'started_at', 'updated_at', 'submitted_at', 'notes'], row)) for row in rows]
 
 
 def get_user_clients(user_id):
     """Get list of client IDs for a user"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     c.execute('SELECT id FROM clients WHERE user_id = ?', (user_id,))
     rows = c.fetchall()
@@ -416,7 +429,7 @@ def get_user_clients(user_id):
 
 def get_all_clients():
     """Get all clients"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
     c.execute('SELECT * FROM clients ORDER BY created_at DESC')
@@ -427,7 +440,7 @@ def get_all_clients():
 
 def is_grant_saved(user_id, grant_id):
     """Check if a grant is saved by user"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     c.execute('SELECT id FROM saved_grants WHERE user_id = ? AND grant_id = ?', (user_id, grant_id))
     row = c.fetchone()
@@ -437,7 +450,7 @@ def is_grant_saved(user_id, grant_id):
 
 def create_password_reset(email):
     """Create password reset token"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     
     # Check if user exists
@@ -463,7 +476,7 @@ def create_password_reset(email):
 
 def verify_password_reset(token):
     """Verify and use password reset token"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute('SELECT email, expires_at, used FROM password_resets WHERE token = ?', (token,))
@@ -493,7 +506,7 @@ def use_password_reset(token, new_password):
     if error:
         return False, error
     
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     
     password_hash = hash_password(new_password)
@@ -508,7 +521,7 @@ def use_password_reset(token, new_password):
 
 def update_last_login(user_id):
     """Update user's last login time"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     c.execute('UPDATE users SET last_login = ? WHERE id = ?', (datetime.now().isoformat(), user_id))
     conn.commit()
@@ -517,7 +530,7 @@ def update_last_login(user_id):
 
 def update_user(user_id, user_data):
     """Update user record"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     now = datetime.now().isoformat()
     
@@ -548,7 +561,7 @@ def update_user(user_id, user_data):
 
 def check_grant_limit(user_id):
     """Check if user can create more grants. Returns (can_create: bool, message: str, remaining: int)"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute('SELECT grants_this_month, max_grants_per_month, plan, subscription_status FROM users WHERE id = ?', (user_id,))
@@ -578,7 +591,7 @@ def check_grant_limit(user_id):
 
 def increment_grant_count(user_id):
     """Increment the user's grant count for this month"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute('UPDATE users SET grants_this_month = grants_this_month + 1 WHERE id = ?', (user_id,))
@@ -588,7 +601,7 @@ def increment_grant_count(user_id):
 
 def reset_monthly_grants():
     """Reset grant counts for all users at the start of a new month - run via cron"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute('UPDATE users SET grants_this_month = 0')
@@ -601,7 +614,7 @@ def reset_monthly_grants():
 
 def get_user_plan(user_id):
     """Get user's plan and limits"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute('SELECT plan, grants_this_month, max_grants_per_month FROM users WHERE id = ?', (user_id,))
@@ -642,7 +655,7 @@ if __name__ == '__main__':
 
 def get_organization_details(user_id):
     """Get all organization details for a user"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     
     # Get organization details
@@ -651,8 +664,8 @@ def get_organization_details(user_id):
     
     org_details = None
     if row:
-        org_details = dict(zip(['user_id', 'ein', 'duns', 'uei', 'address_line1', 'address_line2', 
-                               'city', 'state', 'zip_code', 'country', 'phone', 'website', 
+        org_details = dict(row) if hasattr(row, 'keys') else dict(zip(['user_id', 'ein', 'duns', 'uei', 'address_line1', 'address_line2',
+                               'city', 'state', 'zip_code', 'country', 'phone', 'website',
                                'created_at', 'updated_at'], row))
     
     # Get organization profile
@@ -663,12 +676,12 @@ def get_organization_details(user_id):
     if row:
         cols = ['user_id', 'annual_revenue', 'year_founded', 'employees', 'organization_type',
                 'mission_statement', 'programs_description']
-        # Handle DBs that may not have new columns yet
-        org_profile = dict(zip(cols[:len(row)], row))
+        org_profile = dict(row) if hasattr(row, 'keys') else dict(zip(cols[:len(row)], row))
     
     # Get focus areas
     c.execute('SELECT focus_area FROM mission_focus WHERE user_id = ?', (user_id,))
-    focus_areas = [row[0] for row in c.fetchall()]
+    focus_rows = c.fetchall()
+    focus_areas = [row['focus_area'] if hasattr(row, 'keys') else row[0] for row in focus_rows]
     
     # Get past grant experience
     c.execute('SELECT id, grant_name, funding_organization, year_received, amount_received, status FROM past_grant_experience WHERE user_id = ?', (user_id,))
@@ -701,7 +714,7 @@ def get_organization_details(user_id):
 
 def save_organization_details(user_id, data):
     """Save all organization details for a user"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     now = datetime.now().isoformat()
     
@@ -759,7 +772,7 @@ def save_organization_details(user_id, data):
 
 def is_onboarding_complete(user_id):
     """Check if user has completed onboarding"""
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = get_connection()
     c = conn.cursor()
     c.execute('SELECT onboarding_completed FROM users WHERE id = ?', (user_id,))
     row = c.fetchone()
