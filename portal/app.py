@@ -1712,7 +1712,16 @@ def start_application(grant_id):
     if not research_grant:
         flash('Grant not found', 'error')
         return redirect(url_for('grants'))
-    
+
+    # Check if this grant allows direct application
+    if research_grant.get('direct_apply') == False or research_grant.get('direct_apply') == 0:
+        grant_type = research_grant.get('grant_type', 'formula')
+        message = research_grant.get('ineligible_message',
+            f'This is a {grant_type} grant. Your organization may not be eligible to apply directly. '
+            'Contact the administering agency for guidance on the application process.')
+        flash(message, 'error')
+        return redirect(url_for('grants'))
+
     # Get user's clients
     conn = get_db()
     user_id = session.get('user_id')
