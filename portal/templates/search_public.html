@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Grants - Grant Pro</title>
+    <meta name="description" content="Search {{ grants|length }}+ federal grants from 21 agencies. Find funding for nonprofits, small businesses, and public agencies. No account required.">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%232563eb'/%3E%3Cstop offset='100%25' stop-color='%231d4ed8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='20' y='26' text-anchor='middle' fill='white' font-family='Inter,Helvetica,Arial,sans-serif' font-weight='700' font-size='16'%3EGP%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fc;
+            --bg-tertiary: #f1f3f6;
+            --border-color: #e2e5ed;
+            --text-primary: #1a1f36;
+            --text-secondary: #5e6278;
+            --text-muted: #8993a4;
+            --accent-primary: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-success: #059669;
+            --accent-warning: #d97706;
+            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.875rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg { width: 20px; height: 20px; fill: white; }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 1.75rem;
+        }
+
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.15s;
+        }
+
+        .nav a:hover { color: var(--text-primary); }
+        .nav a.active { color: var(--accent-primary); font-weight: 600; }
+
+        .nav-btn {
+            background: var(--gradient-primary);
+            color: white !important;
+            padding: 0.5rem 1.1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .nav-btn:hover { box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+
+        /* Hamburger */
+        .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 0.5rem; }
+        .hamburger svg { width: 24px; height: 24px; stroke: var(--text-primary); stroke-width: 2; stroke-linecap: round; fill: none; }
+
+        .mobile-nav {
+            display: none;
+            flex-direction: column;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 2rem 1rem;
+        }
+
+        .mobile-nav.open { display: flex; }
+        .mobile-nav a { padding: 0.6rem 0; color: var(--text-secondary); text-decoration: none; font-weight: 500; font-size: 0.95rem; border-bottom: 1px solid var(--border-color); }
+        .mobile-nav a:last-child { border-bottom: none; }
+
+        /* Search Hero */
+        .search-hero {
+            background: var(--bg-primary);
+            padding: 2.5rem 2rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-hero h1 span { color: var(--accent-primary); }
+
+        .search-hero p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Search + Filters */
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .search-bar {
+            max-width: 700px;
+            margin: 0 auto 1.25rem;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.875rem 1.25rem 0.875rem 3rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: border-color 0.2s;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-bar input::placeholder { color: var(--text-muted); }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .filters {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+
+        .filters select {
+            padding: 0.55rem 2rem 0.55rem 0.85rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238993a4' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+        }
+
+        .filters select:focus { outline: none; border-color: var(--accent-primary); }
+
+        .results-count {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding: 0.75rem 0;
+        }
+
+        .results-count strong { color: var(--text-primary); }
+
+        /* Results */
+        .results {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem 3rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .grant-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: box-shadow 0.2s, transform 0.15s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grant-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .grant-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .grant-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--text-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .badge-agency {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--accent-primary);
+        }
+
+        .badge-category {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-success);
+        }
+
+        .grant-desc {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.55;
+            margin-bottom: 1rem;
+            flex: 1;
+        }
+
+        .grant-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .grant-meta-item {
+            font-size: 0.75rem;
+        }
+
+        .grant-meta-label {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.15rem;
+        }
+
+        .grant-meta-value {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .grant-meta-value.amount { color: var(--accent-success); }
+        .grant-meta-value.deadline { color: var(--accent-warning); }
+
+        .grant-card-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn-signup {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.5rem 1rem;
+            background: var(--gradient-primary);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: box-shadow 0.2s;
+        }
+
+        .btn-signup:hover { box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+
+        /* No results */
+        .no-results {
+            display: none;
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem 2rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+        }
+
+        .no-results h3 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .no-results p { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1rem; }
+
+        .no-results a {
+            display: inline-block;
+            padding: 0.6rem 1.25rem;
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--text-primary);
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+
+        footer p { color: rgba(255,255,255,0.6); font-size: 0.85rem; }
+        footer a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.8rem; }
+        footer a:hover { color: white; }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 0.75rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav { display: none; }
+            .hamburger { display: block; }
+            .results { grid-template-columns: 1fr; padding: 1rem; }
+            .search-hero { padding: 1.5rem 1rem 1.25rem; }
+            .search-hero h1 { font-size: 1.5rem; }
+            .filters { gap: 0.5rem; }
+            .filters select { font-size: 0.8rem; padding: 0.5rem 1.75rem 0.5rem 0.65rem; }
+            .search-container { padding: 0 1rem; }
+            .grant-meta { gap: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo" aria-label="Grant Pro home">
+                <div class="logo-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" role="img" aria-label="Grant Pro logo"><defs><linearGradient id="gp-hdr" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2563eb"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs><rect width="40" height="40" rx="8" fill="url(#gp-hdr)"/><text x="20" y="26" text-anchor="middle" fill="white" font-family="Inter,Helvetica,Arial,sans-serif" font-weight="700" font-size="16">GP</text></svg>
+                </div>
+                <span class="logo-text">Grant Pro</span>
+            </a>
+            <nav class="nav" role="navigation" aria-label="Main navigation">
+                <a href="/">Home</a>
+                <a href="/pricing">Pricing</a>
+                <a href="/search" class="active">Search Grants</a>
+                <a href="/login">Sign In</a>
+                <a href="/signup?plan=monthly" class="nav-btn">Get Started</a>
+            </nav>
+            <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileNav">
+                <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="mobile-nav" id="mobileNav" role="navigation" aria-label="Mobile navigation">
+            <a href="/">Home</a>
+            <a href="/pricing">Pricing</a>
+            <a href="/search">Search Grants</a>
+            <a href="/login">Sign In</a>
+            <a href="/signup?plan=monthly" class="nav-btn">Get Started</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="search-hero">
+            <h1>Search <span>{{ grants|length }}+</span> Federal Grants</h1>
+            <p>Browse funding opportunities from 21 federal agencies. No account required.</p>
+            <div class="search-container">
+                <div class="search-bar">
+                    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="searchInput" placeholder="Search by keyword, agency, or topic..." onkeyup="filterGrants()" aria-label="Search grants">
+                </div>
+                <div class="filters">
+                    <select id="agencyFilter" onchange="filterGrants()" aria-label="Filter by agency">
+                        <option value="">All Agencies</option>
+                        <option value="NSF">NSF</option>
+                        <option value="DOE">DOE</option>
+                        <option value="NIH">NIH</option>
+                        <option value="USDA">USDA</option>
+                        <option value="HUD">HUD</option>
+                        <option value="EPA">EPA</option>
+                        <option value="DOT">DOT</option>
+                        <option value="NIST">NIST</option>
+                        <option value="ED">ED (Education)</option>
+                        <option value="HHS">HHS</option>
+                        <option value="SAMHSA">SAMHSA</option>
+                        <option value="DOJ">DOJ</option>
+                        <option value="DOL">DOL</option>
+                        <option value="NASA">NASA</option>
+                        <option value="DOD">DOD</option>
+                        <option value="FEMA">FEMA</option>
+                        <option value="NEA">NEA</option>
+                        <option value="SBA">SBA</option>
+                        <option value="DOC">DOC</option>
+                        <option value="DOI">DOI</option>
+                        <option value="VA">VA</option>
+                    </select>
+                    <select id="categoryFilter" onchange="filterGrants()" aria-label="Filter by category">
+                        <option value="">All Categories</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Education">Education</option>
+                        <option value="Environment">Environment</option>
+                        <option value="Energy">Energy</option>
+                        <option value="Manufacturing">Manufacturing</option>
+                        <option value="Agriculture">Agriculture</option>
+                        <option value="Housing">Housing</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Science">Science</option>
+                        <option value="Community">Community</option>
+                        <option value="Defense">Defense</option>
+                    </select>
+                    <select id="amountFilter" onchange="filterGrants()" aria-label="Filter by amount range">
+                        <option value="">Any Amount</option>
+                        <option value="50000">$50K+</option>
+                        <option value="100000">$100K+</option>
+                        <option value="250000">$250K+</option>
+                        <option value="500000">$500K+</option>
+                        <option value="1000000">$1M+</option>
+                        <option value="5000000">$5M+</option>
+                    </select>
+                </div>
+                <div class="results-count" id="resultsCount">
+                    Showing <strong>{{ grants|length }}</strong> grants
+                </div>
+            </div>
+        </section>
+
+        <div class="results" id="grantsList">
+            {% for grant in grants %}
+            <div class="grant-card"
+                 data-title="{{ grant.title|lower }}"
+                 data-agency="{{ grant.agency }}"
+                 data-agency-code="{{ grant.agency_code|default(grant.agency) }}"
+                 data-category="{{ grant.category }}"
+                 data-amount="{{ grant.amount_max }}"
+                 data-description="{{ grant.description[:200]|lower }}">
+                <div class="grant-card-top">
+                    <h3>{{ grant.title }}</h3>
+                    <span class="badge badge-agency">{{ grant.agency_code|default(grant.agency) }}</span>
+                </div>
+                <p class="grant-desc">{{ grant.description[:180] }}{% if grant.description|length > 180 %}...{% endif %}</p>
+                <div class="grant-meta">
+                    <div class="grant-meta-item">
+                        <div class="grant-meta-label">Funding</div>
+                        <div class="grant-meta-value amount">${{ "{:,.0f}".format(grant.amount_min) }} - ${{ "{:,.0f}".format(grant.amount_max) }}</div>
+                    </div>
+                    <div class="grant-meta-item">
+                        <div class="grant-meta-label">Category</div>
+                        <div class="grant-meta-value"><span class="badge badge-category">{{ grant.category }}</span></div>
+                    </div>
+                    {% if grant.deadline %}
+                    <div class="grant-meta-item">
+                        <div class="grant-meta-label">Deadline</div>
+                        <div class="grant-meta-value deadline">{{ grant.deadline[:10] }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="grant-card-actions">
+                    <a href="/signup?plan=monthly" class="btn-signup">Sign Up to Apply</a>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="no-results" id="noResults">
+                <h3>No grants match your search</h3>
+                <p>Don't see your grant? We add new grants weekly. Sign up free to request a template.</p>
+                <a href="/signup?tier=free">Sign Up Free</a>
+            </div>
+        </div>
+    </main>
+
+    <footer role="contentinfo">
+        <div class="footer-inner">
+            <p>&copy; 2026 Grant Pro by Futurespec Consulting, LLC. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="/terms">Terms</a>
+                <a href="/privacy">Privacy</a>
+                <a href="/refund">Refunds</a>
+                <a href="/help">Help</a>
+                <a href="/contact">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // Mobile nav toggle
+    document.getElementById('hamburger').addEventListener('click', function() {
+        var nav = document.getElementById('mobileNav');
+        nav.classList.toggle('open');
+        this.setAttribute('aria-expanded', nav.classList.contains('open'));
+    });
+
+    // Client-side filtering
+    function filterGrants() {
+        var search = document.getElementById('searchInput').value.toLowerCase();
+        var agency = document.getElementById('agencyFilter').value;
+        var category = document.getElementById('categoryFilter').value;
+        var amount = parseInt(document.getElementById('amountFilter').value) || 0;
+
+        var cards = document.querySelectorAll('.grant-card');
+        var visible = 0;
+
+        cards.forEach(function(card) {
+            var title = card.dataset.title || '';
+            var desc = card.dataset.description || '';
+            var cardAgency = card.dataset.agencyCode || '';
+            var cardCategory = card.dataset.category || '';
+            var cardAmount = parseInt(card.dataset.amount) || 0;
+
+            var matchesSearch = !search || title.indexOf(search) !== -1 || desc.indexOf(search) !== -1;
+            var matchesAgency = !agency || cardAgency.indexOf(agency) !== -1;
+            var matchesCategory = !category || cardCategory.indexOf(category) !== -1;
+            var matchesAmount = !amount || cardAmount >= amount;
+
+            if (matchesSearch && matchesAgency && matchesCategory && matchesAmount) {
+                card.style.display = 'flex';
+                visible++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        document.getElementById('noResults').style.display = visible === 0 ? 'block' : 'none';
+        document.getElementById('resultsCount').innerHTML = 'Showing <strong>' + visible + '</strong> of {{ grants|length }} grants';
+    }
+
+    // Apply URL query params on load
+    (function() {
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('q')) {
+            document.getElementById('searchInput').value = params.get('q');
+        }
+        if (params.get('agency')) {
+            document.getElementById('agencyFilter').value = params.get('agency');
+        }
+        if (params.get('category')) {
+            document.getElementById('categoryFilter').value = params.get('category');
+        }
+        if (params.get('q') || params.get('agency') || params.get('category')) {
+            filterGrants();
+        }
+    })();
+    </script>
+</body>
+</html>

@@ -842,6 +842,7 @@
                 <a href="#features">Features</a>
                 <a href="#how-it-works">How It Works</a>
                 <a href="#pricing">Pricing</a>
+                <a href="/search">Search Grants</a>
                 <a href="/login" class="nav-btn">Sign In</a>
             </nav>
             <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileNav">
@@ -852,6 +853,7 @@
             <a href="#features">Features</a>
             <a href="#how-it-works">How It Works</a>
             <a href="#pricing">Pricing</a>
+            <a href="/search">Search Grants</a>
             <a href="/login" class="nav-btn">Sign In</a>
         </div>
     </header>
@@ -869,6 +871,12 @@
             <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
                 Search {{ grants_count|default('thousands of') }}+ federal grants free &bull; AI writing + guided submission from $19.95/mo &bull; Cancel anytime
             </p>
+            <div style="margin-top: 2rem; padding: 1.25rem 2rem; background: rgba(37, 99, 235, 0.06); border: 1px solid rgba(37, 99, 235, 0.15); border-radius: 10px; display: inline-block;">
+                <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                    Not sure if your grant is in our system? Search our database of <strong>{{ grants_count|default('thousands of') }}+</strong> federal grants before signing up.
+                </p>
+                <a href="/search" style="display: inline-flex; align-items: center; gap: 0.4rem; background: var(--gradient-primary); color: white; padding: 0.6rem 1.25rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Search Our Grant Database &rarr;</a>
+            </div>
         </div>
     </section>
     

@@ -395,6 +395,13 @@ def pricing():
     return render_template('pricing.html')
 
 
+@app.route('/search')
+def search_public():
+    """Public grant search page - no login required"""
+    all_grants = grant_researcher.get_all_grants()
+    return render_template('search_public.html', grants=all_grants)
+
+
 @app.route('/help')
 @app.route('/faq')
 def help():
