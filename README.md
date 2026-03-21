@@ -18,18 +18,23 @@ An end-to-end grant writing platform powered by Google Gemini AI. Built for cons
 6. [Features](#features)
 7. [Template System](#template-system)
 8. [Subscription Model](#subscription-model)
-9. [Environment Variables](#environment-variables)
-10. [Getting Started](#getting-started)
-11. [Production Deployment](#production-deployment)
-12. [Security](#security)
-13. [File Reference](#file-reference)
-14. [Changelog](#changelog)
+9. [Grants.gov Integration](#grantsgov-integration)
+10. [Automated Jobs](#automated-jobs)
+11. [Award Detection & Testimonials](#award-detection--testimonials)
+12. [PDF Branding](#pdf-branding)
+13. [Environment Variables](#environment-variables)
+14. [Getting Started](#getting-started)
+15. [Production Deployment](#production-deployment)
+16. [Vercel Deployment](#vercel-deployment)
+17. [Security](#security)
+18. [File Reference](#file-reference)
+19. [Changelog](#changelog)
 
 ---
 
 ## Project Overview
 
-GrantPro is a self-hosted web application that helps users discover, write, and submit federal grant applications. It combines a database of 131 federal grant opportunities with 21 agency-specific templates and AI-powered content generation to guide users through the entire grant lifecycle -- from research to submission tracking.
+GrantPro is a self-hosted web application that helps users discover, write, and submit federal grant applications. It combines a live-synced catalog of federal grant opportunities (seeded from 131 grants, updated daily from Grants.gov) with 21 agency-specific templates and AI-powered content generation to guide users through the entire grant lifecycle -- from research to submission tracking.
 
 ### Who It's For
 
@@ -42,7 +47,7 @@ GrantPro is a self-hosted web application that helps users discover, write, and 
 
 ### Business Model
 
-Subscription SaaS at **$19.95/month** or **$199.95/year**, with a free tier for research-only access and an enterprise tier for client management. Payments processed via Stripe.
+Subscription SaaS with six tiers from free to Enterprise Unlimited ($99.95/mo), including three enterprise plans for consultants managing multiple client agencies. Payments processed via Stripe.
 
 ---
 
@@ -98,11 +103,16 @@ Subscription SaaS at **$19.95/month** or **$199.95/year**, with a free tier for 
 │       ├── admin_templates.html    # Admin template CMS
 │       ├── admin_leads.html        # Admin leads management
 │       ├── admin_emails.html       # Admin email tools
+│       ├── admin_testimonials.html # Admin testimonial approval workflow
+│       ├── testimonial_form.html   # Token-based testimonial submission form
+│       ├── testimonial_thankyou.html # Testimonial submission confirmation
 │       ├── terms.html              # Terms of Service
 │       ├── privacy.html            # Privacy Policy
 │       ├── refund.html             # Refund Policy
 │       ├── help.html               # FAQ / Help
 │       └── message.html            # Flash message page
+├── api/                            # Vercel serverless entry point
+│   └── index.py                    # WSGI adapter for Vercel deployment
 ├── core/                           # Backend business logic
 │   ├── user_models.py              # User auth, profiles, subscriptions
 │   ├── grant_db.py                 # Grant/client/draft database operations
@@ -110,7 +120,12 @@ Subscription SaaS at **$19.95/month** or **$199.95/year**, with a free tier for 
 │   ├── stripe_payment.py           # Stripe subscription integration
 │   ├── budget_builder.py           # Budget category builder
 │   ├── deadline_reminder.py        # Deadline notification system
+│   ├── pdf_utils.py                # PDF generation with "Assembled by GrantPro.org" branding
+│   ├── db_connection.py            # Database connection factory (SQLite + Turso fallback)
 │   └── cli.py                      # Command-line interface
+├── jobs/                           # Automated background jobs
+│   ├── sync_grants_gov.py          # Daily Grants.gov catalog sync
+│   └── check_awards.py             # Award winner detection via USAspending.gov
 ├── research/                       # Grant research engine
 │   ├── grant_researcher.py         # Grant search, filtering, matching
 │   ├── iot_grants_db.json          # 131 federal grant opportunities
@@ -153,6 +168,8 @@ Subscription SaaS at **$19.95/month** or **$199.95/year**, with a free tier for 
 ├── drafts/                         # Draft exports (empty)
 ├── output/                         # Generated file output (empty)
 ├── reviews/                        # Grant reviews (empty)
+├── vercel.json                     # Vercel deployment configuration
+├── .env.example                    # Environment variable template
 ├── AI_PROMPTS.md                   # AI prompt templates per section
 ├── INTAKE_QUESTIONS.md             # 37 client intake questions
 ├── DOCUMENT_CHECKLIST.md           # Required docs per grant type
@@ -567,7 +584,7 @@ All routes are defined in `portal/app.py`. Decorators are listed in order of app
 
 ### Subscription Management
 
-- Four tiers: Free, Monthly ($19.95), Annual ($199.95), Enterprise (custom)
+- Six tiers: Free, Monthly ($19.95), Annual ($199.95), Enterprise 5/10/Unlimited
 - Stripe Checkout integration for payment
 - Subscription lifecycle: create, manage, cancel
 - Stripe webhook handler for status updates
@@ -711,17 +728,19 @@ Each template includes:
 
 ## Subscription Model
 
-| Tier | Price | Grants/Month | Key Features |
-|------|-------|--------------|--------------|
-| **Free** | $0 | 0 | Search grants, save favorites, view templates, eligibility checker |
-| **Monthly** | $19.95/mo | 3 | AI writing, guided submission, paper submission, downloads, cloning |
-| **Annual** | $199.95/yr | 36 (3/mo) | Same as Monthly, save ~$40/year |
-| **Enterprise** | Custom | Unlimited | Client management, white-label, API access |
+| Tier | Price | Grants/Month | Organizations | Key Features |
+|------|-------|--------------|---------------|--------------|
+| **Free** | $0 | 0 | -- | Search grants, save favorites, eligibility checker, wizard |
+| **Monthly** | $19.95/mo | 3 | 1 | AI writing, guided submission, paper submission, downloads, cloning, templates |
+| **Annual** | $199.95/yr | 3/mo | 1 | Same as Monthly, save $39.45/year |
+| **Enterprise 5** | $44.95/mo | Unlimited | Up to 5 client agencies | Everything in Monthly + multi-client management |
+| **Enterprise 10** | $74.95/mo | Unlimited | Up to 10 clients | Everything in Enterprise 5 + white-label reports |
+| **Enterprise Unlimited** | $99.95/mo | Unlimited | Unlimited | Everything, no caps |
 
 ### Anti-Reseller Policy
 
 - **Free/Monthly/Annual**: Only for grants submitted in the account holder's organization name
-- **Enterprise**: Required if writing grants for clients (resale permitted)
+- **Enterprise tiers**: Required if writing grants for clients (resale permitted)
 - **Rationale**: Prevents users from purchasing a base plan and reselling access to multiple organizations
 
 ### Feature Gating
@@ -737,6 +756,89 @@ The `@paid_required` decorator gates these features behind a paid plan:
 
 ---
 
+## Grants.gov Integration
+
+GrantPro maintains a local `grants_catalog` SQLite table that serves as the canonical source of grant opportunities.
+
+### Data Pipeline
+
+1. **Seed data**: The original 131 grants from `research/iot_grants_db.json` were loaded into the `grants_catalog` table as the initial dataset.
+2. **Daily sync**: `jobs/sync_grants_gov.py` pulls new and updated opportunities from the Grants.gov API every 24 hours.
+3. **Auto-archiving**: Grants past their close date are automatically marked as `archived` during each sync run, keeping the catalog current.
+4. **Dynamic counts**: Templates reference the live grant count from `grants_catalog` rather than a hardcoded number, so the landing page and search always reflect the real catalog size.
+
+### grants_catalog Table
+
+| Column | Type | Notes |
+|--------|------|-------|
+| id | INTEGER | PK, autoincrement |
+| opportunity_id | TEXT | Grants.gov opportunity ID, UNIQUE |
+| title | TEXT | Grant title |
+| agency | TEXT | Funding agency |
+| cfda | TEXT | CFDA/Assistance Listing number |
+| close_date | TEXT | Application deadline |
+| amount | REAL | Estimated funding |
+| status | TEXT | `active`, `archived` |
+| synced_at | TEXT | Last sync timestamp |
+
+---
+
+## Automated Jobs
+
+Background jobs live in the `jobs/` directory and are designed to run via cron.
+
+| Job | File | Schedule | Description |
+|-----|------|----------|-------------|
+| Grants.gov sync | `jobs/sync_grants_gov.py` | Daily at 2:00 AM | Pulls new opportunities from Grants.gov API, updates existing records, archives expired grants |
+| Award detection | `jobs/check_awards.py` | Daily at 6:00 AM | Cross-references USAspending.gov awards against GrantPro users to detect wins |
+| Deadline reminders | `core/deadline_reminder.py` | Weekdays at 8:00 AM | Sends reminder emails for upcoming grant deadlines |
+
+### Cron Setup
+
+```bash
+crontab -e
+
+# Grants.gov daily sync
+0 2 * * * /usr/bin/python3 ~/.hermes/grant-system/jobs/sync_grants_gov.py
+
+# Award winner detection
+0 6 * * * /usr/bin/python3 ~/.hermes/grant-system/jobs/check_awards.py
+
+# Deadline reminders (weekdays)
+0 8 * * 1-5 /usr/bin/python3 ~/.hermes/grant-system/core/deadline_reminder.py
+```
+
+---
+
+## Award Detection & Testimonials
+
+### How It Works
+
+1. **Detection**: `jobs/check_awards.py` queries the USAspending.gov API daily and cross-references awarded grants against GrantPro users by organization name and grant opportunity number.
+2. **Congratulations email**: When a match is found, the system sends an automated congratulations email to the user with a unique token-based link to submit a testimonial.
+3. **Testimonial form**: The user clicks the link, which loads `testimonial_form.html` -- a simple form where they can share their experience. The token ensures only verified award winners can submit.
+4. **Admin approval**: Submitted testimonials appear in `admin_testimonials.html` where admins can review, approve, or reject them.
+5. **Landing page display**: Approved testimonials are displayed on the public landing page to build social proof.
+
+### Token Flow
+
+```
+check_awards.py detects win
+  → generates secure token (secrets.token_urlsafe)
+  → stores token + user_id + grant_id in testimonial_tokens table
+  → sends congratulations email with /testimonial/<token> link
+  → user submits form → testimonial saved as "pending"
+  → admin approves → testimonial displayed on landing page
+```
+
+---
+
+## PDF Branding
+
+Every PDF generated by GrantPro (paper submission packages, SF-424 forms, grant downloads) includes an **"Assembled by GrantPro.org"** footer on every page. This is handled by `core/pdf_utils.py` which provides a shared ReportLab canvas callback used across all PDF generation points.
+
+---
+
 ## Environment Variables
 
 ### Required
@@ -747,6 +849,9 @@ The `@paid_required` decorator gates these features behind a paid plan:
 | `STRIPE_API_KEY` | Stripe secret key | `sk_live_...` |
 | `STRIPE_MONTHLY_PRICE_ID` | Stripe price ID for monthly plan | `price_...` |
 | `STRIPE_ANNUAL_PRICE_ID` | Stripe price ID for annual plan | `price_...` |
+| `STRIPE_ENTERPRISE_5_PRICE_ID` | Stripe price ID for Enterprise 5 plan | `price_...` |
+| `STRIPE_ENTERPRISE_10_PRICE_ID` | Stripe price ID for Enterprise 10 plan | `price_...` |
+| `STRIPE_ENTERPRISE_UNLIMITED_PRICE_ID` | Stripe price ID for Enterprise Unlimited plan | `price_...` |
 
 ### Optional
 
@@ -759,6 +864,8 @@ The `@paid_required` decorator gates these features behind a paid plan:
 | `BASE_URL` | Base URL for email links | `http://localhost:5001` |
 | `DOMAIN_NAME` | Production domain | `grantpro.org` |
 | `HTTPS` | Set to `true` to enable secure cookies | `false` |
+| `TURSO_DATABASE_URL` | Turso database URL for cloud-hosted SQLite | Local SQLite fallback |
+| `TURSO_AUTH_TOKEN` | Turso authentication token | Not used if local SQLite |
 
 ### Where to Set
 
@@ -870,6 +977,50 @@ sqlite3 ~/.hermes/grant-system/tracking/grants.db \
 
 ---
 
+## Vercel Deployment
+
+GrantPro can be deployed to Vercel as a serverless Python application.
+
+### Configuration Files
+
+- **`vercel.json`**: Routes all requests to the `api/index.py` serverless function. Configures Python runtime and build settings.
+- **`api/index.py`**: WSGI adapter that wraps the Flask app for Vercel's serverless environment.
+- **`core/db_connection.py`**: Database connection factory that uses Turso (libSQL over HTTP) when `TURSO_DATABASE_URL` is set, falling back to local SQLite for development.
+- **`.env.example`**: Template listing all required and optional environment variables.
+
+### Deployment Steps
+
+```bash
+# 1. Install Vercel CLI
+npm i -g vercel
+
+# 2. Login and link project
+vercel login
+vercel link
+
+# 3. Set environment variables
+vercel env add GOOGLE_API_KEY
+vercel env add STRIPE_API_KEY
+vercel env add STRIPE_MONTHLY_PRICE_ID
+vercel env add STRIPE_ANNUAL_PRICE_ID
+vercel env add STRIPE_ENTERPRISE_5_PRICE_ID
+vercel env add STRIPE_ENTERPRISE_10_PRICE_ID
+vercel env add STRIPE_ENTERPRISE_UNLIMITED_PRICE_ID
+vercel env add TURSO_DATABASE_URL
+vercel env add TURSO_AUTH_TOKEN
+vercel env add RESEND_API_KEY
+vercel env add SECRET_KEY
+
+# 4. Deploy
+vercel deploy
+```
+
+### Turso Database
+
+For production on Vercel, use [Turso](https://turso.tech/) as the hosted SQLite backend. `core/db_connection.py` detects the `TURSO_DATABASE_URL` environment variable and connects via libSQL over HTTP. When the variable is absent (local development), it falls back to the local `tracking/grants.db` file.
+
+---
+
 ## Security
 
 ### Authentication & Sessions
@@ -940,11 +1091,21 @@ A custom WSGI middleware (`_ServerHeaderStripper`) overrides the `Server` header
 | `core/email_system.py` | Transactional email via Resend API (console fallback) |
 | `core/budget_builder.py` | Federal budget category definitions and builder |
 | `core/deadline_reminder.py` | File-based deadline reminder system |
+| `core/pdf_utils.py` | PDF branding utilities ("Assembled by GrantPro.org" footer) |
+| `core/db_connection.py` | Database connection factory (local SQLite + Turso fallback) |
 | `core/cli.py` | Command-line interface for grant operations |
+| `jobs/sync_grants_gov.py` | Daily Grants.gov catalog sync job |
+| `jobs/check_awards.py` | Award winner detection via USAspending.gov |
+| `api/index.py` | Vercel serverless WSGI entry point |
 | `research/grant_researcher.py` | Grant search engine -- search, filter, match from JSON database |
 | `research/iot_grants_db.json` | 131 federal grant opportunity records |
 | `templates/agency_templates.json` | 21 agency template definitions (sections, guidance, limits) |
 | `portal/templates/layout.html` | Base HTML template (dark theme, Inter/Playfair fonts, nav, CSS) |
+| `vercel.json` | Vercel deployment configuration |
+| `.env.example` | Environment variable template for new deployments |
+| `portal/templates/testimonial_form.html` | Token-based testimonial submission form |
+| `portal/templates/testimonial_thankyou.html` | Testimonial submission confirmation page |
+| `portal/templates/admin_testimonials.html` | Admin testimonial approval workflow |
 | `AI_PROMPTS.md` | Prompt templates for AI section generation |
 | `INTAKE_QUESTIONS.md` | 37 client intake questions |
 | `DOCUMENT_CHECKLIST.md` | Required documents by grant type |
@@ -958,6 +1119,25 @@ A custom WSGI middleware (`_ServerHeaderStripper`) overrides the `Server` header
 ---
 
 ## Changelog
+
+### 2026-03-20 (Wave 10: Vercel Deployment & Database Abstraction)
+
+- Added Vercel serverless deployment support (`vercel.json`, `api/index.py`)
+- Added `core/db_connection.py` with Turso (libSQL) fallback for cloud-hosted SQLite
+- Added `.env.example` documenting all environment variables
+- Deployment-ready configuration for `vercel deploy`
+
+### 2026-03-20 (Wave 9: Grants.gov Sync, Awards, Enterprise Tiers, PDF Branding)
+
+- Added three enterprise subscription tiers: Enterprise 5 ($44.95/mo), Enterprise 10 ($74.95/mo), Enterprise Unlimited ($99.95/mo)
+- Added `grants_catalog` SQLite table with seed data from original 131 grants
+- Added `jobs/sync_grants_gov.py` for daily Grants.gov API sync with auto-archiving of expired grants
+- Added `jobs/check_awards.py` for award winner detection via USAspending.gov API
+- Added congratulations email flow with token-based testimonial submission
+- Added testimonial form, thank-you page, and admin approval workflow (`testimonial_form.html`, `testimonial_thankyou.html`, `admin_testimonials.html`)
+- Added approved testimonials display on landing page
+- Added `core/pdf_utils.py` with "Assembled by GrantPro.org" footer on all generated PDFs
+- Dynamic grant count in templates sourced from live `grants_catalog` table
 
 ### 2026-03-20 (Waves 5-8: Submission, Tracking, Cloning, Polish)
 
