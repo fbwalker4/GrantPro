@@ -29,6 +29,9 @@ def health():
         import grant_db
         steps.append("grant_db OK")
 
+        from portal.app import app as main_app
+        steps.append("portal.app imported OK")
+
         return json.dumps({"status": "ok", "steps": steps}, indent=2), 200, {"Content-Type": "application/json"}
     except Exception as e:
         return json.dumps({
