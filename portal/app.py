@@ -76,7 +76,7 @@ class _ServerHeaderStripper:
 
 # Apply the WSGI middleware to strip server fingerprinting
 # This must wrap app.wsgi_app (not app) to intercept the final response
-app.wsgi_app = _ServerHeaderStripper(app.wsgi_app, header_value='GrantPro')
+app.wsgi_app = _ServerHeaderStripper(app.wsgi_app, header_value='Web')
 # ============ END WSGI MIDDLEWARE =================================
 
 
@@ -110,21 +110,42 @@ import time
 from collections import defaultdict
 from flask import jsonify
 
-# Simple in-memory rate limiter
+# In-memory rate limiter (works locally; on Vercel, supplemented by DB check)
 rate_limit_store = defaultdict(list)
 
 def check_rate_limit(ip, endpoint, max_requests=10, window=60):
-    """Check if IP has exceeded rate limit. Returns True if allowed."""
+    """Check if IP has exceeded rate limit. Uses in-memory store + DB fallback for serverless."""
     now = time.time()
     key = f"{ip}:{endpoint}"
 
-    # Clean old entries
+    # In-memory check (works within a single process/invocation)
     rate_limit_store[key] = [t for t in rate_limit_store[key] if now - t < window]
-
     if len(rate_limit_store[key]) >= max_requests:
         return False
-
     rate_limit_store[key].append(now)
+
+    # On Vercel, also check via database for cross-invocation persistence
+    if os.environ.get('VERCEL'):
+        try:
+            from db_connection import get_connection
+            conn = get_connection()
+            cutoff = datetime.fromtimestamp(now - window).isoformat()
+            row = conn.execute(
+                "SELECT COUNT(*) as cnt FROM grant_checklist WHERE item_type = 'rate_limit' AND item_name = ? AND completed_at > ?",
+                (key, cutoff)).fetchone()
+            db_count = row[0] if row else 0
+            if db_count >= max_requests:
+                conn.close()
+                return False
+            # Record this request
+            conn.execute(
+                "INSERT INTO grant_checklist (id, grant_id, user_id, item_type, item_name, required, completed, completed_at) VALUES (?, ?, ?, 'rate_limit', ?, FALSE, TRUE, ?)",
+                (f"rl-{secrets.token_hex(8)}", '', '', key, datetime.now().isoformat()))
+            conn.commit()
+            conn.close()
+        except Exception:
+            pass  # Fail open — don't block requests if DB is unavailable
+
     return True
 
 
@@ -199,8 +220,8 @@ import html as html_module
 def add_security_headers(response):
     """Add security headers to all responses"""
     # Remove server fingerprinting (Werkzeug sets this last, so we override)
-    response.headers['Server'] = 'GrantPro'
-    response.headers['X-Powered-By'] = 'GrantPro'
+    response.headers['Server'] = 'Web'
+    # Don't set X-Powered-By — unnecessary information disclosure
     # Prevent clickjacking
     response.headers['X-Frame-Options'] = 'DENY'
     # Prevent MIME-type sniffing
@@ -5771,6 +5792,16 @@ def shared_grant_view(token):
 def not_found(e):
     return render_template('message.html', title='Page Not Found',
         message='The page you are looking for does not exist.'), 404
+
+@app.errorhandler(405)
+def method_not_allowed(e):
+    return render_template('message.html', title='Method Not Allowed',
+        message='This action is not supported.'), 405
+
+@app.errorhandler(429)
+def too_many_requests(e):
+    return render_template('message.html', title='Too Many Requests',
+        message='Please slow down and try again in a moment.'), 429
 
 @app.errorhandler(500)
 def server_error(e):
