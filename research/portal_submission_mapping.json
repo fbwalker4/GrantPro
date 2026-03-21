@@ -1,0 +1,1240 @@
+{
+  "meta": {
+    "researched_date": "2026-03-21",
+    "purpose": "Map GrantPro sections to real federal portal form fields for guided submission feature",
+    "sources": [
+      "https://www.grants.gov/applicants/workspace-overview/workspace-basic",
+      "https://www.grants.gov/forms/forms-repository/sf-424-family",
+      "https://justicegrants.usdoj.gov/training/application-submission-guide.pdf",
+      "https://justicegrants.usdoj.gov/training/training-application-submission/ojp-web-based-budget-jarg.pdf",
+      "https://justicegrants.usdoj.gov/training/checklist-application-submission",
+      "https://www.research.gov/research-web/content/aboutpsm",
+      "https://www.nsf.gov/policies/pappg/23-1/ch-2-proposal-preparation",
+      "https://www.era.nih.gov/about-era/services-for-applicants-recipients/prepare-submit-applications",
+      "https://grants.nih.gov/grants-process/write-application/how-to-apply-application-guide/format-attachments",
+      "https://www.era.nih.gov//files/ASSIST_user_guide.pdf"
+    ]
+  },
+
+  "portals": {
+    "grants_gov": {
+      "portal_name": "Grants.gov Workspace",
+      "portal_url": "https://www.grants.gov",
+      "used_by": ["Most federal agencies", "DOE", "USDA", "EPA", "HHS (non-NIH)", "DOT", "Commerce", "ED", "SAMHSA", "HRSA"],
+
+      "submission_flow": {
+        "steps": [
+          {
+            "step": 1,
+            "action": "Find Opportunity",
+            "description": "Search for the funding opportunity on Grants.gov by CFDA number, keyword, or agency.",
+            "user_action": true,
+            "grantpro_can_help": false
+          },
+          {
+            "step": 2,
+            "action": "Create Workspace",
+            "description": "Click 'Apply' on the grant opportunity page. Enter an Application Filing Name (your project workspace name), then click 'Create Workspace'.",
+            "user_action": true,
+            "grantpro_can_help": false
+          },
+          {
+            "step": 3,
+            "action": "Add Team Members (Optional)",
+            "description": "On the Manage Workspace page, click 'Participants' tab. Add members by Grants.gov username or email. Set access level: 'All Forms including Budget' or 'Non-Budget Forms'.",
+            "user_action": true,
+            "grantpro_can_help": false
+          },
+          {
+            "step": 4,
+            "action": "Fill Out SF-424 First",
+            "description": "Complete the SF-424 form FIRST. Workspace auto-populates certain fields on other forms from SF-424 data, saving time and avoiding typos.",
+            "user_action": true,
+            "grantpro_can_help": true,
+            "grantpro_note": "GrantPro provides all data needed for SF-424 fields. User copies from GrantPro output."
+          },
+          {
+            "step": 5,
+            "action": "Fill Remaining Forms",
+            "description": "Complete all other required forms in the package. Forms can be filled online (Webform) or downloaded as PDFs, filled offline, and re-uploaded.",
+            "user_action": true,
+            "grantpro_can_help": true
+          },
+          {
+            "step": 6,
+            "action": "Attach Files",
+            "description": "Upload narrative attachments, budget justification, and other required documents as PDF files to the appropriate form fields.",
+            "user_action": true,
+            "grantpro_can_help": true,
+            "grantpro_note": "GrantPro generates all narrative PDFs and budget documents ready for upload."
+          },
+          {
+            "step": 7,
+            "action": "Check for Errors",
+            "description": "Click 'Check Application' button. Every form must reach 'Passed' status. System alerts you to missing required fields via pop-up.",
+            "user_action": true,
+            "grantpro_can_help": false
+          },
+          {
+            "step": 8,
+            "action": "Sign and Submit",
+            "description": "After all forms show 'Passed' status, the Authorized Organization Representative (AOR) clicks 'Sign and Submit'. SAM.gov registration must be active.",
+            "user_action": true,
+            "grantpro_can_help": false,
+            "grantpro_note": "Only the AOR can submit. GrantPro reminds user to verify SAM.gov is active."
+          }
+        ]
+      },
+
+      "sf424_form_fields": {
+        "description": "Standard Form 424 - Application for Federal Assistance. This is the cover page for most federal grant applications.",
+        "pre_populated_from_sam": [
+          "Legal Name of Applicant (from SAM.gov registration)",
+          "UEI (Unique Entity Identifier, assigned by SAM.gov)",
+          "Organizational DUNS (legacy, replaced by UEI)",
+          "Address (Street, City, State, ZIP)",
+          "EIN / TIN (Employer Identification Number)"
+        ],
+        "fields": [
+          {
+            "field": "1. Type of Submission",
+            "type": "dropdown",
+            "options": ["Application", "Changed/Corrected Application", "Pre-Application"],
+            "grantpro_mapping": null,
+            "user_selects": true
+          },
+          {
+            "field": "2. Date Submitted / Applicant Identifier",
+            "type": "text",
+            "grantpro_mapping": null,
+            "note": "Auto-filled on submission"
+          },
+          {
+            "field": "3. Date Received by State / State Application Identifier",
+            "type": "text",
+            "grantpro_mapping": null,
+            "note": "For state review under E.O. 12372"
+          },
+          {
+            "field": "4a. Federal Identifier",
+            "type": "text",
+            "grantpro_mapping": null,
+            "note": "For continuation/revision applications only"
+          },
+          {
+            "field": "5. Applicant Information",
+            "type": "compound",
+            "subfields": [
+              "Legal Name (pre-populated from SAM)",
+              "UEI (pre-populated from SAM)",
+              "Organizational Unit (Department, Division)",
+              "Address (Street 1, Street 2, City, County, State, Province, Country, ZIP/Postal Code)",
+              "Person to be contacted (Prefix, First Name, Middle Name, Last Name, Suffix, Title, Phone, Fax, Email)"
+            ],
+            "grantpro_mapping": "organization_profile",
+            "note": "Must match SAM.gov registration exactly"
+          },
+          {
+            "field": "6. EIN / TIN",
+            "type": "text",
+            "grantpro_mapping": "organization_profile.ein",
+            "note": "Pre-populated from SAM if registered"
+          },
+          {
+            "field": "7. Type of Applicant",
+            "type": "dropdown",
+            "options": ["State Government", "County Government", "City/Township Government", "Special District Government", "Independent School District", "Public/State Controlled Institution of Higher Education", "Private Institution of Higher Education", "Nonprofit with 501(c)(3)", "Nonprofit without 501(c)(3)", "For-Profit (Other than Small Business)", "Small Business", "Hispanic-serving Institution", "Historically Black College/University", "Tribally Controlled College/University", "Alaska Native/Native Hawaiian Serving Institution", "Native American Tribal Government (Federally Recognized)", "Native American Tribal Organization (other)", "Individual", "Other"],
+            "grantpro_mapping": "organization_profile.type"
+          },
+          {
+            "field": "8. Type of Application",
+            "type": "dropdown",
+            "options": ["New", "Continuation", "Revision"],
+            "grantpro_mapping": null,
+            "user_selects": true
+          },
+          {
+            "field": "9. Name of Federal Agency",
+            "type": "text",
+            "grantpro_mapping": "opportunity.agency",
+            "note": "Usually pre-filled from the opportunity"
+          },
+          {
+            "field": "10. CFDA Number and Title",
+            "type": "text",
+            "grantpro_mapping": "opportunity.cfda_number",
+            "note": "Catalog of Federal Domestic Assistance number, pre-filled from opportunity"
+          },
+          {
+            "field": "11. Descriptive Title of Applicant's Project",
+            "type": "text",
+            "max_length": "200 characters",
+            "grantpro_mapping": "project.title"
+          },
+          {
+            "field": "12. Proposed Project Start/End Dates",
+            "type": "date_range",
+            "grantpro_mapping": "project.period_of_performance"
+          },
+          {
+            "field": "13. Congressional District",
+            "type": "text",
+            "grantpro_mapping": "organization_profile.congressional_district"
+          },
+          {
+            "field": "14. Project Director / Principal Investigator",
+            "type": "compound",
+            "subfields": ["Prefix", "First Name", "Middle Name", "Last Name", "Suffix", "Title", "Phone", "Fax", "Email"],
+            "grantpro_mapping": "project.pd_pi_info"
+          },
+          {
+            "field": "15. Estimated Project Funding",
+            "type": "compound",
+            "subfields": [
+              "Total Federal Funds Requested",
+              "Total Non-Federal Funds (Match)",
+              "Total Federal & Non-Federal Funds",
+              "Estimated Program Income"
+            ],
+            "grantpro_mapping": "budget.summary_totals"
+          },
+          {
+            "field": "16. Is Application Subject to Review by State EO 12372?",
+            "type": "radio",
+            "options": ["Yes (date available)", "No, program not covered", "No, program not selected by state"],
+            "grantpro_mapping": null,
+            "user_selects": true
+          }
+        ]
+      },
+
+      "common_forms_in_package": [
+        {
+          "form": "SF-424 (Application for Federal Assistance)",
+          "entry_method": "web_form_or_pdf",
+          "grantpro_sections": ["Organization Profile", "Project Summary", "Budget Totals"]
+        },
+        {
+          "form": "SF-424A (Budget Information - Non-Construction)",
+          "entry_method": "web_form_or_pdf",
+          "grantpro_sections": ["Budget Detail", "Budget Justification"]
+        },
+        {
+          "form": "SF-424B (Assurances - Non-Construction)",
+          "entry_method": "web_form_or_pdf",
+          "grantpro_sections": [],
+          "note": "Legal certifications, user must review and sign"
+        },
+        {
+          "form": "Project Narrative Attachment Form",
+          "entry_method": "file_upload",
+          "grantpro_sections": ["Statement of Need", "Project Description", "Goals & Objectives", "Project Design", "Organizational Capacity", "Sustainability Plan"]
+        },
+        {
+          "form": "Budget Narrative Attachment Form",
+          "entry_method": "file_upload",
+          "grantpro_sections": ["Budget Narrative / Justification"]
+        },
+        {
+          "form": "Other Attachments Form",
+          "entry_method": "file_upload",
+          "grantpro_sections": ["Letters of Support", "Resumes/CVs", "MOUs", "Logic Model", "Indirect Cost Rate Agreement"]
+        }
+      ],
+
+      "file_requirements": {
+        "max_package_size": "200 MB total for entire application package",
+        "accepted_formats": "Varies by agency; most require PDF for narratives",
+        "filename_max_length": 50,
+        "filename_allowed_chars": "A-Z, a-z, 0-9, underscore, hyphen, space, period, parenthesis, curly braces, square brackets, ampersand, tilde, exclamation point, comma, semicolon, apostrophe, at sign, number sign, dollar sign, percent sign, plus sign, equal sign",
+        "filename_must_be_unique": true,
+        "rejection_risk": "Duplicate filenames or invalid characters can cause entire application rejection"
+      },
+
+      "gotchas": [
+        "SAM.gov registration must be active at time of submission (not just initiated)",
+        "SAM.gov registration can take 7-10+ business days; renew well before deadline",
+        "Fill SF-424 FIRST - it auto-populates fields on other forms",
+        "All forms must show 'Passed' status before Submit button is available",
+        "Only the AOR (Authorized Organization Representative) can submit",
+        "Filename duplicates across attachments can cause rejection",
+        "File naming characters are strictly enforced - no special unicode",
+        "Workspace allows multiple team members to edit different forms simultaneously",
+        "Forms can be filled online (Webform) OR downloaded as PDF, filled offline, and re-uploaded",
+        "Check the 'Form State' field under Applicant & Workspace Details - must read 'No Errors'"
+      ]
+    },
+
+    "justgrants": {
+      "portal_name": "JustGrants (DOJ)",
+      "portal_url": "https://justicegrants.usdoj.gov",
+      "used_by": ["Department of Justice (DOJ)", "Office of Justice Programs (OJP)", "Office of Community Oriented Policing Services (COPS)", "Office on Violence Against Women (OVW)"],
+
+      "submission_flow": {
+        "steps": [
+          {
+            "step": 1,
+            "action": "Find NOFO and Initiate Application",
+            "description": "Locate the Notice of Funding Opportunity (NOFO) in JustGrants. The Entity Administrator must assign the application to an Application Submitter.",
+            "user_action": true,
+            "grantpro_can_help": false
+          },
+          {
+            "step": 2,
+            "action": "Complete Standard Applicant Information",
+            "description": "Fill in organizational details, project title, award amounts (total, federal, match). Must align with budget section.",
+            "user_action": true,
+            "grantpro_can_help": true,
+            "grantpro_note": "GrantPro provides all org info and budget totals to paste here."
+          },
+          {
+            "step": 3,
+            "action": "Enter Proposal Abstract",
+            "description": "Navigate to 'Proposal Abstract' section. Enter/paste text directly into the text box. This is a web form field, not a file upload.",
+            "user_action": true,
+            "grantpro_can_help": true,
+            "grantpro_note": "GrantPro generates the abstract. User copies and pastes into the JustGrants text box."
+          },
+          {
+            "step": 4,
+            "action": "Complete Data Requested with Application",
+            "description": "Fill in any data tables or specific data points requested by the NOFO (varies by program).",
+            "user_action": true,
+            "grantpro_can_help": "partial"
+          },
+          {
+            "step": 5,
+            "action": "Upload Proposal Narrative",
+            "description": "Upload the proposal narrative as a PDF attachment. Typical sections: Description of Need, Project Goals & Objectives, Project Design & Implementation, Capabilities & Competencies.",
+            "user_action": true,
+            "grantpro_can_help": true,
+            "grantpro_note": "GrantPro generates the full narrative PDF ready for upload."
+          },
+          {
+            "step": 6,
+            "action": "Complete Budget Detail",
+            "description": "For OJP awards: use the WEB-BASED budget form (mandatory for new competitive awards). Enter line items in each category. For COPS/OVW: may use attachment upload instead.",
+            "user_action": true,
+            "grantpro_can_help": true,
+            "grantpro_note": "GrantPro provides line-item budget data organized by category. User enters values into web form."
+          },
+          {
+            "step": 7,
+            "action": "Upload Additional Attachments",
+            "description": "Upload MOUs, letters of support, resumes, indirect cost rate agreements, and other supporting documents.",
+            "user_action": true,
+            "grantpro_can_help": true
+          },
+          {
+            "step": 8,
+            "action": "Complete Disclosures and Assurances",
+            "description": "Review and certify standard federal assurances and disclosures.",
+            "user_action": true,
+            "grantpro_can_help": false
+          },
+          {
+            "step": 9,
+            "action": "Certify and Submit",
+            "description": "Review entire application, then certify and submit. The Entity Administrator or authorized submitter completes final submission.",
+            "user_action": true,
+            "grantpro_can_help": false
+          }
+        ]
+      },
+
+      "application_sections": [
+        {
+          "section": "Standard Applicant Information",
+          "entry_method": "web_form",
+          "fields": [
+            "Legal Name of Applicant",
+            "Project Title",
+            "Total Federal Amount Requested",
+            "Total Match Amount (if applicable)",
+            "Total Project Amount",
+            "Project Period Start/End Dates",
+            "Areas Affected by Project"
+          ],
+          "grantpro_mapping": ["organization_profile", "project.title", "budget.summary_totals"],
+          "note": "Budget totals HERE must match the Budget Detail section exactly"
+        },
+        {
+          "section": "Proposal Abstract",
+          "entry_method": "web_form_text_box",
+          "fields": ["Proposal Abstract text (paste into text box)"],
+          "grantpro_mapping": ["executive_summary"],
+          "note": "This is a TEXT ENTRY field, not a file upload. Copy/paste from GrantPro."
+        },
+        {
+          "section": "Data Requested with Application",
+          "entry_method": "web_form",
+          "fields": ["Varies by NOFO - performance measures, demographic data, etc."],
+          "grantpro_mapping": [],
+          "note": "NOFO-specific. Review the solicitation carefully."
+        },
+        {
+          "section": "Proposal Narrative",
+          "entry_method": "file_upload",
+          "typical_subsections": [
+            "Description of the Issue / Statement of Need",
+            "Project Design and Implementation",
+            "Capabilities and Competencies",
+            "Plan for Collecting the Data Required for Performance Measures",
+            "Sustainability Plan"
+          ],
+          "grantpro_mapping": ["statement_of_need", "project_design", "organizational_capacity", "evaluation_plan", "sustainability_plan"],
+          "note": "Upload as single PDF. Check NOFO for page limits."
+        },
+        {
+          "section": "Budget Detail",
+          "entry_method": "web_form_for_ojp_or_file_upload",
+          "web_form_categories": [
+            {
+              "category": "A. Personnel",
+              "line_items": ["Name/Position", "Salary", "Percentage of Time", "Federal Amount", "Match Amount"],
+              "grantpro_mapping": "budget.personnel"
+            },
+            {
+              "category": "B. Fringe Benefits",
+              "line_items": ["Rate", "Base", "Federal Amount", "Match Amount"],
+              "grantpro_mapping": "budget.fringe"
+            },
+            {
+              "category": "C. Travel",
+              "line_items": ["Purpose", "Location", "Number of Trips", "Cost per Trip", "Federal Amount", "Match Amount"],
+              "grantpro_mapping": "budget.travel"
+            },
+            {
+              "category": "D. Equipment",
+              "line_items": ["Item", "Quantity", "Unit Cost", "Federal Amount", "Match Amount"],
+              "grantpro_mapping": "budget.equipment",
+              "note": "Equipment = items over $5,000 per unit"
+            },
+            {
+              "category": "E. Supplies",
+              "line_items": ["Item", "Quantity", "Unit Cost", "Federal Amount", "Match Amount"],
+              "grantpro_mapping": "budget.supplies"
+            },
+            {
+              "category": "F. Construction",
+              "line_items": ["Description", "Federal Amount", "Match Amount"],
+              "grantpro_mapping": "budget.construction"
+            },
+            {
+              "category": "G. Subawards (Subgrants)",
+              "line_items": ["Organization", "Description", "Federal Amount", "Match Amount"],
+              "grantpro_mapping": "budget.subawards"
+            },
+            {
+              "category": "H. Procurement Contracts",
+              "line_items": ["Description", "Federal Amount", "Match Amount"],
+              "grantpro_mapping": "budget.contracts"
+            },
+            {
+              "category": "I. Other Costs",
+              "line_items": ["Description", "Federal Amount", "Match Amount"],
+              "grantpro_mapping": "budget.other"
+            },
+            {
+              "category": "J. Indirect Costs",
+              "line_items": ["Rate", "Base", "Federal Amount", "Match Amount"],
+              "grantpro_mapping": "budget.indirect_costs"
+            }
+          ],
+          "note": "OJP requires web-based form for new competitive awards. Budget can be year-by-year or lump-sum per NOFO instructions."
+        },
+        {
+          "section": "Budget Narrative",
+          "entry_method": "file_upload_or_text",
+          "grantpro_mapping": ["budget_justification"],
+          "note": "Justification for each line item. May be part of the web-based form or a separate upload."
+        },
+        {
+          "section": "Additional Application Components",
+          "entry_method": "file_upload",
+          "common_attachments": [
+            "Memoranda of Understanding (MOUs)",
+            "Letters of Support",
+            "Resumes/CVs of Key Personnel",
+            "Indirect Cost Rate Agreement",
+            "Financial Management Questionnaire",
+            "Disclosure of Lobbying Activities (SF-LLL)",
+            "Research and Evaluation Independence and Integrity Statement",
+            "Time-Task Plan"
+          ],
+          "grantpro_mapping": ["supporting_documents"]
+        },
+        {
+          "section": "Disclosures and Assurances",
+          "entry_method": "web_form_checkboxes",
+          "grantpro_mapping": [],
+          "note": "Legal certifications. User must review and check each assurance."
+        }
+      ],
+
+      "file_requirements": {
+        "max_file_size": "25 MB per file",
+        "filename_max_length": 59,
+        "filename_must_be_unique": true,
+        "accepted_formats": "PDF for narratives; varies for other attachments",
+        "note": "Duplicate filenames are rejected by the system"
+      },
+
+      "gotchas": [
+        "Entity Administrator must assign application to an Application Submitter before work can begin",
+        "Budget totals in 'Standard Applicant Information' MUST match Budget Detail section exactly",
+        "OJP requires web-based budget form (not attachment) for new competitive awards",
+        "COPS and OVW may use different budget entry methods than OJP",
+        "Proposal Abstract is a TEXT BOX, not a file upload - copy/paste only",
+        "Year-by-year vs lump-sum budget depends on the specific NOFO",
+        "JustGrants has frequent maintenance windows - don't wait until deadline day",
+        "File names limited to 59 characters, must be unique",
+        "Required fields are marked with asterisk (*) - complete all before clicking Continue",
+        "After completing each section, click 'Continue' to advance (changes are saved)",
+        "The submitted Proposal Abstract is pulled forward to the Funding Recommendation - make it strong"
+      ]
+    },
+
+    "research_gov": {
+      "portal_name": "Research.gov (NSF)",
+      "portal_url": "https://www.research.gov",
+      "used_by": ["National Science Foundation (NSF)"],
+
+      "submission_flow": {
+        "steps": [
+          {
+            "step": 1,
+            "action": "Login and Select Submission Type",
+            "description": "Login to Research.gov. From the Proposal Preparation landing page, select the proposal submission type from the drop-down (e.g., Full Proposal, Preliminary Proposal, Letter of Intent).",
+            "user_action": true,
+            "grantpro_can_help": false
+          },
+          {
+            "step": 2,
+            "action": "Follow Proposal Setup Wizard",
+            "description": "Complete the setup wizard which collects basic proposal information: program solicitation number, proposal type, PI information.",
+            "user_action": true,
+            "grantpro_can_help": false
+          },
+          {
+            "step": 3,
+            "action": "Complete Cover Sheet",
+            "description": "Fill in the web form with program announcement number, project title, duration, primary place of performance, human subjects/vertebrate animals involvement, international activities, tribal impact, etc.",
+            "user_action": true,
+            "grantpro_can_help": true,
+            "grantpro_note": "GrantPro provides project title, duration, performance site info."
+          },
+          {
+            "step": 4,
+            "action": "Enter Project Summary",
+            "description": "Upload or enter the Project Summary (1 page). Must include: Overview, Intellectual Merit, Broader Impacts as separate sections.",
+            "user_action": true,
+            "grantpro_can_help": true,
+            "grantpro_note": "GrantPro generates Project Summary with all three required subsections."
+          },
+          {
+            "step": 5,
+            "action": "Upload Project Description",
+            "description": "Upload the Project Description as a PDF (15-page limit unless solicitation says otherwise). This is the main narrative.",
+            "user_action": true,
+            "grantpro_can_help": true,
+            "grantpro_note": "GrantPro generates the full Project Description PDF."
+          },
+          {
+            "step": 6,
+            "action": "Upload References Cited",
+            "description": "Upload bibliography as a PDF. No page limit. Must include all references cited in the proposal.",
+            "user_action": true,
+            "grantpro_can_help": true
+          },
+          {
+            "step": 7,
+            "action": "Complete Budget",
+            "description": "Enter budget information in the web-based budget form. Categories: Senior Personnel, Other Personnel, Fringe Benefits, Equipment, Travel, Participant Support, Other Direct Costs, Indirect Costs.",
+            "user_action": true,
+            "grantpro_can_help": true,
+            "grantpro_note": "GrantPro provides line-item budget organized by NSF categories."
+          },
+          {
+            "step": 8,
+            "action": "Upload Budget Justification",
+            "description": "Upload budget justification as PDF (max 5 pages). Explains and justifies each budget item.",
+            "user_action": true,
+            "grantpro_can_help": true,
+            "grantpro_note": "GrantPro generates budget justification PDF."
+          },
+          {
+            "step": 9,
+            "action": "Upload Facilities, Equipment, and Other Resources",
+            "description": "Upload description of available facilities and resources as PDF.",
+            "user_action": true,
+            "grantpro_can_help": true
+          },
+          {
+            "step": 10,
+            "action": "Upload Biographical Sketches",
+            "description": "Upload biosketches for all senior personnel. NSF uses SciENcv format.",
+            "user_action": true,
+            "grantpro_can_help": "partial",
+            "grantpro_note": "User must generate from SciENcv; GrantPro can advise on content."
+          },
+          {
+            "step": 11,
+            "action": "Upload Additional Documents",
+            "description": "Upload Data Management Plan, Mentoring Plan (if applicable), Letters of Collaboration, etc.",
+            "user_action": true,
+            "grantpro_can_help": true
+          },
+          {
+            "step": 12,
+            "action": "Run Compliance Check and Submit",
+            "description": "Research.gov runs automated PAPPG compliance checks. Errors block submission; warnings allow it. The Sponsored Projects Office (SPO) at your institution typically does final submission.",
+            "user_action": true,
+            "grantpro_can_help": false
+          }
+        ]
+      },
+
+      "proposal_sections": [
+        {
+          "section": "Cover Sheet",
+          "entry_method": "web_form",
+          "fields": [
+            "Program Announcement/Solicitation Number",
+            "Project Title",
+            "Project Duration (months)",
+            "Requested Start Date",
+            "Primary Place of Performance",
+            "Human Subjects involvement (yes/no + IRB info)",
+            "Vertebrate Animals involvement (yes/no + IACUC info)",
+            "International Activities",
+            "Off-campus or off-site research",
+            "Potential Impact on Tribal Nations",
+            "PI and Co-PI Information"
+          ],
+          "grantpro_mapping": ["project.title", "project.duration", "organization_profile"],
+          "note": "This is a multi-page web form, not a file upload"
+        },
+        {
+          "section": "Project Summary",
+          "entry_method": "web_form_text_or_upload",
+          "required_subsections": [
+            "Overview (what the project is about)",
+            "Intellectual Merit (advance knowledge)",
+            "Broader Impacts (benefit society)"
+          ],
+          "page_limit": "1 page",
+          "grantpro_mapping": ["executive_summary", "intellectual_merit", "broader_impacts"],
+          "note": "All three subsections are REQUIRED and must be clearly labeled"
+        },
+        {
+          "section": "Project Description",
+          "entry_method": "file_upload_pdf",
+          "page_limit": "15 pages (unless solicitation specifies otherwise)",
+          "grantpro_mapping": ["project_narrative", "statement_of_need", "methodology", "evaluation_plan"],
+          "note": "This is the main proposal narrative. Upload as PDF."
+        },
+        {
+          "section": "References Cited",
+          "entry_method": "file_upload_pdf",
+          "page_limit": "No limit",
+          "grantpro_mapping": ["references"],
+          "note": "Bibliography of all works cited in the proposal"
+        },
+        {
+          "section": "Budget",
+          "entry_method": "web_form",
+          "categories": [
+            "A. Senior Personnel (PI, Co-PIs)",
+            "B. Other Personnel (Postdocs, Grad Students, Undergrads, Secretarial, Other)",
+            "C. Fringe Benefits",
+            "D. Equipment (items >= $5,000)",
+            "E. Travel (Domestic and International, separated)",
+            "F. Participant Support Costs (Stipends, Travel, Subsistence, Other)",
+            "G. Other Direct Costs (Materials/Supplies, Publication Costs, Consultant Services, Computer Services, Subawards, Other)",
+            "H. Total Direct Costs",
+            "I. Indirect Costs (F&A)",
+            "J. Total Cost"
+          ],
+          "grantpro_mapping": ["budget"],
+          "note": "Entered into Research.gov web form. Year-by-year entry."
+        },
+        {
+          "section": "Budget Justification",
+          "entry_method": "file_upload_pdf",
+          "page_limit": "5 pages",
+          "grantpro_mapping": ["budget_justification"]
+        },
+        {
+          "section": "Facilities, Equipment, and Other Resources",
+          "entry_method": "file_upload_pdf",
+          "grantpro_mapping": ["facilities_and_resources"],
+          "note": "Describe labs, equipment, computing, office space available for the project"
+        },
+        {
+          "section": "Biographical Sketch(es)",
+          "entry_method": "file_upload_pdf",
+          "page_limit": "3 pages per person",
+          "grantpro_mapping": [],
+          "note": "Must use NSF-approved SciENcv format"
+        },
+        {
+          "section": "Current and Pending (Other) Support",
+          "entry_method": "file_upload_pdf",
+          "grantpro_mapping": [],
+          "note": "Must use NSF-approved SciENcv format"
+        },
+        {
+          "section": "Data Management Plan",
+          "entry_method": "file_upload_pdf",
+          "page_limit": "2 pages",
+          "grantpro_mapping": ["data_management_plan"]
+        },
+        {
+          "section": "Mentoring Plan",
+          "entry_method": "file_upload_pdf",
+          "page_limit": "1 page",
+          "grantpro_mapping": [],
+          "note": "Required if postdocs are included in the budget"
+        },
+        {
+          "section": "Collaborators and Other Affiliations",
+          "entry_method": "file_upload",
+          "grantpro_mapping": [],
+          "note": "Must use NSF-provided template (spreadsheet format)"
+        },
+        {
+          "section": "Letters of Collaboration",
+          "entry_method": "file_upload_pdf",
+          "grantpro_mapping": ["letters_of_support"],
+          "note": "Brief, factual commitment letters only. NOT letters of support/endorsement."
+        }
+      ],
+
+      "formatting_requirements": {
+        "fonts_allowed": [
+          "Arial (not Arial Narrow) - 10pt or larger",
+          "Courier New - 10pt or larger",
+          "Palatino Linotype - 10pt or larger",
+          "Times New Roman - 11pt or larger",
+          "Computer Modern family - 11pt or larger"
+        ],
+        "margins": "1 inch on all sides",
+        "line_spacing": "Single-spaced or greater",
+        "file_format": "PDF",
+        "upload_formats_accepted": ["PDF", "Word (auto-converted to PDF)", "Excel (some sections)"],
+        "automated_compliance_checks": true,
+        "compliance_check_note": "Errors block submission; warnings allow submission but should be addressed"
+      },
+
+      "gotchas": [
+        "Project Summary MUST have three clearly labeled sections: Overview, Intellectual Merit, Broader Impacts",
+        "Project Description is strictly 15 pages - system enforces this",
+        "Budget Justification is strictly 5 pages",
+        "Font requirements are enforced by automated compliance checking",
+        "1-inch margins are checked automatically",
+        "Biographical Sketches must use SciENcv (mandatory as of recent PAPPG updates)",
+        "Letters of Collaboration must be factual only - do NOT include advocacy or endorsement language",
+        "The SPO (Sponsored Projects Office) typically does final submission, not the PI",
+        "Research.gov may auto-convert uploaded Word docs to PDF, but results can be unpredictable - upload PDF directly",
+        "Compliance check errors will BLOCK submission - resolve all before deadline",
+        "Data Management Plan is required for all proposals",
+        "NSF uses 'Intellectual Merit' and 'Broader Impacts' as review criteria - address both prominently"
+      ]
+    },
+
+    "era_commons_assist": {
+      "portal_name": "eRA Commons / ASSIST (NIH)",
+      "portal_url": "https://public.era.nih.gov/assist",
+      "used_by": ["National Institutes of Health (NIH)", "CDC", "FDA", "AHRQ", "SAMHSA (some)", "Other PHS agencies"],
+
+      "submission_flow": {
+        "steps": [
+          {
+            "step": 1,
+            "action": "Initiate Application in ASSIST",
+            "description": "Login to ASSIST with eRA Commons credentials. Search for the Funding Opportunity Announcement (FOA). Enter project title and PI's eRA Commons User Name. System pre-populates institutional info from eRA Commons registration.",
+            "user_action": true,
+            "grantpro_can_help": false
+          },
+          {
+            "step": 2,
+            "action": "Complete SF424 (R&R) Form",
+            "description": "Fill in the cover page form. Many fields are pre-populated from eRA Commons profile. This is a web-based form in ASSIST (mirrors the old PDF form).",
+            "user_action": true,
+            "grantpro_can_help": true,
+            "grantpro_note": "GrantPro provides project title, dates, funding amounts, PI info."
+          },
+          {
+            "step": 3,
+            "action": "Complete PHS 398 Cover Page Supplement",
+            "description": "Web form with additional NIH-specific fields: human subjects, vertebrate animals, stem cells, inventions, etc.",
+            "user_action": true,
+            "grantpro_can_help": "partial"
+          },
+          {
+            "step": 4,
+            "action": "Complete R&R Other Project Information",
+            "description": "Web form with yes/no questions plus PDF attachment uploads for: Project Summary/Abstract, Project Narrative (public health relevance), Facilities & Other Resources, Equipment.",
+            "user_action": true,
+            "grantpro_can_help": true,
+            "grantpro_note": "GrantPro generates Project Summary, Project Narrative, and Facilities documents as PDFs."
+          },
+          {
+            "step": 5,
+            "action": "Complete Project/Performance Site Locations",
+            "description": "Web form listing all performance sites for the project.",
+            "user_action": true,
+            "grantpro_can_help": true
+          },
+          {
+            "step": 6,
+            "action": "Complete R&R Senior/Key Person Profile",
+            "description": "Web form for each key person. Upload Biosketch (PDF) and Current & Pending Support for each person. Some fields pre-populated from SF424.",
+            "user_action": true,
+            "grantpro_can_help": "partial",
+            "grantpro_note": "Biosketches must be generated via SciENcv (mandatory as of Jan 2026). GrantPro can advise on content."
+          },
+          {
+            "step": 7,
+            "action": "Complete Budget Form",
+            "description": "Choose EITHER R&R Budget (detailed, for requests >$250K/year) OR PHS 398 Modular Budget (for requests up to $250K/year in direct costs). Web-based forms with some attachment uploads.",
+            "user_action": true,
+            "grantpro_can_help": true,
+            "grantpro_note": "GrantPro generates budget data in the correct format for either budget type."
+          },
+          {
+            "step": 8,
+            "action": "Complete PHS 398 Research Plan",
+            "description": "This is where the science goes. Upload PDF attachments for: Introduction (resubmissions only), Specific Aims (1 page), Research Strategy (6-12 pages depending on mechanism), and other required/optional sections.",
+            "user_action": true,
+            "grantpro_can_help": true,
+            "grantpro_note": "GrantPro generates Specific Aims and Research Strategy as PDFs ready for upload."
+          },
+          {
+            "step": 9,
+            "action": "Validate Application",
+            "description": "Run system and business validations. All errors must be resolved. Application status must reach 'Ready for Submission'.",
+            "user_action": true,
+            "grantpro_can_help": false
+          },
+          {
+            "step": 10,
+            "action": "Submit via Signing Official",
+            "description": "The institutional Signing Official (SO) submits the application. PI cannot self-submit.",
+            "user_action": true,
+            "grantpro_can_help": false
+          },
+          {
+            "step": 11,
+            "action": "Post-Submission: Application Viewing Window",
+            "description": "2 business day window to review assembled application in eRA Commons. Can 'reject' to pull back and fix errors, then resubmit before deadline.",
+            "user_action": true,
+            "grantpro_can_help": false,
+            "grantpro_note": "GrantPro reminds users about the 2-day viewing window."
+          }
+        ]
+      },
+
+      "assist_form_tabs": {
+        "description": "ASSIST presents forms as tabs across the top of the interface, mirroring the old SF424 PDF form pages.",
+        "forms": [
+          {
+            "tab": "SF424 (R&R)",
+            "entry_method": "web_form",
+            "key_fields": [
+              "Type of Submission (Application, Changed/Corrected)",
+              "Date Submitted",
+              "Applicant Information (pre-populated from eRA Commons)",
+              "Type of Applicant",
+              "Project Title",
+              "Proposed Project Start/End Dates",
+              "Applicant Organization (pre-populated)",
+              "PI Contact Information (pre-populated from Commons profile)",
+              "Estimated Project Funding (Total Cost, Direct Costs, Indirect Costs)",
+              "Authorized Representative"
+            ],
+            "grantpro_mapping": ["organization_profile", "project.title", "project.dates", "budget.summary_totals"]
+          },
+          {
+            "tab": "PHS 398 Cover Page Supplement",
+            "entry_method": "web_form",
+            "key_fields": [
+              "Human Subjects (yes/no, IRB details, clinical trial info)",
+              "Vertebrate Animals (yes/no, IACUC details)",
+              "Program Income",
+              "Inventions and Patents",
+              "Change of PI/PD",
+              "Applicant Organization Assurance Number",
+              "Stem Cells"
+            ],
+            "grantpro_mapping": []
+          },
+          {
+            "tab": "R&R Other Project Information",
+            "entry_method": "web_form_plus_uploads",
+            "web_fields": [
+              "Human Subjects (yes/no)",
+              "Vertebrate Animals (yes/no)",
+              "Environmental Impact",
+              "International Activities",
+              "Project Summary/Abstract (yes/no + PDF upload)",
+              "Project Narrative (yes/no + PDF upload)"
+            ],
+            "pdf_uploads": [
+              {
+                "attachment": "Project Summary/Abstract",
+                "description": "30-line summary of proposed activity. Include public health relevance.",
+                "page_limit": "30 lines",
+                "grantpro_mapping": "executive_summary"
+              },
+              {
+                "attachment": "Project Narrative (Relevance)",
+                "description": "2-3 sentence description of relevance to public health. Displayed on NIH RePORTER.",
+                "page_limit": "2-3 sentences",
+                "grantpro_mapping": "public_health_relevance"
+              },
+              {
+                "attachment": "Facilities & Other Resources",
+                "description": "Description of scientific environment and resources.",
+                "grantpro_mapping": "facilities_and_resources"
+              },
+              {
+                "attachment": "Equipment",
+                "description": "List of major equipment available for the project.",
+                "grantpro_mapping": "equipment_list"
+              }
+            ]
+          },
+          {
+            "tab": "Project/Performance Site Locations",
+            "entry_method": "web_form",
+            "key_fields": ["Primary site", "Additional sites (if any)", "Congressional district"],
+            "grantpro_mapping": ["organization_profile.address"]
+          },
+          {
+            "tab": "R&R Senior/Key Person Profile (Expanded)",
+            "entry_method": "web_form_plus_uploads",
+            "web_fields": [
+              "Name (pre-populated for PI from SF424)",
+              "eRA Commons User Name",
+              "Position/Title",
+              "Department",
+              "Organization",
+              "Role on Project"
+            ],
+            "pdf_uploads_per_person": [
+              {
+                "attachment": "Biographical Sketch",
+                "page_limit": "5 pages",
+                "note": "SciENcv is MANDATORY as of January 25, 2026. Do NOT flatten the PDF.",
+                "grantpro_mapping": null
+              },
+              {
+                "attachment": "Current and Pending (Other) Support",
+                "note": "SciENcv format required",
+                "grantpro_mapping": null
+              }
+            ]
+          },
+          {
+            "tab": "R&R Budget (Detailed)",
+            "entry_method": "web_form",
+            "when_to_use": "Requests exceeding $250,000 in direct costs in any single year",
+            "categories_per_year": [
+              "A. Senior/Key Person (Name, Role, Calendar/Academic/Summer Months, Requested Salary, Fringe)",
+              "B. Other Personnel (Postdocs, Grad Students, Undergrads, Secretarial, Other - Number, Calendar Months, Requested Salary, Fringe)",
+              "C. Equipment (Item, Amount)",
+              "D. Travel (Domestic, Foreign)",
+              "E. Participant/Trainee Support Costs (Tuition, Stipends, Travel, Subsistence, Other)",
+              "F. Other Direct Costs (Materials & Supplies, Publication Costs, Consultant Services, ADP/Computer, Subaward/Consortium Costs, Equipment Rental, Alterations & Renovations, Other 1-6)",
+              "G. Direct Costs (calculated)",
+              "H. Indirect Costs (Rate, Base, Amount)",
+              "I. Total Direct and Indirect Costs",
+              "J. Fee (SBIR/STTR only)",
+              "Budget Justification (PDF upload)"
+            ],
+            "grantpro_mapping": ["budget"]
+          },
+          {
+            "tab": "PHS 398 Modular Budget (Alternative)",
+            "entry_method": "web_form",
+            "when_to_use": "Requests of $250,000 or less in direct costs per year",
+            "fields": [
+              "Direct Costs per period (in $25,000 modules)",
+              "F&A Costs per period (Rate, Base, Amount)",
+              "Additional Narrative Justification (PDF upload)"
+            ],
+            "grantpro_mapping": ["budget"]
+          },
+          {
+            "tab": "PHS 398 Research Plan",
+            "entry_method": "pdf_uploads_only",
+            "description": "This is where ALL the science narrative goes. Every section is uploaded as a separate PDF.",
+            "attachments": [
+              {
+                "attachment": "Introduction to Application (Resubmission/Revision only)",
+                "page_limit": "1 page",
+                "required": "conditional",
+                "grantpro_mapping": "resubmission_introduction"
+              },
+              {
+                "attachment": "Specific Aims",
+                "page_limit": "1 page",
+                "required": true,
+                "grantpro_mapping": "specific_aims",
+                "note": "THE most important page of the application. Must include long-term goal, hypothesis, specific aims, and expected outcomes."
+              },
+              {
+                "attachment": "Research Strategy",
+                "page_limit": "6 pages (R21), 12 pages (R01/U01), varies by mechanism",
+                "required": true,
+                "grantpro_mapping": "research_strategy",
+                "subsections": [
+                  "Significance (why the problem matters)",
+                  "Innovation (what is new/different)",
+                  "Approach (how you will do it, including preliminary data)"
+                ]
+              },
+              {
+                "attachment": "Progress Report Publication List",
+                "required": "conditional",
+                "grantpro_mapping": null
+              },
+              {
+                "attachment": "Protection of Human Subjects",
+                "required": "if human subjects",
+                "grantpro_mapping": "human_subjects_section"
+              },
+              {
+                "attachment": "Inclusion of Women and Minorities",
+                "required": "if human subjects",
+                "grantpro_mapping": null
+              },
+              {
+                "attachment": "Inclusion of Children",
+                "required": "if human subjects",
+                "grantpro_mapping": null
+              },
+              {
+                "attachment": "Vertebrate Animals",
+                "required": "if vertebrate animals",
+                "grantpro_mapping": null
+              },
+              {
+                "attachment": "Select Agent Research",
+                "required": "if select agents",
+                "grantpro_mapping": null
+              },
+              {
+                "attachment": "Resource Sharing Plan(s)",
+                "required": "varies",
+                "grantpro_mapping": "data_sharing_plan"
+              },
+              {
+                "attachment": "Authentication of Key Biological and/or Chemical Resources",
+                "required": "recommended",
+                "page_limit": "1 page",
+                "grantpro_mapping": null
+              }
+            ]
+          }
+        ]
+      },
+
+      "pdf_requirements": {
+        "format": "PDF only for all narrative attachments",
+        "must_not_be_fillable": "Use non-fillable PDFs. Do NOT use fillable PDF forms.",
+        "filename_max_length": 50,
+        "filename_no_leading_spaces": true,
+        "filename_no_trailing_space_before_extension": true,
+        "biosketch_format": "SciENcv MANDATORY as of January 25, 2026. Do NOT flatten the PDF.",
+        "font_size": "11pt or larger (Arial, Helvetica, Palatino Linotype, Georgia). Smaller fonts OK for figures/tables.",
+        "margins": "At least 0.5 inches on all sides",
+        "line_spacing": "No more than 6 lines per inch",
+        "page_size": "Standard letter (8.5 x 11 inches)",
+        "color": "Color images allowed but application is reviewed in grayscale by some reviewers",
+        "hyperlinks": "Allowed but reviewers are not required to follow them"
+      },
+
+      "gotchas": [
+        "PI CANNOT submit - the institutional Signing Official (SO) must submit",
+        "eRA Commons account required for PI and all senior/key personnel",
+        "SciENcv is MANDATORY for biosketches as of January 2026 - do NOT flatten the PDF",
+        "Use non-fillable PDFs only - fillable PDF forms will cause errors",
+        "Choose EITHER R&R Budget OR Modular Budget, NEVER both",
+        "Modular Budget = $250K or less in direct costs per year (in $25K modules)",
+        "2 business day viewing window after submission - check assembled application carefully",
+        "Can 'reject' application during viewing window to fix errors and resubmit (if before deadline)",
+        "Filename max 50 characters including .pdf extension",
+        "Application must pass all validations to reach 'Ready for Submission' status",
+        "Specific Aims is uploaded as its own separate PDF (1 page)",
+        "Research Strategy is uploaded as its own separate PDF (page limit varies by mechanism)",
+        "Each section of the Research Plan is a SEPARATE PDF upload, not one combined document",
+        "PI's eRA Commons User Name entered during initiation pre-populates institutional info",
+        "Color figures may not render well for reviewers who print in grayscale"
+      ]
+    }
+  },
+
+  "grantpro_section_to_portal_mapping": {
+    "description": "Maps GrantPro-generated content sections to where they go in each portal",
+    "mappings": [
+      {
+        "grantpro_section": "Executive Summary / Abstract",
+        "grants_gov": "Upload as PDF to 'Project Narrative Attachment Form' or paste into SF-424 abstract field",
+        "justgrants": "PASTE into 'Proposal Abstract' TEXT BOX (not upload)",
+        "research_gov": "Upload as PDF or enter in 'Project Summary' section (must include Overview, Intellectual Merit, Broader Impacts)",
+        "era_assist": "Upload as PDF in 'R&R Other Project Information' > 'Project Summary/Abstract' attachment slot"
+      },
+      {
+        "grantpro_section": "Statement of Need / Problem Statement",
+        "grants_gov": "Include in Project Narrative PDF upload",
+        "justgrants": "Include in Proposal Narrative PDF upload (as 'Description of the Issue')",
+        "research_gov": "Include in Project Description PDF upload",
+        "era_assist": "Include in Research Strategy PDF upload (under 'Significance')"
+      },
+      {
+        "grantpro_section": "Goals and Objectives",
+        "grants_gov": "Include in Project Narrative PDF upload",
+        "justgrants": "Include in Proposal Narrative PDF upload (as 'Project Goals and Objectives')",
+        "research_gov": "Include in Project Description PDF upload",
+        "era_assist": "Include in Specific Aims PDF upload"
+      },
+      {
+        "grantpro_section": "Project Design / Methodology",
+        "grants_gov": "Include in Project Narrative PDF upload",
+        "justgrants": "Include in Proposal Narrative PDF upload (as 'Project Design and Implementation')",
+        "research_gov": "Include in Project Description PDF upload",
+        "era_assist": "Include in Research Strategy PDF upload (under 'Approach')"
+      },
+      {
+        "grantpro_section": "Organizational Capacity",
+        "grants_gov": "Include in Project Narrative PDF upload",
+        "justgrants": "Include in Proposal Narrative PDF upload (as 'Capabilities and Competencies')",
+        "research_gov": "Upload as 'Facilities, Equipment, and Other Resources' PDF",
+        "era_assist": "Upload as 'Facilities & Other Resources' PDF in R&R Other Project Information"
+      },
+      {
+        "grantpro_section": "Budget Detail",
+        "grants_gov": "Enter in SF-424A form (web form or PDF) with line items by category",
+        "justgrants": "Enter in WEB-BASED budget form (OJP) with line items in categories A-J",
+        "research_gov": "Enter in Research.gov budget web form by category (Senior Personnel through Indirect Costs)",
+        "era_assist": "Enter in R&R Budget web form (detailed, >$250K/yr) or PHS 398 Modular Budget web form (<=250K/yr)"
+      },
+      {
+        "grantpro_section": "Budget Justification / Narrative",
+        "grants_gov": "Upload as PDF to 'Budget Narrative Attachment Form'",
+        "justgrants": "May be part of web-based budget form or uploaded as PDF attachment",
+        "research_gov": "Upload as PDF (max 5 pages)",
+        "era_assist": "Upload as PDF in the Budget form's 'Budget Justification' attachment slot"
+      },
+      {
+        "grantpro_section": "Evaluation Plan",
+        "grants_gov": "Include in Project Narrative PDF upload",
+        "justgrants": "Include in Proposal Narrative PDF (as 'Plan for Collecting Performance Measures Data')",
+        "research_gov": "Include in Project Description PDF upload",
+        "era_assist": "Not a standard NIH section; include in Research Strategy if relevant"
+      },
+      {
+        "grantpro_section": "Sustainability Plan",
+        "grants_gov": "Include in Project Narrative PDF upload",
+        "justgrants": "Include in Proposal Narrative PDF upload",
+        "research_gov": "Include in Project Description PDF upload if solicitation requires",
+        "era_assist": "Not a standard NIH section; include if FOA requires"
+      },
+      {
+        "grantpro_section": "Letters of Support / Collaboration",
+        "grants_gov": "Upload as PDF(s) to 'Other Attachments Form'",
+        "justgrants": "Upload in 'Additional Application Components' section",
+        "research_gov": "Upload as 'Letters of Collaboration' (factual commitment only, no advocacy language)",
+        "era_assist": "Upload in 'PHS 398 Research Plan' or as supplementary attachment"
+      },
+      {
+        "grantpro_section": "Data Management / Sharing Plan",
+        "grants_gov": "Upload as PDF attachment if required by agency",
+        "justgrants": "Upload if required by NOFO",
+        "research_gov": "Upload as 'Data Management Plan' PDF (max 2 pages, required for all proposals)",
+        "era_assist": "Upload as 'Resource Sharing Plan' PDF in PHS 398 Research Plan"
+      }
+    ]
+  },
+
+  "guided_submission_instructions": {
+    "description": "Templates for the guided_submission.html feature showing users exactly what to do",
+    "grants_gov_checklist": [
+      "1. Verify your SAM.gov registration is ACTIVE (check at sam.gov > Entity Registrations)",
+      "2. Go to Grants.gov and search for your opportunity number",
+      "3. Click 'Apply' to create a Workspace",
+      "4. Name your workspace (e.g., 'OrgName_ProgramName_2026')",
+      "5. Open the SF-424 form FIRST and fill in all fields (use GrantPro org profile data)",
+      "6. Fill in remaining forms using GrantPro-generated data",
+      "7. For each narrative attachment: click the attachment field > Browse > select the GrantPro-generated PDF",
+      "8. IMPORTANT: Ensure each uploaded file has a UNIQUE name (max 50 characters)",
+      "9. Click 'Check Application' - resolve any errors until all forms show 'Passed'",
+      "10. Have your AOR click 'Sign and Submit'",
+      "11. Save your confirmation/tracking number"
+    ],
+    "justgrants_checklist": [
+      "1. Ensure your Entity Administrator has assigned the application to you",
+      "2. Open the application in JustGrants",
+      "3. Complete 'Standard Applicant Information' (use GrantPro org profile and budget totals)",
+      "4. Navigate to 'Proposal Abstract' > PASTE your GrantPro-generated abstract into the text box",
+      "5. Complete 'Data Requested with Application' per NOFO instructions",
+      "6. Navigate to 'Proposal Narrative' > Upload your GrantPro-generated narrative PDF",
+      "7. Navigate to 'Budget Detail' > Enter line items from GrantPro budget into the web form (categories A-J)",
+      "8. CRITICAL: Verify budget totals match between Standard Applicant Information and Budget Detail",
+      "9. Upload all additional attachments (MOUs, letters, resumes, indirect cost agreement)",
+      "10. Complete 'Disclosures and Assurances' (review and check each box)",
+      "11. Click 'Certify and Submit'",
+      "12. Note: Files max 25 MB each, filenames max 59 characters, no duplicate names"
+    ],
+    "research_gov_checklist": [
+      "1. Login to Research.gov > Proposals > Prepare New",
+      "2. Select submission type from dropdown (e.g., Full Proposal)",
+      "3. Complete the Proposal Setup Wizard (solicitation #, proposal type, PI info)",
+      "4. Complete the Cover Sheet web form (project title, duration, performance site)",
+      "5. Enter/upload Project Summary with THREE required sections: Overview, Intellectual Merit, Broader Impacts",
+      "6. Upload Project Description PDF (max 15 pages) - generated by GrantPro",
+      "7. Upload References Cited PDF",
+      "8. Complete Budget web form (year-by-year, all NSF categories)",
+      "9. Upload Budget Justification PDF (max 5 pages) - generated by GrantPro",
+      "10. Upload Facilities, Equipment, and Other Resources PDF",
+      "11. Upload Biographical Sketches (MUST be from SciENcv)",
+      "12. Upload Current and Pending Support (MUST be from SciENcv)",
+      "13. Upload Data Management Plan PDF (max 2 pages)",
+      "14. Upload any additional required documents per solicitation",
+      "15. Run compliance check - resolve ALL errors before submission",
+      "16. Submit through your institution's SPO (PI typically cannot self-submit)",
+      "17. FORMATTING: PDF, approved fonts (Arial 10pt+, TNR 11pt+), 1-inch margins, single-spaced"
+    ],
+    "era_assist_checklist": [
+      "1. Verify all senior/key personnel have eRA Commons accounts",
+      "2. Login to ASSIST (public.era.nih.gov/assist)",
+      "3. Search for your FOA number",
+      "4. Enter project title and PI's eRA Commons User Name (triggers institutional pre-population)",
+      "5. Complete SF424 (R&R) tab (web form - most org fields pre-populated)",
+      "6. Complete PHS 398 Cover Page Supplement tab (human subjects, animals, etc.)",
+      "7. Complete R&R Other Project Information tab:",
+      "   - Upload Project Summary/Abstract PDF (max 30 lines)",
+      "   - Upload Project Narrative (2-3 sentences, public health relevance)",
+      "   - Upload Facilities & Other Resources PDF",
+      "   - Upload Equipment PDF",
+      "8. Complete Project/Performance Site Locations tab",
+      "9. Complete R&R Senior/Key Person Profile tab:",
+      "   - Upload Biosketch PDF per person (SciENcv MANDATORY, do NOT flatten)",
+      "   - Upload Current & Pending Support per person",
+      "10. Complete Budget tab (R&R Budget if >$250K/yr OR Modular if <=$250K/yr, NEVER both)",
+      "   - Upload Budget Justification PDF",
+      "11. Complete PHS 398 Research Plan tab - upload EACH section as SEPARATE PDF:",
+      "    - Specific Aims (1 page) - generated by GrantPro",
+      "    - Research Strategy (6-12 pages depending on mechanism) - generated by GrantPro",
+      "    - Additional sections as required by FOA",
+      "12. Run validation - resolve all errors until status = 'Ready for Submission'",
+      "13. Notify your institutional Signing Official to submit",
+      "14. After submission: CHECK your assembled application within the 2 business day viewing window",
+      "15. If errors found: 'Reject' in eRA Commons, fix, and resubmit before deadline",
+      "16. PDF RULES: Non-fillable only, 50-char filename max, 11pt+ font, 0.5-inch margins minimum"
+    ]
+  }
+}
