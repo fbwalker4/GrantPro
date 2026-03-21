@@ -214,9 +214,14 @@
     <p style="color: #10b981; font-size: 0.85rem; margin-bottom: 1.5rem;">
         Budget math verified · Titles consistent · Personnel matched · Page limits OK
     </p>
-    <a href="/grant/{{ grant.id }}/paper-submission" class="btn btn-success" style="font-size: 1.1rem; padding: 0.75rem 2rem;">
-        Generate Final Submission Package
-    </a>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="/grant/{{ grant.id }}/paper-submission" class="btn btn-success" style="font-size: 1.1rem; padding: 0.75rem 2rem;">
+            Generate Final Submission Package
+        </a>
+        <a href="/grant/{{ grant.id }}/download/pdf?branded=0" class="btn btn-primary" style="font-size: 1rem; padding: 0.65rem 1.5rem;">
+            Download Final PDF (No Branding)
+        </a>
+    </div>
     {% elif readiness_pct >= 100 %}
     <h2 style="color: #f59e0b;">Almost Ready — Consistency Check Required</h2>
     <p style="color: var(--text-secondary); margin-bottom: 1rem;">

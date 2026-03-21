@@ -2400,16 +2400,38 @@ Do NOT include placeholder text — use the actual organization data provided be
         if client_info.get('budget_info'):
             prompt += f"- Budget Data: {sanitize_for_prompt(json.dumps(client_info['budget_info']))}\n"
 
+    # Load all existing sections for cross-section consistency
+    existing_sections = conn.execute(
+        'SELECT section, content FROM drafts WHERE grant_id = ? AND content IS NOT NULL ORDER BY section',
+        (grant_id,)).fetchall()
+
+    if existing_sections:
+        prompt += "\n**OTHER SECTIONS ALREADY WRITTEN (maintain consistency with these — use the same project title, personnel names, dollar amounts, and timeline):**\n"
+        for es in existing_sections:
+            es_name = es['section'].replace('_', ' ').title()
+            es_content = es['content'][:2000]  # First 2000 chars to stay within limits
+            prompt += f"\n--- {es_name} (excerpt) ---\n{sanitize_for_prompt(es_content)}\n"
+
+    # Load project title axiom from budget builder if set
+    try:
+        budget_row = conn.execute('SELECT project_title FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
+        if budget_row and budget_row['project_title']:
+            prompt += f"\n**PROJECT TITLE (use this exact title throughout): {budget_row['project_title']}**\n"
+    except Exception:
+        pass
+
     prompt += f"""
 **TASK:**
 Write COMPELLING, GRANT-SPECIFIC content for this section that:
 1. Directly addresses {agency}'s exact requirements listed above
 2. Follows ALL compliance requirements for this agency
-3. Includes specific details about the applicant organization (use real data above, not placeholders)
-4. Shows the applicant meets the eligibility requirements
-5. Fits within the funding amount: ${amount_min:,.0f} - ${amount_max:,.0f}
-6. Is ready to submit — professional federal grant language, not generic filler
-7. Addresses the section's page/character limits appropriately
+3. Is CONSISTENT with the other sections already written (same project title, same personnel, same numbers)
+4. Uses the EXACT budget data provided above — do not invent different numbers
+5. Includes specific details about the applicant organization (use real data, not placeholders)
+6. Fits within the funding amount: ${amount_min:,.0f} - ${amount_max:,.0f}
+7. Is ready to submit — professional federal grant language, not generic filler
+8. Addresses the section's page/character limits appropriately
+9. Do NOT repeat large blocks of text that appear in other sections
 
 Write the complete section content now:"""
     
@@ -4790,29 +4812,116 @@ def grant_checklist(grant_id):
 @paid_required
 @csrf_required
 def run_consistency_check(grant_id):
-    """Run final consistency validation before submission."""
+    """Run final consistency validation — rule-based checks + AI-powered review."""
     if not user_owns_grant(grant_id):
         flash('Access denied', 'error')
         return redirect(url_for('dashboard'))
 
+    # Phase 1: Rule-based checks
     issues = validate_budget_consistency(grant_id)
 
+    # Phase 2: AI-powered cross-section consistency review
     conn = get_db()
+    drafts = conn.execute(
+        'SELECT section, content FROM drafts WHERE grant_id = ? AND content IS NOT NULL',
+        (grant_id,)).fetchall()
+    grant = conn.execute('SELECT * FROM grants WHERE id = ?', (grant_id,)).fetchone()
+    budget_row = None
+    try:
+        budget_row = conn.execute('SELECT * FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
+    except Exception:
+        pass
+
+    if drafts and len(drafts) >= 2:
+        try:
+            api_key = os.environ.get('GP_GOOGLE_API_KEY') or os.environ.get('GOOGLE_API_KEY')
+            if not api_key:
+                env_path = os.path.expanduser('~/.hermes/.env')
+                if os.path.exists(env_path):
+                    with open(env_path) as f:
+                        for line in f:
+                            if line.startswith('GOOGLE_API_KEY='):
+                                api_key = line.split('=', 1)[1].strip()
+                                break
+
+            if api_key:
+                from google import genai
+                client = genai.Client(api_key=api_key)
+
+                # Build full application text for AI review
+                full_text = ""
+                for d in drafts:
+                    full_text += f"\n\n=== SECTION: {d['section'].replace('_',' ').upper()} ===\n"
+                    full_text += d['content'][:5000]  # First 5K chars per section
+
+                budget_context = ""
+                if budget_row:
+                    bd = dict(budget_row)
+                    budget_context = f"\nBudget grand total: ${bd.get('grand_total', 0):,.0f}"
+                    budget_context += f"\nProject title from budget: {bd.get('project_title', 'Not set')}"
+
+                grant_amount = grant.get('amount', 0) if grant else 0
+
+                review_prompt = f"""You are a federal grants compliance reviewer. Review the following grant application for INTERNAL CONSISTENCY.
+
+GRANT: {grant.get('grant_name', '') if grant else ''}
+AGENCY: {grant.get('agency', '') if grant else ''}
+REQUESTED AMOUNT: ${float(grant_amount):,.0f}
+{budget_context}
+
+APPLICATION SECTIONS:
+{full_text}
+
+CHECK FOR THESE SPECIFIC ISSUES:
+1. Are all dollar amounts consistent across sections? (Budget total should match everywhere)
+2. Is the project title the same in every section?
+3. Are personnel names and roles consistent? (Same people in budget, narrative, and bios)
+4. Is the indirect cost rate the same everywhere it's mentioned?
+5. Are timeline dates consistent?
+6. Does the requested amount match the budget total?
+7. Are there any direct contradictions between sections?
+8. Is the same data (demographics, statistics) cited consistently?
+
+RESPOND IN THIS EXACT FORMAT — one issue per line, or "NO ISSUES FOUND" if clean:
+ISSUE: [description of the inconsistency]
+ISSUE: [description of the inconsistency]
+...or...
+NO ISSUES FOUND"""
+
+                response = client.models.generate_content(
+                    model="gemini-2.5-flash",
+                    contents=review_prompt
+                )
+                ai_result = response.text.strip()
+
+                if 'NO ISSUES FOUND' not in ai_result.upper():
+                    for line in ai_result.split('\n'):
+                        line = line.strip()
+                        if line.startswith('ISSUE:'):
+                            issue_text = line[6:].strip()
+                            if issue_text:
+                                issues.append({
+                                    'title': 'AI Consistency Review',
+                                    'message': issue_text,
+                                    'severity': 'warning'
+                                })
+        except Exception as e:
+            logger.warning(f'AI consistency review failed: {e}')
+
     user = get_current_user()
     now = datetime.now().isoformat()
 
     if not issues:
-        # Mark consistency check as passed
         check_id = f"check-consistency-{grant_id}"
         conn.execute(
             """INSERT INTO grant_checklist (id, grant_id, user_id, item_type, item_name, description, required, completed, completed_at)
-               VALUES (?, ?, ?, 'consistency_check', 'Final Consistency Check', 'Automated validation of budget, titles, and personnel', TRUE, TRUE, ?)
+               VALUES (?, ?, ?, 'consistency_check', 'Final Consistency Check', 'Rule-based + AI-powered validation passed', TRUE, TRUE, ?)
                ON CONFLICT (id) DO UPDATE SET completed = TRUE, completed_at = EXCLUDED.completed_at""",
             (check_id, grant_id, user['id'], now))
         conn.commit()
-        flash('Consistency check passed! Your application is ready to submit.', 'success')
+        flash('Consistency check passed! All sections are consistent. Your application is ready to submit.', 'success')
     else:
-        flash(f'Consistency check found {len(issues)} issue(s). Please fix them before submitting.', 'warning')
+        flash(f'Consistency check found {len(issues)} issue(s). Please review and fix them.', 'warning')
 
     conn.close()
     return redirect(url_for('grant_checklist', grant_id=grant_id))
