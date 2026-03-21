@@ -97,7 +97,7 @@ if not os.environ.get('SECRET_KEY') and not os.environ.get('VERCEL'):
 # Session security configuration
 # HTTPS enforced when HTTPS=true env var or in production
 app.config.update(
-    SESSION_COOKIE_SECURE=os.environ.get('HTTPS', '').lower() == 'true',
+    SESSION_COOKIE_SECURE=os.environ.get('HTTPS', '').lower() == 'true' or os.environ.get('VERCEL', '') == '1',
     SESSION_COOKIE_HTTPONLY=True,  # Prevent JavaScript access
     SESSION_COOKIE_SAMESITE='Strict',  # Strict CSRF protection (strictest available)
     PERMANENT_SESSION_LIFETIME=3600,  # 1 hour timeout
@@ -462,9 +462,9 @@ def login():
             logger.info(f'User login: {email}')
             flash(f'Welcome back, {session["user_name"]}!', 'success')
 
-            # Redirect to dashboard
-            next_url = request.args.get('next')
-            if next_url:
+            # Redirect to dashboard (validate next_url to prevent open redirect)
+            next_url = request.args.get('next', '')
+            if next_url and next_url.startswith('/') and not next_url.startswith('//'):
                 return redirect(next_url)
             return redirect(url_for('dashboard'))
         else:
