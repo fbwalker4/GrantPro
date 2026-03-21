@@ -1907,51 +1907,41 @@ def start_application(grant_id):
         # Create the grant for this client
         new_grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
         
-        # Determine template based on agency
+        # Use template from catalog if available, otherwise detect from agency name
         agency = research_grant.get('agency', '')
-        template = 'generic'
-        if 'Science Foundation' in agency:
-            template = 'nsf'
-        elif 'Energy' in agency:
-            template = 'doe'
-        elif 'Health' in agency or 'NIH' in agency:
-            template = 'nih'
-        elif 'Agriculture' in agency or 'Rural' in agency or 'USDA' in agency:
-            template = 'usda'
-        elif 'Environmental' in agency:
-            template = 'epa'
-        elif 'Transportation' in agency:
-            template = 'dot'
-        elif 'Standards' in agency:
-            template = 'nist'
-        elif 'Arts' in agency:
-            template = 'nea'
-        elif 'Housing' in agency or 'HUD' in agency:
-            template = 'hud'
-        elif 'NASA' in agency or 'Space' in agency:
-            template = 'nasa'
-        elif 'Defense' in agency or 'DOD' in agency:
-            template = 'dod'
-        elif 'FEMA' in agency or 'Homeland' in agency:
-            template = 'fema'
-        elif 'Labor' in agency or 'DOL' in agency:
-            template = 'dol'
-        elif 'Justice' in agency or 'DOJ' in agency:
-            template = 'doj'
-        elif 'Education' in agency:
-            template = 'education'
-        
+        template = research_grant.get('template', '')
+        if not template or template == 'generic':
+            # Fallback: detect from agency name
+            agency_lower = agency.lower()
+            for keyword, tmpl in [
+                ('science foundation', 'nsf'), ('energy', 'doe'), ('health', 'nih'),
+                ('agriculture', 'usda'), ('environmental', 'epa'), ('transportation', 'dot'),
+                ('standards', 'nist'), ('arts', 'nea'), ('housing', 'hud'), ('hud', 'hud'),
+                ('nasa', 'nasa'), ('space', 'nasa'), ('defense', 'dod'), ('dod', 'dod'),
+                ('fema', 'fema'), ('homeland', 'fema'), ('labor', 'dol'), ('dol', 'dol'),
+                ('justice', 'doj'), ('doj', 'doj'), ('education', 'education'),
+            ]:
+                if keyword in agency_lower:
+                    template = tmpl
+                    break
+            else:
+                template = 'generic'
+
+        # Amount defaults to 0 — user sets their actual request amount later
+        # Don't copy amount_max from catalog (that's the max available, not what they're asking for)
+        initial_amount = 0
+
         conn = get_db()
         conn.execute('''
             INSERT INTO grants (id, client_id, grant_name, agency, amount, deadline, status, assigned_at, template)
-            VALUES (?, ?, ?, ?, ?, ?, 'assigned', ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, 'draft', ?, ?)
         ''', (
             new_grant_id,
             client_id,
             research_grant.get('title', ''),
             agency,
-            research_grant.get('amount_max', 0),
-            research_grant.get('deadline', ''),
+            initial_amount,
+            research_grant.get('deadline', research_grant.get('close_date', '')),
             datetime.now().isoformat(),
             template
         ))
