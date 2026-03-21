@@ -34,6 +34,16 @@ def health():
         from portal.app import app as main_app
         steps.append("portal.app imported OK")
 
+        # Test user lookup
+        user = user_models.get_user_by_email('sarah@rivercityyouth.org')
+        if user:
+            steps.append(f"test user found: {user.get('first_name')} {user.get('last_name')}")
+            steps.append(f"plan: {user.get('plan')}")
+            pw_ok = user_models.verify_password('TestGrant2026!', user.get('password_hash', ''))
+            steps.append(f"password verify: {pw_ok}")
+        else:
+            steps.append("test user NOT FOUND")
+
         return json.dumps({"status": "ok", "steps": steps}, indent=2), 200, {"Content-Type": "application/json"}
     except Exception as e:
         return json.dumps({
