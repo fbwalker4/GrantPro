@@ -390,36 +390,94 @@
       ],
       "required_documents": [
         {
-          "type": "letters_of_support",
-          "name": "Letters of Support",
-          "description": "Letters from collaborators and resource providers confirming commitment",
-          "required": false,
+          "type": "sf_424",
+          "name": "SF-424 Application for Federal Assistance",
+          "form_number": "SF-424",
+          "description": "Standard federal application form required for all DOE grant submissions",
+          "required": true,
           "can_generate": true,
-          "generate_prompt": "Draft a letter of support from a collaborator for a DOE grant"
+          "generate_prompt": "Generate SF-424 Application for Federal Assistance from organization profile and project data for a DOE grant"
         },
         {
-          "type": "environmental_questionnaire",
-          "name": "Environmental Questionnaire",
-          "description": "DOE environmental compliance questionnaire (NEPA)",
+          "type": "sf_424a",
+          "name": "SF-424A Budget Information - Non-Construction Programs",
+          "form_number": "SF-424A",
+          "description": "Standard federal budget form detailing costs by category and funding period",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-424A Budget Information form from DOE project budget data"
+        },
+        {
+          "type": "sf_424b",
+          "name": "SF-424B Assurances - Non-Construction Programs",
+          "form_number": "SF-424B",
+          "description": "Standard assurances for non-construction programs requiring authorized representative signature",
           "required": true,
           "can_generate": false,
-          "upload_instructions": "Complete and upload DOE environmental questionnaire"
+          "upload_instructions": "Download SF-424B from Grants.gov, have your Authorized Representative sign it, and upload the signed form."
         },
         {
-          "type": "intellectual_property_plan",
-          "name": "Intellectual Property Management Plan",
-          "description": "Plan for managing intellectual property developed under the project",
-          "required": false,
+          "type": "sf_lll",
+          "name": "SF-LLL Disclosure of Lobbying Activities",
+          "form_number": "SF-LLL",
+          "description": "Required if award exceeds $100,000; discloses any paid lobbying activities",
+          "required": true,
           "can_generate": true,
-          "generate_prompt": "Draft an intellectual property management plan for a DOE-funded project"
+          "generate_prompt": "Generate SF-LLL Disclosure of Lobbying Activities form for a DOE grant"
         },
         {
-          "type": "cost_share_commitment",
-          "name": "Cost Share Commitment Letter",
-          "description": "Letter documenting cost share commitments from partners",
+          "type": "nepa_questionnaire",
+          "name": "NEPA Environmental Questionnaire",
+          "form_number": "N/A",
+          "description": "DOE environmental compliance questionnaire required under National Environmental Policy Act (10 CFR Part 1021)",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Complete and upload DOE NEPA environmental questionnaire. Available from the DOE funding office or program announcement."
+        },
+        {
+          "type": "buy_america_certification",
+          "name": "Buy America Certification",
+          "form_number": "N/A",
+          "description": "Certification of compliance with Build America, Buy America Act for infrastructure projects funded after May 14, 2022",
           "required": false,
+          "can_generate": false,
+          "upload_instructions": "Complete and upload the Buy America certification form if your project involves infrastructure components."
+        },
+        {
+          "type": "budget_justification",
+          "name": "Budget Justification Narrative",
+          "form_number": "N/A",
+          "description": "Detailed narrative explaining and justifying each budget category including personnel, equipment, travel, supplies, and subcontracts",
+          "required": true,
           "can_generate": true,
-          "generate_prompt": "Draft a cost share commitment letter from a project partner"
+          "generate_prompt": "Generate a budget justification narrative for a DOE grant detailing all cost categories"
+        },
+        {
+          "type": "key_personnel_biosketches",
+          "name": "Key Personnel Biographical Sketches",
+          "form_number": "N/A",
+          "description": "CVs or biosketches for all senior/key personnel describing education, experience, publications, and relevant achievements",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate biographical sketches for key personnel on a DOE grant application"
+        },
+        {
+          "type": "facilities_equipment",
+          "name": "Facilities and Equipment Description",
+          "form_number": "N/A",
+          "description": "Description of laboratory space, equipment, computing resources, and other facilities available for the project",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a facilities and equipment description for a DOE grant application"
+        },
+        {
+          "type": "letters_of_commitment",
+          "name": "Letters of Commitment",
+          "form_number": "N/A",
+          "description": "Letters from collaborators, partners, and resource providers confirming their commitment and roles in the project",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Obtain signed letters of commitment from all collaborators and partners, then upload as a single PDF."
         }
       ],
       "eligibility": {
@@ -812,28 +870,76 @@
       ],
       "required_documents": [
         {
-          "type": "letters_of_support",
-          "name": "Letters of Support",
-          "description": "Letters showing partnerships, market interest, or technical support",
-          "required": false,
+          "type": "sf_424",
+          "name": "SF-424 Application for Federal Assistance",
+          "form_number": "SF-424",
+          "description": "Standard federal application form required for all USDA grant submissions",
+          "required": true,
           "can_generate": true,
-          "generate_prompt": "Draft a letter of support for a USDA grant application"
+          "generate_prompt": "Generate SF-424 Application for Federal Assistance from organization profile and project data for a USDA grant"
         },
         {
-          "type": "501c3_determination",
-          "name": "IRS 501(c)(3) Determination Letter",
-          "description": "Proof of tax-exempt status (if nonprofit applicant)",
-          "required": false,
-          "can_generate": false,
-          "upload_instructions": "Upload your IRS determination letter (PDF)"
+          "type": "sf_424a",
+          "name": "SF-424A Budget Information - Non-Construction Programs",
+          "form_number": "SF-424A",
+          "description": "Standard federal budget form detailing costs by category and funding period",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-424A Budget Information form from USDA project budget data"
         },
         {
-          "type": "assurance_statements",
-          "name": "USDA Assurance Statements",
-          "description": "Required certifications and assurances for USDA grants",
+          "type": "sf_424b",
+          "name": "SF-424B Assurances - Non-Construction Programs",
+          "form_number": "SF-424B",
+          "description": "Standard assurances for non-construction programs requiring authorized representative signature",
           "required": true,
           "can_generate": false,
-          "upload_instructions": "Complete and upload USDA assurance statements"
+          "upload_instructions": "Download SF-424B from Grants.gov, have your Authorized Representative sign it, and upload the signed form."
+        },
+        {
+          "type": "sf_lll",
+          "name": "SF-LLL Disclosure of Lobbying Activities",
+          "form_number": "SF-LLL",
+          "description": "Required if award exceeds $100,000; discloses any paid lobbying activities",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-LLL Disclosure of Lobbying Activities form for a USDA grant"
+        },
+        {
+          "type": "civil_rights_compliance",
+          "name": "USDA Civil Rights Compliance Certification",
+          "form_number": "AD-1049",
+          "description": "Certification of compliance with USDA civil rights requirements and nondiscrimination policies",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Complete and upload USDA Form AD-1049 Civil Rights Compliance certification. USDA actively audits civil rights compliance."
+        },
+        {
+          "type": "matching_certification",
+          "name": "Matching Funds Certification",
+          "form_number": "N/A",
+          "description": "Documentation certifying the source and availability of matching or cost-sharing funds if required by the program",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Upload signed letters or certifications from each source of matching funds documenting the amount and commitment."
+        },
+        {
+          "type": "project_narrative",
+          "name": "Project Narrative",
+          "form_number": "N/A",
+          "description": "Detailed narrative describing the project problem statement, objectives, methodology, expected outcomes, and relevance to USDA priorities",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a project narrative for a USDA grant application addressing problem, objectives, methodology, and outcomes"
+        },
+        {
+          "type": "key_personnel_resumes",
+          "name": "Key Personnel Resumes",
+          "form_number": "N/A",
+          "description": "Resumes or CVs for all key personnel demonstrating relevant qualifications and experience",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate formatted resumes for key personnel on a USDA grant application"
         }
       ],
       "eligibility": {
@@ -1169,20 +1275,76 @@
       ],
       "required_documents": [
         {
-          "type": "letters_of_support",
-          "name": "Letters of Support",
-          "description": "Letters from local government, partners, and stakeholders",
-          "required": false,
-          "can_generate": true,
-          "generate_prompt": "Draft a letter of support from a local government official for a DOT grant"
-        },
-        {
-          "type": "cost_share_documentation",
-          "name": "Cost Share/Match Documentation",
-          "description": "Documentation of matching funds or cost share commitments",
+          "type": "sf_424",
+          "name": "SF-424 Application for Federal Assistance",
+          "form_number": "SF-424",
+          "description": "Standard federal application form required for all DOT discretionary grant submissions",
           "required": true,
           "can_generate": true,
-          "generate_prompt": "Draft a cost share commitment letter for a DOT grant application"
+          "generate_prompt": "Generate SF-424 Application for Federal Assistance from organization profile and project data for a DOT grant"
+        },
+        {
+          "type": "sf_424a",
+          "name": "SF-424A Budget Information - Non-Construction Programs",
+          "form_number": "SF-424A",
+          "description": "Standard federal budget form detailing costs by category and funding period",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-424A Budget Information form from DOT project budget data"
+        },
+        {
+          "type": "sf_424b",
+          "name": "SF-424B Assurances - Non-Construction Programs",
+          "form_number": "SF-424B",
+          "description": "Standard assurances for non-construction programs requiring authorized representative signature",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Download SF-424B from Grants.gov, have your Authorized Representative sign it, and upload the signed form."
+        },
+        {
+          "type": "sf_lll",
+          "name": "SF-LLL Disclosure of Lobbying Activities",
+          "form_number": "SF-LLL",
+          "description": "Required if award exceeds $100,000; discloses any paid lobbying activities",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-LLL Disclosure of Lobbying Activities form for a DOT grant"
+        },
+        {
+          "type": "nepa_documentation",
+          "name": "NEPA Environmental Documentation",
+          "form_number": "N/A",
+          "description": "Environmental review documentation per 23 CFR 771; may be categorical exclusion, environmental assessment, or environmental impact statement",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload NEPA environmental documentation. No construction funds can be obligated until NEPA review is complete. Contact your state DOT or FHWA division for guidance on the required level of review."
+        },
+        {
+          "type": "davis_bacon_certification",
+          "name": "Davis-Bacon Prevailing Wage Certification",
+          "form_number": "N/A",
+          "description": "Certification of compliance with Davis-Bacon Act prevailing wage requirements for all construction contracts over $2,000",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload signed certification of Davis-Bacon compliance. Weekly certified payroll reports (WH-347) will be required during construction."
+        },
+        {
+          "type": "dbe_plan",
+          "name": "Disadvantaged Business Enterprise (DBE) Plan",
+          "form_number": "N/A",
+          "description": "Plan describing how the applicant will meet DBE utilization goals per 49 CFR Part 26",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a Disadvantaged Business Enterprise (DBE) plan for a DOT-funded transportation project"
+        },
+        {
+          "type": "benefit_cost_analysis",
+          "name": "Benefit-Cost Analysis (BCA)",
+          "form_number": "N/A",
+          "description": "Required for BUILD/RAISE/INFRA grants; quantifies project benefits vs. costs using DOT methodology and 3.1% discount rate",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Complete a Benefit-Cost Analysis using DOT BCA methodology with 3.1% discount rate. Use DOT BCA Resource Guide for formatting and required elements."
         }
       ],
       "eligibility": {
@@ -1327,12 +1489,58 @@
       ],
       "required_documents": [
         {
+          "type": "sf_424",
+          "name": "SF-424 Application for Federal Assistance",
+          "form_number": "SF-424",
+          "description": "Standard federal application form required for all NIST grant submissions",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-424 Application for Federal Assistance from organization profile and project data for a NIST grant"
+        },
+        {
+          "type": "budget_forms",
+          "name": "Budget Forms (SF-424A or NIST-specific)",
+          "form_number": "SF-424A",
+          "description": "Budget detail forms showing costs by category; SBIR proposals use NIST-specific budget templates",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate budget forms for a NIST grant application including all cost categories"
+        },
+        {
+          "type": "ip_bayh_dole_plan",
+          "name": "Intellectual Property / Bayh-Dole Plan",
+          "form_number": "N/A",
+          "description": "Plan addressing intellectual property management under Bayh-Dole Act provisions including invention disclosure, title election, and government license rights",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate an intellectual property management plan addressing Bayh-Dole requirements for a NIST-funded project"
+        },
+        {
+          "type": "matching_documentation",
+          "name": "Matching Funds Documentation (MEP)",
+          "form_number": "N/A",
+          "description": "Documentation of non-federal cost share sources for MEP program which requires minimum 1:1 match (50% federal, 50% non-federal)",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Upload signed commitment letters from each matching fund source with amounts and terms. MEP requires 1:1 cost share."
+        },
+        {
+          "type": "key_personnel_biosketches",
+          "name": "Key Personnel Biographical Sketches",
+          "form_number": "N/A",
+          "description": "Biosketches or CVs for all key personnel describing education, experience, publications, and technical qualifications",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate biographical sketches for key personnel on a NIST grant application"
+        },
+        {
           "type": "letters_of_support",
           "name": "Letters of Support",
-          "description": "Letters from industry partners and collaborators",
+          "form_number": "N/A",
+          "description": "Letters from industry partners and collaborators confirming their roles and commitment to the project",
           "required": false,
-          "can_generate": true,
-          "generate_prompt": "Draft a letter of support from an industry partner for a NIST grant"
+          "can_generate": false,
+          "upload_instructions": "Obtain signed letters of support from industry partners and collaborators, then upload as PDF."
         }
       ],
       "eligibility": {
@@ -1758,6 +1966,62 @@
           "guidance": "Include 2-3 letters from partners, collaborators, or community members who support this project."
         }
       ],
+      "required_documents": [
+        {
+          "type": "sf_424",
+          "name": "SF-424 Application for Federal Assistance",
+          "form_number": "SF-424",
+          "description": "Standard federal application form required for NEA grant submissions through Grants.gov",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-424 Application for Federal Assistance from organization profile and project data for an NEA grant"
+        },
+        {
+          "type": "budget_form",
+          "name": "NEA Budget Form",
+          "form_number": "N/A",
+          "description": "Line-item budget showing how NEA funds and matching funds will be spent across project activities",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate an NEA budget form with line-item detail for grant funds and matching contributions"
+        },
+        {
+          "type": "work_samples",
+          "name": "Work Samples",
+          "form_number": "N/A",
+          "description": "6-10 examples of recent artistic work (images, video, audio, or program documentation) demonstrating artistic merit -- the primary evaluation criterion for NEA",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload 6-10 work samples that represent the artistic quality of your organization or project. Images: JPEG/PNG, max 5MB each. Video/audio: provide URLs. Include a work sample index describing each item."
+        },
+        {
+          "type": "artist_statements",
+          "name": "Artist/Staff Biographies and Statements",
+          "form_number": "N/A",
+          "description": "Brief biographies and artistic statements for key artists or staff who will work on the project",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate artist biographies and statements for key personnel on an NEA grant application"
+        },
+        {
+          "type": "organizational_narrative",
+          "name": "Organizational Narrative",
+          "form_number": "N/A",
+          "description": "Description of the organization's mission, programming history, audience, and capacity to carry out the proposed project",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate an organizational narrative for an NEA Grants for Arts Projects application"
+        },
+        {
+          "type": "accessibility_plan",
+          "name": "Accessibility Plan",
+          "form_number": "N/A",
+          "description": "Plan describing how the project will be accessible to people with disabilities, both physically and programmatically, as required by NEA",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate an accessibility plan for an NEA-funded arts project addressing physical and programmatic access for people with disabilities"
+        }
+      ],
       "compliance": {
         "davis_bacon": {
           "applies": false,
@@ -1905,6 +2169,53 @@
           "guidance": "Describe who your current audience is and how this project will reach NEW audiences - people who don't typically attend your programs."
         }
       ],
+      "required_documents": [
+        {
+          "type": "sf_424",
+          "name": "SF-424 Application for Federal Assistance",
+          "form_number": "SF-424",
+          "description": "Standard federal application form required for NEA Challenge America submissions through Grants.gov",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-424 Application for Federal Assistance for an NEA Challenge America grant"
+        },
+        {
+          "type": "budget_form",
+          "name": "NEA Challenge America Budget Form",
+          "form_number": "N/A",
+          "description": "Simple budget showing how the fixed $10,000 NEA grant and $10,000 match will be spent",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a budget form for an NEA Challenge America grant showing use of the $10,000 award and required match"
+        },
+        {
+          "type": "project_narrative",
+          "name": "Project Narrative",
+          "form_number": "N/A",
+          "description": "Narrative describing the project, its artistic merit, how it reaches new audiences, and its benefit to the community",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a project narrative for an NEA Challenge America application addressing artistic merit and new audience reach"
+        },
+        {
+          "type": "organizational_info",
+          "name": "Organizational Information",
+          "form_number": "N/A",
+          "description": "Basic information about the organization including mission, programming history, and capacity",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate organizational information for an NEA Challenge America application"
+        },
+        {
+          "type": "accessibility_plan",
+          "name": "Accessibility Plan",
+          "form_number": "N/A",
+          "description": "Plan describing how the project and venue will be accessible to people with disabilities",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate an accessibility plan for an NEA Challenge America arts project"
+        }
+      ],
       "compliance": {
         "davis_bacon": {
           "applies": false,
@@ -2026,6 +2337,44 @@
           "guidance": "Brief bio: your background, training, exhibitions, awards. Help reviewers understand your experience."
         }
       ],
+      "required_documents": [
+        {
+          "type": "work_samples",
+          "name": "Work Samples",
+          "form_number": "N/A",
+          "description": "5-10 examples of recent artistic work that relate to the proposed project; the primary evaluation criterion for individual artist grants",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload 5-10 work samples of your recent work. Images: JPEG/PNG. Video/audio: provide URLs or upload files. Include a work sample description sheet explaining each piece."
+        },
+        {
+          "type": "artist_statement",
+          "name": "Artist Statement",
+          "form_number": "N/A",
+          "description": "Personal statement describing your artistic practice, creative vision, influences, and what makes your approach unique",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate an artist statement for an individual artist grant application describing creative practice and vision"
+        },
+        {
+          "type": "resume_cv",
+          "name": "Artist Resume / CV",
+          "form_number": "N/A",
+          "description": "Resume or CV listing education, exhibitions, performances, publications, awards, and relevant artistic experience",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate an artist resume/CV for an individual artist grant application"
+        },
+        {
+          "type": "project_description",
+          "name": "Project Description",
+          "form_number": "N/A",
+          "description": "Detailed description of the proposed project including what will be created, the creative process, timeline, and expected outcome",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a project description for an individual artist grant application"
+        }
+      ],
       "compliance": {
         "davis_bacon": {
           "applies": false,
@@ -2126,6 +2475,35 @@
           "required": true,
           "max_chars": 250,
           "guidance": "Briefly: who are you? Why are you the right person to do this? Any relevant experience?"
+        }
+      ],
+      "required_documents": [
+        {
+          "type": "project_description",
+          "name": "Project Description",
+          "form_number": "N/A",
+          "description": "Plain-language description of your project idea, what you will accomplish, and who will benefit",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a simple project description for a micro-grant application (under $5K)"
+        },
+        {
+          "type": "budget",
+          "name": "Simple Budget",
+          "form_number": "N/A",
+          "description": "Straightforward list of how grant funds will be spent with estimated costs for each item",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a simple line-item budget for a micro-grant application"
+        },
+        {
+          "type": "org_verification",
+          "name": "Organization or Individual Verification",
+          "form_number": "N/A",
+          "description": "Basic proof of identity or organizational existence such as business license, nonprofit registration, or personal ID",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload proof of organizational status (articles of incorporation, business license) or personal identification as required by the funder."
         }
       ],
       "compliance": {
@@ -2242,6 +2620,80 @@
           "name": "Financial Information",
           "required": false,
           "guidance": "Basic financial info: revenue, expenses, any existing funding. Keep it brief."
+        }
+      ],
+      "required_documents": [
+        {
+          "type": "sf_424",
+          "name": "SF-424 Application for Federal Assistance",
+          "form_number": "SF-424",
+          "description": "Standard federal application form required for SBIR/STTR submissions through Grants.gov",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-424 Application for Federal Assistance for a small business SBIR/STTR grant"
+        },
+        {
+          "type": "sbir_sttr_forms",
+          "name": "SBIR/STTR Application Forms",
+          "form_number": "N/A",
+          "description": "Agency-specific SBIR/STTR forms including company information, research institution partner info (STTR), and program certifications",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SBIR/STTR application forms with company information and certifications"
+        },
+        {
+          "type": "company_commercialization_report",
+          "name": "Company Commercialization Report",
+          "form_number": "N/A",
+          "description": "Report on prior SBIR/STTR awards including sales, licensing, and other commercialization outcomes from previous federal small business funding",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a Company Commercialization Report for SBIR/STTR application summarizing prior award outcomes"
+        },
+        {
+          "type": "budget",
+          "name": "Detailed Budget",
+          "form_number": "N/A",
+          "description": "Itemized budget showing direct costs (labor, materials, travel, equipment, subcontracts) and indirect costs within agency caps",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a detailed budget for a small business SBIR/STTR grant application"
+        },
+        {
+          "type": "technical_proposal",
+          "name": "Technical Proposal",
+          "form_number": "N/A",
+          "description": "Detailed technical description of the proposed research including objectives, approach, innovation, anticipated results, and commercialization potential",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a technical proposal for an SBIR/STTR grant application"
+        },
+        {
+          "type": "key_personnel",
+          "name": "Key Personnel Resumes and Biosketches",
+          "form_number": "N/A",
+          "description": "Resumes or biosketches for the PI and all key personnel demonstrating technical qualifications and relevant experience",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate key personnel biosketches for an SBIR/STTR grant application"
+        },
+        {
+          "type": "prior_sbir_sttr_awards",
+          "name": "Prior SBIR/STTR Awards List",
+          "form_number": "N/A",
+          "description": "Complete list of all prior SBIR/STTR awards received by the company including award numbers, amounts, dates, and current status",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a prior SBIR/STTR awards list for a small business grant application"
+        },
+        {
+          "type": "subcontractor_info",
+          "name": "Subcontractor Information",
+          "form_number": "N/A",
+          "description": "Details on all proposed subcontractors including scope of work, budget, and letters of commitment; SBIR requires at least 2/3 of work performed by the small business",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Upload subcontractor letters of commitment, statements of work, and budgets. Ensure the small business performs at least 2/3 of SBIR work (1/3 for STTR with research institution)."
         }
       ],
       "compliance": {
@@ -2364,6 +2816,62 @@
           "required": false,
           "max_chars": 500,
           "guidance": "How will this project continue after grant funds are spent? What ongoing resources are needed?"
+        }
+      ],
+      "required_documents": [
+        {
+          "type": "sf_424",
+          "name": "SF-424 Application for Federal Assistance",
+          "form_number": "SF-424",
+          "description": "Standard federal application form if applying for a federally-funded community project grant",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-424 Application for Federal Assistance for a community project grant"
+        },
+        {
+          "type": "sf_424a",
+          "name": "SF-424A Budget Information - Non-Construction Programs",
+          "form_number": "SF-424A",
+          "description": "Standard federal budget form detailing costs by category if federally funded",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-424A Budget Information form for a community project grant"
+        },
+        {
+          "type": "sf_424b",
+          "name": "SF-424B Assurances - Non-Construction Programs",
+          "form_number": "SF-424B",
+          "description": "Standard assurances for non-construction programs if federally funded",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Download SF-424B from Grants.gov, have your Authorized Representative sign it, and upload the signed form."
+        },
+        {
+          "type": "project_narrative",
+          "name": "Project Narrative",
+          "form_number": "N/A",
+          "description": "Detailed description of the community need, proposed activities, target population, timeline, and expected outcomes",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a project narrative for a community project grant addressing need, activities, and expected outcomes"
+        },
+        {
+          "type": "budget_justification",
+          "name": "Budget Justification",
+          "form_number": "N/A",
+          "description": "Narrative explaining each budget line item and how costs relate to project activities and community benefit",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a budget justification narrative for a community project grant"
+        },
+        {
+          "type": "letters_of_support",
+          "name": "Letters of Support",
+          "form_number": "N/A",
+          "description": "Letters from community stakeholders, local officials, partner organizations, and residents demonstrating community backing for the project",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Obtain signed letters of support from community members, local officials, and partner organizations. Upload as a single combined PDF."
         }
       ],
       "compliance": {
@@ -2536,28 +3044,76 @@
       ],
       "required_documents": [
         {
-          "type": "letters_of_support",
-          "name": "Letters of Support",
-          "description": "Letters from school districts, community partners, or stakeholders",
-          "required": false,
-          "can_generate": true,
-          "generate_prompt": "Draft a letter of support from a school district for a Department of Education grant"
-        },
-        {
-          "type": "logic_model",
-          "name": "Logic Model",
-          "description": "Visual diagram showing inputs, activities, outputs, and outcomes",
+          "type": "sf_424",
+          "name": "SF-424 Application for Federal Assistance",
+          "form_number": "SF-424",
+          "description": "Standard federal application form required for all Department of Education grant submissions",
           "required": true,
           "can_generate": true,
-          "generate_prompt": "Draft a logic model narrative for a Department of Education grant project"
+          "generate_prompt": "Generate SF-424 Application for Federal Assistance for a Department of Education grant"
         },
         {
-          "type": "mou_partners",
-          "name": "MOU with Partner Organizations",
-          "description": "Memoranda of understanding with school districts, universities, or service providers",
-          "required": false,
+          "type": "sf_424a",
+          "name": "SF-424A Budget Information - Non-Construction Programs",
+          "form_number": "SF-424A",
+          "description": "Standard federal budget form detailing costs by category and funding period",
+          "required": true,
           "can_generate": true,
-          "generate_prompt": "Draft a memorandum of understanding between a grantee and a school district partner"
+          "generate_prompt": "Generate SF-424A Budget Information form for a Department of Education grant"
+        },
+        {
+          "type": "sf_424b",
+          "name": "SF-424B Assurances - Non-Construction Programs",
+          "form_number": "SF-424B",
+          "description": "Standard assurances for non-construction programs requiring authorized representative signature",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Download SF-424B from Grants.gov, have your Authorized Representative sign it, and upload the signed form."
+        },
+        {
+          "type": "gepa_427_statement",
+          "name": "GEPA Section 427 Statement",
+          "form_number": "N/A",
+          "description": "Statement describing steps the applicant will take to ensure equitable access to and participation in the project for students, teachers, and other beneficiaries with special needs -- uniquely required by the Department of Education",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a GEPA Section 427 equitable access statement for a Department of Education grant application"
+        },
+        {
+          "type": "program_narrative",
+          "name": "Program Narrative",
+          "form_number": "N/A",
+          "description": "Detailed narrative addressing all absolute, competitive, and invitational priorities from the NOFO, including need, objectives, methods, management, and evaluation",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a program narrative for a Department of Education grant addressing NOFO priorities"
+        },
+        {
+          "type": "budget_narrative",
+          "name": "Budget Narrative (ED Form 524 Support)",
+          "form_number": "ED 524",
+          "description": "Detailed narrative justifying all costs by category with calculation methods, supporting the ED Form 524 budget",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a budget narrative for a Department of Education grant justifying all cost categories"
+        },
+        {
+          "type": "key_personnel",
+          "name": "Key Personnel Qualifications",
+          "form_number": "N/A",
+          "description": "Resumes, CVs, or qualifications summaries for all key project personnel demonstrating relevant education and experience",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate key personnel qualifications summaries for a Department of Education grant application"
+        },
+        {
+          "type": "needs_assessment_data",
+          "name": "Needs Assessment Data",
+          "form_number": "N/A",
+          "description": "Supporting data demonstrating the educational need including demographics, achievement gaps, test scores, and other relevant statistics",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload needs assessment data supporting the statement of need. Include relevant local data, demographics, achievement metrics, and comparison data. Data must be from verifiable sources."
         }
       ],
       "compliance": {
@@ -3015,20 +3571,67 @@
       ],
       "required_documents": [
         {
-          "type": "letters_of_support",
-          "name": "Letters of Support",
-          "description": "Letters from collaborators, NASA centers, or resource providers",
-          "required": false,
+          "type": "sf_424",
+          "name": "SF-424 Application for Federal Assistance",
+          "form_number": "SF-424",
+          "description": "Standard federal application form required for NASA grant submissions (submitted via NSPIRES or Grants.gov)",
+          "required": true,
           "can_generate": true,
-          "generate_prompt": "Draft a letter of support for a NASA research grant application"
+          "generate_prompt": "Generate SF-424 Application for Federal Assistance for a NASA research grant"
+        },
+        {
+          "type": "budget_forms",
+          "name": "NASA Budget Forms",
+          "form_number": "SF-424A",
+          "description": "Budget detail forms including SF-424A and any NASA-specific budget templates showing costs by category",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate budget forms for a NASA research grant application"
+        },
+        {
+          "type": "technical_proposal",
+          "name": "Technical Proposal",
+          "form_number": "N/A",
+          "description": "Detailed technical description of the proposed research including objectives, approach, innovation, work plan, deliverables, and relevance to NASA mission",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a technical proposal for a NASA research grant addressing objectives, approach, and NASA mission relevance"
+        },
+        {
+          "type": "key_personnel_biosketches",
+          "name": "Key Personnel Biographical Sketches",
+          "form_number": "N/A",
+          "description": "Biosketches for the PI and all key personnel describing education, experience, publications, and relevant NASA or applied research expertise",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate biographical sketches for key personnel on a NASA grant application"
+        },
+        {
+          "type": "current_pending_support",
+          "name": "Current and Pending Support",
+          "form_number": "N/A",
+          "description": "List of all current and pending funding for each key investigator including source, amount, period, and relationship to this proposal",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a current and pending support document for key personnel on a NASA grant"
+        },
+        {
+          "type": "facilities_description",
+          "name": "Facilities and Equipment Description",
+          "form_number": "N/A",
+          "description": "Description of laboratory, computing, and fabrication facilities and equipment available for the project",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a facilities and equipment description for a NASA grant application"
         },
         {
           "type": "export_control_certification",
           "name": "Export Control Certification",
-          "description": "Certification of compliance with ITAR/EAR export control regulations",
+          "form_number": "N/A",
+          "description": "Certification of compliance with ITAR (22 CFR 120-130) and EAR (15 CFR 730-799) export control regulations; must disclose all foreign nationals on the team",
           "required": true,
           "can_generate": false,
-          "upload_instructions": "Upload your signed export control certification"
+          "upload_instructions": "Upload your signed export control certification. Must disclose all foreign national team members and any ITAR/EAR-controlled technology. May require Technology Assistance Agreement for foreign participation."
         }
       ],
       "compliance": {
@@ -3219,20 +3822,76 @@
       ],
       "required_documents": [
         {
-          "type": "security_clearance",
-          "name": "Facility Security Clearance Documentation",
-          "description": "Documentation of facility security clearance (if applicable)",
-          "required": false,
+          "type": "sf_424",
+          "name": "SF-424 Application for Federal Assistance",
+          "form_number": "SF-424",
+          "description": "Standard federal application form required for DOD research grant submissions",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-424 Application for Federal Assistance for a DOD research grant"
+        },
+        {
+          "type": "budget_forms",
+          "name": "Budget Forms",
+          "form_number": "SF-424A",
+          "description": "Budget detail forms showing costs by category; DOD may require certified cost or pricing data for larger awards",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate budget forms for a DOD research grant application"
+        },
+        {
+          "type": "technical_proposal",
+          "name": "Technical Proposal",
+          "form_number": "N/A",
+          "description": "Detailed technical description including objectives, approach, innovation, deliverables, milestones, and risk management",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a technical proposal for a DOD research grant addressing objectives, approach, and risk"
+        },
+        {
+          "type": "key_personnel",
+          "name": "Key Personnel Qualifications",
+          "form_number": "N/A",
+          "description": "Resumes and biosketches for the PI and all key personnel showing relevant technical expertise and experience",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate key personnel qualifications for a DOD research grant application"
+        },
+        {
+          "type": "itar_export_compliance",
+          "name": "ITAR/Export Control Compliance Certification",
+          "form_number": "N/A",
+          "description": "Certification of compliance with ITAR (22 CFR 120-130) and EAR regulations; must disclose all foreign nationals and confirm ability to handle export-controlled information",
+          "required": true,
           "can_generate": false,
-          "upload_instructions": "Upload facility security clearance documentation if classified work is involved"
+          "upload_instructions": "Upload signed ITAR/export control compliance certification. Must list all foreign national team members. Many DOD SBIR topics are explicitly ITAR-restricted."
+        },
+        {
+          "type": "cybersecurity_plan",
+          "name": "Cybersecurity Plan (CMMC Compliance)",
+          "form_number": "N/A",
+          "description": "Plan demonstrating compliance with NIST SP 800-171 for safeguarding Controlled Unclassified Information (CUI) per DFARS 252.204-7012 and CMMC requirements",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload your cybersecurity plan demonstrating NIST SP 800-171 compliance. Include your CMMC certification level or timeline for achieving required level. System Security Plan (SSP) and Plan of Action and Milestones (POA&M) may be required."
+        },
+        {
+          "type": "subcontractor_info",
+          "name": "Subcontractor Information",
+          "form_number": "N/A",
+          "description": "Details on all proposed subcontractors including scope of work, budget, qualifications, and security clearance status",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Generate subcontractor information for a DOD research grant application"
         },
         {
           "type": "cost_accounting_certification",
           "name": "Cost Accounting Standards Certification",
-          "description": "CAS certification as required for DOD contracts and grants",
+          "form_number": "N/A",
+          "description": "CAS certification or disclosure statement as required for DOD grants; modified CAS applies to awards over $7.5M, full CAS over $100M",
           "required": true,
           "can_generate": false,
-          "upload_instructions": "Upload your CAS certification or disclosure statement"
+          "upload_instructions": "Upload your CAS certification or CAS Disclosure Statement. Must have DCAA-adequate accounting system before award."
         }
       ],
       "compliance": {
@@ -3419,20 +4078,76 @@
       ],
       "required_documents": [
         {
-          "type": "benefit_cost_analysis",
-          "name": "Benefit-Cost Analysis",
-          "description": "Analysis showing project benefits exceed costs (required for mitigation grants)",
-          "required": false,
-          "can_generate": false,
-          "upload_instructions": "Upload your benefit-cost analysis using FEMA BCA toolkit"
+          "type": "sf_424",
+          "name": "SF-424 Application for Federal Assistance",
+          "form_number": "SF-424",
+          "description": "Standard federal application form required for FEMA grant submissions",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-424 Application for Federal Assistance for a FEMA grant"
         },
         {
-          "type": "floodplain_map",
-          "name": "FEMA Floodplain Map",
-          "description": "FEMA flood insurance rate map for the project area",
-          "required": false,
+          "type": "sf_424a",
+          "name": "SF-424A Budget Information - Non-Construction Programs",
+          "form_number": "SF-424A",
+          "description": "Standard federal budget form detailing costs by category and funding period",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-424A Budget Information form for a FEMA grant"
+        },
+        {
+          "type": "sf_424b",
+          "name": "SF-424B Assurances - Non-Construction Programs",
+          "form_number": "SF-424B",
+          "description": "Standard assurances for non-construction programs requiring authorized representative signature",
+          "required": true,
           "can_generate": false,
-          "upload_instructions": "Upload FEMA flood map for the project location"
+          "upload_instructions": "Download SF-424B from Grants.gov, have your Authorized Representative sign it, and upload the signed form."
+        },
+        {
+          "type": "benefit_cost_analysis",
+          "name": "Benefit-Cost Analysis (BCA)",
+          "form_number": "N/A",
+          "description": "Analysis using FEMA BCA Toolkit (Version 6.0+) demonstrating that project benefits exceed costs with BCR >= 1.0 using 3.1% discount rate; required for all HMA project subapplications",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Complete your Benefit-Cost Analysis using the FEMA BCA Toolkit (Version 6.0+). BCR must be >= 1.0 using 3.1% discount rate. Upload the BCA output report."
+        },
+        {
+          "type": "scope_of_work",
+          "name": "Scope of Work",
+          "form_number": "N/A",
+          "description": "Detailed scope of work describing project activities, methodology, timeline, milestones, and deliverables",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a scope of work for a FEMA hazard mitigation or preparedness grant"
+        },
+        {
+          "type": "cost_estimate",
+          "name": "Detailed Cost Estimate",
+          "form_number": "N/A",
+          "description": "Itemized cost estimate supporting the budget with unit costs, quantities, and sources for cost data",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a detailed cost estimate for a FEMA grant project"
+        },
+        {
+          "type": "hazard_mitigation_plan_certification",
+          "name": "Hazard Mitigation Plan Certification",
+          "form_number": "N/A",
+          "description": "Certification that the applicant's jurisdiction has a FEMA-approved and current hazard mitigation plan (valid for 5 years); prerequisite for HMGP, BRIC, and FMA",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload proof of your FEMA-approved hazard mitigation plan including plan name, approval date, and expiration date. Enhanced plans unlock 20% HMGP funding vs. 15%."
+        },
+        {
+          "type": "ehp_screening_form",
+          "name": "Environmental and Historic Preservation (EHP) Screening Form",
+          "form_number": "N/A",
+          "description": "FEMA EHP screening form providing information about the project location, environmental impacts, and historic preservation considerations for FEMA environmental review per 44 CFR Part 10",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Complete and upload the FEMA EHP screening form. Include project location maps, photos, and information about environmental and historic resources in the project area. FEMA conducts the environmental review."
         }
       ],
       "compliance": {
@@ -3621,20 +4336,76 @@
       ],
       "required_documents": [
         {
-          "type": "mou_partners",
-          "name": "MOU with Partner Organizations",
-          "description": "Memoranda of understanding with workforce boards, employers, or training providers",
-          "required": false,
+          "type": "sf_424",
+          "name": "SF-424 Application for Federal Assistance",
+          "form_number": "SF-424",
+          "description": "Standard federal application form required for all DOL competitive grant submissions",
+          "required": true,
           "can_generate": true,
-          "generate_prompt": "Draft a memorandum of understanding between a workforce development grantee and an employer partner"
+          "generate_prompt": "Generate SF-424 Application for Federal Assistance for a DOL workforce grant"
         },
         {
-          "type": "letters_of_commitment",
-          "name": "Letters of Commitment from Employers",
-          "description": "Letters from employers committing to hire program participants",
-          "required": false,
+          "type": "sf_424a",
+          "name": "SF-424A Budget Information - Non-Construction Programs",
+          "form_number": "SF-424A",
+          "description": "Standard federal budget form detailing costs by category and funding period",
+          "required": true,
           "can_generate": true,
-          "generate_prompt": "Draft a letter of commitment from an employer for a DOL workforce grant"
+          "generate_prompt": "Generate SF-424A Budget Information form for a DOL grant"
+        },
+        {
+          "type": "sf_424b",
+          "name": "SF-424B Assurances - Non-Construction Programs",
+          "form_number": "SF-424B",
+          "description": "Standard assurances for non-construction programs requiring authorized representative signature",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Download SF-424B from Grants.gov, have your Authorized Representative sign it, and upload the signed form."
+        },
+        {
+          "type": "sf_lll",
+          "name": "SF-LLL Disclosure of Lobbying Activities",
+          "form_number": "SF-LLL",
+          "description": "Required if award exceeds $100,000; discloses any paid lobbying activities",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-LLL Disclosure of Lobbying Activities form for a DOL grant"
+        },
+        {
+          "type": "project_narrative",
+          "name": "Project Narrative",
+          "form_number": "N/A",
+          "description": "Detailed narrative describing program design, services, target population, partnerships, timeline, and expected workforce outcomes",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a project narrative for a DOL workforce development grant"
+        },
+        {
+          "type": "budget_narrative",
+          "name": "Budget Narrative",
+          "form_number": "N/A",
+          "description": "Detailed justification for each budget line item explaining how costs relate to program design and workforce outcomes",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a budget narrative for a DOL workforce grant justifying all cost categories"
+        },
+        {
+          "type": "eeo_certification",
+          "name": "Equal Employment Opportunity (EEO) Certification",
+          "form_number": "N/A",
+          "description": "Certification of compliance with EEO requirements per 29 CFR Part 38 including designation of Equal Opportunity Officer and maintenance of nondiscrimination policies",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload signed EEO certification including name and contact information for your designated Equal Opportunity Officer. Must demonstrate compliance with 29 CFR Part 38."
+        },
+        {
+          "type": "wioa_performance_plan",
+          "name": "WIOA Performance Accountability Plan",
+          "form_number": "N/A",
+          "description": "Plan describing how the project will track and report on the six WIOA Primary Indicators of Performance: employment 2nd/4th quarter after exit, median earnings, credential attainment, measurable skill gains, and employer effectiveness",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a WIOA Performance Accountability Plan addressing the six primary indicators of performance for a DOL grant"
         }
       ],
       "compliance": {
