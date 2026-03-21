@@ -5809,13 +5809,21 @@ def server_error(e):
         message='Something went wrong. Please try again later.'), 500
 
 
-# ============ SECURITY.TXT ============
+# ============ SECURITY.TXT + ROBOTS.TXT ============
 
 @app.route('/.well-known/security.txt')
 def security_txt():
     """Serve security.txt for vulnerability disclosure."""
     return send_file(
         os.path.join(app.static_folder, '.well-known', 'security.txt'),
+        mimetype='text/plain'
+    )
+
+@app.route('/robots.txt')
+def robots_txt():
+    """Serve robots.txt for search engine crawlers."""
+    return send_file(
+        os.path.join(app.static_folder, 'robots.txt'),
         mimetype='text/plain'
     )
 

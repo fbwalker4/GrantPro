@@ -24,3 +24,11 @@ def health():
         return json.dumps({"status": "ok"}), 200, {"Content-Type": "application/json"}
     except Exception:
         return json.dumps({"status": "error"}), 500, {"Content-Type": "application/json"}
+
+@app.errorhandler(405)
+def method_not_allowed(e):
+    return json.dumps({"error": "method not allowed"}), 405, {"Content-Type": "application/json"}
+
+@app.errorhandler(404)
+def not_found(e):
+    return json.dumps({"error": "not found"}), 404, {"Content-Type": "application/json"}

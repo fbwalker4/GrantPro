@@ -1,0 +1,26 @@
+User-agent: *
+Disallow: /admin
+Disallow: /api/
+Disallow: /grant/
+Disallow: /grants
+Disallow: /dashboard
+Disallow: /wizard
+Disallow: /my-grants
+Disallow: /profile
+Disallow: /onboarding
+Disallow: /shared/
+Disallow: /testimonial/
+
+Allow: /
+Allow: /search
+Allow: /guide
+Allow: /how-it-works
+Allow: /pricing
+Allow: /help
+Allow: /about
+Allow: /terms
+Allow: /privacy
+Allow: /refund
+Allow: /contact
+
+Sitemap: https://grantpro-sigma.vercel.app/sitemap.xml

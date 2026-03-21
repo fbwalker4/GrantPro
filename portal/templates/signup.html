@@ -274,7 +274,8 @@
             
             <form method="POST" action="/signup" role="form" aria-label="Create account">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="plan" value="{{ plan }}">
+                <input type="hidden" name="plan" value="free">
+                <input type="hidden" name="requested_tier" value="{{ plan }}">
 
                 <div class="form-row">
                     <div class="form-group">
