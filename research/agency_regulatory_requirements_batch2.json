@@ -1,0 +1,1788 @@
+{
+  "metadata": {
+    "description": "Regulatory requirements, eligibility rules, and compliance obligations for federal grant agencies - Batch 2",
+    "research_date": "2026-03-21",
+    "agencies_covered": ["ED", "DOT", "NIST", "NASA", "DOD", "FEMA", "DOL", "NEA"],
+    "templates_covered": ["SBIR_STTR_General", "Community_Project_Grants", "Artist_Individual_Grants", "Micro_Grants"],
+    "purpose": "Smart eligibility checking for grant writing application"
+  },
+
+  "agencies": {
+
+    "ed": {
+      "agency_number": 8,
+      "name": "Department of Education (ED)",
+      "full_name": "United States Department of Education",
+
+      "eligible_applicant_types": {
+        "formula_grants": [
+          "State Educational Agencies (SEAs)",
+          "Local Educational Agencies (LEAs)",
+          "Bureau of Indian Education (BIE)"
+        ],
+        "competitive_grants": [
+          "State Educational Agencies (SEAs)",
+          "Local Educational Agencies (LEAs)",
+          "Institutions of Higher Education (IHEs)",
+          "Nonprofit organizations (501(c)(3))",
+          "For-profit organizations (limited programs)",
+          "Consortia of eligible entities",
+          "Community-based organizations",
+          "Charter school operators",
+          "Regional educational laboratories"
+        ],
+        "student_aid": [
+          "Accredited postsecondary institutions participating in Title IV programs"
+        ],
+        "notes": "Most K-12 formula grants flow SEA -> LEA -> school. Competitive grants have program-specific eligibility. Higher ed programs require institutional eligibility designation."
+      },
+
+      "grant_types": {
+        "formula_grants": {
+          "programs": ["Title I Part A", "IDEA Part B (Sections 611/619)", "Title II Part A", "Title III", "Title IV Part A", "Perkins V"],
+          "description": "Allocated to states by statutory formulas based on census data, child counts, or other metrics. States then distribute to LEAs.",
+          "plain_english": "Money flows automatically based on formulas -- states and districts don't compete for it, they just apply and meet requirements."
+        },
+        "competitive_grants": {
+          "programs": ["Charter Schools Program", "Education Innovation and Research (EIR)", "Magnet Schools Assistance", "Teacher Quality Partnership", "TRIO", "GEAR UP"],
+          "description": "Awarded through peer-reviewed competition. Applications scored against published criteria.",
+          "plain_english": "You write a proposal, it gets scored by reviewers, and the best ones get funded."
+        },
+        "entitlement_grants": {
+          "programs": ["Pell Grants", "Federal Supplemental Educational Opportunity Grant (FSEOG)"],
+          "description": "Student-level entitlements administered through participating institutions.",
+          "plain_english": "Students who qualify automatically get the money through their school."
+        }
+      },
+
+      "registration_prerequisites": [
+        {
+          "requirement": "SAM.gov registration",
+          "details": "Must have active SAM.gov registration with valid UEI number. Allow 4+ weeks for new registrations.",
+          "required_for": "All grants"
+        },
+        {
+          "requirement": "Grants.gov registration",
+          "details": "Organization must register on Grants.gov with Authorized Organization Representative (AOR).",
+          "required_for": "All competitive grants"
+        },
+        {
+          "requirement": "G5 System registration",
+          "details": "ED's electronic grants management system for managing awards post-award.",
+          "required_for": "All ED grants"
+        },
+        {
+          "requirement": "DUNS/UEI Number",
+          "details": "Unique Entity Identifier required. DUNS replaced by UEI through SAM.gov.",
+          "required_for": "All grants"
+        },
+        {
+          "requirement": "Title IV eligibility (Higher Ed only)",
+          "details": "Institutions must have Program Participation Agreement (PPA) and be accredited by ED-recognized accreditor.",
+          "required_for": "Student aid programs, higher education grants"
+        }
+      ],
+
+      "compliance_requirements": {
+        "ferpa": {
+          "regulation": "Family Educational Rights and Privacy Act (20 U.S.C. 1232g; 34 CFR Part 99)",
+          "applies_to": "All educational agencies and institutions receiving ED funding",
+          "plain_english": "You must protect student education records. Parents (or students 18+) have the right to see records, request corrections, and control who gets access. You can't share personally identifiable student information without consent except in specific narrow exceptions.",
+          "key_rules": [
+            "Annual notification to parents/students of FERPA rights",
+            "Maintain records of disclosures",
+            "Written consent required before releasing PII from education records",
+            "Directory information may be disclosed only if parents given opt-out opportunity",
+            "Violations can result in loss of all federal funding"
+          ]
+        },
+        "edgar": {
+          "regulation": "Education Department General Administrative Regulations (34 CFR Parts 75-79, 81-86, 97-99)",
+          "applies_to": "All ED discretionary grants",
+          "plain_english": "EDGAR is the rulebook for how ED grants are administered. It covers everything from how you apply, to how you spend the money, to what happens if you mess up. For awards after 12/26/2014, the Uniform Guidance (2 CFR 200) also applies.",
+          "key_rules": [
+            "Must follow 2 CFR 200 for awards made on/after 12/26/2014",
+            "Prior approval required for budget changes exceeding 10% of total award",
+            "Equipment purchases over $5,000 require prior approval",
+            "Subcontracting requires ED approval",
+            "Records must be retained for 3 years after final expenditure report"
+          ]
+        },
+        "supplement_not_supplant": {
+          "regulation": "ESSA Section 1118(b)(1) and similar provisions in other programs",
+          "applies_to": "Title I Part A, IDEA, Title II Part A, Title III, and other formula programs",
+          "plain_english": "Federal money must ADD TO what you're already spending from state/local sources -- not replace it. You can't cut your local budget for a program and backfill with federal funds. Under ESSA, the test changed: LEAs must show their allocation methodology gives each Title I school all the state/local funds it would get without Title I.",
+          "key_rules": [
+            "LEA must demonstrate methodology ensures Title I schools receive full state/local allocation",
+            "Cannot use federal funds to pay for activities previously funded with state/local money",
+            "Must maintain fiscal effort (maintenance of effort) from year to year",
+            "MOE requires 90% of prior year combined fiscal effort or per-pupil expenditure",
+            "Restricted indirect cost rate must be used for supplement-not-supplant programs"
+          ]
+        },
+        "equitable_participation": {
+          "regulation": "ESSA Sections 1117, 8501; IDEA Section 612(a)(10)(A)",
+          "applies_to": "Title I, Title II, Title III, Title IV Part A, IDEA",
+          "plain_english": "Private school students in your district are entitled to a fair share of federal education services. The LEA must consult with private school officials, calculate per-pupil amounts, and provide equitable services. You don't give them the money -- you provide the services directly or through a contractor.",
+          "key_rules": [
+            "LEA must consult with private school officials before making decisions about services",
+            "Per-pupil allocation for private school students based on proportional share",
+            "LEA retains title to and control of materials/equipment purchased",
+            "Services must be secular, neutral, and non-ideological",
+            "Third-party provider may be used to deliver services"
+          ]
+        },
+        "maintenance_of_effort": {
+          "regulation": "ESSA Section 1118(a); IDEA Section 612(a)(18)",
+          "applies_to": "Most formula grant programs",
+          "plain_english": "You must keep spending at least 90% of what you spent last year from state and local sources. If you fall below that, your federal allocation gets reduced proportionally.",
+          "key_rules": [
+            "90% threshold of prior year expenditures (aggregate or per-pupil)",
+            "Failure triggers proportional reduction in federal allocation",
+            "Waivers available in limited circumstances (natural disaster, precipitous enrollment decline)",
+            "Calculated on combined state and local expenditures"
+          ]
+        }
+      },
+
+      "required_supporting_documents": [
+        "SF-424 (Application for Federal Assistance)",
+        "ED 524 (Budget Information - Non-Construction Programs)",
+        "Project Narrative addressing all selection criteria",
+        "Logic Model or Theory of Change",
+        "Resumes of key personnel",
+        "Letters of support from partner organizations",
+        "Indirect cost rate agreement (or use 8% de minimis)",
+        "Assurances and Certifications (SF-424B or ED 80-0013/0014)",
+        "Lobbying disclosure (SF-LLL if applicable)",
+        "Organizational capacity narrative",
+        "Data on target population and need",
+        "GEPA Section 427 statement (addressing equitable access for special populations)"
+      ],
+
+      "indirect_cost_rate_rules": {
+        "restricted_rate": {
+          "applies_to": "Programs with supplement-not-supplant requirement (Title I, IDEA, etc.)",
+          "description": "Must use restricted indirect cost rate, which excludes certain costs from the base to prevent supplanting.",
+          "plain_english": "For formula grants with supplement-not-supplant rules, you can't use your full negotiated rate. You use a 'restricted' rate that's lower, to make sure indirect costs aren't eating into direct services."
+        },
+        "unrestricted_rate": {
+          "applies_to": "Competitive/discretionary grants without supplement-not-supplant",
+          "description": "May use full negotiated indirect cost rate."
+        },
+        "de_minimis": {
+          "rate": "8%",
+          "applies_to": "Organizations without a negotiated rate",
+          "description": "Organizations that have never had a negotiated rate may use 8% of Modified Total Direct Costs (MTDC). If your calculated restricted rate is below 8%, you must use the lower rate.",
+          "plain_english": "If you've never negotiated a rate with the feds, you can claim 8% -- but if math shows your actual rate is lower, use the lower number."
+        },
+        "cognizant_agency": "ED Indirect Cost Group (ICG) or the entity's cognizant federal agency",
+        "negotiation_timeline": "Must submit indirect cost rate proposal within 90 days of Grant Award Notification (GAN)"
+      },
+
+      "agency_specific_quirks": [
+        "Title I formula uses FOUR different formulas (Basic, Concentration, Targeted, Education Finance Incentive) with different thresholds -- LEAs can qualify under some but not others",
+        "IDEA has 'child find' obligation: districts must identify ALL children with disabilities, even those in private schools or home schools",
+        "Charter Schools Program has unique eligibility: must be authorized by state charter law, and state must have specific accountability provisions",
+        "ED has been subject to significant restructuring/downsizing in 2025-2026, which may affect program administration and timelines",
+        "GEPA Section 427 statement is uniquely required by ED -- no other agency requires this specific equity access statement",
+        "Higher ed eligibility designations (HSI, HBCU, TCU, AANAPISI) unlock access to specific grant programs",
+        "Many ED grants require annual performance reports tied to Government Performance and Results Act (GPRA) measures"
+      ]
+    },
+
+    "dot": {
+      "agency_number": 9,
+      "name": "Department of Transportation (DOT)",
+      "full_name": "United States Department of Transportation",
+
+      "eligible_applicant_types": {
+        "discretionary_programs": [
+          "State governments and state DOTs",
+          "Local governments (cities, counties, townships)",
+          "Metropolitan Planning Organizations (MPOs)",
+          "Transit agencies and authorities",
+          "Port authorities",
+          "Tribal governments (federally recognized)",
+          "Special purpose districts or public authorities with transportation function",
+          "Multi-state or multi-jurisdictional groups of eligible entities"
+        ],
+        "formula_programs": [
+          "State DOTs (FHWA programs)",
+          "Designated transit agencies (FTA formula programs)",
+          "Metropolitan Planning Organizations (MPOs)"
+        ],
+        "notes": "Nonprofits and private entities are generally NOT directly eligible for DOT infrastructure grants, though they may be project partners or subrecipients. Some planning grants have broader eligibility."
+      },
+
+      "grant_types": {
+        "discretionary_competitive": {
+          "programs": ["BUILD/RAISE (now BUILD again as of FY2026)", "INFRA Grants", "Mega Grants", "Reconnecting Communities", "Safe Streets and Roads for All (SS4A)", "RAISE (rebranded to BUILD in FY2026)"],
+          "description": "Competitively awarded for capital infrastructure projects. Scored on merit criteria including safety, economic competitiveness, quality of life, environmental sustainability, innovation, and state of good repair.",
+          "plain_english": "Big competitive pots of money for building or improving transportation infrastructure. You pitch your project and it gets scored against other applicants nationwide."
+        },
+        "formula_programs": {
+          "programs": ["National Highway Performance Program (NHPP)", "Surface Transportation Block Grant (STBG)", "Highway Safety Improvement Program (HSIP)", "FTA Section 5307 (Urbanized Area)", "FTA Section 5311 (Rural Area)"],
+          "description": "Distributed to states and transit agencies by formula based on lane miles, vehicle miles traveled, population, and other factors.",
+          "plain_english": "States and transit agencies get their share automatically based on formulas in the law. No competition required."
+        }
+      },
+
+      "registration_prerequisites": [
+        {
+          "requirement": "SAM.gov registration",
+          "details": "Active registration with UEI required. Must be renewed annually.",
+          "required_for": "All DOT grants"
+        },
+        {
+          "requirement": "Grants.gov registration",
+          "details": "AOR must be registered. E-Business POC must authorize AOR in SAM.gov.",
+          "required_for": "Discretionary grants"
+        },
+        {
+          "requirement": "DUNS/UEI Number",
+          "details": "UEI obtained through SAM.gov registration.",
+          "required_for": "All grants"
+        },
+        {
+          "requirement": "Transportation Management System access",
+          "details": "FHWA uses FMIS; FTA uses TrAMS (Transit Award Management System).",
+          "required_for": "Post-award management"
+        }
+      ],
+
+      "compliance_requirements": {
+        "nepa": {
+          "regulation": "National Environmental Policy Act (42 U.S.C. 4321 et seq.); 23 CFR 771 (FHWA/FTA); 49 CFR Part 1500 (PHMSA)",
+          "applies_to": "All federally funded transportation projects involving construction or physical changes",
+          "plain_english": "Before you build anything, you must study the environmental impacts. Depending on project size, this means a Categorical Exclusion (small/routine projects), Environmental Assessment (moderate impacts), or full Environmental Impact Statement (major impacts). This process can take months to years.",
+          "key_rules": [
+            "Categorical Exclusion (CE): Routine projects with no significant impact. Fastest path (~weeks to months).",
+            "Environmental Assessment (EA): Moderate projects. Average completion ~10 months. Results in Finding of No Significant Impact (FONSI) or triggers EIS.",
+            "Environmental Impact Statement (EIS): Major projects. Average completion ~2.2 years (26 months). Requires public comment, alternatives analysis.",
+            "NEPA review must be completed BEFORE construction funds are obligated",
+            "Section 4(f): Special protections for parks, wildlife refuges, and historic sites",
+            "Section 106: Historic preservation review required"
+          ]
+        },
+        "davis_bacon": {
+          "regulation": "Davis-Bacon Act (40 U.S.C. 3141-3148); 29 CFR Parts 1, 3, 5",
+          "applies_to": "All federally funded construction contracts over $2,000",
+          "plain_english": "All workers on the construction project must be paid at least the local 'prevailing wage' rate set by the Department of Labor for that type of work in that area. You must collect certified payroll reports weekly from every contractor and subcontractor.",
+          "key_rules": [
+            "Applies to construction contracts over $2,000",
+            "Must include wage determination in bid/contract documents",
+            "Weekly certified payroll reports required (WH-347)",
+            "Post wage determination and Davis-Bacon poster at job site",
+            "Conduct periodic employee interviews (SF-1445)",
+            "Apprentices must have DOL certification",
+            "Records retained 3 years after project completion"
+          ]
+        },
+        "buy_america": {
+          "regulation": "Build America, Buy America Act (BABAA, part of Infrastructure Investment and Jobs Act 2021); 23 CFR 635.410 (FHWA); 49 CFR Part 661 (FTA)",
+          "applies_to": "All federally funded infrastructure projects",
+          "plain_english": "Steel, iron, and manufactured products used in the project must be produced in the United States. 'Produced in the US' means all manufacturing processes must occur domestically. Waivers exist but are hard to get.",
+          "key_rules": [
+            "ALL iron and steel must be produced in the US (melted and poured domestically)",
+            "Manufactured products: all manufacturing processes must occur in the US",
+            "Construction materials must be produced in the US",
+            "Waivers available: public interest, non-availability, unreasonable cost (>25% price differential)",
+            "BABAA expanded Buy America to ALL federal financial assistance programs, not just DOT",
+            "FTA requires Buy America compliance certification before award",
+            "De minimis waiver for components under $1 million or less than 5% of project cost"
+          ]
+        },
+        "dbe": {
+          "regulation": "49 CFR Part 26 (Disadvantaged Business Enterprise)",
+          "applies_to": "All DOT-assisted contracts",
+          "plain_english": "A percentage of contract dollars must go to small businesses owned by socially and economically disadvantaged individuals (minorities, women, etc.). The recipient sets an overall DBE goal and applies contract-specific goals or race-neutral methods.",
+          "key_rules": [
+            "Recipients must set an overall DBE goal (updated every 3 years)",
+            "DBE firms must be certified by a Unified Certification Program (UCP)",
+            "Small business size standard: average annual gross receipts not exceeding $30.54 million (adjusted for inflation)",
+            "Good faith efforts documentation required if goal not met",
+            "Prompt payment provisions required in all contracts",
+            "DBE participation counted only for work actually performed by DBE firm",
+            "Cannot discriminate against any DBE firm"
+          ]
+        },
+        "ata": {
+          "regulation": "Americans with Disabilities Act (42 U.S.C. 12101 et seq.); Section 504 of Rehabilitation Act",
+          "applies_to": "All transportation facilities and services",
+          "plain_english": "All transit facilities, vehicles, and transportation services must be accessible to people with disabilities. New construction must be fully accessible. Alterations must be accessible to the maximum extent feasible.",
+          "key_rules": [
+            "New construction must be fully ADA-accessible",
+            "Key stations in rail systems must be made accessible",
+            "Complementary paratransit service required for fixed-route systems",
+            "Vehicle accessibility requirements per DOT ADA regulations"
+          ]
+        }
+      },
+
+      "required_supporting_documents": [
+        "SF-424 (Application for Federal Assistance)",
+        "Project narrative addressing merit criteria",
+        "Benefit-Cost Analysis (BCA) -- required for BUILD/RAISE/INFRA",
+        "Project budget with detailed cost estimates",
+        "Letters of financial commitment (match/leverage)",
+        "Project schedule and milestones",
+        "Environmental readiness documentation",
+        "Maps and project area descriptions",
+        "Letters of support from affected communities/stakeholders",
+        "DBE plan or commitment",
+        "Organizational capacity documentation",
+        "Planning and environmental linkages documentation"
+      ],
+
+      "indirect_cost_rate_rules": {
+        "general": "DOT follows 2 CFR Part 1201 (DOT adoption of Uniform Guidance with minor deviations).",
+        "state_dots": "State DOTs must have approved indirect cost allocation plans reviewed by FHWA.",
+        "other_recipients": "Must use federally negotiated rate or 10% de minimis rate per 2 CFR 200.414.",
+        "match_credit": "Unrecovered indirect costs may be used for match/cost-sharing with prior DOT approval.",
+        "plain_english": "You need a federally approved overhead rate, or you can use 10% as a default. State DOTs have their own approval process through FHWA."
+      },
+
+      "match_requirements": {
+        "build_urban": "80% federal / 20% local match",
+        "build_rural": "Up to 100% federal funding for rural projects",
+        "build_equity_areas": "Up to 100% federal for designated equity areas",
+        "fhwa_formula": "Typically 80% federal / 20% state match (90/10 for Interstate)",
+        "fta_formula": "80% federal / 20% local for capital; 50% / 50% for operating",
+        "minimum_grant_size": {
+          "build_urban": "$5 million minimum request",
+          "build_rural": "$1 million minimum request",
+          "build_planning": "No minimum for planning grants",
+          "build_maximum": "$25 million maximum per project"
+        }
+      },
+
+      "agency_specific_quirks": [
+        "RAISE grants were rebranded BACK to BUILD grants starting FY2026 -- same program, third name change",
+        "NEPA process can take 2+ years for major projects, which creates a chicken-and-egg problem with grant timelines",
+        "Urban vs. rural classification uses 2020 Census Urban Areas (200,000+ population = urban). This classification affects match requirements and scoring",
+        "BUILD funds must be OBLIGATED by Sept 30, 2030 and EXPENDED by Sept 30, 2035",
+        "DOT requires a formal Benefit-Cost Analysis using their specific methodology and discount rate (currently 3.1%)",
+        "Multi-modal projects spanning multiple DOT agencies (FHWA, FTA, FRA) can be particularly complex -- each has its own rules",
+        "Buy America requirements expanded significantly under BABAA -- now applies to ALL infrastructure, not just highways/transit",
+        "DOT has a 'DOT Navigator' web resource specifically to help first-time applicants"
+      ]
+    },
+
+    "nist": {
+      "agency_number": 10,
+      "name": "National Institute of Standards and Technology (NIST)",
+      "full_name": "National Institute of Standards and Technology",
+
+      "eligible_applicant_types": {
+        "mep_program": [
+          "US-based nonprofit institutions",
+          "Institutions of higher education",
+          "State, territorial, local, or tribal governments",
+          "Consortia of the above entities",
+          "Incumbent MEP Centers in good standing (for recompetition)"
+        ],
+        "sbir": [
+          "Small businesses (500 or fewer employees)",
+          "Must be for-profit",
+          "Must be 51%+ US-owned (citizens or permanent residents)",
+          "PI must be primarily employed by the small business"
+        ],
+        "research_grants": [
+          "Institutions of higher education",
+          "Nonprofit research organizations",
+          "State and local governments",
+          "For-profit companies (selected programs)"
+        ],
+        "notes": "NIST is a relatively small granting agency. The MEP program and SBIR are the primary external grant programs. Most NIST funding goes to internal research."
+      },
+
+      "grant_types": {
+        "competitive": {
+          "programs": ["MEP Center Competition", "NIST SBIR Phase I", "NIST SBIR Phase II", "Manufacturing USA Institutes", "Measurement Science and Engineering (MSE) Research Grants"],
+          "description": "Awarded through competitive review. MEP awards are for 5+5 year periods with performance reviews.",
+          "plain_english": "You compete against other applicants. NIST reviews proposals on technical merit, relevance to NIST mission, and qualifications."
+        },
+        "cooperative_agreements": {
+          "programs": ["MEP Centers", "Manufacturing USA"],
+          "description": "NIST provides substantial involvement in the project -- not just money, but technical collaboration.",
+          "plain_english": "NIST doesn't just hand you a check. They're actively involved in the work alongside you."
+        }
+      },
+
+      "registration_prerequisites": [
+        {
+          "requirement": "SAM.gov registration",
+          "details": "Active registration with UEI required.",
+          "required_for": "All NIST grants"
+        },
+        {
+          "requirement": "Grants.gov registration",
+          "details": "Required for proposal submission. Must register AOR.",
+          "required_for": "All NIST grants"
+        },
+        {
+          "requirement": "SBA company registry (SBIR only)",
+          "details": "Must register at SBIR.gov and SBA's company registry. Annual certification of size and ownership.",
+          "required_for": "SBIR/STTR"
+        }
+      ],
+
+      "compliance_requirements": {
+        "intellectual_property_bayh_dole": {
+          "regulation": "Bayh-Dole Act (35 U.S.C. 200-212); 37 CFR 401",
+          "applies_to": "All NIST-funded research generating inventions",
+          "plain_english": "If you invent something using NIST grant money, you can keep the patent -- but the government gets a free license to use it, and you must report the invention, file for a patent within specific deadlines, and actually commercialize it. If you don't, the government can 'march in' and license it to someone else.",
+          "key_rules": [
+            "Recipient retains title to inventions (subject invention)",
+            "Must disclose inventions to NIST within 2 months of inventor disclosure",
+            "Must elect title within 2 years of disclosure",
+            "Must file patent application within 1 year of election",
+            "Government gets non-exclusive, irrevocable, royalty-free license",
+            "Must include 'manufactured substantially in the US' clause for exclusive licenses",
+            "March-in rights: NIST can require licensing if practical application not achieved",
+            "NIST is the primary agency interpreting march-in rights under Bayh-Dole"
+          ]
+        },
+        "matching_requirements": {
+          "regulation": "15 CFR Part 290 (MEP); program-specific NOFOs",
+          "applies_to": "MEP program primarily",
+          "plain_english": "MEP Centers must match federal funding with non-federal sources. The match ratio increases over time, pushing centers toward financial sustainability.",
+          "key_rules": [
+            "MEP requires minimum 1:1 cost share (50% federal, 50% non-federal)",
+            "Non-federal match can include state funds, fees for service, and in-kind contributions",
+            "SBIR/STTR: NO matching requirement",
+            "Research grants: varies by program, check NOFO"
+          ]
+        },
+        "nist_standards_compliance": {
+          "regulation": "Various NIST standards and Special Publications",
+          "applies_to": "Manufacturing and cybersecurity grants",
+          "plain_english": "If your project involves manufacturing or cybersecurity, NIST may require you to use or align with specific NIST frameworks (like the Cybersecurity Framework or manufacturing standards).",
+          "key_rules": [
+            "MEP Centers must use NIST MEP performance measurement system",
+            "Cybersecurity grants may require alignment with NIST Cybersecurity Framework",
+            "Manufacturing projects may need to reference NIST measurement standards"
+          ]
+        }
+      },
+
+      "required_supporting_documents": [
+        "SF-424 (Application for Federal Assistance)",
+        "SF-424A (Budget Information)",
+        "Project narrative (format per NOFO)",
+        "Budget narrative/justification",
+        "Biographical sketches of key personnel",
+        "Letters of commitment for cost share/match",
+        "Organizational chart",
+        "Current and pending support documentation",
+        "Indirect cost rate agreement",
+        "SBIR-specific: Company commercialization plan, SBA company registration"
+      ],
+
+      "indirect_cost_rate_rules": {
+        "general": "NIST follows 2 CFR 200 Uniform Guidance.",
+        "negotiated_rate": "Use federally negotiated rate from cognizant agency.",
+        "de_minimis": "10% of MTDC for organizations without negotiated rate.",
+        "sbir": "NIST SBIR Phase I: up to $100,000 total (inclusive of indirect). Phase II: up to $400,000 total.",
+        "plain_english": "Standard federal rules apply. For SBIR, your indirect costs eat into the total award cap, so high overhead rates reduce the money available for actual work."
+      },
+
+      "award_amounts": {
+        "sbir_phase_i": "$100,000 for 6 months",
+        "sbir_phase_ii": "$400,000 for 24 months",
+        "mep_center": "Varies by state, typically $1-5 million per year for 5-year periods",
+        "research_grants": "Varies widely by program"
+      },
+
+      "agency_specific_quirks": [
+        "NIST is small -- total extramural grants budget is modest compared to NSF, NIH, DOE",
+        "MEP Centers are quasi-permanent institutions: once established, they typically get renewed unless performance is poor",
+        "NIST SBIR is one of the smallest SBIR programs across all agencies",
+        "NIST's primary mission is measurement science -- grants must connect to standards, measurement, or manufacturing",
+        "Bayh-Dole march-in rights interpretation: NIST is the lead agency on this issue nationally, which gives their IP policies outsized importance",
+        "MEP 10-year rule: Centers that have received funding for 10 consecutive years must compete in a state competition for renewal"
+      ]
+    },
+
+    "nasa": {
+      "agency_number": 11,
+      "name": "National Aeronautics and Space Administration (NASA)",
+      "full_name": "National Aeronautics and Space Administration",
+
+      "eligible_applicant_types": {
+        "sbir_sttr": [
+          "Small businesses (500 or fewer employees)",
+          "For-profit only",
+          "51%+ US-owned (citizens or permanent residents)",
+          "PI primarily employed by company (SBIR)",
+          "Must partner with research institution (STTR)"
+        ],
+        "research_grants": [
+          "US universities and colleges",
+          "Nonprofit research institutions",
+          "Other nonprofits with relevant research capability",
+          "NASA Centers (internal, but sometimes collaborative)",
+          "Federally Funded Research and Development Centers (FFRDCs) -- limited"
+        ],
+        "epscor": [
+          "Institutions in eligible EPSCoR jurisdictions only (28 states/territories)",
+          "Proposals must come from the resident institution of the NASA EPSCoR Jurisdiction Director",
+          "One proposal per jurisdiction"
+        ],
+        "notes": "Foreign entities CANNOT be prime recipients. Foreign participation as sub-awardees or collaborators is allowed but subject to export control review."
+      },
+
+      "grant_types": {
+        "sbir_sttr": {
+          "programs": ["SBIR Phase I", "SBIR Phase II", "SBIR Ignite", "STTR Phase I", "STTR Phase II"],
+          "description": "Small business innovation programs. As of 2026, NASA is transitioning from traditional solicitation cycles to Broad Agency Announcements (BAAs) with rolling appendices.",
+          "status_note": "SBIR/STTR authorization expired Sept 30, 2025. Reauthorized through Sept 30, 2031 with new screening requirements.",
+          "plain_english": "NASA funds small businesses to develop technologies the agency needs. New 2026 rules add foreign-ties screening and allow rolling submissions instead of fixed deadlines."
+        },
+        "research_opportunities": {
+          "programs": ["ROSES (Research Opportunities in Space and Earth Sciences)", "MUREP (Minority University Research and Education Project)", "University Leadership Initiative"],
+          "description": "Competitively awarded research grants through NASA Research Announcements (NRAs). ROSES has dozens of program elements released throughout the year.",
+          "plain_english": "NASA's main research grant program. ROSES alone has 50+ sub-programs per year covering everything from astrophysics to Earth science."
+        },
+        "epscor": {
+          "programs": ["EPSCoR Research Awards", "EPSCoR Rapid Response Research (R3)", "EPSCoR International Space Station (ISS) Flight Opportunity"],
+          "description": "Builds research capacity in states historically underrepresented in NASA funding.",
+          "plain_english": "If your state doesn't get much NASA money (28 qualifying states/territories), this program helps build up your state's research infrastructure."
+        }
+      },
+
+      "registration_prerequisites": [
+        {
+          "requirement": "SAM.gov registration",
+          "details": "Active registration with UEI required.",
+          "required_for": "All NASA grants"
+        },
+        {
+          "requirement": "Grants.gov / NSPIRES registration",
+          "details": "NASA uses NSPIRES (NASA Solicitation and Proposal Integrated Review and Evaluation System) for research proposals. Some programs use Grants.gov.",
+          "required_for": "Research grants use NSPIRES; SBIR uses sbir.nasa.gov"
+        },
+        {
+          "requirement": "SBA company registry (SBIR/STTR)",
+          "details": "Must register at SBIR.gov. Annual certification required.",
+          "required_for": "SBIR/STTR"
+        },
+        {
+          "requirement": "Export control registration",
+          "details": "ITAR-controlled work may require State Department registration. EAR-controlled work may need BIS classification.",
+          "required_for": "Projects involving controlled technology"
+        }
+      ],
+
+      "compliance_requirements": {
+        "export_control_itar": {
+          "regulation": "International Traffic in Arms Regulations (22 CFR Parts 120-130); USML Categories",
+          "applies_to": "Research involving defense articles, defense services, or technical data on the US Munitions List",
+          "plain_english": "If your NASA-funded research involves technology that could have military applications (rockets, satellites, certain sensors, etc.), you need State Department approval before sharing it with ANY foreign person -- even a foreign grad student in your lab. Violations carry criminal penalties.",
+          "key_rules": [
+            "Cannot share ITAR-controlled technical data with foreign nationals without license",
+            "Applies to physical exports AND 'deemed exports' (sharing with foreign persons in the US)",
+            "Registration with State Department DDTC required for manufacturers/exporters",
+            "Fundamental research exclusion: basic research results intended for publication are generally exempt",
+            "License required before foreign nationals can access controlled information",
+            "Criminal penalties: up to $1M fine and 20 years imprisonment per violation"
+          ]
+        },
+        "export_control_ear": {
+          "regulation": "Export Administration Regulations (15 CFR Parts 730-799); Commerce Control List",
+          "applies_to": "Dual-use technologies (commercial items with potential military applications)",
+          "plain_english": "Even if your technology isn't military (ITAR), it might be 'dual-use' and controlled by the Commerce Department. Check the Commerce Control List to see if your tech needs a license before sharing internationally.",
+          "key_rules": [
+            "Check if technology is on Commerce Control List (CCL)",
+            "License requirements depend on classification (ECCN) and destination country",
+            "Fundamental research exclusion applies",
+            "Published information is generally excluded",
+            "Enforcement by Bureau of Industry and Security (BIS)"
+          ]
+        },
+        "intellectual_property": {
+          "regulation": "Bayh-Dole Act; NASA FAR Supplement (NFS) 1852.227-70 through 1852.227-72",
+          "applies_to": "All NASA-funded research",
+          "plain_english": "Same Bayh-Dole rules as other agencies -- you keep the patent, government gets a license. But NASA also has 'New Technology' reporting requirements: you must report ANY new technology developed under the grant, not just patentable inventions.",
+          "key_rules": [
+            "Standard Bayh-Dole rights apply",
+            "Must report ALL new technology via NASA New Technology Reports",
+            "Government gets royalty-free license for government purposes",
+            "NASA has march-in rights if technology not commercialized",
+            "Data rights: NASA may require unlimited rights to technical data in some cases",
+            "SBIR data rights: 20-year protection period for SBIR-generated data (extended from 4 years under reauthorization)"
+          ]
+        },
+        "nasa_far_supplement": {
+          "regulation": "NASA FAR Supplement (NFS), 48 CFR Chapter 18",
+          "applies_to": "NASA contracts and cooperative agreements (some provisions flow to grants)",
+          "plain_english": "NASA has its own additions to the standard federal acquisition rules. Key ones include export control clauses, safety requirements for flight hardware, and intellectual property provisions specific to space technology.",
+          "key_rules": [
+            "NFS 1852.225-70: Export control clause -- contractor responsible for compliance",
+            "NFS 1852.223-70: Safety and health requirements for flight hardware",
+            "NFS 1852.227-70: New technology clause (invention reporting)",
+            "NFS 1852.235-72: Instructions for responding to research announcements"
+          ]
+        },
+        "foreign_screening_2026": {
+          "regulation": "SBIR/STTR Reauthorization Act of 2025; SBA Policy Directive",
+          "applies_to": "All SBIR/STTR applicants at all agencies including NASA",
+          "plain_english": "Starting with the 2026 reauthorization, every SBIR/STTR application gets screened for foreign ties. They check your cybersecurity, patents, employee backgrounds, and financial connections to countries like China, Russia, Iran, and North Korea. Connections to these countries can disqualify you.",
+          "key_rules": [
+            "Due diligence review of cybersecurity practices",
+            "Patent portfolio review",
+            "Employee background checks for foreign connections",
+            "Financial ties to 'foreign countries of concern' (China, Russia, Iran, North Korea)",
+            "Screening against federal watchlists",
+            "Applies to all 11 SBIR/STTR participating agencies"
+          ]
+        }
+      },
+
+      "required_supporting_documents": [
+        "NSPIRES Cover Page or SF-424",
+        "Project summary/abstract",
+        "Scientific/Technical/Management proposal",
+        "Budget with justification (NASA budget forms)",
+        "Biographical sketches (NASA format)",
+        "Current and pending support",
+        "Facilities and equipment description",
+        "Data management plan",
+        "Export control assessment/classification",
+        "SBIR-specific: Commercialization plan, technical abstract, company data",
+        "EPSCoR-specific: Jurisdiction Director endorsement, state match commitment letter"
+      ],
+
+      "indirect_cost_rate_rules": {
+        "general": "NASA follows 2 CFR 200 Uniform Guidance for grants.",
+        "negotiated_rate": "Use federally negotiated rate. NASA accepts rates negotiated by cognizant agency.",
+        "de_minimis": "10% of MTDC for organizations without negotiated rate.",
+        "sbir_note": "SBIR awards have fixed total caps. High indirect rates reduce direct research spending.",
+        "epscor_note": "EPSCoR awards: $200K/year or $750K over 3 years. Indirect costs come from the total.",
+        "plain_english": "Standard federal overhead rules. But for SBIR and EPSCoR where there are hard dollar caps, every dollar in overhead is a dollar less for research."
+      },
+
+      "epscor_eligible_jurisdictions": [
+        "Alabama", "Alaska", "Arkansas", "Delaware", "Guam", "Hawaii", "Idaho", "Iowa",
+        "Kansas", "Kentucky", "Louisiana", "Maine", "Mississippi", "Montana", "Nebraska",
+        "Nevada", "New Hampshire", "New Mexico", "North Dakota", "Oklahoma", "Puerto Rico",
+        "Rhode Island", "South Carolina", "South Dakota", "US Virgin Islands", "Vermont",
+        "West Virginia", "Wyoming"
+      ],
+
+      "agency_specific_quirks": [
+        "NSPIRES is NASA's own proposal submission system -- different from Grants.gov, with its own learning curve",
+        "ROSES releases 50+ sub-program elements per year, each with its own deadline and requirements",
+        "EPSCoR is limited to 28 jurisdictions -- if you're not in one of those states, you cannot apply",
+        "Export control is MORE restrictive for NASA than most agencies because space technology overlaps heavily with missile technology (USML Category IV)",
+        "SBIR/STTR transitioning to BAA model in 2026 with rolling submissions -- major change from annual cycles",
+        "NASA flight opportunity grants require extensive safety review processes unique to spaceflight",
+        "Foreign participation requires Technology Assistance Agreements (TAAs) or Technical Data Packages reviewed by DDTC",
+        "The 2026 SBIR reauthorization added 'Strategic Breakthrough Awards' up to $30M -- much larger than traditional SBIR"
+      ]
+    },
+
+    "dod": {
+      "agency_number": 12,
+      "name": "Department of Defense (DOD)",
+      "full_name": "United States Department of Defense",
+
+      "eligible_applicant_types": {
+        "sbir_sttr": [
+          "Small businesses (500 or fewer employees)",
+          "For-profit, US-owned (51%+ by citizens/permanent residents)",
+          "PI primarily employed by company (SBIR)",
+          "Must partner with nonprofit research institution (STTR)",
+          "Cannot have foreign nationals working on ITAR-restricted topics"
+        ],
+        "research_grants": [
+          "US universities and colleges",
+          "Nonprofit research institutions",
+          "For-profit companies (under contracts, not usually grants)",
+          "Federally Funded Research and Development Centers (FFRDCs)",
+          "University Affiliated Research Centers (UARCs)"
+        ],
+        "darpa": [
+          "Public and private educational institutions (grants/cooperative agreements)",
+          "Nonprofit organizations operated in the public interest (grants)",
+          "Commercial firms (contracts only, not grants)",
+          "Foreign entities: generally NOT eligible, case-by-case exceptions"
+        ],
+        "notes": "DOD grants are primarily for BASIC RESEARCH. Applied research and development typically use contracts or Other Transactions (OTs), not grants. The distinction matters for compliance requirements."
+      },
+
+      "grant_types": {
+        "sbir_sttr": {
+          "programs": ["Army SBIR/STTR", "Navy SBIR/STTR", "Air Force SBIR/STTR", "DARPA SBIR/STTR", "MDA SBIR/STTR", "SOCOM SBIR/STTR", "DHA SBIR/STTR", "DTRA SBIR/STTR"],
+          "description": "DOD is the LARGEST SBIR/STTR funder across all federal agencies. Each military service and defense agency runs its own program.",
+          "status_note": "Program lapsed Oct 1, 2025 due to Congressional inaction. Reauthorized through Sept 30, 2031.",
+          "plain_english": "DOD spends more on SBIR than any other agency. Each service branch (Army, Navy, Air Force) plus DARPA and others have their own topics and timelines."
+        },
+        "research_grants_baa": {
+          "programs": ["DARPA BAAs (various programs)", "ONR (Office of Naval Research) BAAs", "ARO (Army Research Office) BAAs", "AFOSR (Air Force Office of Scientific Research) BAAs", "DTRA BAAs"],
+          "description": "Broad Agency Announcements for basic and applied research. Open to proposals on topics within stated areas of interest.",
+          "plain_english": "DOD posts broad research topics they're interested in, and researchers submit proposals. These are more flexible than traditional grant programs."
+        },
+        "darpa_programs": {
+          "programs": ["DARPA-specific BAAs for breakthrough technologies", "Young Faculty Award (YFA)", "Microsystems Technology Office programs"],
+          "description": "DARPA funds high-risk, high-reward research. Programs often have unique structures.",
+          "plain_english": "DARPA funds moonshot research. If it's not potentially transformative, DARPA isn't interested."
+        }
+      },
+
+      "registration_prerequisites": [
+        {
+          "requirement": "SAM.gov registration",
+          "details": "Active registration required. Must include CAGE code (Commercial and Government Entity).",
+          "required_for": "All DOD awards"
+        },
+        {
+          "requirement": "DSIP registration (SBIR/STTR)",
+          "details": "Defense SBIR/STTR Innovation Portal (DSIP) at dodsbirsttr.mil. Required for proposal submission.",
+          "required_for": "DOD SBIR/STTR"
+        },
+        {
+          "requirement": "Grants.gov registration",
+          "details": "For research grants submitted through Grants.gov.",
+          "required_for": "Research grants"
+        },
+        {
+          "requirement": "Facility Security Clearance (if applicable)",
+          "details": "If the work involves classified information, the company/institution must have an active Facility Clearance (FCL) under NISP. Individuals must hold appropriate personnel security clearances.",
+          "required_for": "Classified research only"
+        },
+        {
+          "requirement": "CMMC Certification (contracts)",
+          "details": "Cybersecurity Maturity Model Certification required for DOD contracts handling CUI. Currently phased implementation.",
+          "required_for": "Contracts (not typically grants, but may affect SBIR Phase III)"
+        },
+        {
+          "requirement": "SBA company registry (SBIR/STTR)",
+          "details": "Must register at SBIR.gov with annual certification.",
+          "required_for": "SBIR/STTR"
+        }
+      ],
+
+      "compliance_requirements": {
+        "itar": {
+          "regulation": "International Traffic in Arms Regulations (22 CFR Parts 120-130)",
+          "applies_to": "Research involving defense articles, defense services, or technical data on the US Munitions List",
+          "plain_english": "Same ITAR rules as NASA but even MORE items are covered because DOD research directly involves weapons systems, military vehicles, and defense electronics. Many DOD SBIR topics are ITAR-restricted, meaning NO foreign nationals can work on them.",
+          "key_rules": [
+            "Many DOD SBIR/STTR topics explicitly marked ITAR-restricted",
+            "Foreign nationals cannot work on ITAR-restricted topics",
+            "Must disclose ALL foreign nationals in proposal regardless of ITAR status",
+            "DDTC registration required for defense article manufacturers/exporters",
+            "Deemed export rules apply to lab access",
+            "Fundamental research exclusion available for basic research at universities (with limitations)"
+          ]
+        },
+        "security_clearances": {
+          "regulation": "NISPOM (32 CFR Part 117); Executive Order 12829",
+          "applies_to": "Classified research programs",
+          "plain_english": "If your project involves classified information, your company needs a Facility Security Clearance (FCL) and your people need personal clearances at the appropriate level (Confidential, Secret, or Top Secret). Getting clearances takes months to over a year.",
+          "key_rules": [
+            "Facility Clearance (FCL) required before accessing classified information",
+            "FCL types: Confidential, Secret, Top Secret",
+            "Personnel clearances: individuals must pass background investigation",
+            "Processing time: 3-12+ months for initial clearance",
+            "Foreign Ownership, Control, or Influence (FOCI) disqualifies facility clearance",
+            "Must have DD Form 254 (Contract Security Classification Specification)",
+            "DCSA (Defense Counterintelligence and Security Agency) administers the program"
+          ]
+        },
+        "dfars": {
+          "regulation": "Defense Federal Acquisition Regulation Supplement (48 CFR Chapter 2)",
+          "applies_to": "DOD contracts and, by flowdown, some grant provisions",
+          "plain_english": "DFARS adds defense-specific rules on top of the standard federal acquisition regulations. Key areas include cybersecurity (protecting Controlled Unclassified Information), cost accounting, and socioeconomic requirements. While DFARS technically applies to contracts, some provisions flow down to grants and cooperative agreements.",
+          "key_rules": [
+            "DFARS 252.204-7012: Safeguarding Covered Defense Information -- requires NIST SP 800-171 compliance",
+            "DFARS 252.225-7048: Export-controlled items clause",
+            "DFARS 252.227-7013/7014: Technical data and computer software rights",
+            "DFARS 252.242-7006: Accounting system adequacy requirements",
+            "Cyber incident reporting: must report within 72 hours",
+            "CMMC: Phased implementation of Cybersecurity Maturity Model Certification"
+          ]
+        },
+        "cost_accounting_standards": {
+          "regulation": "Cost Accounting Standards (48 CFR Chapter 99); FAR Part 30; DFARS Part 230",
+          "applies_to": "CAS-covered contracts/grants above threshold ($7.5M modified CAS; $100M full CAS)",
+          "plain_english": "If you get a big enough DOD award, you must follow strict rules about how you track and allocate costs. There are 19 specific standards covering everything from how you handle pensions to how you allocate overhead. Getting this wrong can trigger audits and disallowances.",
+          "key_rules": [
+            "Modified CAS: Contracts/grants $7.5M+ must comply with CAS 401, 402, 405, 406",
+            "Full CAS: Single award $100M+ or $100M+ in CAS-covered awards in prior period",
+            "CAS 401: Consistency in estimating, accumulating, and reporting costs",
+            "CAS 402: Consistency in allocating costs for same purpose",
+            "CAS 405: Accounting for unallowable costs",
+            "CAS 406: Cost accounting period consistency",
+            "Must submit CAS Disclosure Statement (CASB DS-1 or DS-2)",
+            "DCAA (Defense Contract Audit Agency) audits CAS compliance"
+          ]
+        },
+        "dcaa_audit": {
+          "regulation": "FAR Part 42; DFARS Part 242",
+          "applies_to": "All cost-reimbursable DOD awards",
+          "plain_english": "The Defense Contract Audit Agency (DCAA) can and will audit your books. You need an accounting system that can track costs by project, separate direct from indirect costs, and withstand scrutiny. DCAA audits are famously thorough.",
+          "key_rules": [
+            "Must have DCAA-adequate accounting system",
+            "Pre-award survey may include accounting system review",
+            "Incurred cost submissions required annually",
+            "Must comply with FAR Part 31 cost principles",
+            "DCAA can perform floor checks, time-keeping reviews, and compensation audits",
+            "Accounting system deficiencies can result in payment withholding"
+          ]
+        }
+      },
+
+      "required_supporting_documents": [
+        "SF-424 or DARPA-specific cover page",
+        "Technical proposal (Volume I)",
+        "Cost proposal (Volume II) -- must be separate from technical",
+        "Biographical sketches of key personnel",
+        "Current and pending support",
+        "Facilities description",
+        "SBIR/STTR: Commercialization plan, company data sheet",
+        "SBIR/STTR: Foreign national disclosure form",
+        "Subcontracting plan (if applicable)",
+        "DD Form 254 (classified programs only)",
+        "Accounting system documentation",
+        "Organizational conflict of interest statement",
+        "Intellectual property assertions"
+      ],
+
+      "indirect_cost_rate_rules": {
+        "general": "DOD follows FAR Part 31 (Cost Principles) and 2 CFR 200 for grants.",
+        "negotiated_rate": "DCAA or cognizant agency negotiates indirect cost rates. Must use negotiated rates.",
+        "provisional_rates": "DOD often uses provisional (estimated) rates during performance, with final rates established after audit.",
+        "cas_interaction": "Organizations under full CAS coverage must ensure indirect rates are consistent with CAS Disclosure Statement.",
+        "de_minimis": "10% of MTDC for organizations without negotiated rates (for grants under 2 CFR 200).",
+        "sbir_note": "SBIR Phase I: $275K cap (DOD). Phase II: $1.75M cap. Indirect costs within these caps.",
+        "plain_english": "DOD takes indirect costs seriously. DCAA will negotiate and then audit your rate. Using provisional rates during the project and settling up later is common but creates uncertainty."
+      },
+
+      "agency_specific_quirks": [
+        "DOD is the LARGEST SBIR/STTR funder -- about 60% of all federal SBIR dollars",
+        "Each service branch (Army, Navy, Air Force) runs its own SBIR independently with different timelines and topics",
+        "DARPA grants are limited to nonprofits and universities -- commercial firms get contracts, not grants",
+        "SBIR Phase III: No separate competition. Any DOD component can fund Phase III from its own R&D or procurement budget with NO SBIR set-aside required",
+        "DOD SBIR Phase I caps are higher than most agencies: $275K (vs $150K-$200K typical)",
+        "Many DOD topics are ITAR-restricted from the start -- check each topic's restrictions before proposing",
+        "OTA (Other Transaction Authority): DOD uses OTs increasingly for nontraditional defense contractors, bypassing FAR/DFARS",
+        "Cost-type grants require DCAA-adequate accounting system BEFORE award -- getting this set up takes time",
+        "DARPA Young Faculty Award specifically targets untenured faculty at research institutions",
+        "The 2026 SBIR reauthorization introduced 'Strategic Breakthrough Awards' -- DOD can award up to $30M for select high-priority technologies"
+      ]
+    },
+
+    "fema": {
+      "agency_number": 13,
+      "name": "Federal Emergency Management Agency (FEMA)",
+      "full_name": "Federal Emergency Management Agency",
+
+      "eligible_applicant_types": {
+        "hazard_mitigation": {
+          "applicants": [
+            "State emergency management agencies (as applicant/pass-through)",
+            "Federally recognized tribal governments",
+            "US territories"
+          ],
+          "subapplicants": [
+            "Local governments (cities, counties, townships)",
+            "Special districts",
+            "Certain private nonprofits (those that own/operate eligible facilities)"
+          ],
+          "notes": "Local governments and nonprofits CANNOT apply directly -- they must apply through their state or tribe."
+        },
+        "preparedness_grants": {
+          "applicants": [
+            "State Administrative Agencies (SAAs)",
+            "Urban Area Security Initiative (UASI) designated jurisdictions",
+            "Tribal governments",
+            "Port authorities (Port Security Grant Program)",
+            "Transit agencies (Transit Security Grant Program)",
+            "Nonprofit organizations (Nonprofit Security Grant Program)"
+          ]
+        },
+        "notes": "FEMA grants are heavily intermediated -- states are the primary applicants and pass funds to local entities. Nonprofits have very limited direct access."
+      },
+
+      "grant_types": {
+        "hazard_mitigation_post_disaster": {
+          "programs": ["Hazard Mitigation Grant Program (HMGP)", "HMGP Post Fire"],
+          "description": "Triggered by Presidential disaster declaration. Funding equals a percentage (15-20%) of total federal disaster assistance for that declaration.",
+          "plain_english": "After a disaster, FEMA makes mitigation money available to reduce future risk. The amount depends on how much FEMA spent on the disaster response."
+        },
+        "hazard_mitigation_pre_disaster": {
+          "programs": ["Building Resilient Infrastructure and Communities (BRIC)"],
+          "status_note": "FEMA ended the BRIC program in April 2025. No FY2025 or FY2026 NOFOs issued. Future of pre-disaster mitigation funding uncertain.",
+          "description": "Was a competitive pre-disaster mitigation program. Currently discontinued.",
+          "plain_english": "BRIC was the big pre-disaster mitigation program but got canceled in 2025. As of March 2026, no replacement has been announced."
+        },
+        "preparedness": {
+          "programs": ["State Homeland Security Program (SHSP)", "Urban Area Security Initiative (UASI)", "Emergency Management Performance Grant (EMPG)", "Nonprofit Security Grant Program (NSGP)", "Tribal Homeland Security Grant Program (THSGP)"],
+          "description": "Annual competitive and formula grants to build state and local preparedness capabilities.",
+          "plain_english": "Annual funding to help states, cities, and nonprofits prepare for terrorism and other threats."
+        }
+      },
+
+      "registration_prerequisites": [
+        {
+          "requirement": "SAM.gov registration",
+          "details": "Active registration with UEI required. Allow 4+ weeks for new registration.",
+          "required_for": "All FEMA grants"
+        },
+        {
+          "requirement": "FEMA GO registration",
+          "details": "FEMA Grants Outcomes (FEMA GO) is the online application portal. Must enter UEI from SAM.gov. AOR must create account and assign roles.",
+          "required_for": "All FEMA grants"
+        },
+        {
+          "requirement": "Grants.gov (some programs)",
+          "details": "Some FEMA programs still use Grants.gov for initial application.",
+          "required_for": "Select programs"
+        },
+        {
+          "requirement": "Hazard Mitigation Plan (HMA programs)",
+          "details": "State, tribal, or local hazard mitigation plan must be FEMA-approved and current (not expired). Plans are valid for 5 years.",
+          "required_for": "HMGP, BRIC, FMA"
+        }
+      ],
+
+      "compliance_requirements": {
+        "stafford_act": {
+          "regulation": "Robert T. Stafford Disaster Relief and Emergency Assistance Act (42 U.S.C. 5121 et seq.)",
+          "applies_to": "All FEMA disaster-related programs (HMGP, PA, IA)",
+          "plain_english": "The Stafford Act is the legal foundation for federal disaster response. It defines when the President can declare a disaster, what FEMA can fund, and the cost-sharing rules between federal and state/local governments.",
+          "key_rules": [
+            "Presidential disaster declaration required to activate HMGP",
+            "Federal cost share: typically 75% federal / 25% non-federal",
+            "Enhanced mitigation plan states: eligible for 20% of disaster costs (vs. 15%)",
+            "Duplication of benefits prohibited (can't get paid twice for same loss)",
+            "Must comply with federal floodplain management requirements",
+            "Substantial damage/improvement rule (50% rule for structures in flood zones)"
+          ]
+        },
+        "nepa_fema": {
+          "regulation": "National Environmental Policy Act; 44 CFR Part 10; DHS NEPA directive",
+          "applies_to": "HMGP and other construction/acquisition projects",
+          "plain_english": "Same NEPA as DOT but applied to mitigation projects. FEMA does environmental reviews for things like buyouts, elevation projects, and infrastructure hardening. FEMA uses its own NEPA procedures (Categorical Exclusions are common for standard mitigation activities).",
+          "key_rules": [
+            "FEMA conducts environmental review (not the applicant)",
+            "Categorical Exclusions available for many standard mitigation activities",
+            "Environmental Assessment required for larger/novel projects",
+            "EIS rarely required for FEMA mitigation projects",
+            "Section 106 historic preservation review required",
+            "Endangered Species Act consultation may be required",
+            "Must comply with EO 11988 (Floodplain Management) and EO 11990 (Wetlands)"
+          ]
+        },
+        "davis_bacon_fema": {
+          "regulation": "Davis-Bacon Act; 44 CFR Part 206",
+          "applies_to": "FEMA-funded construction projects over $2,000",
+          "plain_english": "Same prevailing wage rules as DOT. If FEMA funds construction work, workers must be paid the local prevailing wage. This applies to mitigation construction projects like elevating homes or building safe rooms.",
+          "key_rules": [
+            "Applies to construction contracts over $2,000",
+            "Weekly certified payroll reports required",
+            "Prevailing wage determinations from DOL must be included in contracts",
+            "Applies to HMGP, PDM/BRIC, and Public Assistance construction"
+          ]
+        },
+        "benefit_cost_analysis": {
+          "regulation": "44 CFR Part 206; HMA Guidance",
+          "applies_to": "All HMA project subapplications (HMGP, BRIC, FMA)",
+          "plain_english": "You must prove your mitigation project is cost-effective -- that the future losses you'll prevent are worth more than what the project costs. FEMA provides a specific software tool (BCA Toolkit) and you must achieve a benefit-cost ratio of at least 1.0.",
+          "key_rules": [
+            "Benefit-Cost Ratio (BCR) must be >= 1.0",
+            "Must use FEMA-approved BCA Toolkit (Version 6.0+)",
+            "Discount rate reduced from 7% to 3.1% (makes it easier to demonstrate cost-effectiveness)",
+            "Pre-calculated benefits available for some standard project types (safe rooms, generators)",
+            "BCA can use historical damage data, modeled losses, or engineering analysis",
+            "Costs must include all project costs including management and environmental review"
+          ]
+        },
+        "hazard_mitigation_planning": {
+          "regulation": "44 CFR Part 201; Stafford Act Section 322",
+          "applies_to": "All HMA applicants and subapplicants",
+          "plain_english": "Before you can get FEMA mitigation money, your jurisdiction must have a FEMA-approved hazard mitigation plan. The plan identifies your risks and the actions you'll take to reduce them. Plans must be updated every 5 years.",
+          "key_rules": [
+            "State Mitigation Plan required for state eligibility",
+            "Enhanced State Mitigation Plan: additional requirements, but unlocks 20% HMGP funding (vs. 15%)",
+            "Local/Tribal Mitigation Plan required for subapplicant project eligibility",
+            "Plans valid for 5 years, must be updated before expiration",
+            "Plan must include risk assessment, mitigation strategy, and plan maintenance process",
+            "Multi-jurisdictional plans are common for smaller communities"
+          ]
+        }
+      },
+
+      "required_supporting_documents": [
+        "SF-424 (Application for Federal Assistance)",
+        "Project narrative / scope of work",
+        "Benefit-Cost Analysis (using FEMA BCA Toolkit)",
+        "Cost estimate with supporting documentation",
+        "FEMA-approved Hazard Mitigation Plan (current, not expired)",
+        "Environmental and Historic Preservation (EHP) screening form",
+        "Property data (for acquisition/elevation projects)",
+        "Maps showing project location and hazard areas",
+        "Photos of existing conditions",
+        "Engineering/design documents (if available)",
+        "Maintenance agreement/commitment",
+        "Evidence of repetitive loss status (if applicable)",
+        "Letters of commitment for cost share (25% non-federal)"
+      ],
+
+      "indirect_cost_rate_rules": {
+        "general": "FEMA follows 2 CFR 200 Uniform Guidance.",
+        "negotiated_rate": "Use federally negotiated rate from cognizant agency.",
+        "de_minimis": "10% of MTDC for organizations without negotiated rate.",
+        "management_costs": "FEMA allows up to 15% of HMGP project costs for state management costs and up to 10% for local management costs.",
+        "plain_english": "Standard federal rules apply. But FEMA also has specific caps on 'management costs' (which are different from indirect costs) that limit how much states and locals can spend on administering the grants."
+      },
+
+      "cost_share": {
+        "hmgp_standard": "75% federal / 25% non-federal",
+        "hmgp_small_impoverished": "Up to 90% federal for small impoverished communities",
+        "bric": "75% federal / 25% non-federal (when operational)",
+        "preparedness_shsp": "No match required",
+        "preparedness_uasi": "No match required",
+        "empg": "50% federal / 50% non-federal",
+        "nsgp": "No match required"
+      },
+
+      "agency_specific_quirks": [
+        "BRIC program was CANCELED in April 2025 -- major shift in pre-disaster mitigation funding landscape",
+        "HMGP is ONLY available after a Presidential disaster declaration -- you can't just apply anytime",
+        "Local governments CANNOT apply directly -- must go through their State Emergency Management Agency",
+        "Benefit-Cost Analysis is a unique FEMA requirement not commonly seen in other agencies' grant programs",
+        "FEMA's discount rate change (7% to 3.1%) made many previously ineligible projects now viable",
+        "Hazard mitigation plan is a PREREQUISITE -- no plan, no project funding. Plan development itself can be funded.",
+        "FEMA GO portal is separate from Grants.gov -- applicants must navigate two systems",
+        "FEMA application period for HMGP was extended from 12 to 15 months (as of Jan 2025)",
+        "Private nonprofits can only access HMGP if they own/operate eligible critical facilities (hospitals, utilities, emergency services)",
+        "The FEMA Act of 2025 may restructure the agency -- applicants should monitor for changes"
+      ]
+    },
+
+    "dol": {
+      "agency_number": 14,
+      "name": "Department of Labor (DOL)",
+      "full_name": "United States Department of Labor",
+
+      "eligible_applicant_types": {
+        "wioa_formula": [
+          "State Workforce Agencies",
+          "Local Workforce Development Boards (LWDBs)",
+          "One-Stop Career Center operators"
+        ],
+        "competitive_grants": [
+          "Public or private nonprofit organizations",
+          "Community-based organizations",
+          "Faith-based organizations",
+          "Tribal organizations (including Indian tribes, tribal organizations, Alaska Native entities, Indian-controlled organizations)",
+          "Institutions of higher education",
+          "Local workforce development boards",
+          "Consortia of eligible entities"
+        ],
+        "youthbuild": [
+          "Public or private nonprofit organizations",
+          "Tribal entities",
+          "Must serve youth ages 16-24 who left high school prior to graduation"
+        ],
+        "apprenticeship": [
+          "Industry or employer-led partnerships",
+          "Workforce intermediaries",
+          "Community-based organizations",
+          "Institutions of higher education",
+          "State workforce agencies"
+        ],
+        "notes": "DOL grants heavily favor workforce-focused organizations. Most competitive grants require demonstrated experience serving target populations."
+      },
+
+      "grant_types": {
+        "formula_grants": {
+          "programs": ["WIOA Title I Adult", "WIOA Title I Dislocated Worker", "WIOA Title I Youth", "Wagner-Peyser Employment Service (Title III)", "WIOA Title II Adult Education"],
+          "description": "Distributed to states by formula based on unemployment data, poverty rates, and other workforce indicators. States distribute to local workforce boards.",
+          "plain_english": "States get their share automatically based on unemployment and poverty data, then pass funds to local workforce boards."
+        },
+        "competitive_grants": {
+          "programs": ["YouthBuild", "Apprenticeship grants", "Reentry Employment Opportunities (REO)", "H-1B Skills Training Grants", "Community Project Fund / Earmarks"],
+          "description": "Competitively awarded through Funding Opportunity Announcements (FOAs). Scored by review panels.",
+          "plain_english": "You apply and compete against other organizations. DOL's Employment and Training Administration (ETA) runs most of these."
+        }
+      },
+
+      "registration_prerequisites": [
+        {
+          "requirement": "SAM.gov registration",
+          "details": "Active registration with UEI required.",
+          "required_for": "All DOL grants"
+        },
+        {
+          "requirement": "Grants.gov registration",
+          "details": "AOR registration required for competitive grant applications.",
+          "required_for": "Competitive grants"
+        },
+        {
+          "requirement": "ETA-9130 reporting capability",
+          "details": "Must be able to submit quarterly financial reports via ETA's system.",
+          "required_for": "All ETA grants"
+        }
+      ],
+
+      "compliance_requirements": {
+        "wioa_compliance": {
+          "regulation": "Workforce Innovation and Opportunity Act (29 U.S.C. 3101 et seq.); 20 CFR Parts 676-683",
+          "applies_to": "All WIOA-funded programs",
+          "plain_english": "WIOA is the main federal workforce development law. It requires one-stop delivery systems, performance accountability, and coordination among workforce programs. Key obligations include tracking participants, reporting outcomes, and meeting negotiated performance targets.",
+          "key_rules": [
+            "Must operate through the one-stop delivery system (American Job Centers)",
+            "Must provide career services, training services, and supportive services",
+            "Eligible training providers must appear on state's Eligible Training Provider List (ETPL)",
+            "Individual Training Accounts (ITAs) required for participant-directed training",
+            "Must serve priority populations: veterans, low-income, public assistance recipients, basic skills deficient",
+            "Must coordinate with other WIOA core partners (adult ed, vocational rehab, Wagner-Peyser)"
+          ]
+        },
+        "performance_reporting": {
+          "regulation": "WIOA Section 116; 20 CFR 677; TEGL guidance letters",
+          "applies_to": "All WIOA programs and most DOL competitive grants",
+          "plain_english": "You must track every participant and report on six specific outcome measures: did they get a job after the program (2nd and 4th quarters), how much do they earn, did they get a credential, are they making skill gains, and are employers satisfied. Failure to meet targets can trigger corrective action.",
+          "key_rules": [
+            "Six Primary Indicators: (1) Employment 2nd quarter after exit, (2) Employment 4th quarter after exit, (3) Median earnings 2nd quarter after exit, (4) Credential attainment rate, (5) Measurable skill gains, (6) Effectiveness in serving employers",
+            "Must use state's participant tracking system (for WIOA formula)",
+            "Competitive grants typically use DOL's ETA-9172 or 9173 reporting forms",
+            "Quarterly narrative and financial reports required (ETA-9130)",
+            "Annual performance reports with participant-level data",
+            "Failure to meet negotiated performance levels triggers sanctions"
+          ]
+        },
+        "davis_bacon_dol": {
+          "regulation": "Davis-Bacon Act (40 U.S.C. 3141 et seq.); DOL Wage and Hour Division regulations",
+          "applies_to": "YouthBuild (construction training) and any DOL grant with construction component",
+          "plain_english": "Same prevailing wage rules. Particularly relevant for YouthBuild because the program REQUIRES construction skills training. Youth doing construction work on federally funded projects must be paid prevailing wages unless an exemption applies.",
+          "key_rules": [
+            "YouthBuild participants performing construction must be paid prevailing wages",
+            "DOL Apprentice Certification required for apprentices on first week on site",
+            "Certified payroll reports (WH-347) submitted weekly",
+            "Davis-Bacon poster and wage determination posted at work site",
+            "3-year record retention after construction completion"
+          ]
+        },
+        "eeo_requirements": {
+          "regulation": "29 CFR Part 38 (WIOA Nondiscrimination); Title VI Civil Rights Act; Section 504 Rehabilitation Act; Title IX; Age Discrimination Act",
+          "applies_to": "All DOL-funded programs",
+          "plain_english": "You cannot discriminate in providing workforce services. Must provide equal access regardless of race, color, national origin, sex, disability, age, religion, or political affiliation. Must also provide language access for Limited English Proficiency (LEP) individuals.",
+          "key_rules": [
+            "Must designate an Equal Opportunity Officer",
+            "Must have written EEO/nondiscrimination policies",
+            "Must provide 'Equal Opportunity is the Law' notice to all participants",
+            "Must collect and report demographic data on participants",
+            "Must provide reasonable accommodations for individuals with disabilities",
+            "Must provide language access services for LEP individuals",
+            "Complaint process must be established and communicated",
+            "Must conduct periodic self-assessments of EEO compliance"
+          ]
+        }
+      },
+
+      "required_supporting_documents": [
+        "SF-424 (Application for Federal Assistance)",
+        "SF-424A (Budget Information)",
+        "Project narrative addressing evaluation criteria",
+        "Abstract/project summary",
+        "Budget narrative with detailed cost justification",
+        "Organizational chart",
+        "Resumes of key personnel",
+        "Letters of commitment from partners",
+        "Logic model or theory of change",
+        "Evidence of past performance (prior grant results)",
+        "Indirect cost rate agreement",
+        "YouthBuild-specific: Evidence of construction training partnerships, MOU with local workforce board"
+      ],
+
+      "indirect_cost_rate_rules": {
+        "general": "DOL follows 2 CFR 200 Uniform Guidance. DOL's 2 CFR Part 2900 provides DOL-specific deviations.",
+        "negotiated_rate": "Use federally negotiated rate from cognizant agency.",
+        "de_minimis": "10% of MTDC for organizations that have never had a negotiated rate. Must use consistently across all federal awards.",
+        "program_caps": "Some DOL FOAs cap administrative/indirect costs at a percentage of the award (check each FOA).",
+        "plain_english": "Standard federal overhead rules, but watch for program-specific caps. Some DOL grants limit admin costs to 10% of the award regardless of your negotiated rate."
+      },
+
+      "award_amounts": {
+        "youthbuild": "$700,000 to $1,500,000 per award",
+        "apprenticeship": "Varies by FOA, typically $500,000 to $10,000,000",
+        "reo_reentry": "Varies, typically $1,000,000 to $6,000,000",
+        "wioa_formula": "State allocations determined by formula"
+      },
+
+      "agency_specific_quirks": [
+        "WIOA is overdue for reauthorization (last authorized in 2014) -- the program continues under continuing appropriations but uncertainty affects planning",
+        "YouthBuild REQUIRES construction skills training -- it's not optional. May also include other in-demand industries (IT, advanced manufacturing, healthcare)",
+        "DOL's six performance indicators are unique to workforce grants -- no other agency uses exactly this framework",
+        "Performance targets are NEGOTIATED between state and DOL (not set unilaterally), which adds a political dimension",
+        "DOL grants strongly emphasize partnerships with employers -- 'demand-driven' workforce development",
+        "Many DOL programs require serving specific populations: disconnected youth, returning citizens (formerly incarcerated), veterans",
+        "YouthBuild participants must be 16-24 and have left high school prior to graduation with additional risk factors (foster care, justice-involved, homeless, etc.)",
+        "DOL ETA grants require both financial reports (ETA-9130, quarterly) and performance reports -- both must be timely or risk corrective action",
+        "The 2 CFR Part 2900 (DOL supplement to Uniform Guidance) has specific requirements around prior approval for certain costs"
+      ]
+    },
+
+    "nea": {
+      "agency_number": 15,
+      "name": "National Endowment for the Arts (NEA)",
+      "full_name": "National Endowment for the Arts",
+
+      "eligible_applicant_types": {
+        "grants_for_arts_projects": [
+          "Nonprofit, tax-exempt 501(c)(3) organizations",
+          "Units of state or local government",
+          "Federally recognized tribal communities or tribes",
+          "Must have completed 3-year (increasing to 5-year for FY27) history of arts programming prior to application deadline"
+        ],
+        "challenge_america": [
+          "Same as Grants for Arts Projects eligibility",
+          "Primarily targets: small organizations, first-time NEA applicants, returning Challenge America applicants, organizations not funded in 3 most recent fiscal years",
+          "Status: Folded into Grants for Arts Projects as a discipline for FY2026"
+        ],
+        "our_town": [
+          "Same organizational eligibility as GAP",
+          "Projects must involve partnership between arts/cultural organization and local government"
+        ],
+        "ineligible": [
+          "Individuals CANNOT apply directly to the NEA (with rare exceptions for Literature Fellowships and Jazz Masters)",
+          "For-profit entities",
+          "Organizations that have been debarred or suspended"
+        ],
+        "notes": "The NEA is one of the smallest federal granting agencies. Individual artists generally cannot apply -- they must go through an eligible organization. The exception is NEA Literature Fellowships (creative writing) and NEA Jazz Masters."
+      },
+
+      "grant_types": {
+        "competitive": {
+          "programs": ["Grants for Arts Projects (GAP) -- 15 artistic disciplines", "Challenge America (now within GAP)", "Our Town (creative placemaking)", "Research Awards", "NEA Literature Fellowships (individual)", "NEA Jazz Masters Fellowships (individual/nomination)"],
+          "description": "All NEA grants are competitive. Reviewed by panels of arts professionals. NEA Chair makes final decisions.",
+          "plain_english": "Every NEA grant is competitive. Expert panels review and score applications, and the NEA Chair makes final funding decisions."
+        },
+        "formula": {
+          "programs": ["State Arts Agency Partnership Agreements", "Regional Arts Organization grants"],
+          "description": "40% of NEA program funds go to state arts agencies and regional arts organizations by formula.",
+          "plain_english": "A big chunk of NEA money goes automatically to state arts councils, who then regrant it."
+        }
+      },
+
+      "registration_prerequisites": [
+        {
+          "requirement": "SAM.gov registration",
+          "details": "Active registration with UEI required.",
+          "required_for": "All NEA grants"
+        },
+        {
+          "requirement": "Grants.gov registration",
+          "details": "Applications submitted through Grants.gov.",
+          "required_for": "All NEA grants"
+        },
+        {
+          "requirement": "IRS 501(c)(3) determination letter",
+          "details": "Must provide proof of nonprofit status. Government entities exempt from this requirement.",
+          "required_for": "Nonprofit applicants"
+        },
+        {
+          "requirement": "3-year (5-year for FY27+) programming history",
+          "details": "Must demonstrate at least 3 years of arts programming before application deadline. Programming may predate incorporation. Pandemic exception: pre-2020 programming counts.",
+          "required_for": "All organizational grants"
+        }
+      ],
+
+      "compliance_requirements": {
+        "matching_requirements": {
+          "regulation": "NEA General Terms and Conditions; 2 CFR 200.306",
+          "applies_to": "All NEA grants",
+          "plain_english": "Every NEA grant requires you to match federal dollars at least 1:1 from non-federal sources. If you get a $10,000 NEA grant, your total project budget must be at least $20,000, with $10,000+ from your own or non-federal sources. Match can include cash AND in-kind contributions (donated space, volunteer time, etc.).",
+          "key_rules": [
+            "Minimum 1:1 match required (non-federal sources)",
+            "Match sources: cash, earned revenue, in-kind contributions, other non-federal grants",
+            "Federal funds CANNOT be used as match (no double-dipping)",
+            "Match must be verifiable, allowable, necessary, and documented",
+            "In-kind contributions must be valued at fair market value",
+            "Challenge America: fixed $10,000 grant, must match with $10,000 non-federal"
+          ]
+        },
+        "accessibility_ada": {
+          "regulation": "Section 504 of Rehabilitation Act; Americans with Disabilities Act; NEA General Terms",
+          "applies_to": "All NEA-funded projects",
+          "plain_english": "Your arts project must be accessible to people with disabilities -- both physically and programmatically. This means accessible venues, captioning for deaf audiences, audio description for blind patrons, and materials in accessible formats. You must explain your accessibility plan in your application.",
+          "key_rules": [
+            "Events must be held in physically accessible venues",
+            "Must provide program access and effective communication",
+            "Must describe accessibility plan in application",
+            "If funded, must provide detailed accessibility information",
+            "Common accommodations: captioning, ASL interpretation, audio description, large print, accessible seating",
+            "NEA provides an Accessibility Checklist for applicants"
+          ]
+        },
+        "no_subgranting": {
+          "regulation": "Congressional restriction; NEA General Terms and Conditions",
+          "applies_to": "Most NEA grantees",
+          "plain_english": "Congress prohibits the NEA from funding subgrants -- meaning you can't take NEA money and regrant it to other organizations or individuals. You must use the money for your own project activities. EXCEPTION: state arts agencies, regional arts organizations, and designated local arts agencies CAN subgrant.",
+          "key_rules": [
+            "NEA funds cannot be regranted to other organizations or individuals",
+            "Exceptions: state arts agencies, regional arts organizations, designated local arts agencies",
+            "Subcontracting for project services IS allowed (hiring artists, renting venues, etc.)",
+            "Local arts agencies must have government designation to subgrant",
+            "Subgranting local arts agencies face additional reporting and compliance requirements"
+          ]
+        },
+        "content_restrictions": {
+          "regulation": "NEA authorizing legislation; General Terms and Conditions",
+          "applies_to": "All NEA-funded projects",
+          "plain_english": "NEA grants come with content restrictions. Funds cannot be used for projects that are obscene (per legal definition), that involve desecration of religious objects, or that involve lobbying.",
+          "key_rules": [
+            "No funds for projects determined to be obscene (Miller test)",
+            "No funds for lobbying or attempts to influence legislation",
+            "No funds for projects involving seasonal or holiday decorations",
+            "Grantees must acknowledge NEA support in all published materials",
+            "NEA logo must be used per brand guidelines"
+          ]
+        }
+      },
+
+      "required_supporting_documents": [
+        "SF-424 (Application for Federal Assistance)",
+        "Project budget (NEA Budget Form)",
+        "Project narrative (8-page limit for GAP, varies by category)",
+        "Work samples (format specified by discipline: images, audio, video, manuscripts)",
+        "Accessibility narrative",
+        "Organizational history and mission statement",
+        "Board of directors list",
+        "Letters of commitment from project partners",
+        "IRS determination letter (nonprofits)",
+        "DUNS/UEI number documentation",
+        "Challenge America: Single fixed $10,000 request (no higher)"
+      ],
+
+      "indirect_cost_rate_rules": {
+        "general": "NEA follows 2 CFR 200 but grants are typically small enough that indirect cost treatment varies.",
+        "negotiated_rate": "May use federally negotiated rate.",
+        "de_minimis": "10% of MTDC for organizations without negotiated rate.",
+        "practical_note": "NEA grants are small ($10,000 - $100,000). High indirect rates can consume a large portion of the grant. NEA reviewers consider whether the budget reflects efficient use of funds.",
+        "plain_english": "You can claim overhead, but NEA grants are small. If your indirect rate eats up half the grant, reviewers may view the budget unfavorably."
+      },
+
+      "award_amounts": {
+        "grants_for_arts_projects": "$10,000 to $100,000 (most awards $10,000 - $30,000)",
+        "challenge_america": "Fixed $10,000",
+        "our_town": "$25,000 to $150,000",
+        "literature_fellowships": "$25,000 (individual)",
+        "jazz_masters": "$25,000 (individual)"
+      },
+
+      "agency_specific_quirks": [
+        "Challenge America was a standalone program, then got folded INTO Grants for Arts Projects as a discipline for FY2026. Same rules, different submission pathway.",
+        "NEA is perpetually threatened with elimination -- applicants should monitor Congressional appropriations closely",
+        "Work samples are CRITICAL to NEA applications -- unlike most federal grants, artistic quality is the primary review criterion",
+        "The no-subgranting rule catches many first-time applicants off guard, especially arts councils and regranting organizations",
+        "Programming history requirement is increasing from 3 to 5 years for FY2027 -- new organizations are disadvantaged",
+        "NEA grants are tiny by federal standards ($10K-$100K) but carry the SAME compliance burden as million-dollar grants from other agencies",
+        "The NEA is an independent agency, not a Cabinet department -- it has its own appropriation and governance structure",
+        "NEA deadlines are firm -- late applications are rejected without review. Two annual deadlines (typically February and July)",
+        "Artistic quality is weighted MORE heavily than organizational capacity or need, unlike most federal programs"
+      ]
+    }
+  },
+
+  "grant_templates": {
+
+    "sbir_sttr_general": {
+      "template_number": 16,
+      "name": "Small Business Innovation Research / Small Business Technology Transfer (General Rules)",
+      "description": "Cross-agency rules applying to all 11 SBIR/STTR participating agencies",
+
+      "eligible_applicant_types": [
+        "Small business concerns (500 or fewer employees)",
+        "Must be for-profit (no nonprofits, no 501(c)(3))",
+        "51%+ owned and controlled by US citizens or permanent residents",
+        "OR 51%+ owned by another small business that itself is 51%+ US-owned",
+        "OR owned and controlled by Alaska Native Corporation (ANC), Indian tribe, or Native Hawaiian Organization (NHO)",
+        "STTR: Must formally partner with a nonprofit research institution (university, FFRDC, etc.)"
+      ],
+
+      "program_structure": {
+        "phase_i": {
+          "purpose": "Feasibility study / proof of concept",
+          "typical_award": "$50,000 - $275,000 (varies by agency)",
+          "duration": "6-12 months",
+          "sbir_requirement": "PI must be primarily employed by the small business"
+        },
+        "phase_ii": {
+          "purpose": "Full R&D of the innovation",
+          "typical_award": "$400,000 - $1,750,000 (varies by agency)",
+          "duration": "24 months typically",
+          "sbir_requirement": "PI must be primarily employed by the small business"
+        },
+        "phase_iii": {
+          "purpose": "Commercialization (no SBIR/STTR set-aside funds)",
+          "funding": "From agency's regular R&D or procurement budget, private investment, or other non-SBIR sources",
+          "note": "Phase III is NOT a separate competition -- it's the path to commercialization"
+        }
+      },
+
+      "work_location_rules": {
+        "sbir": "At least 2/3 (67%) of Phase I work and 1/2 (50%) of Phase II work must be performed by the small business",
+        "sttr": "Small business must perform at least 40% of the work. Research institution must perform at least 30% of the work."
+      },
+
+      "registration_prerequisites": [
+        "SAM.gov registration with UEI",
+        "SBA Company Registry at SBIR.gov (annual certification)",
+        "Agency-specific submission portal registration",
+        "Grants.gov registration (for some agencies)"
+      ],
+
+      "compliance_requirements": {
+        "size_certification": "Must certify small business size at time of award AND at all times during performance. Growing above 500 employees during performance may trigger issues.",
+        "ownership_verification": "Must certify 51%+ US ownership. Venture capital, hedge fund, or private equity ownership may disqualify under new rules.",
+        "foreign_screening_2026": "Under 2026 reauthorization: mandatory due diligence review covering cybersecurity, patents, employee backgrounds, and financial ties to foreign countries of concern (China, Russia, Iran, North Korea). Screening against federal watchlists.",
+        "data_rights": "SBIR data rights: 20-year protection period (extended from 4 years under 2026 reauthorization). During this period, government cannot release SBIR data to competitors.",
+        "intellectual_property": "Bayh-Dole applies. Small business retains title to inventions. Government gets royalty-free license for government purposes.",
+        "no_vc_pe_restrictions": "Companies majority-owned by venture capital, hedge funds, or private equity firms face additional disclosure requirements and may be ineligible for some agency programs.",
+        "commercialization_reporting": "Must report commercialization outcomes for Phase II awards via SBA's Company Commercialization reporting system."
+      },
+
+      "participating_agencies": [
+        "DOD (largest: ~60% of all SBIR funding)",
+        "HHS/NIH",
+        "NASA",
+        "DOE",
+        "NSF",
+        "USDA",
+        "DHS",
+        "DOT",
+        "EPA",
+        "ED",
+        "NIST/DOC"
+      ],
+
+      "key_differences_by_agency": {
+        "dod": "Largest program. Phase I up to $275K. Multiple service branches with separate topics. Many ITAR-restricted topics.",
+        "nih": "Phase I up to $295K. Allows sequential Phase II. Focuses on biomedical/health technologies.",
+        "nasa": "Transitioning to BAA model in 2026. Strong export control. Phase I ~$150K.",
+        "nsf": "Phase I up to $275K. Focuses on broader commercial potential.",
+        "doe": "Phase I up to $250K. Energy-focused. Often requires DOE national lab engagement.",
+        "nist": "Smallest SBIR program. Phase I up to $100K. Measurement/standards focus."
+      },
+
+      "quirks": [
+        "SBIR/STTR expired Oct 1, 2025. Reauthorized through Sept 30, 2031 with significant new rules.",
+        "The 2026 reauthorization added 'Strategic Breakthrough Awards' -- single awards up to $30M from DOD and other agencies",
+        "Foreign screening is the biggest change: every application now gets vetted for foreign ties",
+        "SBIR data rights extended from 4 to 20 years -- huge IP protection improvement",
+        "Each agency has DIFFERENT dollar caps, durations, and submission systems",
+        "Phase III has NO dollar limit and NO requirement to use SBIR set-aside funds",
+        "A company can have multiple active SBIR awards from multiple agencies simultaneously"
+      ]
+    },
+
+    "community_project_grants": {
+      "template_number": 17,
+      "name": "Community Project Grants (General Rules for Community-Based Nonprofits)",
+      "description": "General framework for federal grants to community-based nonprofit organizations",
+
+      "eligible_applicant_types": [
+        "Nonprofit organizations with 501(c)(3) status",
+        "Community-based organizations (CBOs)",
+        "Faith-based organizations (may apply on equal footing; cannot use funds for inherently religious activities)",
+        "Units of local government",
+        "Tribal organizations",
+        "Consortia or partnerships of the above"
+      ],
+
+      "common_grant_sources": [
+        "HHS (Community Services Block Grant, Head Start)",
+        "HUD (Community Development Block Grant)",
+        "DOL (YouthBuild, workforce grants)",
+        "DOJ (Office of Justice Programs community grants)",
+        "USDA (Community Facilities, rural development)",
+        "ED (21st Century Community Learning Centers)",
+        "AmeriCorps/CNCS (service grants)"
+      ],
+
+      "registration_prerequisites": [
+        {
+          "requirement": "SAM.gov registration",
+          "details": "Active registration with UEI. Allow 4+ weeks for new registration. Must renew annually.",
+          "required_for": "All federal grants"
+        },
+        {
+          "requirement": "Grants.gov registration",
+          "details": "E-Business POC and AOR registration. E-Biz POC must authorize AOR.",
+          "required_for": "All federal competitive grants"
+        },
+        {
+          "requirement": "IRS 501(c)(3) determination letter",
+          "details": "Proof of tax-exempt status. Some programs accept 501(c)(4) or other designations.",
+          "required_for": "Nonprofit applicants"
+        },
+        {
+          "requirement": "State nonprofit registration",
+          "details": "Must be registered/in good standing in state of incorporation.",
+          "required_for": "All nonprofits"
+        },
+        {
+          "requirement": "Single Audit (if applicable)",
+          "details": "Organizations spending $1,000,000+ in federal funds in a fiscal year must have a Single Audit per 2 CFR 200 Subpart F.",
+          "required_for": "Organizations above the $1M threshold"
+        }
+      ],
+
+      "compliance_requirements": {
+        "uniform_guidance_2cfr200": {
+          "regulation": "2 CFR Part 200 (Uniform Administrative Requirements, Cost Principles, and Audit Requirements)",
+          "applies_to": "ALL federal grant recipients",
+          "plain_english": "This is the master rulebook for all federal grants. It covers how you apply, spend, track, and report on federal money. Key areas: cost principles (what you can and can't spend on), procurement standards (how you buy things), and audit requirements.",
+          "key_rules": [
+            "Costs must be necessary, reasonable, and allocable to the federal award",
+            "Must maintain adequate financial management system",
+            "Procurement: micro-purchase threshold $10,000; simplified acquisition up to $250,000; competitive bidding above that",
+            "Single Audit required if $1,000,000+ in federal expenditures per year",
+            "Financial reports: SF-425 (Federal Financial Report) due quarterly or semi-annually",
+            "Performance reports due per terms of award (typically quarterly or semi-annually)",
+            "Records retained for 3 years after final expenditure report",
+            "Prior approval needed for: budget transfers >10%, foreign travel, equipment >$5,000"
+          ]
+        },
+        "civil_rights": {
+          "regulation": "Title VI Civil Rights Act; Section 504 Rehabilitation Act; Title IX; Age Discrimination Act; EO 13166 (LEP)",
+          "applies_to": "All federal grant recipients",
+          "plain_english": "You cannot discriminate in providing services funded by federal grants. Must provide equal access regardless of race, national origin, disability, sex, or age. Must provide language access for people with limited English proficiency.",
+          "key_rules": [
+            "Must sign civil rights assurances",
+            "Must have nondiscrimination policies",
+            "Must provide language access for LEP populations",
+            "Must accommodate individuals with disabilities",
+            "Must maintain demographic data on participants served",
+            "Must have complaint/grievance procedures"
+          ]
+        },
+        "lobbying_restrictions": {
+          "regulation": "31 U.S.C. 1352; OMB Guidance",
+          "applies_to": "All federal grant recipients",
+          "plain_english": "You cannot use federal grant money to lobby Congress or federal agencies. If you spend your own money lobbying for federal grants over $100,000, you must disclose it.",
+          "key_rules": [
+            "No federal funds for lobbying",
+            "SF-LLL disclosure required if lobbying with own funds for awards >$100K",
+            "Grassroots lobbying also restricted with federal funds"
+          ]
+        }
+      },
+
+      "required_supporting_documents": [
+        "SF-424 (Application for Federal Assistance)",
+        "SF-424A or SF-424C (Budget Information)",
+        "Project narrative addressing evaluation criteria",
+        "Budget justification/narrative",
+        "IRS determination letter",
+        "Board of directors list",
+        "Organizational chart",
+        "Key personnel resumes",
+        "Letters of support/commitment from partners",
+        "Logic model or theory of change",
+        "Most recent financial audit or Single Audit",
+        "Indirect cost rate agreement (or use 10% de minimis)",
+        "Certifications and assurances"
+      ],
+
+      "indirect_cost_rate_rules": {
+        "negotiated_rate": "Use rate negotiated with cognizant federal agency (usually the agency providing the most funding).",
+        "de_minimis": "10% of Modified Total Direct Costs (MTDC) for organizations that have never had a negotiated rate.",
+        "first_time_note": "Organizations applying for their first federal grant often don't have a negotiated rate. The 10% de minimis option is designed for them.",
+        "plain_english": "If you've never gotten a federal grant before, use 10% of your direct costs as overhead. Once you start getting regular federal funding, you should negotiate an actual rate with your main federal funder."
+      },
+
+      "quirks": [
+        "First-time applicants face a Catch-22: you need experience to be competitive, but need grants to get experience. Build a track record with smaller grants first.",
+        "SAM.gov registration is the #1 barrier for new applicants -- start the process at least 6 weeks before any deadline",
+        "Faith-based organizations CAN receive federal grants but CANNOT use funds for worship, religious instruction, or proselytization",
+        "The Single Audit threshold increased from $750K to $1M in the 2024 Uniform Guidance revision",
+        "Many community grants require partnerships -- letters of commitment carry more weight than generic letters of support",
+        "Congressional earmarks/Community Project Funding is making a comeback -- check if your Congressional delegation is accepting requests"
+      ]
+    },
+
+    "artist_individual_grants": {
+      "template_number": 18,
+      "name": "Artist Individual Grants (NEA Fellowships and State Arts Council Grants)",
+      "description": "Rules for individual artist grants from federal and state sources",
+
+      "federal_nea_fellowships": {
+        "eligible_programs": [
+          "NEA Literature Fellowships (prose and poetry, alternating years)",
+          "NEA Jazz Masters Fellowships (lifetime achievement, by nomination)"
+        ],
+        "eligibility": [
+          "US citizens or permanent residents",
+          "Must be practicing artists (published/exhibited/performed work)",
+          "Cannot be enrolled in degree program at time of application (Literature Fellowships)",
+          "No organizational affiliation required -- individuals apply directly"
+        ],
+        "award_amount": "$25,000 per fellowship",
+        "frequency": "Literature Fellowships: prose in even years, poetry in odd years",
+        "compliance": {
+          "tax_reporting": "Fellowship income is taxable. NEA issues 1099-MISC.",
+          "project_restrictions": "Literature Fellowships do not require a specific project plan -- they recognize artistic excellence.",
+          "acknowledgment": "Must acknowledge NEA support in published work resulting from fellowship period."
+        },
+        "notes": "NEA Literature Fellowships are among the VERY FEW federal grants available directly to individuals. The NEA does NOT fund individual visual artists, musicians (except Jazz Masters), or performers directly."
+      },
+
+      "state_arts_council_fellowships": {
+        "typical_eligibility": [
+          "Must be state resident (usually 1+ year residency)",
+          "Must be 18+ years old",
+          "Cannot be enrolled in degree-granting program",
+          "Must be practicing artist in eligible discipline",
+          "Professional artists only (not hobbyists)"
+        ],
+        "typical_award_amounts": "$1,000 to $10,000 (varies widely by state)",
+        "common_disciplines": [
+          "Visual arts (painting, sculpture, photography, crafts)",
+          "Literary arts (fiction, poetry, creative nonfiction, playwriting)",
+          "Music composition",
+          "Choreography/dance",
+          "Film/media arts",
+          "Traditional/folk arts"
+        ],
+        "typical_requirements": [
+          "Work samples (portfolio, manuscript excerpts, recordings)",
+          "Artist statement",
+          "Resume/CV",
+          "Project description (for project-based grants)",
+          "Budget (for project-based grants)",
+          "References or letters of recommendation (some states)"
+        ],
+        "compliance": {
+          "residency": "Must maintain state residency throughout grant period",
+          "reporting": "Final report required, usually including documentation of completed work",
+          "acknowledgment": "Must credit the state arts council in published/exhibited work",
+          "tax_reporting": "Grant income is generally taxable. Some states issue 1099s."
+        },
+        "notes": "State arts councils are the PRIMARY source of individual artist grants. Each state has different programs, disciplines, amounts, and deadlines. Many state arts councils receive NEA partnership funds but also have state appropriations."
+      },
+
+      "other_sources": {
+        "regional_arts_organizations": [
+          "Mid Atlantic Arts (fellowships, travel grants)",
+          "New England Foundation for the Arts",
+          "South Arts",
+          "Western States Arts Federation (WESTAF)",
+          "Arts Midwest",
+          "Mid-America Arts Alliance"
+        ],
+        "foundation_fellowships": "Private foundations (Guggenheim, MacArthur, Creative Capital, Pollock-Krasner, etc.) are often more significant funding sources for individual artists than government grants."
+      },
+
+      "quirks": [
+        "The NEA funds very few individual artists directly -- this surprises most people",
+        "State arts councils are the main pipeline for government-funded individual artist grants",
+        "Work samples are the PRIMARY evaluation criterion -- not budgets, not need statements",
+        "Many artist grants are NOT project-based -- they're awarded based on artistic merit/excellence",
+        "Artist grants are generally taxable income (not tax-exempt like some nonprofit grants)",
+        "Residency requirements vary widely -- some states require 1 year, others require 2+",
+        "Some states (like California) use Administering Organizations to distribute individual artist grants rather than granting directly"
+      ]
+    },
+
+    "micro_grants": {
+      "template_number": 19,
+      "name": "Micro Grants (Under $5,000 -- Simplified Requirements)",
+      "description": "Rules and simplified requirements for very small grants",
+
+      "definition": "Grants under $5,000 (or sometimes under $10,000) with simplified application and reporting requirements. Not a formal federal category, but many agencies and pass-through entities offer simplified processes for small awards.",
+
+      "eligible_applicant_types": [
+        "Varies by program -- typically same as parent program",
+        "Often targeted at: small nonprofits, grassroots organizations, individual community members, student organizations",
+        "Some micro-grant programs accept applications from individuals"
+      ],
+
+      "simplified_requirements": {
+        "application": {
+          "description": "Most micro-grant programs use simplified application forms rather than full SF-424 packages.",
+          "typical_requirements": [
+            "Brief project description (1-2 pages)",
+            "Simple budget (may be a one-page form)",
+            "Organizational information",
+            "Contact information",
+            "Brief statement of need"
+          ],
+          "what_is_usually_NOT_required": [
+            "Full SF-424 package (some programs still require it)",
+            "Detailed budget justification",
+            "Logic model",
+            "Biographical sketches",
+            "Letters of support (sometimes waived)",
+            "Indirect cost rate agreement",
+            "Audit reports"
+          ]
+        },
+        "financial_management": {
+          "single_audit": "NOT required unless organization spends $1,000,000+ in federal funds total across ALL awards in a fiscal year",
+          "micro_purchase_threshold": "Purchases under $10,000 do not require competitive bidding per 2 CFR 200",
+          "fixed_amount_awards": "Many micro-grants are structured as fixed-amount awards under 2 CFR 200.201 -- you receive a set amount and are accountable for performance/results rather than detailed cost tracking",
+          "plain_english": "For very small grants, the paperwork burden is much lighter. You still need to do the work and show results, but you don't need the same level of financial documentation as a $500K grant."
+        },
+        "reporting": {
+          "financial": "May be simplified or waived for fixed-amount awards",
+          "performance": "Brief final report showing what was accomplished",
+          "frequency": "Usually just a final report (no quarterly reports)"
+        }
+      },
+
+      "common_micro_grant_sources": [
+        {
+          "source": "State arts councils",
+          "typical_amount": "$500 - $5,000",
+          "for": "Individual artists, small arts organizations"
+        },
+        {
+          "source": "Community foundations",
+          "typical_amount": "$1,000 - $5,000",
+          "for": "Local nonprofits, community projects"
+        },
+        {
+          "source": "AmeriCorps mini-grants",
+          "typical_amount": "$2,000 - $5,000",
+          "for": "Service projects"
+        },
+        {
+          "source": "USDA micro-enterprise grants",
+          "typical_amount": "Up to $5,000",
+          "for": "Rural micro-enterprises"
+        },
+        {
+          "source": "Federal pass-through mini-grants",
+          "typical_amount": "$1,000 - $10,000",
+          "for": "Various, through state/local intermediaries"
+        }
+      ],
+
+      "compliance_thresholds_to_know": {
+        "single_audit_threshold": "$1,000,000 in total federal expenditures per fiscal year (increased from $750K in 2024)",
+        "micro_purchase_threshold": "$10,000 (no competitive bidding required below this)",
+        "simplified_acquisition_threshold": "$250,000 (simplified procurement procedures up to this level)",
+        "equipment_threshold": "$5,000 (items above this are 'equipment' with special tracking requirements)",
+        "prior_approval_budget_change": "10% of total award (changes above this need agency approval)"
+      },
+
+      "quirks": [
+        "There is NO formal federal 'micro grant' category -- it's a practical term for small awards",
+        "Even a $500 grant technically triggers ALL 2 CFR 200 requirements unless the agency explicitly simplifies them",
+        "Fixed-amount awards (2 CFR 200.201) are the best mechanism for truly simplified micro-grants -- accountability is based on performance, not cost tracking",
+        "SAM.gov registration is still required for direct federal micro-grants -- this is often the biggest barrier",
+        "Many micro-grants come from PASS-THROUGH entities (state agencies, foundations) rather than directly from federal agencies, which may reduce registration burden",
+        "The 2024 Uniform Guidance revision raised the micro-purchase threshold from $3,500 to $10,000, simplifying small purchases under any grant",
+        "Some agencies allow 'fixed amount subawards' under $250,000 to further simplify compliance for small subrecipients"
+      ]
+    }
+  }
+}

@@ -1,0 +1,1243 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2026-03-21",
+    "description": "Federal grant eligibility, compliance, and regulatory requirements for 7 agencies (Batch 1)",
+    "purpose": "Drive smart eligibility checking in grant writing application",
+    "notes": {
+      "single_audit_threshold": "Updated from $750,000 to $1,000,000 per 2024 Uniform Guidance revision",
+      "de_minimis_indirect_rate": "Updated from 10% to 15% effective October 1, 2024 per 2024 Uniform Guidance revision",
+      "nih_indirect_cap": "NIH attempted 15% cap in Feb 2025; blocked by court injunction Apr 2025; appeal pending as of Mar 2026"
+    }
+  },
+
+  "universal_requirements": {
+    "registration": {
+      "sam_gov": {
+        "required": true,
+        "description": "All organizations applying for federal grants must register in SAM.gov (System for Award Management)",
+        "plain_english": "SAM.gov is the government's master list of organizations approved to do business with the federal government -- you must be registered here before applying for any grant.",
+        "timeline": "7-10 business days to complete",
+        "renewal": "Must be renewed annually",
+        "cost": "Free",
+        "exemptions": ["Individuals applying in personal capacity (rare)"]
+      },
+      "uei": {
+        "required": true,
+        "description": "Unique Entity Identifier -- 12-character alphanumeric ID assigned through SAM.gov registration",
+        "plain_english": "Your UEI is like a Social Security number for your organization -- every entity doing business with the federal government needs one.",
+        "replaces": "DUNS number (phased out April 2022)",
+        "subrecipients": "Need UEI but not full SAM registration"
+      },
+      "grants_gov": {
+        "required": true,
+        "description": "Federal portal where most grant applications are submitted",
+        "plain_english": "Grants.gov is the website where you actually submit your grant application -- think of it as the online mailbox for federal grants.",
+        "requires": ["SAM.gov registration", "UEI", "Authorized Organization Representative (AOR)"]
+      },
+      "login_gov": {
+        "required": true,
+        "description": "Identity verification system required to access SAM.gov and Grants.gov",
+        "plain_english": "Login.gov is the government's single sign-on system -- you need an account here to access SAM.gov and Grants.gov."
+      }
+    },
+    "compliance": {
+      "single_audit": {
+        "regulation": "2 CFR 200 Subpart F",
+        "threshold": 1000000,
+        "threshold_note": "Raised from $750,000 to $1,000,000 in 2024 Uniform Guidance revision",
+        "description": "Non-federal entities expending $1,000,000+ in federal awards per fiscal year must have an annual single audit",
+        "plain_english": "If your organization spends more than $1 million in federal grant money in a year, you must have a special audit done by an independent auditor to make sure you spent the money correctly.",
+        "applies_to": ["State governments", "Local governments", "Nonprofits", "Institutions of higher education"],
+        "standard": "Generally Accepted Government Auditing Standards (GAGAS)"
+      },
+      "lobbying_restrictions": {
+        "regulation": "31 USC 1352",
+        "form": "SF-LLL (Disclosure of Lobbying Activities)",
+        "threshold": 100000,
+        "description": "For awards over $100,000, recipients must certify no federal funds were used for lobbying and disclose any lobbying activities",
+        "plain_english": "You cannot use federal grant money to lobby Congress or government officials, and if your grant is over $100,000, you must formally promise this in writing."
+      },
+      "drug_free_workplace": {
+        "regulation": "2 CFR Part 182",
+        "description": "Recipients must certify they maintain a drug-free workplace",
+        "plain_english": "You must have a written policy prohibiting drugs in your workplace and share it with employees."
+      },
+      "debarment_suspension": {
+        "regulation": "2 CFR Part 180",
+        "description": "Recipients must certify they are not debarred, suspended, or otherwise excluded from federal programs",
+        "plain_english": "You must confirm that neither you nor your organization has been banned from receiving federal funds."
+      },
+      "civil_rights": {
+        "regulations": [
+          "Title VI of Civil Rights Act of 1964",
+          "Section 504 of Rehabilitation Act of 1973",
+          "Title IX of Education Amendments of 1972",
+          "Age Discrimination Act of 1975"
+        ],
+        "description": "All federal grant recipients must comply with civil rights laws prohibiting discrimination based on race, color, national origin, disability, sex, and age",
+        "plain_english": "You cannot discriminate against anyone based on race, gender, disability, or age in any program or activity funded by your grant."
+      },
+      "uniform_guidance": {
+        "regulation": "2 CFR Part 200",
+        "description": "Master regulation governing all federal grants -- covers administrative requirements, cost principles, and audit requirements",
+        "plain_english": "2 CFR 200 is the rulebook for how to manage federal grant money -- it covers what you can spend on, how to track it, and how to report it."
+      }
+    },
+    "indirect_cost_rates": {
+      "de_minimis": {
+        "rate": 0.15,
+        "rate_display": "15%",
+        "base": "Modified Total Direct Costs (MTDC)",
+        "effective_date": "2024-10-01",
+        "previous_rate": 0.10,
+        "eligibility": "Entities without a current NICRA that received less than $35 million in direct federal funding",
+        "documentation_required": false,
+        "duration": "May be used indefinitely",
+        "plain_english": "If you have never negotiated an overhead rate with the government, you can automatically claim 15% on top of your direct costs to cover things like rent, utilities, and general administration."
+      },
+      "negotiated_rate": {
+        "description": "Negotiated Indirect Cost Rate Agreement (NICRA) with cognizant federal agency",
+        "plain_english": "If your organization has significant overhead costs, you can negotiate a specific percentage with a designated federal agency that all other agencies must accept.",
+        "acceptance": "Must be accepted by all federal agencies unless statute/regulation requires otherwise"
+      }
+    }
+  },
+
+  "agencies": {
+    "HUD": {
+      "agency_name": "Department of Housing and Urban Development",
+      "grant_portal": "HUD Exchange (hudexchange.info)",
+      "additional_portal": "JustGrants is NOT used; applications via Grants.gov",
+
+      "eligible_applicant_types": {
+        "CDBG_entitlement": {
+          "eligible": [
+            "Metropolitan cities (population 50,000+)",
+            "Urban counties",
+            "States (for non-entitlement areas)"
+          ],
+          "determination": "Eligibility based on U.S. Census population data and OMB metropolitan area delineations",
+          "plain_english": "CDBG entitlement grants go automatically to larger cities and urban counties based on a formula -- you don't compete for them, but you must be a qualifying local government."
+        },
+        "CDBG_competitive": {
+          "eligible": [
+            "States (for Section 108 loan guarantees)",
+            "Units of local government (for disaster recovery, neighborhood stabilization)",
+            "Nonprofits (as subrecipients through local governments)"
+          ],
+          "plain_english": "Some CDBG money is awarded competitively for special purposes like disaster recovery -- local governments apply and may pass funds to nonprofits."
+        },
+        "HOME": {
+          "eligible": [
+            "Participating Jurisdictions (states, cities, counties, consortia meeting formula threshold)",
+            "Community Housing Development Organizations (CHDOs) as subrecipients"
+          ],
+          "minimum_allocation": 750000,
+          "plain_english": "HOME grants go to cities, counties, and states that qualify as 'Participating Jurisdictions' based on a formula -- they must set aside 15% for community housing organizations (CHDOs)."
+        },
+        "Section_202": {
+          "eligible": [
+            "Private nonprofit organizations",
+            "Nonprofit consumer cooperatives"
+          ],
+          "purpose": "Supportive housing for elderly (62+)",
+          "plain_english": "Section 202 is specifically for nonprofit organizations that want to build or operate housing for seniors age 62 and older."
+        },
+        "Section_811": {
+          "eligible": [
+            "Private nonprofit organizations (for capital advances)",
+            "State housing agencies (for Project Rental Assistance)"
+          ],
+          "tenant_requirements": "Extremely low-income (at or below 30% AMI) with at least one disabled household member",
+          "plain_english": "Section 811 helps nonprofits and state agencies create housing for very low-income people with disabilities."
+        }
+      },
+
+      "grant_types": {
+        "CDBG_entitlement": "formula",
+        "CDBG_state": "formula",
+        "CDBG_competitive": "competitive",
+        "HOME": "formula",
+        "Section_202": "competitive",
+        "Section_811_capital": "competitive",
+        "Section_811_PRA": "competitive"
+      },
+
+      "registration_prerequisites": [
+        "SAM.gov active registration",
+        "UEI number",
+        "Grants.gov account with AOR",
+        "HUD-specific forms (HUD-2880 Applicant/Recipient Disclosure)",
+        "Consolidated Plan (for CDBG/HOME entitlement communities)",
+        "Annual Action Plan"
+      ],
+
+      "compliance_requirements": {
+        "davis_bacon": {
+          "applies": true,
+          "trigger": "Construction or rehabilitation contracts over $2,000",
+          "regulation": "40 USC 3141-3148",
+          "description": "Must pay workers prevailing wages on all construction/rehab projects funded by HUD",
+          "plain_english": "If your grant pays for construction work, you must pay workers at least the going wage rate for that type of work in your area, as determined by the Department of Labor."
+        },
+        "section_3": {
+          "applies": true,
+          "regulation": "24 CFR Part 75",
+          "thresholds": {
+            "housing_community_development": 200000,
+            "lead_hazard_healthy_homes": 100000,
+            "public_housing": "All capital, operating, or development funds"
+          },
+          "description": "Must direct employment, training, and contracting opportunities to low-income residents and businesses that employ them",
+          "plain_english": "When your HUD-funded project is large enough, you must make an effort to hire local low-income residents and use businesses that employ them.",
+          "reporting": "Annual Section 3 compliance reports required (starting Jan 2026 via S3R system for PHAs)"
+        },
+        "environmental_review": {
+          "applies": true,
+          "regulation": "24 CFR Part 58",
+          "description": "HUD requires environmental review for all projects, but uniquely delegates this responsibility to the grant recipient (not HUD itself)",
+          "plain_english": "Unlike most agencies, HUD makes YOU (the grantee) do the environmental review instead of doing it themselves -- you must assess environmental impacts before spending any money.",
+          "key_rule": "No funds may be committed until environmental review is complete and HUD issues a Release of Funds"
+        },
+        "fair_housing": {
+          "applies": true,
+          "regulation": "Fair Housing Act, Executive Order 12892",
+          "description": "Must affirmatively further fair housing -- not just avoid discrimination but take proactive steps",
+          "plain_english": "You must not only avoid housing discrimination but actively work to promote equal housing opportunity in your community."
+        },
+        "ura": {
+          "applies": true,
+          "regulation": "Uniform Relocation Assistance and Real Property Acquisition Policies Act (49 CFR Part 24)",
+          "description": "Protects people displaced by federally-funded projects -- must provide relocation assistance and fair compensation",
+          "plain_english": "If your project displaces people from their homes or businesses, you must help them relocate and compensate them fairly."
+        },
+        "nepa": {
+          "applies": true,
+          "note": "Implemented through 24 CFR Part 58 (see environmental_review above)"
+        },
+        "buy_american": {
+          "applies": false,
+          "note": "Not a standard HUD requirement, though BABA may apply to infrastructure components"
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000
+        },
+        "civil_rights": {
+          "applies": true,
+          "additional": ["Section 109 of Housing and Community Development Act", "Fair Housing Act"]
+        },
+        "lobbying_restrictions": {
+          "applies": true
+        },
+        "drug_free_workplace": {
+          "applies": true
+        }
+      },
+
+      "required_supporting_documents": {
+        "CDBG_entitlement": [
+          "Consolidated Plan (3-5 year strategic plan)",
+          "Annual Action Plan",
+          "Citizen Participation Plan",
+          "Certifications (civil rights, anti-lobbying, drug-free workplace, etc.)",
+          "SF-424 Application for Federal Assistance",
+          "HUD-2880 Applicant/Recipient Disclosure/Update Report"
+        ],
+        "Section_202_811": [
+          "SF-424 Application for Federal Assistance",
+          "Articles of Incorporation / Bylaws",
+          "IRS 501(c)(3) determination letter",
+          "Evidence of site control",
+          "Architectural plans/specifications",
+          "Operating pro forma",
+          "Market study",
+          "Environmental review documentation",
+          "Affirmative Fair Housing Marketing Plan"
+        ]
+      },
+
+      "indirect_cost_rate": {
+        "policy": "Accepts negotiated NICRA or de minimis rate (15%)",
+        "form": "HUD-426 (for competitive grants)",
+        "admin_cap": "CDBG: 20% for planning/admin, with admin capped at 5%",
+        "plain_english": "HUD accepts your negotiated overhead rate or the standard 15% if you don't have one, but CDBG caps total admin spending at 20% of the grant."
+      }
+    },
+
+    "NSF": {
+      "agency_name": "National Science Foundation",
+      "grant_portal": "Research.gov",
+      "policy_document": "PAPPG (Proposal & Award Policies & Procedures Guide) -- currently NSF 24-1",
+
+      "eligible_applicant_types": {
+        "standard_research": {
+          "eligible": [
+            "Institutions of Higher Education (2-year and 4-year, accredited, U.S.-based)",
+            "Nonprofit organizations (museums, observatories, research labs, professional societies with research/education mission)",
+            "Federally recognized tribal nations"
+          ],
+          "conditionally_eligible": [
+            "For-profit companies (U.S.-based, with research capabilities)",
+            "State and local governments (when programmatically necessary)",
+            "Federal agencies and FFRDCs (special approval required)"
+          ],
+          "ineligible": [
+            "Unaffiliated individuals",
+            "Individuals who are party to a Malign Foreign Talent Recruitment Program"
+          ],
+          "plain_english": "NSF mainly funds universities, colleges, and research nonprofits. Companies and governments can sometimes apply. Individuals cannot apply on their own -- they must go through an eligible organization."
+        },
+        "SBIR_STTR": {
+          "eligible": [
+            "Small businesses (500 or fewer employees, U.S.-based, for-profit)"
+          ],
+          "additional_requirements": {
+            "SBIR": "PI must be primarily employed by the small business",
+            "STTR": "Must partner with a U.S. research institution"
+          }
+        }
+      },
+
+      "grant_types": {
+        "research_grants": "competitive",
+        "CAREER_awards": "competitive",
+        "S_and_CC": "competitive",
+        "SBIR_STTR": "competitive",
+        "note": "Nearly all NSF funding is competitive -- no formula or entitlement grants"
+      },
+
+      "registration_prerequisites": [
+        "SAM.gov active registration (must remain current throughout proposal review and award)",
+        "UEI number",
+        "NSF ID (unique alpha-numeric identifier for individual PIs)",
+        "Research.gov organizational profile",
+        "Authorized Organizational Representative (AOR) designation",
+        "Government-wide certifications in SAM"
+      ],
+
+      "compliance_requirements": {
+        "pappg": {
+          "applies": true,
+          "description": "NSF's PAPPG is the master policy document implementing 2 CFR 200 for NSF awards",
+          "plain_english": "The PAPPG is NSF's rulebook for proposals and awards -- if a topic isn't covered in the PAPPG, fall back to the government-wide rules in 2 CFR 200."
+        },
+        "data_management": {
+          "applies": true,
+          "description": "All proposals must include a Data Management Plan (max 2 pages) describing how data will be managed, shared, and preserved",
+          "plain_english": "You must explain how you will store, share, and preserve the data your research produces -- NSF wants publicly funded research data to be available to others."
+        },
+        "irb_human_subjects": {
+          "applies": "When research involves human subjects",
+          "regulation": "45 CFR Part 46 (Common Rule)",
+          "description": "Must have IRB approval before human subjects research begins",
+          "plain_english": "If your research involves people (surveys, experiments, interviews), you need approval from an Institutional Review Board that ensures participants are protected."
+        },
+        "iacuc_animal_welfare": {
+          "applies": "When research involves vertebrate animals",
+          "regulation": "PHS Policy, Animal Welfare Act",
+          "description": "Must have IACUC approval before research with animals begins",
+          "plain_english": "If your research uses animals, you need approval from an Institutional Animal Care and Use Committee to ensure humane treatment."
+        },
+        "malign_foreign_talent": {
+          "applies": true,
+          "effective": "2024-05-20",
+          "description": "Senior/key personnel must not be party to a Malign Foreign Talent Recruitment Program",
+          "plain_english": "Researchers on your grant cannot participate in talent recruitment programs from adversarial foreign governments (like China's Thousand Talents Plan)."
+        },
+        "davis_bacon": {
+          "applies": false,
+          "note": "NSF rarely funds construction"
+        },
+        "nepa": {
+          "applies": "Rarely -- only for projects with potential environmental impact (e.g., Antarctic research, certain field work)"
+        },
+        "buy_american": {
+          "applies": false
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000
+        },
+        "civil_rights": {
+          "applies": true
+        },
+        "lobbying_restrictions": {
+          "applies": true
+        },
+        "drug_free_workplace": {
+          "applies": true
+        }
+      },
+
+      "required_supporting_documents": [
+        "Cover Sheet (via Research.gov)",
+        "Project Summary (1 page: overview, intellectual merit, broader impacts)",
+        "Project Description (up to 15 pages for most programs)",
+        "References Cited",
+        "Budget and Budget Justification (up to 5 pages)",
+        "Biographical Sketch for each senior/key person (via SciENcv -- MANDATORY format)",
+        "Current and Pending (Other) Support for each senior/key person (via SciENcv)",
+        "Data Management Plan (up to 2 pages)",
+        "Facilities, Equipment, and Other Resources",
+        "Collaborators and Other Affiliations (COA)",
+        "Postdoctoral Mentoring Plan (if applicable)",
+        "Letters of Collaboration (if applicable, must use standard format)",
+        "Supplementary Documents (if allowed by specific program)"
+      ],
+
+      "indirect_cost_rate": {
+        "policy": "NSF accepts full negotiated NICRA -- no statutory cap",
+        "de_minimis": "15% available for eligible organizations",
+        "note": "NSF is one of the more generous agencies regarding indirect costs -- they honor whatever rate your organization has negotiated",
+        "plain_english": "NSF pays your full negotiated overhead rate with no cap. If you don't have a negotiated rate, you can use the standard 15%."
+      }
+    },
+
+    "DOE": {
+      "agency_name": "Department of Energy",
+      "grant_portal": "ARPA-E eXCHANGE (arpa-e-foa.energy.gov) for ARPA-E; EERE Exchange for EERE; Grants.gov for all",
+      "key_offices": ["ARPA-E", "EERE (now CMEI)", "Office of Science"],
+
+      "eligible_applicant_types": {
+        "ARPA_E": {
+          "eligible": [
+            "U.S. individuals (citizens or permanent residents -- but must form an entity to receive award)",
+            "Domestic for-profit entities",
+            "Domestic educational institutions",
+            "Domestic nonprofit organizations",
+            "National laboratories / FFRDCs (as team lead or member, NOT standalone)",
+            "Federal agencies other than DOE (as team member only)"
+          ],
+          "ineligible_standalone": ["FFRDCs/DOE labs", "Federal agencies"],
+          "plain_english": "ARPA-E funds universities, companies, nonprofits, and even individuals (who must form an organization). National labs can participate on teams but cannot apply alone."
+        },
+        "EERE": {
+          "eligible": [
+            "State and local governments",
+            "Tribal nations",
+            "Institutions of higher education",
+            "Nonprofit organizations",
+            "For-profit entities",
+            "Utilities"
+          ],
+          "note": "Eligibility varies significantly by FOA -- always check the specific NOFO",
+          "plain_english": "EERE (now CMEI) has a wide range of eligible applicants depending on the specific program -- from utilities to universities to small businesses."
+        },
+        "SBIR_STTR": {
+          "eligible": [
+            "Small businesses (500 or fewer employees, U.S.-based, majority U.S.-owned)"
+          ]
+        }
+      },
+
+      "grant_types": {
+        "ARPA_E": "competitive",
+        "EERE_CMEI": "competitive (most programs)",
+        "weatherization": "formula (to states)",
+        "SBIR_STTR": "competitive"
+      },
+
+      "registration_prerequisites": [
+        "SAM.gov active registration",
+        "UEI number",
+        "Grants.gov account",
+        "ARPA-E eXCHANGE registration (for ARPA-E programs)",
+        "PAMS registration (DOE Portfolio Analysis and Management System -- for Office of Science)",
+        "SF-424 (Application for Federal Assistance)",
+        "SF-LLL (Disclosure of Lobbying Activities)"
+      ],
+
+      "compliance_requirements": {
+        "nepa": {
+          "applies": true,
+          "regulation": "10 CFR Part 1021 (DOE NEPA Implementing Procedures)",
+          "description": "Environmental review required for projects with potential environmental impact. DOE updated procedures in 2025-2026 to streamline reviews.",
+          "plain_english": "DOE must assess whether your project could harm the environment before approving it. Recent rule changes have simplified this process for many projects."
+        },
+        "buy_american": {
+          "applies": true,
+          "regulation": "Build America, Buy America Act (BABA), 2 CFR 184",
+          "effective": "FOAs issued on or after May 14, 2022",
+          "description": "Iron, steel, manufactured products, and construction materials used in infrastructure projects must be domestically produced",
+          "waiver_process": "Project-specific waivers available -- submitted to DOE, reviewed by DOE and OMB, subject to 15-day public comment",
+          "plain_english": "If your DOE grant builds infrastructure, you must use American-made iron, steel, and construction materials unless you get a waiver."
+        },
+        "davis_bacon": {
+          "applies": true,
+          "trigger": "Construction projects, especially those funded under IIJA/BIL",
+          "reporting": "Semiannual payroll reports due April 21 and October 21",
+          "software": "LCPtracker required for payroll submissions unless waiver granted",
+          "plain_english": "If your DOE grant includes construction work, you must pay workers the prevailing local wage and submit payroll reports twice a year."
+        },
+        "technology_licensing": {
+          "applies": true,
+          "regulation": "Bayh-Dole Act (35 USC 200-212), DOE Patent Clause",
+          "description": "Recipients retain title to inventions but must disclose and grant the government a license. U.S. manufacturing preference for products using the invention.",
+          "plain_english": "If your research produces an invention, you can patent it, but you must tell DOE about it and give the government rights to use it. Products made with the invention should be manufactured in the U.S."
+        },
+        "nepa_categorical_exclusions": {
+          "description": "Many smaller DOE projects qualify for categorical exclusions from full NEPA review",
+          "plain_english": "Not every project needs a full environmental study -- many routine research and small projects are automatically exempt."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "note": "DOE issued PF 2025-02 class deviation for for-profit organizations under 2 CFR 910.501"
+        },
+        "civil_rights": {
+          "applies": true
+        },
+        "lobbying_restrictions": {
+          "applies": true
+        },
+        "drug_free_workplace": {
+          "applies": true
+        }
+      },
+
+      "required_supporting_documents": [
+        "SF-424 (Application for Federal Assistance)",
+        "SF-424A (Budget Information)",
+        "SF-LLL (Disclosure of Lobbying Activities)",
+        "Project Narrative / Technical Volume",
+        "Statement of Project Objectives (SOPO)",
+        "Budget Justification",
+        "Resumes/CVs of key personnel",
+        "Letters of commitment from partners/subrecipients",
+        "Technology-to-market plan (ARPA-E)",
+        "NEPA compliance documentation (Environmental Questionnaire)",
+        "Buy America certification (for infrastructure projects)",
+        "Foreign entity participation disclosure",
+        "Data Management Plan (varies by program)"
+      ],
+
+      "indirect_cost_rate": {
+        "policy": "Accepts negotiated NICRA or de minimis (15%)",
+        "for_profit": "DOE uses 2 CFR 910 for for-profit entities (parallel to 2 CFR 200 for nonprofits)",
+        "plain_english": "DOE accepts your negotiated overhead rate. If you don't have one, use the standard 15%. For-profit companies follow slightly different rules under 2 CFR 910."
+      }
+    },
+
+    "NIH": {
+      "agency_name": "National Institutes of Health",
+      "parent": "Department of Health and Human Services (HHS)",
+      "grant_portal": "eRA Commons",
+      "policy_document": "NIH Grants Policy Statement (NIH GPS)",
+
+      "eligible_applicant_types": {
+        "research_grants_R01_R21": {
+          "eligible": [
+            "Institutions of Higher Education (domestic and foreign)",
+            "Nonprofit organizations (domestic and foreign)",
+            "For-profit organizations",
+            "Hospitals",
+            "State and local governments",
+            "Federal institutions (rarely)",
+            "Tribal nations"
+          ],
+          "restrictions": [
+            "Foreign organizations ineligible for: training grants, SBIR/STTR, program projects, center grants, construction grants",
+            "Fellowships and career awards: PI must be U.S. citizen or permanent resident"
+          ],
+          "plain_english": "NIH has the broadest eligibility of any science agency -- universities, hospitals, nonprofits, companies, and even foreign institutions can apply for most research grants."
+        },
+        "SBIR_STTR": {
+          "eligible": [
+            "Small businesses (500 or fewer employees, U.S.-based, majority U.S.-owned)"
+          ],
+          "status_note": "SBIR/STTR funding on hold pending congressional reauthorization as of early 2026",
+          "SBIR_PI": "Must be primarily employed (51%+) by the small business",
+          "STTR": "Must partner with U.S. research institution",
+          "plain_english": "NIH SBIR/STTR is for small companies doing health-related research, but the program is currently paused awaiting Congress to renew its authorization."
+        },
+        "training_grants_T32": {
+          "eligible": [
+            "Domestic institutions of higher education",
+            "Domestic research organizations"
+          ],
+          "plain_english": "Training grants are only for U.S.-based universities and research organizations."
+        }
+      },
+
+      "grant_types": {
+        "R01": "competitive",
+        "R21": "competitive",
+        "R43_R44_SBIR": "competitive",
+        "R41_R42_STTR": "competitive",
+        "T32_training": "competitive",
+        "P01_program_project": "competitive",
+        "note": "Nearly all NIH funding is competitive peer-reviewed"
+      },
+
+      "registration_prerequisites": [
+        "SAM.gov active registration",
+        "UEI number",
+        "eRA Commons account (organization and individual PI)",
+        "Grants.gov account",
+        "Institutional Profile in eRA Commons",
+        "PI eRA Commons username",
+        "DUNS number replacement: UEI"
+      ],
+
+      "compliance_requirements": {
+        "human_subjects_irb": {
+          "applies": "When research involves human subjects",
+          "regulation": "45 CFR Part 46 (Common Rule)",
+          "description": "IRB approval required before human subjects research begins. Multi-site studies must use single IRB. Must document training of all key personnel.",
+          "plain_english": "If your research involves people, an ethics board (IRB) must approve your plan to protect participants. For studies at multiple sites, one IRB reviews for all sites."
+        },
+        "animal_welfare_iacuc": {
+          "applies": "When research involves vertebrate animals",
+          "regulation": "PHS Policy on Humane Care and Use of Laboratory Animals, Animal Welfare Act",
+          "description": "IACUC approval required; must be granted within 3 years of budget period start date",
+          "plain_english": "If your research uses animals, an institutional committee must approve your protocol to ensure humane treatment, and approval must be current (within 3 years)."
+        },
+        "financial_conflict_of_interest": {
+          "applies": true,
+          "regulation": "42 CFR 50 Subpart F",
+          "exemption": "Phase I SBIR/STTR applicants exempt",
+          "description": "Institutions must have FCOI policies, investigators must disclose significant financial interests, and institutions must manage identified conflicts",
+          "plain_english": "Researchers must disclose any financial interests (like stock or consulting income) that could bias their research, and their institution must manage any conflicts."
+        },
+        "data_sharing": {
+          "applies": true,
+          "policy": "NIH Data Management and Sharing Policy (effective January 25, 2023)",
+          "description": "Must submit a Data Management and Sharing Plan with application; becomes a condition of award",
+          "plain_english": "You must explain how you will share the data your research produces so other scientists can use it -- this plan is required with your application and enforced after you get funded."
+        },
+        "biohazard": {
+          "applies": "When research involves biohazardous materials",
+          "regulations": ["NIH Guidelines for Research Involving Recombinant DNA", "Select Agent regulations"],
+          "description": "Institutional Biosafety Committee (IBC) oversight required for recombinant DNA and select agents",
+          "plain_english": "If your research uses dangerous biological materials (like modified viruses or bacteria), you need approval from a biosafety committee."
+        },
+        "certificates_of_confidentiality": {
+          "applies": true,
+          "description": "Automatically issued for all NIH-funded research collecting identifiable, sensitive information",
+          "plain_english": "NIH automatically protects the privacy of research participants -- their personal information cannot be disclosed even under court order."
+        },
+        "davis_bacon": {
+          "applies": false,
+          "note": "NIH rarely funds construction"
+        },
+        "nepa": {
+          "applies": false,
+          "note": "NIH research typically does not trigger NEPA"
+        },
+        "buy_american": {
+          "applies": false
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000
+        },
+        "civil_rights": {
+          "applies": true
+        },
+        "lobbying_restrictions": {
+          "applies": true
+        },
+        "drug_free_workplace": {
+          "applies": true
+        }
+      },
+
+      "required_supporting_documents": [
+        "SF-424 (R&R) Application for Federal Assistance",
+        "Project Summary/Abstract",
+        "Project Narrative / Specific Aims (1 page)",
+        "Research Strategy (up to 12 pages for R01, 6 pages for R21)",
+        "Budget and Budget Justification (modular or detailed)",
+        "Biographical Sketch (NIH format via SciENcv)",
+        "Other Support (current and pending -- via SciENcv)",
+        "Facilities & Other Resources",
+        "Equipment",
+        "Data Management and Sharing Plan",
+        "Human Subjects documentation (protection of human subjects, inclusion enrollment report)",
+        "Vertebrate Animals section (if applicable)",
+        "Authentication of Key Biological and/or Chemical Resources",
+        "Letters of Support",
+        "Resource Sharing Plan",
+        "Cover Letter"
+      ],
+
+      "indirect_cost_rate": {
+        "policy": "Historically accepts full negotiated NICRA",
+        "controversy": {
+          "date": "2025-02-07",
+          "action": "NIH published NOT-OD-25-068 capping indirect costs at 15% for all grants",
+          "legal_status": "Permanently enjoined by U.S. District Court (Massachusetts) on April 4, 2025; HHS appealed to First Circuit on April 8, 2025",
+          "current_status": "Appeal pending as of March 2026 -- negotiated rates currently in effect due to court injunction"
+        },
+        "plain_english": "NIH tried to cap overhead rates at 15% in early 2025, but a court blocked it. For now, NIH still pays your full negotiated rate, but this could change if the government wins its appeal."
+      }
+    },
+
+    "USDA": {
+      "agency_name": "Department of Agriculture",
+      "key_offices": ["NIFA (National Institute of Food and Agriculture)", "Rural Development", "Natural Resources Conservation Service (NRCS)"],
+      "grant_portal": "Grants.gov; NIFA uses specific application systems",
+
+      "eligible_applicant_types": {
+        "NIFA_research_grants": {
+          "eligible": [
+            "Land-grant universities (1862, 1890, 1994 institutions)",
+            "Other institutions of higher education",
+            "State agricultural experiment stations",
+            "Nonprofit organizations",
+            "Federal agencies (for some programs)",
+            "Tribal nations"
+          ],
+          "plain_english": "NIFA mainly funds agricultural colleges and universities, especially land-grant institutions, but nonprofits and tribes can also apply for many programs."
+        },
+        "SBIR_STTR": {
+          "eligible": [
+            "Small businesses (500 or fewer employees, for-profit, majority U.S.-owned, U.S.-based)"
+          ],
+          "PI_requirement": "SBIR: PI must be primarily employed (51%+) by the small business",
+          "work_location": "R&D must be performed in the United States",
+          "foreign_ties": "Must disclose connections to foreign countries of concern; may be disqualified",
+          "phase_1_limits": "$175,000 (most topics) or $125,000 (topics 8.6/8.12), 8 months",
+          "phase_2_limits": "$600,000, 24 months (only for previous Phase I awardees)",
+          "plain_english": "USDA SBIR is for small U.S. companies doing agricultural innovation. Your lead researcher must work for the company more than half-time, and all R&D must happen in the U.S."
+        },
+        "rural_development": {
+          "eligible": [
+            "Rural communities (population under 50,000 for most programs)",
+            "Rural utilities (electric, telecom, water)",
+            "Nonprofits",
+            "Tribal nations",
+            "State and local governments"
+          ],
+          "plain_english": "Rural Development programs serve communities under 50,000 people -- cities, utilities, nonprofits, and tribes in rural areas can apply."
+        },
+        "conservation_programs": {
+          "eligible": [
+            "Agricultural producers",
+            "Landowners",
+            "Conservation districts",
+            "Tribal nations",
+            "State and local governments"
+          ],
+          "plain_english": "Conservation programs are mainly for farmers, ranchers, and landowners who want to protect soil, water, and wildlife on their land."
+        }
+      },
+
+      "grant_types": {
+        "NIFA_competitive": "competitive",
+        "NIFA_formula_capacity": "formula (to land-grant institutions)",
+        "SBIR_STTR": "competitive",
+        "rural_development_loans_grants": "competitive",
+        "EQIP_conservation": "competitive (individual applications ranked)",
+        "CRP_conservation": "competitive/continuous signup"
+      },
+
+      "registration_prerequisites": [
+        "SAM.gov active registration",
+        "UEI number",
+        "Grants.gov account",
+        "NIFA-specific certifications (for NIFA grants)",
+        "SBIR/STTR size and ownership certification",
+        "Foreign ties disclosure (SBIR Phase II)"
+      ],
+
+      "compliance_requirements": {
+        "environmental_review": {
+          "applies": true,
+          "regulation": "NEPA, 7 CFR Part 799 (USDA NEPA procedures)",
+          "description": "Environmental review required for projects with potential environmental impact",
+          "plain_english": "USDA must check whether your project could harm the environment before funding it."
+        },
+        "civil_rights": {
+          "applies": true,
+          "regulation": "7 CFR Part 15 (USDA Nondiscrimination)",
+          "enforcement": "NIFA Office of Equal Opportunity and Civil Rights conducts compliance reviews",
+          "protected_classes": ["Race", "Color", "National origin", "Sex", "Disability", "Age", "Retaliation for civil rights activities"],
+          "plain_english": "USDA takes civil rights very seriously -- they actively audit grantees to make sure no one is being discriminated against in funded programs."
+        },
+        "buy_american": {
+          "applies": "For infrastructure-related programs under BABA",
+          "plain_english": "If your USDA grant builds infrastructure, you may need to use American-made materials."
+        },
+        "davis_bacon": {
+          "applies": "For construction projects in some Rural Development programs",
+          "plain_english": "Some USDA construction grants require paying workers the prevailing local wage."
+        },
+        "nepa": {
+          "applies": true,
+          "note": "See environmental_review"
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000
+        },
+        "lobbying_restrictions": {
+          "applies": true
+        },
+        "drug_free_workplace": {
+          "applies": true
+        }
+      },
+
+      "required_supporting_documents": {
+        "NIFA_grants": [
+          "SF-424 (R&R) Application for Federal Assistance",
+          "Project Summary/Abstract",
+          "Project Narrative",
+          "Budget and Budget Justification",
+          "Biographical Sketches (key personnel)",
+          "Current and Pending Support",
+          "Facilities and Equipment",
+          "Data Management Plan",
+          "Letters of Support/Collaboration",
+          "Conflict of Interest disclosure"
+        ],
+        "SBIR": [
+          "SF-424 Application",
+          "Technical Proposal",
+          "Budget and Budget Justification",
+          "SBC size certification",
+          "PI employment certification",
+          "Foreign ties disclosure (Phase II)",
+          "Commercialization plan (Phase II)"
+        ],
+        "rural_development": [
+          "SF-424 Application",
+          "Project description and work plan",
+          "Budget and budget narrative",
+          "Organizational documents (articles of incorporation, bylaws)",
+          "Financial statements",
+          "Environmental review documentation",
+          "Evidence of matching funds (if required)"
+        ]
+      },
+
+      "indirect_cost_rate": {
+        "policy": "Accepts negotiated NICRA or de minimis (15%)",
+        "statutory_cap": "30% of total federal funds for agricultural research, education, and extension programs under NIFA",
+        "cognizant_agency": "NIFA may be cognizant agency -- organizations must verify by emailing RecipientsICPs@usda.gov",
+        "cap_calculation": "Lesser of negotiated rate OR 30% of total federal funds",
+        "plain_english": "USDA has a unique rule: for agricultural research grants, your overhead is capped at 30% of the total grant, even if your negotiated rate is higher. This is set by Congress and cannot be waived."
+      }
+    },
+
+    "EPA": {
+      "agency_name": "Environmental Protection Agency",
+      "grant_portal": "Grants.gov; EPA Grants Management portal",
+      "key_programs": ["Brownfields", "Environmental Justice", "Clean Water SRF", "Clean Air", "Environmental Education"],
+
+      "eligible_applicant_types": {
+        "brownfields": {
+          "eligible": [
+            "State and territorial governments",
+            "Local governments (cities, counties, towns)",
+            "Tribal governments (federally recognized)",
+            "Alaska Native Regional/Village Corporations",
+            "Metlakatla Indian Community",
+            "Nonprofit organizations (501(c)(3))",
+            "Qualified Community Development Entities (per IRC 45D(c)(1))",
+            "Redevelopment authorities",
+            "Regional councils",
+            "Land clearance authorities"
+          ],
+          "grant_amounts": {
+            "community_wide_assessment": "Up to $500,000",
+            "assessment_coalition": "Up to $1,500,000",
+            "cleanup": "Up to $500,000 per site"
+          },
+          "plain_english": "Brownfields grants help communities clean up contaminated properties. Cities, counties, tribes, and nonprofits can all apply."
+        },
+        "environmental_justice": {
+          "eligible": [
+            "Community-based organizations",
+            "Environmental justice organizations",
+            "Nonprofit organizations",
+            "Tribal governments (federally and state recognized)",
+            "Institutions of higher education",
+            "State and local governments"
+          ],
+          "plain_english": "Environmental justice grants go to organizations working in communities disproportionately affected by pollution -- especially community groups and nonprofits."
+        },
+        "environmental_education": {
+          "eligible": [
+            "Nonprofit organizations (501(c)(3))",
+            "Tribal organizations qualifying as nonprofits",
+            "Tribal education agencies",
+            "Noncommercial educational broadcasting entities",
+            "State education agencies",
+            "Local education agencies"
+          ],
+          "plain_english": "Environmental education grants fund nonprofits, tribal organizations, and educational institutions teaching about the environment."
+        },
+        "clean_water_srf": {
+          "eligible": [
+            "States (who then lend to communities)",
+            "Tribal nations"
+          ],
+          "plain_english": "Clean Water State Revolving Fund money goes to states, who use it to make low-interest loans to local water systems."
+        }
+      },
+
+      "grant_types": {
+        "brownfields": "competitive",
+        "environmental_justice": "competitive",
+        "environmental_education": "competitive",
+        "clean_water_SRF": "formula (to states)",
+        "clean_air_section_103_105": "formula/competitive mix",
+        "tribal_GAP": "competitive"
+      },
+
+      "registration_prerequisites": [
+        "SAM.gov active registration",
+        "UEI number",
+        "Grants.gov account",
+        "State environmental authority letter of acknowledgment (Brownfields -- for non-state/tribal applicants)",
+        "EPA-specific certifications"
+      ],
+
+      "compliance_requirements": {
+        "nepa": {
+          "applies": true,
+          "description": "Environmental review may be required depending on scope of activities",
+          "plain_english": "Even though EPA is an environmental agency, projects may still need formal environmental review if they involve construction or land disturbance."
+        },
+        "quality_assurance": {
+          "applies": true,
+          "regulation": "EPA QA/R-2 (Quality Management Plan) and QA/R-5 (Quality Assurance Project Plans)",
+          "description": "Recipients conducting environmental data collection must have an approved Quality Management Plan (QMP) and/or Quality Assurance Project Plan (QAPP)",
+          "timeline": "QAPP usually due 30-90 days after award",
+          "plain_english": "If you are collecting environmental data (like water samples or air quality readings), you must have an approved plan that ensures your data collection methods are scientifically sound."
+        },
+        "mbe_wbe": {
+          "applies": true,
+          "regulation": "40 CFR Part 33",
+          "form": "EPA Form 5700-52A",
+          "description": "Recipients must make good faith efforts to award contracts to Minority Business Enterprises and Women Business Enterprises, meeting 'fair share' goals negotiated with EPA",
+          "qualification": "MBE/WBE must be 51%+ owned/controlled by socially and economically disadvantaged U.S. citizens",
+          "plain_english": "EPA requires you to make a real effort to hire minority-owned and women-owned businesses as contractors on your grant project."
+        },
+        "davis_bacon": {
+          "applies": "For construction-related grants (e.g., water infrastructure, brownfields cleanup with construction)",
+          "plain_english": "If your EPA grant involves construction work, you must pay workers the prevailing local wage."
+        },
+        "buy_american": {
+          "applies": "For infrastructure projects under BABA",
+          "plain_english": "EPA infrastructure grants may require using American-made iron, steel, and construction materials."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000
+        },
+        "civil_rights": {
+          "applies": true,
+          "additional": "Title VI compliance especially important for environmental justice programs"
+        },
+        "lobbying_restrictions": {
+          "applies": true
+        },
+        "drug_free_workplace": {
+          "applies": true
+        }
+      },
+
+      "required_supporting_documents": {
+        "brownfields": [
+          "SF-424 Application for Federal Assistance",
+          "Project narrative (community description, site information, project activities)",
+          "Budget and budget justification",
+          "State or tribal environmental authority letter of acknowledgment",
+          "Community notification documentation",
+          "Threshold criteria responses",
+          "Letters of commitment from partners",
+          "Organizational capacity documentation"
+        ],
+        "general_epa": [
+          "SF-424 Application",
+          "Project narrative",
+          "Budget detail and narrative",
+          "Quality Assurance Project Plan (post-award, 30-90 days)",
+          "MBE/WBE utilization plan",
+          "Key personnel resumes",
+          "Negotiated indirect cost rate agreement (if applicable)",
+          "Lobbying certification (SF-LLL if applicable)"
+        ]
+      },
+
+      "indirect_cost_rate": {
+        "policy": "Accepts negotiated NICRA or de minimis (15%)",
+        "note": "No EPA-specific statutory cap on indirect costs",
+        "plain_english": "EPA accepts your negotiated overhead rate or the standard 15%. No special caps apply."
+      }
+    },
+
+    "DOJ": {
+      "agency_name": "Department of Justice",
+      "grant_portal": "JustGrants (justicegrants.usdoj.gov)",
+      "key_offices": [
+        "BJA (Bureau of Justice Assistance)",
+        "OVW (Office on Violence Against Women)",
+        "OJJDP (Office of Juvenile Justice and Delinquency Prevention)",
+        "COPS Office (Community Oriented Policing Services)",
+        "OVC (Office for Victims of Crime)"
+      ],
+
+      "eligible_applicant_types": {
+        "BJA": {
+          "JAG_formula": [
+            "State governments",
+            "Units of local government (allocated by formula)"
+          ],
+          "competitive_programs": [
+            "State governments",
+            "Local governments",
+            "Tribal governments",
+            "Nonprofit organizations",
+            "Institutions of higher education",
+            "For-profit organizations (limited programs)",
+            "Courts"
+          ],
+          "plain_english": "BJA's JAG program distributes money by formula to states and cities based on crime data. Other BJA programs are competitive and open to a wide range of applicants."
+        },
+        "OVW": {
+          "eligible_varies_by_program": {
+            "STOP_formula": ["States", "Territories", "DC"],
+            "disabilities_program": ["States", "Local governments", "Tribal governments", "Victim service providers"],
+            "justice_for_families": ["States", "Local governments", "Courts", "Tribal governments", "Nonprofits", "Legal services providers"],
+            "legal_assistance_victims": ["Private nonprofits", "Publicly funded organizations (non-governmental capacity)", "Tribal governments", "Tribal organizations"]
+          },
+          "plain_english": "OVW funds programs combating violence against women. Some are formula grants to states; others are competitive and open to nonprofits, tribes, and service providers."
+        },
+        "OJJDP": {
+          "eligible": [
+            "State governments",
+            "Local governments",
+            "Tribal governments and jurisdictions",
+            "Nonprofit organizations",
+            "Institutions of higher education",
+            "For-profit organizations (limited)"
+          ],
+          "plain_english": "OJJDP funds juvenile justice programs. States, cities, tribes, nonprofits, and universities can all apply."
+        },
+        "COPS": {
+          "eligible": [
+            "State governments",
+            "Local governments",
+            "Tribal governments",
+            "Law enforcement agencies"
+          ],
+          "plain_english": "COPS grants primarily go to law enforcement agencies and the governments that oversee them."
+        }
+      },
+
+      "grant_types": {
+        "JAG": "formula",
+        "STOP_VAWA": "formula (to states)",
+        "COPS_hiring": "competitive",
+        "OJJDP_discretionary": "competitive",
+        "OVW_discretionary": "competitive",
+        "BJA_competitive": "competitive"
+      },
+
+      "registration_prerequisites": [
+        "SAM.gov active registration",
+        "UEI number",
+        "Grants.gov account (for initial application submission)",
+        "JustGrants account (for application completion and award management)",
+        "DOJ Certified Standard Assurances (acknowledged in JustGrants)",
+        "SF-LLL (if lobbying disclosure required)"
+      ],
+
+      "compliance_requirements": {
+        "vawa_requirements": {
+          "applies": "OVW grants",
+          "description": "Must comply with VAWA nondiscrimination provisions, confidentiality requirements, and prohibited activities",
+          "confidentiality": "Cannot disclose personally identifying information of victims without informed consent",
+          "prohibited_activities": [
+            "Mandatory arrest or prosecution policies as conditions of funding",
+            "Involuntary HIV testing",
+            "Requiring victims to participate in services as condition of receiving other services"
+          ],
+          "plain_english": "VAWA grants have strict rules about protecting victim privacy and ensuring victims are never forced to cooperate with law enforcement or undergo testing to receive services."
+        },
+        "civil_rights": {
+          "applies": true,
+          "regulations": [
+            "Title VI of Civil Rights Act of 1964",
+            "Section 504 of Rehabilitation Act of 1973",
+            "Title IX of Education Amendments of 1972",
+            "Age Discrimination Act of 1975",
+            "Omnibus Crime Control and Safe Streets Act of 1968",
+            "DOJ Equal Treatment of Faith-Based Organizations"
+          ],
+          "plain_english": "DOJ grant recipients cannot discriminate and must serve all eligible people regardless of race, disability, sex, or age. Faith-based organizations can receive funding but cannot require participation in religious activities."
+        },
+        "research_evaluation": {
+          "applies": "For research and evaluation grants (NIJ, OJJDP research)",
+          "requirements": [
+            "IRB approval for human subjects research",
+            "Privacy certificate",
+            "Data archiving requirements",
+            "Publication review by DOJ"
+          ],
+          "plain_english": "If your DOJ grant involves research, you need ethics board approval, must protect participant privacy, and DOJ may review your publications before release."
+        },
+        "performance_reporting": {
+          "applies": true,
+          "description": "All DOJ recipients must collect and report performance data demonstrating results",
+          "plain_english": "You must track and report measurable outcomes showing your program is actually making a difference."
+        },
+        "davis_bacon": {
+          "applies": false,
+          "note": "DOJ grants rarely involve construction"
+        },
+        "nepa": {
+          "applies": false,
+          "note": "DOJ grants typically do not trigger NEPA"
+        },
+        "buy_american": {
+          "applies": false
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000
+        },
+        "lobbying_restrictions": {
+          "applies": true,
+          "threshold": 100000,
+          "form": "SF-LLL"
+        },
+        "drug_free_workplace": {
+          "applies": true
+        }
+      },
+
+      "required_supporting_documents": [
+        "SF-424 Application for Federal Assistance",
+        "Project narrative / program narrative",
+        "Budget detail worksheet and budget narrative",
+        "Indirect cost rate agreement (if applicable)",
+        "DOJ Certified Standard Assurances",
+        "SF-LLL Disclosure of Lobbying Activities (if applicable)",
+        "Organizational capability statement",
+        "Resumes of key personnel",
+        "Letters of support/MOUs from partners",
+        "Timeline and milestones",
+        "Data collection plan / performance measurement plan",
+        "Research and evaluation plan (if applicable)",
+        "Tribal resolution (if tribal applicant)",
+        "Confidentiality/privacy protections plan (OVW grants)",
+        "Financial Management and System of Internal Controls Questionnaire"
+      ],
+
+      "indirect_cost_rate": {
+        "policy": "Accepts negotiated NICRA or de minimis (15%)",
+        "note": "DOJ Financial Guide 2024 governs cost principles",
+        "plain_english": "DOJ accepts your negotiated overhead rate or the standard 15%. Check the specific NOFO as some programs may have additional restrictions."
+      }
+    }
+  },
+
+  "glossary": {
+    "SAM.gov": "System for Award Management -- the federal government's official database of organizations approved to receive grants and contracts.",
+    "UEI": "Unique Entity Identifier -- a 12-character ID number assigned to your organization through SAM.gov, replacing the old DUNS number.",
+    "NICRA": "Negotiated Indirect Cost Rate Agreement -- a formal agreement between your organization and a federal agency establishing what percentage you can charge for overhead costs.",
+    "MTDC": "Modified Total Direct Costs -- the base amount used to calculate indirect costs; excludes items like equipment over $5,000, participant support, and subaward amounts over $25,000.",
+    "IRB": "Institutional Review Board -- an ethics committee that reviews research involving people to make sure participants are protected.",
+    "IACUC": "Institutional Animal Care and Use Committee -- a committee that reviews research involving animals to ensure humane treatment.",
+    "NEPA": "National Environmental Policy Act -- requires federal agencies to evaluate how proposed projects might affect the environment before approving them.",
+    "Davis-Bacon Act": "A federal law requiring contractors on government-funded construction projects to pay workers at least the prevailing wage for their type of work in that area.",
+    "Section 3": "A HUD requirement that when HUD-funded projects create jobs or contracting opportunities, preference should go to low-income residents and businesses in the project area.",
+    "BABA": "Build America, Buy America Act -- requires federally-funded infrastructure projects to use American-made iron, steel, and construction materials.",
+    "URA": "Uniform Relocation Assistance Act -- protects people who are displaced by federally-funded projects, requiring fair compensation and relocation help.",
+    "PAPPG": "Proposal & Award Policies & Procedures Guide -- NSF's comprehensive rulebook for how to submit proposals and manage awards.",
+    "NIH GPS": "NIH Grants Policy Statement -- NIH's comprehensive guide covering all policies and requirements for NIH grants.",
+    "eRA Commons": "NIH's electronic system for managing grant applications and awards.",
+    "SciENcv": "Science Experts Network Curriculum Vitae -- a free online tool for creating standardized biosketches required by NSF and NIH.",
+    "FCOI": "Financial Conflict of Interest -- when a researcher's personal financial interests could bias their research.",
+    "QMP": "Quality Management Plan -- an EPA-required document describing how your organization ensures the quality of environmental data it collects.",
+    "QAPP": "Quality Assurance Project Plan -- a detailed plan for a specific EPA-funded project describing data collection methods and quality controls.",
+    "MBE/WBE": "Minority Business Enterprise / Women Business Enterprise -- businesses that are at least 51% owned by minorities or women.",
+    "CHDO": "Community Housing Development Organization -- a special type of nonprofit that qualifies for set-aside HOME program funds.",
+    "JustGrants": "The Department of Justice's online grants management system for applying for and managing DOJ grants.",
+    "SF-424": "Standard Form 424 -- the cover sheet used for nearly all federal grant applications.",
+    "SF-LLL": "Standard Form LLL -- a disclosure form required when any non-federal funds have been used for lobbying activities related to a grant.",
+    "NOFO": "Notice of Funding Opportunity -- the official announcement of a grant program, including eligibility rules, deadlines, and application instructions (formerly called RFP or solicitation).",
+    "FOA": "Funding Opportunity Announcement -- same as NOFO; term commonly used by DOE and some other agencies.",
+    "AOR": "Authorized Organization Representative -- the person designated by your organization to officially submit grant applications.",
+    "Cognizant Agency": "The federal agency responsible for negotiating your indirect cost rate -- usually the agency that provides the most funding to your organization.",
+    "Single Audit": "An annual audit required for organizations spending $1 million or more in federal funds, examining both financial statements and compliance with federal requirements.",
+    "De Minimis Rate": "A standard 15% indirect cost rate that organizations can use without negotiation if they have never had a negotiated rate and receive less than $35 million in federal funding.",
+    "Bayh-Dole Act": "A law allowing grant recipients to keep patent rights to inventions made with federal funding, provided they disclose the invention and give the government a license to use it."
+  },
+
+  "eligibility_decision_matrix": {
+    "description": "Quick-reference matrix for determining which agencies an applicant type can apply to",
+    "applicant_types": {
+      "nonprofit_501c3": {
+        "HUD": ["Section 202", "Section 811", "CDBG (as subrecipient)"],
+        "NSF": ["Research grants (with research mission)"],
+        "DOE": ["ARPA-E", "EERE programs"],
+        "NIH": ["R01", "R21", "Training grants"],
+        "USDA": ["NIFA grants", "Rural Development"],
+        "EPA": ["Brownfields", "Environmental Justice", "Environmental Education"],
+        "DOJ": ["OJJDP", "OVW (victim services)", "BJA competitive", "OVC"]
+      },
+      "city_local_government": {
+        "HUD": ["CDBG entitlement", "HOME (if Participating Jurisdiction)"],
+        "NSF": ["Limited -- only when programmatically necessary"],
+        "DOE": ["EERE programs", "Weatherization"],
+        "NIH": ["R01 (rare)"],
+        "USDA": ["Rural Development (if population under 50,000)"],
+        "EPA": ["Brownfields", "Environmental Justice", "Clean Water SRF (via state)"],
+        "DOJ": ["JAG (formula)", "COPS", "OJJDP", "OVW programs"]
+      },
+      "university": {
+        "HUD": ["Limited -- mostly as research partners"],
+        "NSF": ["All research programs", "CAREER", "S&CC"],
+        "DOE": ["ARPA-E", "EERE", "Office of Science"],
+        "NIH": ["All research programs (R01, R21, T32, P01, etc.)"],
+        "USDA": ["NIFA (especially land-grant institutions)"],
+        "EPA": ["Environmental Justice", "Research grants"],
+        "DOJ": ["OJJDP", "BJA (research/evaluation)"]
+      },
+      "small_business": {
+        "HUD": ["Not typically eligible"],
+        "NSF": ["SBIR/STTR"],
+        "DOE": ["SBIR/STTR", "ARPA-E"],
+        "NIH": ["SBIR/STTR (currently on hold)"],
+        "USDA": ["SBIR/STTR"],
+        "EPA": ["SBIR (limited programs)"],
+        "DOJ": ["Not typically eligible"]
+      },
+      "tribal_nation": {
+        "HUD": ["CDBG (tribal set-aside)", "Section 811"],
+        "NSF": ["Research grants"],
+        "DOE": ["EERE programs"],
+        "NIH": ["R01 and other research grants"],
+        "USDA": ["NIFA", "Rural Development", "Conservation programs"],
+        "EPA": ["Brownfields", "Environmental Justice", "GAP", "Clean Water tribal set-aside"],
+        "DOJ": ["COPS", "OJJDP", "OVW", "BJA (tribal set-asides)"]
+      },
+      "state_government": {
+        "HUD": ["CDBG (non-entitlement)", "HOME"],
+        "NSF": ["Limited"],
+        "DOE": ["EERE", "Weatherization", "State Energy Program"],
+        "NIH": ["Limited"],
+        "USDA": ["Rural Development", "Conservation"],
+        "EPA": ["Clean Water SRF", "Clean Air Section 105", "Brownfields"],
+        "DOJ": ["JAG (formula)", "STOP VAWA (formula)", "OJJDP", "BJA"]
+      },
+      "individual": {
+        "HUD": ["Not eligible"],
+        "NSF": ["Not eligible (must go through organization)"],
+        "DOE": ["ARPA-E (must form entity to receive award)"],
+        "NIH": ["Fellowships only (F-series, very limited)"],
+        "USDA": ["Conservation programs (as landowner/producer)"],
+        "EPA": ["Not eligible"],
+        "DOJ": ["Not eligible"]
+      }
+    }
+  }
+}

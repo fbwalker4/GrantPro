@@ -3,7 +3,20 @@
     "nsf": {
       "name": "National Science Foundation (NSF)",
       "full_name": "National Science Foundation",
-      "forms": ["SF424", "NSF Cover Sheet", "Project Summary", "Project Description", "References Cited", "Biographical Sketches", "Budget", "Budget Justification", "Current and Pending Support", "Facilities", "Equipment", "Letters of Support"],
+      "forms": [
+        "SF424",
+        "NSF Cover Sheet",
+        "Project Summary",
+        "Project Description",
+        "References Cited",
+        "Biographical Sketches",
+        "Budget",
+        "Budget Justification",
+        "Current and Pending Support",
+        "Facilities",
+        "Equipment",
+        "Letters of Support"
+      ],
       "cfda": "47.076",
       "system": "Research.gov / FastLane",
       "required_sections": [
@@ -14,7 +27,11 @@
           "max_pages": 1,
           "max_chars": 3000,
           "guidance": "Must contain: (1) a statement of the project activity, (2) an explicit statement of the intellectual merit, and (3) a statement of the broader impacts. Separate these three parts clearly.",
-          "components": ["overview", "intellectual_merit", "broader_impacts"]
+          "components": [
+            "overview",
+            "intellectual_merit",
+            "broader_impacts"
+          ]
         },
         {
           "id": "project_description",
@@ -22,7 +39,14 @@
           "required": true,
           "max_pages": 15,
           "guidance": "Describe the research plan including: (1) objectives, (2) methods, (3) expected significance, (4) relation to current knowledge, (5) plan for work, (6) results from prior NSF support. Include sufficient detail for review.",
-          "components": ["objectives", "methods", "significance", "prior_work", "work_plan", "results"]
+          "components": [
+            "objectives",
+            "methods",
+            "significance",
+            "prior_work",
+            "work_plan",
+            "results"
+          ]
         },
         {
           "id": "references_cited",
@@ -43,7 +67,10 @@
           "id": "budget",
           "name": "Budget",
           "required": true,
-          "forms_required": ["SF424A", "R&R Budget"],
+          "forms_required": [
+            "SF424A",
+            "R&R Budget"
+          ],
           "guidance": "Complete all budget categories. Justify all senior personnel time. Include fringe benefits, equipment, travel, participant support, other direct costs, and indirect costs."
         },
         {
@@ -114,12 +141,128 @@
           "can_generate": false,
           "upload_instructions": "Upload your most recent independent audit (PDF)"
         }
-      ]
+      ],
+      "eligibility": {
+        "eligible_applicants": [
+          "university",
+          "nonprofit_research",
+          "tribal_nation"
+        ],
+        "conditionally_eligible": [
+          "for_profit",
+          "state_government",
+          "local_government"
+        ],
+        "ineligible_applicants": [
+          "individual",
+          "unaffiliated_individual"
+        ],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration at SAM.gov is required for all federal grants."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov, replaced DUNS in April 2022."
+          },
+          {
+            "id": "nsf_id",
+            "name": "NSF ID",
+            "required": true,
+            "description": "Unique alphanumeric identifier for individual PIs via Research.gov."
+          },
+          {
+            "id": "research_gov",
+            "name": "Research.gov Profile",
+            "required": true,
+            "description": "Organizational profile in Research.gov required for submission."
+          },
+          {
+            "id": "aor",
+            "name": "Authorized Organizational Representative (AOR)",
+            "required": true,
+            "description": "Designated representative authorized to submit proposals on behalf of the organization."
+          }
+        ]
+      },
+      "compliance": {
+        "davis_bacon": {
+          "applies": false,
+          "description": "Requires paying prevailing wages on federally-funded construction projects over $2,000. NSF rarely funds construction."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "HUD requirement to provide employment and contracting opportunities to low-income residents. Not applicable to NSF."
+        },
+        "nepa": {
+          "applies": false,
+          "description": "National Environmental Policy Act review required for projects affecting the physical environment. Rarely applies to NSF except Antarctic research or certain field work."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "Requires using American-made iron, steel, and manufactured products in infrastructure projects. Not applicable to NSF."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit per 2 CFR 200 Subpart F."
+        },
+        "irb": {
+          "applies": true,
+          "conditional": "when_human_subjects",
+          "description": "Institutional Review Board approval required for research involving human subjects per 45 CFR Part 46."
+        },
+        "iacuc": {
+          "applies": true,
+          "conditional": "when_vertebrate_animals",
+          "description": "Institutional Animal Care and Use Committee approval for research involving vertebrate animals."
+        },
+        "matching": {
+          "required": false,
+          "ratio": null,
+          "description": null
+        },
+        "malign_foreign_talent": {
+          "applies": true,
+          "description": "Senior/key personnel must not be party to a Malign Foreign Talent Recruitment Program (effective May 2024)."
+        },
+        "data_management_plan": {
+          "applies": true,
+          "description": "All proposals must include a Data Management Plan (max 2 pages) describing how data will be managed, shared, and preserved."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 15,
+        "max_rate": null,
+        "notes": "NSF accepts full negotiated NICRA with no statutory cap. De minimis rate of 15% available for organizations without a negotiated rate."
+      },
+      "submission_portal": {
+        "name": "Research.gov",
+        "url": "https://www.research.gov",
+        "notes": "FastLane being phased out; Research.gov is primary submission system. Biosketches must use SciENcv format."
+      },
+      "ai_context": "NSF proposals must clearly address Intellectual Merit and Broader Impacts as the two foundational review criteria. The Project Summary must contain three labeled sections: Overview, Intellectual Merit, and Broader Impacts. The PAPPG (currently NSF 24-1) governs all proposal requirements. Nearly all NSF funding is competitive with peer review. Biosketches must use SciENcv format. Senior personnel must certify non-participation in Malign Foreign Talent Recruitment Programs."
     },
     "doe": {
       "name": "Department of Energy (DOE)",
       "full_name": "Department of Energy",
-      "forms": ["SF424", "SF424A", "Budget", "Project Narrative", "Resume/CV", "Letters of Support", "Budget Justification"],
+      "forms": [
+        "SF424",
+        "SF424A",
+        "Budget",
+        "Project Narrative",
+        "Resume/CV",
+        "Letters of Support",
+        "Budget Justification"
+      ],
       "cfda": "81.049",
       "system": "Grants.gov / DOE Portal",
       "required_sections": [
@@ -136,7 +279,13 @@
           "required": true,
           "max_pages": 15,
           "guidance": "Describe: (1) significance/objectives, (2) approach/methods, (3) innovation, (4) timeline/milestones, (5) deliverables. Address DOE policy priorities if applicable.",
-          "components": ["objectives", "approach", "innovation", "timeline", "deliverables"]
+          "components": [
+            "objectives",
+            "approach",
+            "innovation",
+            "timeline",
+            "deliverables"
+          ]
         },
         {
           "id": "biographical",
@@ -205,12 +354,121 @@
           "can_generate": true,
           "generate_prompt": "Draft a cost share commitment letter from a project partner"
         }
-      ]
+      ],
+      "eligibility": {
+        "eligible_applicants": [
+          "university",
+          "nonprofit",
+          "for_profit",
+          "state_government",
+          "local_government",
+          "tribal_nation",
+          "utility"
+        ],
+        "ineligible_applicants": [],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration at SAM.gov is required for all federal grants."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov, replaced DUNS in April 2022."
+          },
+          {
+            "id": "grants_gov",
+            "name": "Grants.gov Account",
+            "required": true,
+            "description": "Registration on Grants.gov with Authorized Organization Representative (AOR)."
+          },
+          {
+            "id": "arpa_e_exchange",
+            "name": "ARPA-E eXCHANGE",
+            "required": false,
+            "description": "Required for ARPA-E programs only. Register at arpa-e-foa.energy.gov."
+          },
+          {
+            "id": "pams",
+            "name": "PAMS Registration",
+            "required": false,
+            "description": "DOE Portfolio Analysis and Management System for Office of Science programs."
+          }
+        ]
+      },
+      "compliance": {
+        "davis_bacon": {
+          "applies": true,
+          "description": "Requires paying prevailing wages on federally-funded construction projects, especially those funded under IIJA/BIL. Semiannual payroll reports due April 21 and October 21."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "HUD requirement to provide employment and contracting opportunities to low-income residents. Not applicable to DOE."
+        },
+        "nepa": {
+          "applies": true,
+          "description": "Environmental review required per 10 CFR Part 1021. Many smaller projects qualify for categorical exclusions. DOE streamlined procedures in 2025-2026."
+        },
+        "buy_america": {
+          "applies": true,
+          "description": "Build America, Buy America Act (BABA) requires domestically produced iron, steel, manufactured products, and construction materials for infrastructure projects. Applies to FOAs issued after May 14, 2022."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit. DOE uses 2 CFR 910 for for-profit entities."
+        },
+        "irb": {
+          "applies": true,
+          "conditional": "when_human_subjects",
+          "description": "Institutional Review Board approval required for research involving human subjects."
+        },
+        "iacuc": {
+          "applies": true,
+          "conditional": "when_vertebrate_animals",
+          "description": "Institutional Animal Care and Use Committee approval for research involving animals."
+        },
+        "matching": {
+          "required": false,
+          "ratio": null,
+          "description": "Varies by program and FOA. Check specific NOFO for cost-sharing requirements."
+        },
+        "technology_licensing": {
+          "applies": true,
+          "description": "Bayh-Dole Act applies. Recipients retain title to inventions but must disclose and grant government a license. U.S. manufacturing preference."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 15,
+        "max_rate": null,
+        "notes": "DOE accepts negotiated NICRA or de minimis 15%. For-profit entities follow 2 CFR 910 (parallel to 2 CFR 200 for nonprofits)."
+      },
+      "submission_portal": {
+        "name": "Grants.gov / DOE Exchange Portals",
+        "url": "https://www.grants.gov",
+        "notes": "ARPA-E uses eXCHANGE portal (arpa-e-foa.energy.gov). EERE uses EERE Exchange. Office of Science uses PAMS."
+      },
+      "ai_context": "DOE proposals must address relevance to DOE mission areas (energy, environment, nuclear security). NEPA compliance is critical -- include environmental questionnaire. Buy America applies to infrastructure projects. For ARPA-E, emphasize transformative potential and technology-to-market pathway. DOE has specific cost principles for for-profit entities under 2 CFR 910. Davis-Bacon applies to construction projects, especially under IIJA/BIL funding."
     },
     "nih": {
       "name": "National Institutes of Health (NIH)",
       "full_name": "National Institutes of Health",
-      "forms": ["PHS398", "SF424", "Research Plan", "Specific Aims", "Strategy", "Biographical Sketch", "Budget", "Resource Sharing Plan"],
+      "forms": [
+        "PHS398",
+        "SF424",
+        "Research Plan",
+        "Specific Aims",
+        "Strategy",
+        "Biographical Sketch",
+        "Budget",
+        "Resource Sharing Plan"
+      ],
       "cfda": "93.xxx",
       "system": "Assit / eRA Commons",
       "required_sections": [
@@ -228,7 +486,11 @@
           "required": true,
           "max_pages": 12,
           "guidance": "Must address: (1) Significance - importance of the problem, (2) Innovation - new approaches, (3) Approach - methods, analysis, interpretation. Organize with clear headings.",
-          "components": ["significance", "innovation", "approach"]
+          "components": [
+            "significance",
+            "innovation",
+            "approach"
+          ]
         },
         {
           "id": "biographical",
@@ -313,12 +575,122 @@
           "can_generate": true,
           "generate_prompt": "Draft an authentication plan for key biological resources used in the project"
         }
-      ]
+      ],
+      "eligibility": {
+        "eligible_applicants": [
+          "university",
+          "nonprofit",
+          "for_profit",
+          "hospital",
+          "state_government",
+          "local_government",
+          "tribal_nation"
+        ],
+        "ineligible_applicants": [],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration at SAM.gov is required for all federal grants."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov, replaced DUNS in April 2022."
+          },
+          {
+            "id": "era_commons",
+            "name": "eRA Commons Account",
+            "required": true,
+            "description": "Both organizational and individual PI eRA Commons accounts required. PI needs eRA Commons username."
+          },
+          {
+            "id": "grants_gov",
+            "name": "Grants.gov Account",
+            "required": true,
+            "description": "Registration on Grants.gov with Authorized Organization Representative (AOR)."
+          },
+          {
+            "id": "institutional_profile",
+            "name": "eRA Commons Institutional Profile",
+            "required": true,
+            "description": "Organization must have an Institutional Profile registered in eRA Commons."
+          }
+        ]
+      },
+      "compliance": {
+        "davis_bacon": {
+          "applies": false,
+          "description": "Requires paying prevailing wages on federally-funded construction projects over $2,000. NIH rarely funds construction."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "HUD requirement. Not applicable to NIH."
+        },
+        "nepa": {
+          "applies": false,
+          "description": "NIH research typically does not trigger NEPA review."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "Not applicable to NIH research grants."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit."
+        },
+        "irb": {
+          "applies": true,
+          "conditional": "when_human_subjects",
+          "description": "IRB approval required before human subjects research begins. Multi-site studies must use single IRB per 45 CFR Part 46."
+        },
+        "iacuc": {
+          "applies": true,
+          "conditional": "when_vertebrate_animals",
+          "description": "IACUC approval required; must be granted within 3 years of budget period start date per PHS Policy and Animal Welfare Act."
+        },
+        "matching": {
+          "required": false,
+          "ratio": null,
+          "description": null
+        },
+        "fcoi": {
+          "applies": true,
+          "description": "Financial Conflict of Interest disclosure required per 42 CFR 50 Subpart F. Investigators must disclose significant financial interests."
+        },
+        "data_sharing": {
+          "applies": true,
+          "description": "NIH Data Management and Sharing Plan required with application (effective January 25, 2023). Becomes a condition of award."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 15,
+        "max_rate": null,
+        "notes": "NIH historically accepts full negotiated NICRA. NIH attempted 15% cap in Feb 2025 (NOT-OD-25-068); permanently enjoined by court Apr 2025. Appeal pending as of Mar 2026. Negotiated rates currently in effect."
+      },
+      "submission_portal": {
+        "name": "eRA Commons / ASSIST",
+        "url": "https://era.nih.gov",
+        "notes": "Applications submitted via ASSIST or Grants.gov, managed through eRA Commons. Biosketches must use SciENcv format."
+      },
+      "ai_context": "NIH proposals must address Significance, Innovation, and Approach in the Research Strategy section. Specific Aims page (1 page) is the most critical component. Use PHS398 budget forms. Biosketches must use NIH SciENcv format. IRB approval required for human subjects; IACUC for animal research. Financial Conflict of Interest disclosure mandatory. Data Management and Sharing Plan required since Jan 2023. NIH indirect cost rate cap controversy: court blocked 15% cap in Apr 2025, appeal pending."
     },
     "usda": {
       "name": "USDA (Rural Development / SBIR)",
       "full_name": "United States Department of Agriculture",
-      "forms": ["SF424", "SF424A", "Project Narrative", "Budget", "Assurance Statements"],
+      "forms": [
+        "SF424",
+        "SF424A",
+        "Project Narrative",
+        "Budget",
+        "Assurance Statements"
+      ],
       "cfda": "10.xxx",
       "system": "Grants.gov",
       "required_sections": [
@@ -335,13 +707,21 @@
           "required": true,
           "max_pages": 15,
           "guidance": "Include: (1) problem statement, (2) objectives, (3) methodology, (4) expected outcomes, (5) relevance to agriculture/rural development.",
-          "components": ["problem", "objectives", "methodology", "outcomes", "relevance"]
+          "components": [
+            "problem",
+            "objectives",
+            "methodology",
+            "outcomes",
+            "relevance"
+          ]
         },
         {
           "id": "budget",
           "name": "Budget",
           "required": true,
-          "forms_required": ["SF424A"],
+          "forms_required": [
+            "SF424A"
+          ],
           "guidance": "Complete all budget categories. Justify all costs. USDA has specific allowability rules - check eligible costs."
         },
         {
@@ -388,12 +768,103 @@
           "can_generate": false,
           "upload_instructions": "Complete and upload USDA assurance statements"
         }
-      ]
+      ],
+      "eligibility": {
+        "eligible_applicants": [
+          "university",
+          "land_grant_institution",
+          "nonprofit",
+          "tribal_nation",
+          "state_government",
+          "small_business"
+        ],
+        "ineligible_applicants": [],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration at SAM.gov is required for all federal grants."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov, replaced DUNS in April 2022."
+          },
+          {
+            "id": "grants_gov",
+            "name": "Grants.gov Account",
+            "required": true,
+            "description": "Registration on Grants.gov with Authorized Organization Representative (AOR)."
+          }
+        ]
+      },
+      "compliance": {
+        "davis_bacon": {
+          "applies": true,
+          "conditional": "construction_projects",
+          "description": "Applies to construction projects in some Rural Development programs. Must pay workers the prevailing local wage."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "HUD requirement. Not applicable to USDA."
+        },
+        "nepa": {
+          "applies": true,
+          "description": "Environmental review required per 7 CFR Part 799 for projects with potential environmental impact."
+        },
+        "buy_america": {
+          "applies": true,
+          "conditional": "infrastructure_projects",
+          "description": "BABA applies to infrastructure-related programs. American-made materials may be required."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit."
+        },
+        "irb": {
+          "applies": true,
+          "conditional": "when_human_subjects",
+          "description": "IRB approval required for research involving human subjects."
+        },
+        "iacuc": {
+          "applies": true,
+          "conditional": "when_vertebrate_animals",
+          "description": "IACUC approval for research involving animals."
+        },
+        "matching": {
+          "required": false,
+          "ratio": null,
+          "description": "Varies by program. Check specific NOFO."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 15,
+        "max_rate": 30,
+        "notes": "USDA NIFA programs have a statutory 30% cap on indirect costs (30% of total federal funds). This is set by Congress and cannot be waived. De minimis rate of 15% also available."
+      },
+      "submission_portal": {
+        "name": "Grants.gov",
+        "url": "https://www.grants.gov",
+        "notes": "NIFA uses specific application systems for some programs. SBIR applications may have separate submission requirements."
+      },
+      "ai_context": "USDA proposals should emphasize relevance to agriculture, food systems, or rural development. NIFA research grants have a unique 30% statutory cap on indirect costs. Land-grant institutions (1862, 1890, 1994) have priority for many NIFA programs. Environmental review (NEPA) applies. Civil rights compliance is actively audited by USDA. Rural Development programs generally serve communities under 50,000 population."
     },
     "epa": {
       "name": "EPA (Environmental Protection Agency)",
       "full_name": "Environmental Protection Agency",
-      "forms": ["SF424", "Project Narrative", "Budget", "Key Contacts", "Environmental Compliance"],
+      "forms": [
+        "SF424",
+        "Project Narrative",
+        "Budget",
+        "Key Contacts",
+        "Environmental Compliance"
+      ],
       "cfda": "66.xxx",
       "system": "Grants.gov",
       "required_sections": [
@@ -410,7 +881,13 @@
           "required": true,
           "max_pages": 10,
           "guidance": "Include: (1) statement of work, (2) quality assurance if applicable, (3) timeout milestones, (4) environmental outcomes, (5) transfer/promotion plan.",
-          "components": ["work", "qa", "milestones", "outcomes", "transfer"]
+          "components": [
+            "work",
+            "qa",
+            "milestones",
+            "outcomes",
+            "transfer"
+          ]
         },
         {
           "id": "budget",
@@ -443,12 +920,111 @@
           "can_generate": false,
           "upload_instructions": "Upload copies of any relevant environmental permits"
         }
-      ]
+      ],
+      "eligibility": {
+        "eligible_applicants": [
+          "nonprofit",
+          "state_government",
+          "local_government",
+          "tribal_nation",
+          "university",
+          "community_organization"
+        ],
+        "ineligible_applicants": [
+          "individual",
+          "for_profit"
+        ],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration at SAM.gov is required for all federal grants."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov, replaced DUNS in April 2022."
+          },
+          {
+            "id": "grants_gov",
+            "name": "Grants.gov Account",
+            "required": true,
+            "description": "Registration on Grants.gov with Authorized Organization Representative (AOR)."
+          }
+        ]
+      },
+      "compliance": {
+        "davis_bacon": {
+          "applies": true,
+          "conditional": "construction_projects",
+          "description": "Applies to construction-related grants (water infrastructure, brownfields cleanup with construction). Must pay workers the prevailing local wage."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "HUD requirement. Not applicable to EPA."
+        },
+        "nepa": {
+          "applies": true,
+          "description": "Environmental review may be required depending on scope of activities, even for an environmental agency."
+        },
+        "buy_america": {
+          "applies": true,
+          "conditional": "infrastructure_projects",
+          "description": "BABA applies to EPA infrastructure grants. American-made iron, steel, and construction materials may be required."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit."
+        },
+        "irb": {
+          "applies": false,
+          "description": "Not typically applicable to EPA grants."
+        },
+        "iacuc": {
+          "applies": false,
+          "description": "Not typically applicable to EPA grants."
+        },
+        "matching": {
+          "required": false,
+          "ratio": null,
+          "description": "Varies by program. Check specific NOFO."
+        },
+        "quality_assurance": {
+          "applies": true,
+          "description": "Recipients collecting environmental data must have an approved Quality Management Plan (QMP) and/or Quality Assurance Project Plan (QAPP) per EPA QA/R-2 and QA/R-5."
+        },
+        "mbe_wbe": {
+          "applies": true,
+          "description": "Must make good faith efforts to award contracts to Minority Business Enterprises and Women Business Enterprises per 40 CFR Part 33. EPA Form 5700-52A required."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 15,
+        "max_rate": null,
+        "notes": "EPA accepts negotiated NICRA or de minimis 15%. No EPA-specific statutory cap on indirect costs."
+      },
+      "submission_portal": {
+        "name": "Grants.gov",
+        "url": "https://www.grants.gov",
+        "notes": "EPA also has its own Grants Management portal for post-award management."
+      },
+      "ai_context": "EPA proposals must clearly describe environmental outcomes and benefits. Quality Assurance Project Plans (QAPPs) are required for any environmental data collection, typically due 30-90 days after award. MBE/WBE utilization targets must be addressed. Brownfields programs require state environmental authority letter of acknowledgment. Environmental Justice grants should address disproportionate environmental impacts on underserved communities. Title VI compliance is especially important for EJ programs."
     },
     "dot": {
       "name": "DOT (Department of Transportation)",
       "full_name": "Department of Transportation",
-      "forms": ["SF424", "Project Narrative", "Budget", "Standard Forms"],
+      "forms": [
+        "SF424",
+        "Project Narrative",
+        "Budget",
+        "Standard Forms"
+      ],
       "cfda": "20.xxx",
       "system": "Grants.gov",
       "required_sections": [
@@ -464,7 +1040,14 @@
           "required": true,
           "max_pages": 15,
           "guidance": "Include: (1) problem/opportunity, (2) project goals, (3) scope of work, (4) methodology, (5) timeline, (6) expected outcomes, (7) how addresses DOT priorities.",
-          "components": ["problem", "goals", "scope", "methodology", "timeline", "outcomes"]
+          "components": [
+            "problem",
+            "goals",
+            "scope",
+            "methodology",
+            "timeline",
+            "outcomes"
+          ]
         },
         {
           "id": "budget",
@@ -496,12 +1079,116 @@
           "can_generate": true,
           "generate_prompt": "Draft a cost share commitment letter for a DOT grant application"
         }
-      ]
+      ],
+      "eligibility": {
+        "eligible_applicants": [
+          "state_government",
+          "local_government",
+          "transit_agency",
+          "port_authority",
+          "tribal_nation",
+          "metropolitan_planning_organization"
+        ],
+        "ineligible_applicants": [
+          "nonprofit",
+          "individual",
+          "for_profit"
+        ],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration at SAM.gov is required for all federal grants."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov, replaced DUNS in April 2022."
+          },
+          {
+            "id": "grants_gov",
+            "name": "Grants.gov Account",
+            "required": true,
+            "description": "Registration on Grants.gov with AOR for discretionary grants."
+          },
+          {
+            "id": "trams",
+            "name": "TrAMS/FMIS Access",
+            "required": false,
+            "description": "FTA uses TrAMS (Transit Award Management System); FHWA uses FMIS for post-award management."
+          }
+        ]
+      },
+      "compliance": {
+        "davis_bacon": {
+          "applies": true,
+          "description": "Applies to all federally funded construction contracts over $2,000. Weekly certified payroll reports (WH-347) required. Must post wage determination at job site."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "HUD requirement. Not applicable to DOT."
+        },
+        "nepa": {
+          "applies": true,
+          "description": "Required for all federally funded transportation projects involving construction or physical changes per 23 CFR 771. Process can take months (CE) to years (EIS). Section 4(f) protections for parks and historic sites."
+        },
+        "buy_america": {
+          "applies": true,
+          "description": "ALL iron and steel must be produced in the US (melted and poured domestically). Manufactured products and construction materials must also be domestically produced per BABAA. Waivers available but difficult to obtain."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit."
+        },
+        "irb": {
+          "applies": false,
+          "description": "Not typically applicable to DOT grants."
+        },
+        "iacuc": {
+          "applies": false,
+          "description": "Not typically applicable to DOT grants."
+        },
+        "matching": {
+          "required": true,
+          "ratio": "80/20",
+          "description": "Typically 80% federal / 20% local match. Rural and equity areas may qualify for up to 100% federal. FTA operating: 50/50. Interstate: 90/10."
+        },
+        "dbe": {
+          "applies": true,
+          "description": "Disadvantaged Business Enterprise requirements per 49 CFR Part 26. Recipients must set overall DBE goals updated every 3 years. DBE firms must be UCP-certified."
+        },
+        "ada": {
+          "applies": true,
+          "description": "All transportation facilities and services must be ADA-accessible. New construction must be fully accessible."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 15,
+        "max_rate": null,
+        "notes": "DOT follows 2 CFR Part 1201. State DOTs must have indirect cost plans approved by FHWA. Unrecovered indirect costs may be used for match with prior DOT approval."
+      },
+      "submission_portal": {
+        "name": "Grants.gov",
+        "url": "https://www.grants.gov",
+        "notes": "DOT has a DOT Navigator web resource to help first-time applicants. BUILD/RAISE grants submit through Grants.gov."
+      },
+      "ai_context": "DOT proposals must address merit criteria including safety, economic competitiveness, quality of life, environmental sustainability, innovation, and state of good repair. Benefit-Cost Analysis (BCA) is required for BUILD/RAISE/INFRA grants using DOT methodology and 3.1% discount rate. Davis-Bacon and Buy America are strictly enforced. NEPA review must be completed before construction funds are obligated. DBE utilization goals required. Match requirements vary: 80/20 standard, up to 100% federal for rural and equity areas. BUILD grants were rebranded from RAISE in FY2026."
     },
     "nist": {
       "name": "NIST (National Institute of Standards and Technology)",
       "full_name": "National Institute of Standards and Technology",
-      "forms": ["SF424", "Technical Proposal", "Budget", "Management Proposal"],
+      "forms": [
+        "SF424",
+        "Technical Proposal",
+        "Budget",
+        "Management Proposal"
+      ],
       "cfda": "11.xxx",
       "system": "Grants.gov",
       "required_sections": [
@@ -511,7 +1198,14 @@
           "required": true,
           "max_pages": 20,
           "guidance": "Include: (1) technical objectives, (2) approach/methodology, (3) innovation, (4) work plan, (5) deliverables, (6) relevance to NIST mission.",
-          "components": ["objectives", "approach", "innovation", "work_plan", "deliverables", "relevance"]
+          "components": [
+            "objectives",
+            "approach",
+            "innovation",
+            "work_plan",
+            "deliverables",
+            "relevance"
+          ]
         },
         {
           "id": "management_proposal",
@@ -535,12 +1229,111 @@
           "can_generate": true,
           "generate_prompt": "Draft a letter of support from an industry partner for a NIST grant"
         }
-      ]
+      ],
+      "eligibility": {
+        "eligible_applicants": [
+          "nonprofit",
+          "university",
+          "state_government",
+          "local_government",
+          "tribal_nation",
+          "small_business"
+        ],
+        "ineligible_applicants": [
+          "individual"
+        ],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration at SAM.gov is required for all federal grants."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov, replaced DUNS in April 2022."
+          },
+          {
+            "id": "grants_gov",
+            "name": "Grants.gov Account",
+            "required": true,
+            "description": "Registration on Grants.gov with Authorized Organization Representative (AOR)."
+          },
+          {
+            "id": "sba_registry",
+            "name": "SBA Company Registry",
+            "required": false,
+            "description": "Required for SBIR/STTR only. Register at SBIR.gov with annual certification."
+          }
+        ]
+      },
+      "compliance": {
+        "davis_bacon": {
+          "applies": false,
+          "description": "NIST rarely funds construction projects."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "HUD requirement. Not applicable to NIST."
+        },
+        "nepa": {
+          "applies": false,
+          "description": "NIST grants generally do not trigger NEPA review."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "Not typically applicable to NIST grants."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit."
+        },
+        "irb": {
+          "applies": false,
+          "description": "Not typically applicable to NIST grants."
+        },
+        "iacuc": {
+          "applies": false,
+          "description": "Not typically applicable to NIST grants."
+        },
+        "matching": {
+          "required": true,
+          "ratio": "1:1",
+          "description": "MEP program requires minimum 1:1 cost share (50% federal, 50% non-federal). SBIR/STTR has NO matching requirement. Research grants vary by program."
+        },
+        "bayh_dole": {
+          "applies": true,
+          "description": "Recipient retains title to inventions but must disclose to NIST within 2 months, elect title within 2 years, and file patent within 1 year. Government gets royalty-free license. NIST is the lead agency interpreting Bayh-Dole march-in rights."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 15,
+        "max_rate": null,
+        "notes": "NIST follows 2 CFR 200. SBIR Phase I: up to $100,000 total (inclusive of indirect). Phase II: up to $400,000 total. High indirect rates reduce money available for actual work."
+      },
+      "submission_portal": {
+        "name": "Grants.gov",
+        "url": "https://www.grants.gov",
+        "notes": "NIST is a relatively small granting agency. MEP and SBIR are the primary external grant programs."
+      },
+      "ai_context": "NIST proposals must connect to standards, measurement, or manufacturing missions. Bayh-Dole IP provisions are critical -- NIST is the lead agency on march-in rights interpretation. MEP Centers require 1:1 matching and use NIST MEP performance measurement system. SBIR awards are among the smallest across agencies (Phase I: $100K). Cybersecurity grants may require alignment with NIST Cybersecurity Framework. NIST provides substantial involvement through cooperative agreements, not just funding."
     },
     "generic": {
       "name": "Generic Federal Grant",
       "full_name": "Standard Federal Grant",
-      "forms": ["SF424", "SF424A", "Project Narrative", "Budget", "Budget Justification"],
+      "forms": [
+        "SF424",
+        "SF424A",
+        "Project Narrative",
+        "Budget",
+        "Budget Justification"
+      ],
       "cfda": null,
       "system": "Grants.gov",
       "required_sections": [
@@ -557,13 +1350,22 @@
           "required": true,
           "max_pages": 15,
           "guidance": "Full narrative including: statement of need, project objectives, methods/approach, expected outcomes, evaluation plan, sustainability.",
-          "components": ["need", "objectives", "methods", "outcomes", "evaluation", "sustainability"]
+          "components": [
+            "need",
+            "objectives",
+            "methods",
+            "outcomes",
+            "evaluation",
+            "sustainability"
+          ]
         },
         {
           "id": "budget",
           "name": "Budget",
           "required": true,
-          "forms_required": ["SF424A"],
+          "forms_required": [
+            "SF424A"
+          ],
           "guidance": "Complete budget forms with all categories. Ensure costs are allowable, reasonable, and allocable."
         },
         {
@@ -624,15 +1426,144 @@
           "can_generate": true,
           "generate_prompt": "Draft a board resolution authorizing the grant application"
         }
-      ]
+      ],
+      "eligibility": {
+        "eligible_applicants": [
+          "nonprofit",
+          "government",
+          "university",
+          "tribal_nation"
+        ],
+        "ineligible_applicants": [],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration at SAM.gov is required for all federal grants."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov, replaced DUNS in April 2022."
+          },
+          {
+            "id": "grants_gov",
+            "name": "Grants.gov Account",
+            "required": true,
+            "description": "Registration on Grants.gov with Authorized Organization Representative (AOR)."
+          }
+        ]
+      },
+      "compliance": {
+        "davis_bacon": {
+          "applies": false,
+          "description": "Requires paying prevailing wages on federally-funded construction projects over $2,000. Check specific program requirements."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "HUD-specific requirement. Check if HUD funds are involved."
+        },
+        "nepa": {
+          "applies": false,
+          "description": "National Environmental Policy Act review may be required depending on program. Check specific NOFO."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "May apply to infrastructure projects. Check specific NOFO."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit."
+        },
+        "irb": {
+          "applies": false,
+          "description": "Required only for research involving human subjects."
+        },
+        "iacuc": {
+          "applies": false,
+          "description": "Required only for research involving animals."
+        },
+        "matching": {
+          "required": false,
+          "ratio": null,
+          "description": "Varies by program. Check specific NOFO for cost-sharing requirements."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 15,
+        "max_rate": null,
+        "notes": "De minimis rate of 15% available for organizations without a negotiated rate per 2024 Uniform Guidance revision (effective October 1, 2024)."
+      },
+      "submission_portal": {
+        "name": "Grants.gov",
+        "url": "https://www.grants.gov",
+        "notes": "Some agencies use additional portals. Check the specific NOFO for submission instructions."
+      },
+      "ai_context": "This is a generic federal grant template. When generating content, follow standard federal grant writing conventions: clear statement of need with data, measurable objectives, detailed methodology, realistic budget, and strong evaluation plan. Ensure all costs are allowable, reasonable, and allocable per 2 CFR 200. Address all selection criteria from the NOFO in the order presented."
     },
     "nea": {
       "name": "NEA - Grants for Arts Projects",
       "full_name": "National Endowment for the Arts",
-      "forms": ["NEA Application", "Project Narrative", "Work Sample", "Budget", "Proof of Nonprofit Status"],
+      "forms": [
+        "NEA Application",
+        "Project Narrative",
+        "Work Sample",
+        "Budget",
+        "Proof of Nonprofit Status"
+      ],
       "cfda": "45.024",
       "system": "NEA Applicant Portal",
-      "eligibility": "501(c)(3) nonprofits, government entities, tribal organizations. Must have 5+ years programming.",
+      "eligibility": {
+        "eligible_applicants": [
+          "nonprofit",
+          "government",
+          "tribal_nation"
+        ],
+        "ineligible_applicants": [
+          "individual",
+          "for_profit"
+        ],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration at SAM.gov is required for all federal grants."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov, replaced DUNS in April 2022."
+          },
+          {
+            "id": "grants_gov",
+            "name": "Grants.gov Account",
+            "required": true,
+            "description": "Applications submitted through Grants.gov."
+          },
+          {
+            "id": "501c3",
+            "name": "IRS 501(c)(3) Determination Letter",
+            "required": true,
+            "description": "Proof of nonprofit status required. Government entities exempt."
+          },
+          {
+            "id": "programming_history",
+            "name": "3-Year Programming History",
+            "required": true,
+            "description": "Must demonstrate at least 3 years (5 years for FY27+) of arts programming prior to application deadline."
+          }
+        ]
+      },
       "required_sections": [
         {
           "id": "narrative",
@@ -640,7 +1571,12 @@
           "required": true,
           "max_chars": 6000,
           "guidance": "Describe your project in 6000 characters or less. Include: what you will do, who will benefit, why this matters, how you will evaluate success.",
-          "components": ["what", "who_benefits", "why_matters", "evaluation"]
+          "components": [
+            "what",
+            "who_benefits",
+            "why_matters",
+            "evaluation"
+          ]
         },
         {
           "id": "budget",
@@ -668,15 +1604,120 @@
           "required": false,
           "guidance": "Include 2-3 letters from partners, collaborators, or community members who support this project."
         }
-      ]
+      ],
+      "compliance": {
+        "davis_bacon": {
+          "applies": false,
+          "description": "NEA does not fund construction projects."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "HUD requirement. Not applicable to NEA."
+        },
+        "nepa": {
+          "applies": false,
+          "description": "NEA grants do not trigger NEPA review."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "Not applicable to NEA grants."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit."
+        },
+        "irb": {
+          "applies": false,
+          "description": "Not applicable to NEA grants."
+        },
+        "iacuc": {
+          "applies": false,
+          "description": "Not applicable to NEA grants."
+        },
+        "matching": {
+          "required": true,
+          "ratio": "1:1",
+          "description": "All NEA grants require minimum 1:1 match from non-federal sources. Federal funds cannot be used as match. In-kind contributions valued at fair market value are acceptable."
+        },
+        "no_subgranting": {
+          "applies": true,
+          "description": "Congressional restriction prohibits regranting NEA funds to other organizations or individuals. Exceptions: state arts agencies, regional arts organizations, designated local arts agencies. Subcontracting for project services IS allowed."
+        },
+        "accessibility_ada": {
+          "applies": true,
+          "description": "All NEA-funded projects must be accessible to people with disabilities -- physically and programmatically. Must provide accessibility plan in application."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 15,
+        "max_rate": null,
+        "notes": "NEA follows 2 CFR 200. Grants are typically small ($10,000-$100,000). High indirect rates can consume a large portion of the grant and may be viewed unfavorably by reviewers."
+      },
+      "submission_portal": {
+        "name": "Grants.gov",
+        "url": "https://www.grants.gov",
+        "notes": "NEA applications submitted through Grants.gov. Two annual deadlines (typically February and July). Late applications rejected without review."
+      },
+      "ai_context": "NEA proposals emphasize artistic quality above all other criteria -- unlike most federal grants. Work samples are critical and must demonstrate artistic merit. All grants require 1:1 non-federal match. No subgranting allowed (cannot regrant funds). Accessibility/ADA compliance must be explicitly addressed. Content restrictions apply (no obscenity per Miller test). NEA grants are small ($10K-$100K) but carry full federal compliance burden. NEA acknowledgment and logo required in all published materials."
     },
     "nea_challenge": {
       "name": "NEA - Challenge America",
       "full_name": "NEA Challenge America",
-      "forms": ["NEA Application", "Project Narrative", "Budget", "Proof of Nonprofit Status"],
+      "forms": [
+        "NEA Application",
+        "Project Narrative",
+        "Budget",
+        "Proof of Nonprofit Status"
+      ],
       "cfda": "45.024",
       "system": "NEA Applicant Portal",
-      "eligibility": "Organizations with budgets under $250,000. Focus on reaching underserved communities.",
+      "eligibility": {
+        "eligible_applicants": [
+          "nonprofit",
+          "government",
+          "tribal_nation"
+        ],
+        "ineligible_applicants": [
+          "individual",
+          "for_profit"
+        ],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration at SAM.gov is required."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov."
+          },
+          {
+            "id": "grants_gov",
+            "name": "Grants.gov Account",
+            "required": true,
+            "description": "Applications submitted through Grants.gov."
+          },
+          {
+            "id": "501c3",
+            "name": "IRS 501(c)(3) Determination Letter",
+            "required": true,
+            "description": "Proof of nonprofit status required."
+          },
+          {
+            "id": "budget_under_250k",
+            "name": "Organization Budget Under $250,000",
+            "required": true,
+            "description": "Primarily targets organizations with budgets under $250,000."
+          }
+        ]
+      },
       "required_sections": [
         {
           "id": "project_summary",
@@ -691,7 +1732,11 @@
           "required": true,
           "max_chars": 4000,
           "guidance": "Describe: (1) artistic merit, (2) reaching new audiences, (3) how project benefits underserved community. Be concise.",
-          "components": ["artistic_merit", "new_audiences", "community_benefit"]
+          "components": [
+            "artistic_merit",
+            "new_audiences",
+            "community_benefit"
+          ]
         },
         {
           "id": "budget",
@@ -706,15 +1751,86 @@
           "max_chars": 1000,
           "guidance": "Describe who your current audience is and how this project will reach NEW audiences - people who don't typically attend your programs."
         }
-      ]
+      ],
+      "compliance": {
+        "davis_bacon": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "nepa": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit. Rarely triggered given small grant size."
+        },
+        "irb": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "iacuc": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "matching": {
+          "required": true,
+          "ratio": "1:1",
+          "description": "Fixed $10,000 grant requires $10,000 non-federal match. Total project budget must be at least $20,000."
+        },
+        "no_subgranting": {
+          "applies": true,
+          "description": "Cannot regrant NEA funds to other organizations."
+        },
+        "accessibility_ada": {
+          "applies": true,
+          "description": "Events must be in accessible venues with program access for people with disabilities."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 15,
+        "max_rate": null,
+        "notes": "Grant is fixed at $10,000. Indirect costs would significantly reduce direct project spending. Most Challenge America grantees do not claim indirect."
+      },
+      "submission_portal": {
+        "name": "Grants.gov",
+        "url": "https://www.grants.gov",
+        "notes": "Challenge America was folded into Grants for Arts Projects as a discipline for FY2026."
+      },
+      "ai_context": "Challenge America targets small organizations (budgets under $250,000), first-time NEA applicants, and underserved communities. Grant is fixed at $10,000 with required 1:1 match. Narrative is shorter than standard GAP (4,000 characters). Focus on reaching new audiences and underserved populations. Artistic merit and community impact are key criteria. Now operates within the Grants for Arts Projects framework as of FY2026."
     },
     "artist_individual": {
       "name": "Artist Individual Grant",
       "full_name": "Individual Artist / Creative Project",
-      "forms": ["Application Form", "Project Description", "Artist Statement", "Budget", "Work Samples"],
+      "forms": [
+        "Application Form",
+        "Project Description",
+        "Artist Statement",
+        "Budget",
+        "Work Samples"
+      ],
       "cfda": null,
       "system": "Various (state arts councils, private foundations)",
-      "eligibility": "Individual artists, no nonprofit required for many programs",
+      "eligibility": {
+        "eligible_applicants": [
+          "individual",
+          "artist"
+        ],
+        "ineligible_applicants": [],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": []
+      },
       "required_sections": [
         {
           "id": "artist_statement",
@@ -729,7 +1845,12 @@
           "required": true,
           "max_chars": 2500,
           "guidance": "Describe your proposed project: what you will create, process, timeline, expected outcome.",
-          "components": ["what", "process", "timeline", "outcome"]
+          "components": [
+            "what",
+            "process",
+            "timeline",
+            "outcome"
+          ]
         },
         {
           "id": "budget",
@@ -751,15 +1872,79 @@
           "max_chars": 500,
           "guidance": "Brief bio: your background, training, exhibitions, awards. Help reviewers understand your experience."
         }
-      ]
+      ],
+      "compliance": {
+        "davis_bacon": {
+          "applies": false,
+          "description": "Not applicable to individual artist grants."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "nepa": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "single_audit": {
+          "applies": false,
+          "threshold": null,
+          "description": "Not applicable to individual grants from non-federal sources."
+        },
+        "irb": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "iacuc": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "matching": {
+          "required": false,
+          "ratio": null,
+          "description": "Varies by program. Some require matching, most do not for individual artists."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": false,
+        "de_minimis_rate": null,
+        "max_rate": null,
+        "notes": "Individual artist grants typically do not allow indirect cost claims. All funds go directly to the artist/project."
+      },
+      "submission_portal": {
+        "name": "Various",
+        "url": null,
+        "notes": "State arts councils, private foundations, and individual artist programs each have their own submission systems."
+      },
+      "ai_context": "Individual artist grants prioritize artistic quality and creative vision. Work samples are the most important component. Artist statement should convey unique voice and approach. Budget should be straightforward listing of project expenses. No nonprofit status required for most programs. These are typically from state arts councils or private foundations, not federal agencies (except NEA Literature Fellowships and Jazz Masters)."
     },
     "micro_grant": {
       "name": "Micro-Grant (Under $5K)",
       "full_name": "Micro-Grant / Quick Application",
-      "forms": ["Simple Application Form", "Project Idea", "Budget"],
+      "forms": [
+        "Simple Application Form",
+        "Project Idea",
+        "Budget"
+      ],
       "cfda": null,
       "system": "Various (Awesome Foundation, local community foundations)",
-      "eligibility": "Wide open - individuals, small groups, startups",
+      "eligibility": {
+        "eligible_applicants": [
+          "individual",
+          "small_group",
+          "startup",
+          "nonprofit",
+          "community_organization"
+        ],
+        "ineligible_applicants": [],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": []
+      },
       "required_sections": [
         {
           "id": "idea",
@@ -789,15 +1974,81 @@
           "max_chars": 250,
           "guidance": "Briefly: who are you? Why are you the right person to do this? Any relevant experience?"
         }
-      ]
+      ],
+      "compliance": {
+        "davis_bacon": {
+          "applies": false,
+          "description": "Not applicable to micro-grants."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "nepa": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "single_audit": {
+          "applies": false,
+          "threshold": null,
+          "description": "Not applicable. Micro-grants are typically from non-federal sources."
+        },
+        "irb": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "iacuc": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "matching": {
+          "required": false,
+          "ratio": null,
+          "description": "Most micro-grants do not require matching funds."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": false,
+        "de_minimis_rate": null,
+        "max_rate": null,
+        "notes": "Micro-grants under $5K typically do not allow indirect cost claims. All funds go directly to the project."
+      },
+      "submission_portal": {
+        "name": "Various",
+        "url": null,
+        "notes": "Awesome Foundation, local community foundations, and other micro-grant programs each have their own simple application processes."
+      },
+      "ai_context": "Micro-grants (under $5K) have minimal compliance requirements and simple applications. Focus on a compelling idea, clear impact, and realistic budget. Keep language plain and accessible. No jargon needed. Most programs value creativity, community impact, and feasibility over organizational capacity."
     },
     "small_business_grant": {
       "name": "Small Business Grant",
       "full_name": "Small Business / Startup Grant",
-      "forms": ["Application", "Business Description", "Use of Funds", "Financials"],
+      "forms": [
+        "Application",
+        "Business Description",
+        "Use of Funds",
+        "Financials"
+      ],
       "cfda": null,
       "system": "Various (state programs, private competitions)",
-      "eligibility": "For-profit small businesses, startups",
+      "eligibility": {
+        "eligible_applicants": [
+          "for_profit",
+          "small_business",
+          "startup"
+        ],
+        "ineligible_applicants": [
+          "nonprofit",
+          "government"
+        ],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": []
+      },
       "required_sections": [
         {
           "id": "business_description",
@@ -805,7 +2056,12 @@
           "required": true,
           "max_chars": 2000,
           "guidance": "Describe your business: what you do, your target customers, what makes you unique, your experience.",
-          "components": ["what", "customers", "unique", "experience"]
+          "components": [
+            "what",
+            "customers",
+            "unique",
+            "experience"
+          ]
         },
         {
           "id": "project_proposal",
@@ -834,15 +2090,82 @@
           "required": false,
           "guidance": "Basic financial info: revenue, expenses, any existing funding. Keep it brief."
         }
-      ]
+      ],
+      "compliance": {
+        "davis_bacon": {
+          "applies": false,
+          "description": "Not typically applicable to small business grants."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "nepa": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "single_audit": {
+          "applies": false,
+          "threshold": null,
+          "description": "Not applicable for most state/private small business grants."
+        },
+        "irb": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "iacuc": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "matching": {
+          "required": false,
+          "ratio": null,
+          "description": "Varies by program. Some require matching funds or co-investment."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": false,
+        "de_minimis_rate": null,
+        "max_rate": null,
+        "notes": "Small business grants from state programs and private competitions typically do not use indirect cost rate structures. Budget is project-based."
+      },
+      "submission_portal": {
+        "name": "Various",
+        "url": null,
+        "notes": "State programs, private competitions, and SBA-affiliated programs each have their own portals."
+      },
+      "ai_context": "Small business grants emphasize business viability, market opportunity, job creation, and economic impact. Include concrete metrics (revenue projections, jobs created, customers served). Show clear use of funds tied to growth. Demonstrate market demand and competitive advantage. Financial information should show business sustainability beyond the grant period."
     },
     "community_project": {
       "name": "Community Project Grant",
       "full_name": "Community Development / Neighborhood Grant",
-      "forms": ["Application", "Project Description", "Community Support", "Budget"],
+      "forms": [
+        "Application",
+        "Project Description",
+        "Community Support",
+        "Budget"
+      ],
       "cfda": null,
       "system": "Community foundations, local government",
-      "eligibility": "Nonprofits, community groups, neighborhood organizations",
+      "eligibility": {
+        "eligible_applicants": [
+          "nonprofit",
+          "community_organization",
+          "neighborhood_group",
+          "local_government"
+        ],
+        "ineligible_applicants": [
+          "individual",
+          "for_profit"
+        ],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": []
+      },
       "required_sections": [
         {
           "id": "need_statement",
@@ -850,7 +2173,11 @@
           "required": true,
           "max_chars": 1500,
           "guidance": "Describe the community need your project addresses. Use data if available. Why is this important NOW?",
-          "components": ["what_need", "who_affected", "why_now"]
+          "components": [
+            "what_need",
+            "who_affected",
+            "why_now"
+          ]
         },
         {
           "id": "project_description",
@@ -858,7 +2185,12 @@
           "required": true,
           "max_chars": 2000,
           "guidance": "Describe your project: what you will do, how it addresses the need, who will be involved, timeline.",
-          "components": ["what", "how", "who", "timeline"]
+          "components": [
+            "what",
+            "how",
+            "who",
+            "timeline"
+          ]
         },
         {
           "id": "community_support",
@@ -880,15 +2212,115 @@
           "max_chars": 500,
           "guidance": "How will this project continue after grant funds are spent? What ongoing resources are needed?"
         }
-      ]
+      ],
+      "compliance": {
+        "davis_bacon": {
+          "applies": false,
+          "description": "Not typically applicable unless federal construction funds are involved."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "Not applicable unless HUD funds are involved."
+        },
+        "nepa": {
+          "applies": false,
+          "description": "Not applicable for most community foundation grants."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "single_audit": {
+          "applies": false,
+          "threshold": null,
+          "description": "Not applicable for most community/local grants unless federal funds are involved."
+        },
+        "irb": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "iacuc": {
+          "applies": false,
+          "description": "Not applicable."
+        },
+        "matching": {
+          "required": false,
+          "ratio": null,
+          "description": "Many community grants value matching funds or in-kind support but may not require it."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": false,
+        "de_minimis_rate": null,
+        "max_rate": null,
+        "notes": "Community grants from local foundations typically do not use indirect cost rate structures. Keep overhead minimal and direct most funds to project activities."
+      },
+      "submission_portal": {
+        "name": "Various",
+        "url": null,
+        "notes": "Community foundations, local government grant programs, and neighborhood development organizations each have their own application processes."
+      },
+      "ai_context": "Community project grants emphasize demonstrated community need (with data), community engagement and support, and sustainable impact. Letters of support from community stakeholders are critical. Show how the project addresses an urgent local need and has buy-in from residents. Sustainability plan should explain how benefits continue after the grant period. Budget should maximize direct community benefit."
     },
     "education": {
       "name": "Department of Education (ED)",
       "full_name": "United States Department of Education",
-      "forms": ["SF424", "SF424A", "Project Abstract", "Project Narrative", "Budget", "Budget Justification", "Key Contacts", "ED Certifications"],
+      "forms": [
+        "SF424",
+        "SF424A",
+        "Project Abstract",
+        "Project Narrative",
+        "Budget",
+        "Budget Justification",
+        "Key Contacts",
+        "ED Certifications"
+      ],
       "cfda": "84.215",
       "system": "Grants.gov / G5 Portal",
-      "eligibility": "Local education agencies (LEAs), state education agencies (SEAs), nonprofits, IHEs, community organizations",
+      "eligibility": {
+        "eligible_applicants": [
+          "local_education_agency",
+          "state_education_agency",
+          "nonprofit",
+          "university",
+          "community_organization",
+          "charter_school_operator"
+        ],
+        "conditionally_eligible": [
+          "for_profit"
+        ],
+        "ineligible_applicants": [
+          "individual"
+        ],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration at SAM.gov is required. Allow 4+ weeks for new registrations."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov, replaced DUNS in April 2022."
+          },
+          {
+            "id": "grants_gov",
+            "name": "Grants.gov Account",
+            "required": true,
+            "description": "Registration on Grants.gov with Authorized Organization Representative (AOR)."
+          },
+          {
+            "id": "g5",
+            "name": "G5 System Registration",
+            "required": true,
+            "description": "ED electronic grants management system for post-award management."
+          }
+        ]
+      },
       "required_sections": [
         {
           "id": "project_abstract",
@@ -903,13 +2335,22 @@
           "required": true,
           "max_pages": 25,
           "guidance": "Must address absolute, competitive and invitational priorities. Include: (1) need/population, (2) objectives, (3) methods, (4) management plan, (5) evaluation, (6) supporting documents.",
-          "components": ["need", "objectives", "methods", "management", "evaluation", "supporting"]
+          "components": [
+            "need",
+            "objectives",
+            "methods",
+            "management",
+            "evaluation",
+            "supporting"
+          ]
         },
         {
           "id": "budget",
           "name": "Budget",
           "required": true,
-          "forms_required": ["SF424A"],
+          "forms_required": [
+            "SF424A"
+          ],
           "guidance": "Complete ED Form 524. Include all costs by category. Most ED programs require cost sharing/matching - document clearly."
         },
         {
@@ -965,15 +2406,135 @@
           "can_generate": true,
           "generate_prompt": "Draft a memorandum of understanding between a grantee and a school district partner"
         }
-      ]
+      ],
+      "compliance": {
+        "davis_bacon": {
+          "applies": false,
+          "description": "ED grants rarely involve construction."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "HUD requirement. Not applicable to ED."
+        },
+        "nepa": {
+          "applies": false,
+          "description": "ED grants typically do not trigger NEPA review."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "Not applicable to ED grants."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit."
+        },
+        "irb": {
+          "applies": true,
+          "conditional": "when_research_involves_human_subjects",
+          "description": "IRB approval required for research grants involving human subjects."
+        },
+        "iacuc": {
+          "applies": false,
+          "description": "Not applicable to ED grants."
+        },
+        "matching": {
+          "required": false,
+          "ratio": null,
+          "description": "Varies by program. Some competitive programs require cost sharing. Check specific NOFO."
+        },
+        "ferpa": {
+          "applies": true,
+          "description": "Family Educational Rights and Privacy Act protects student education records. Annual notification required. Written consent needed before releasing PII. Violations can result in loss of all federal funding."
+        },
+        "edgar": {
+          "applies": true,
+          "description": "Education Department General Administrative Regulations (34 CFR Parts 75-99) govern all ED discretionary grants. Prior approval required for budget changes >10%."
+        },
+        "supplement_not_supplant": {
+          "applies": true,
+          "conditional": "formula_programs",
+          "description": "Federal funds must ADD TO state/local spending, not replace it. Applies to Title I, IDEA, Title II Part A, Title III. Restricted indirect cost rate required."
+        },
+        "gepa_427": {
+          "applies": true,
+          "description": "GEPA Section 427 statement required -- describe steps to ensure equitable access for special populations. Uniquely required by ED."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 8,
+        "max_rate": null,
+        "notes": "ED uses 8% de minimis for organizations without a negotiated rate (lower than government-wide 15%). Restricted indirect cost rate required for supplement-not-supplant programs (Title I, IDEA). Must submit rate proposal within 90 days of Grant Award Notification."
+      },
+      "submission_portal": {
+        "name": "Grants.gov / G5 Portal",
+        "url": "https://www.grants.gov",
+        "notes": "Applications submitted through Grants.gov. Post-award management through G5 system. ED has been subject to restructuring in 2025-2026 which may affect administration."
+      },
+      "ai_context": "ED proposals must address absolute, competitive, and invitational priorities from the NOFO. Logic models or theories of change are typically required. FERPA compliance is critical for any project involving student data. GEPA Section 427 statement (equitable access for special populations) is uniquely required by ED. Supplement-not-supplant rules apply to formula programs with restricted indirect cost rates. ED uses 8% de minimis rate (lower than the standard 15%). EDGAR governs all discretionary grants. Title I uses four different allocation formulas. Higher ed institutions need special eligibility designations (HSI, HBCU, TCU, AANAPISI) for certain programs."
     },
     "hud": {
       "name": "HUD (Housing and Urban Development)",
       "full_name": "Department of Housing and Urban Development",
-      "forms": ["SF424", "SF424A", "Project Narrative", "Budget", "Budget Justification", "HUD Form 4010", "Logic Model"],
+      "forms": [
+        "SF424",
+        "SF424A",
+        "Project Narrative",
+        "Budget",
+        "Budget Justification",
+        "HUD Form 4010",
+        "Logic Model"
+      ],
       "cfda": "14.218",
       "system": "Grants.gov / HUD Exchange",
-      "eligibility": "State and local governments, public housing authorities, nonprofits, tribal entities",
+      "eligibility": {
+        "eligible_applicants": [
+          "state_government",
+          "local_government",
+          "public_housing_authority",
+          "nonprofit",
+          "tribal_nation"
+        ],
+        "ineligible_applicants": [
+          "individual",
+          "for_profit"
+        ],
+        "grant_type": "mixed",
+        "direct_apply": true,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration at SAM.gov is required for all federal grants."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov, replaced DUNS in April 2022."
+          },
+          {
+            "id": "grants_gov",
+            "name": "Grants.gov Account",
+            "required": true,
+            "description": "Registration on Grants.gov with AOR."
+          },
+          {
+            "id": "hud_2880",
+            "name": "HUD-2880 Applicant Disclosure",
+            "required": true,
+            "description": "HUD-specific Applicant/Recipient Disclosure/Update Report."
+          },
+          {
+            "id": "consolidated_plan",
+            "name": "Consolidated Plan",
+            "required": true,
+            "description": "3-5 year strategic plan required for CDBG/HOME entitlement communities. Includes Annual Action Plan and Citizen Participation Plan."
+          }
+        ]
+      },
       "required_sections": [
         {
           "id": "need_statement",
@@ -981,7 +2542,12 @@
           "required": true,
           "max_pages": 3,
           "guidance": "Describe the housing/community development need. Use data: demographics, gaps, conditions. Explain why federal funds are needed.",
-          "components": ["data", "gaps", "conditions", "why_funding"]
+          "components": [
+            "data",
+            "gaps",
+            "conditions",
+            "why_funding"
+          ]
         },
         {
           "id": "project_description",
@@ -989,13 +2555,22 @@
           "required": true,
           "max_pages": 10,
           "guidance": "Describe: (1) activities/services, (2) target population, (3) expected outcomes, (4) how addresses need, (5) timeline, (6) partnerships.",
-          "components": ["activities", "population", "outcomes", "approach", "timeline", "partnerships"]
+          "components": [
+            "activities",
+            "population",
+            "outcomes",
+            "approach",
+            "timeline",
+            "partnerships"
+          ]
         },
         {
           "id": "budget",
           "name": "Budget",
           "required": true,
-          "forms_required": ["SF424A"],
+          "forms_required": [
+            "SF424A"
+          ],
           "guidance": "Complete detailed budget. HUD programs often require 25-50% match - document match sources clearly."
         },
         {
@@ -1064,15 +2639,118 @@
           "can_generate": false,
           "upload_instructions": "Upload your signed fair housing certification"
         }
-      ]
+      ],
+      "compliance": {
+        "davis_bacon": {
+          "applies": true,
+          "description": "Must pay workers prevailing wages on all construction/rehabilitation contracts over $2,000 funded by HUD per 40 USC 3141-3148."
+        },
+        "section_3": {
+          "applies": true,
+          "description": "Must direct employment, training, and contracting opportunities to low-income residents and Section 3 businesses per 24 CFR Part 75. Thresholds: $200K for housing/community development, $100K for lead hazard."
+        },
+        "nepa": {
+          "applies": true,
+          "description": "Environmental review required per 24 CFR Part 58. Uniquely, HUD delegates this responsibility to the grant recipient (not HUD itself). No funds may be committed until environmental review is complete and HUD issues a Release of Funds."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "Not a standard HUD requirement, though BABA may apply to infrastructure components."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit."
+        },
+        "irb": {
+          "applies": false,
+          "description": "Not applicable to HUD grants."
+        },
+        "iacuc": {
+          "applies": false,
+          "description": "Not applicable to HUD grants."
+        },
+        "matching": {
+          "required": true,
+          "ratio": "varies",
+          "description": "CDBG entitlement: no formal match but leveraging scored. HOME: 25% match (with reductions for fiscal distress). Section 202/811: varies. Most competitive HUD programs score leveraged resources heavily."
+        },
+        "fair_housing": {
+          "applies": true,
+          "description": "Must affirmatively further fair housing per Fair Housing Act and EO 12892. Not just avoid discrimination but take proactive steps to promote equal housing opportunity."
+        },
+        "ura": {
+          "applies": true,
+          "description": "Uniform Relocation Assistance Act protects people displaced by federally-funded projects. Must provide relocation assistance and fair compensation per 49 CFR Part 24."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 15,
+        "max_rate": null,
+        "notes": "HUD accepts negotiated NICRA or de minimis 15%. CDBG has administrative caps: 20% for planning/admin, with admin capped at 5% of total grant."
+      },
+      "submission_portal": {
+        "name": "Grants.gov / HUD Exchange",
+        "url": "https://www.grants.gov",
+        "notes": "Applications submitted via Grants.gov. HUD Exchange (hudexchange.info) provides technical assistance and post-award resources. JustGrants is NOT used by HUD."
+      },
+      "ai_context": "HUD proposals must address housing and community development needs with strong data. CDBG is an entitlement program for metropolitan cities (50,000+) and urban counties -- formula-based, not competitive. HOME funds go to Participating Jurisdictions with 15% CHDO set-aside. Davis-Bacon prevailing wage requirements apply to all construction over $2,000. Section 3 requires directing employment to low-income residents. Environmental review is uniquely delegated to the grantee (not HUD). Fair housing obligations are proactive, not just non-discrimination. Matching/leveraging is heavily scored in competitive programs."
     },
     "nasa": {
       "name": "NASA (National Aeronautics and Space Administration)",
       "full_name": "National Aeronautics and Space Administration",
-      "forms": ["SF424", "SF424A", "Technical Proposal", "Business Proposal", "Budget", "Letter of Intent"],
+      "forms": [
+        "SF424",
+        "SF424A",
+        "Technical Proposal",
+        "Business Proposal",
+        "Budget",
+        "Letter of Intent"
+      ],
       "cfda": "43.012",
       "system": "NSPIRES / Grants.gov",
-      "eligibility": "Universities, research institutions, nonprofits, businesses, state/local governments",
+      "eligibility": {
+        "eligible_applicants": [
+          "university",
+          "nonprofit_research",
+          "nonprofit",
+          "for_profit",
+          "state_government",
+          "local_government"
+        ],
+        "ineligible_applicants": [
+          "foreign_entity_as_prime"
+        ],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration at SAM.gov is required for all federal grants."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov, replaced DUNS in April 2022."
+          },
+          {
+            "id": "nspires",
+            "name": "NSPIRES Registration",
+            "required": true,
+            "description": "NASA Solicitation and Proposal Integrated Review and Evaluation System required for research proposals."
+          },
+          {
+            "id": "export_control",
+            "name": "Export Control Registration",
+            "required": false,
+            "description": "ITAR-controlled work may require State Department DDTC registration. EAR-controlled work may need BIS classification."
+          }
+        ]
+      },
       "required_sections": [
         {
           "id": "technical_abstract",
@@ -1087,7 +2765,14 @@
           "required": true,
           "max_pages": 15,
           "guidance": "Include: (1) objectives/significance, (2) approach/methodology, (3) innovation, (4) work plan/timeline, (5) deliverables, (6) relevance to NASA mission.",
-          "components": ["objectives", "approach", "innovation", "work_plan", "deliverables", "relevance"]
+          "components": [
+            "objectives",
+            "approach",
+            "innovation",
+            "work_plan",
+            "deliverables",
+            "relevance"
+          ]
         },
         {
           "id": "biographical",
@@ -1105,7 +2790,9 @@
           "id": "budget",
           "name": "Budget",
           "required": true,
-          "forms_required": ["SF424A"],
+          "forms_required": [
+            "SF424A"
+          ],
           "guidance": "Complete NASA budget forms. Justify all costs. NASA has specific policies on facilities, equipment, subcontracts."
         },
         {
@@ -1140,15 +2827,134 @@
           "can_generate": false,
           "upload_instructions": "Upload your signed export control certification"
         }
-      ]
+      ],
+      "compliance": {
+        "davis_bacon": {
+          "applies": false,
+          "description": "NASA rarely funds construction projects."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "HUD requirement. Not applicable to NASA."
+        },
+        "nepa": {
+          "applies": false,
+          "description": "NASA research grants generally do not trigger NEPA review."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "Not typically applicable to NASA research grants."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit."
+        },
+        "irb": {
+          "applies": true,
+          "conditional": "when_human_subjects",
+          "description": "IRB approval required for research involving human subjects."
+        },
+        "iacuc": {
+          "applies": true,
+          "conditional": "when_vertebrate_animals",
+          "description": "IACUC approval for research involving vertebrate animals."
+        },
+        "matching": {
+          "required": false,
+          "ratio": null,
+          "description": "Most NASA research grants do not require matching. EPSCoR may require state match."
+        },
+        "itar": {
+          "applies": true,
+          "description": "International Traffic in Arms Regulations (22 CFR Parts 120-130) apply to research involving defense articles or technology on US Munitions List. Cannot share ITAR-controlled data with foreign nationals without license. Criminal penalties up to $1M fine and 20 years imprisonment."
+        },
+        "ear": {
+          "applies": true,
+          "description": "Export Administration Regulations (15 CFR Parts 730-799) apply to dual-use technologies. Check Commerce Control List. Fundamental research exclusion available."
+        },
+        "new_technology_reporting": {
+          "applies": true,
+          "description": "Must report ALL new technology developed under the grant via NASA New Technology Reports, not just patentable inventions."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 15,
+        "max_rate": null,
+        "notes": "NASA follows 2 CFR 200. SBIR and EPSCoR have hard dollar caps where indirect costs reduce direct research spending. EPSCoR: $200K/year or $750K over 3 years total."
+      },
+      "submission_portal": {
+        "name": "NSPIRES",
+        "url": "https://nspires.nasaprs.com",
+        "notes": "NSPIRES is NASA proprietary system, different from Grants.gov. ROSES has 50+ sub-programs per year. SBIR uses sbir.nasa.gov. Transitioning to BAA model in 2026."
+      },
+      "ai_context": "NASA proposals must demonstrate direct relevance to NASA mission areas and strategic priorities. ROSES (Research Opportunities in Space and Earth Sciences) has 50+ sub-programs annually. Export control (ITAR/EAR) is MORE restrictive for NASA than most agencies because space technology overlaps with missile technology (USML Category IV). Foreign nationals on the team must be disclosed and may require Technology Assistance Agreements. EPSCoR is limited to 28 eligible jurisdictions. NSPIRES is a separate system from Grants.gov with its own learning curve. New Technology reporting is mandatory for all inventions."
     },
     "dod": {
       "name": "DOD (Department of Defense)",
       "full_name": "Department of Defense",
-      "forms": ["SF424", "SF424A", "Technical Proposal", "Statement of Work", "Budget", "Cost Accounting Standards"],
+      "forms": [
+        "SF424",
+        "SF424A",
+        "Technical Proposal",
+        "Statement of Work",
+        "Budget",
+        "Cost Accounting Standards"
+      ],
       "cfda": "12.300",
       "system": "Grants.gov / Defense forms portal",
-      "eligibility": "Universities, research institutions, nonprofits, businesses - varies by program",
+      "eligibility": {
+        "eligible_applicants": [
+          "university",
+          "nonprofit_research",
+          "for_profit",
+          "small_business"
+        ],
+        "ineligible_applicants": [
+          "foreign_entity"
+        ],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration with CAGE code (Commercial and Government Entity) required."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov, replaced DUNS in April 2022."
+          },
+          {
+            "id": "grants_gov",
+            "name": "Grants.gov Account",
+            "required": true,
+            "description": "For research grants submitted through Grants.gov."
+          },
+          {
+            "id": "dsip",
+            "name": "DSIP Registration",
+            "required": false,
+            "description": "Defense SBIR/STTR Innovation Portal (dodsbirsttr.mil) required for DOD SBIR/STTR proposals."
+          },
+          {
+            "id": "facility_clearance",
+            "name": "Facility Security Clearance",
+            "required": false,
+            "description": "Required only if work involves classified information. Processing takes 3-12+ months."
+          },
+          {
+            "id": "cmmc",
+            "name": "CMMC Certification",
+            "required": false,
+            "description": "Cybersecurity Maturity Model Certification for contracts handling CUI. Phased implementation."
+          }
+        ]
+      },
       "required_sections": [
         {
           "id": "project_summary",
@@ -1163,7 +2969,14 @@
           "required": true,
           "max_pages": 20,
           "guidance": "Must address: (1) objectives/technical approach, (2) innovation/unique contributions, (3) deliverables, (4) milestones, (5) risk management, (6) dual-use potential if applicable.",
-          "components": ["objectives", "approach", "innovation", "deliverables", "milestones", "risk"]
+          "components": [
+            "objectives",
+            "approach",
+            "innovation",
+            "deliverables",
+            "milestones",
+            "risk"
+          ]
         },
         {
           "id": "statement_of_work",
@@ -1181,7 +2994,10 @@
           "id": "budget",
           "name": "Budget",
           "required": true,
-          "forms_required": ["SF424A", "Additional DOD forms"],
+          "forms_required": [
+            "SF424A",
+            "Additional DOD forms"
+          ],
           "guidance": "Detailed budget with justifications. DOD has specific cost principles - may require certified cost/pricing data."
         },
         {
@@ -1215,15 +3031,131 @@
           "can_generate": false,
           "upload_instructions": "Upload your CAS certification or disclosure statement"
         }
-      ]
+      ],
+      "compliance": {
+        "davis_bacon": {
+          "applies": false,
+          "description": "DOD grants are primarily for basic research, not construction."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "HUD requirement. Not applicable to DOD."
+        },
+        "nepa": {
+          "applies": false,
+          "description": "DOD research grants generally do not trigger NEPA."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "Not typically applicable to DOD research grants (applies more to contracts)."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit."
+        },
+        "irb": {
+          "applies": true,
+          "conditional": "when_human_subjects",
+          "description": "IRB approval required for research involving human subjects."
+        },
+        "iacuc": {
+          "applies": true,
+          "conditional": "when_vertebrate_animals",
+          "description": "IACUC approval for research involving vertebrate animals."
+        },
+        "matching": {
+          "required": false,
+          "ratio": null,
+          "description": "DOD research grants generally do not require matching."
+        },
+        "itar": {
+          "applies": true,
+          "description": "ITAR (22 CFR Parts 120-130) applies broadly. Many SBIR topics explicitly marked ITAR-restricted. Foreign nationals cannot work on ITAR-restricted topics. Must disclose ALL foreign nationals in proposal."
+        },
+        "dfars": {
+          "applies": true,
+          "description": "Defense Federal Acquisition Regulation Supplement adds defense-specific rules including cybersecurity (NIST SP 800-171), export control, and technical data rights. DFARS 252.204-7012 requires safeguarding CUI."
+        },
+        "cas": {
+          "applies": true,
+          "conditional": "large_awards",
+          "description": "Cost Accounting Standards apply to awards over $7.5M (modified CAS) or $100M (full CAS). 19 standards covering cost tracking and allocation. CAS Disclosure Statement required."
+        },
+        "dcaa_audit": {
+          "applies": true,
+          "description": "Defense Contract Audit Agency can and will audit books. Must have DCAA-adequate accounting system before award. Annual incurred cost submissions required."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 15,
+        "max_rate": null,
+        "notes": "DOD follows FAR Part 31 and 2 CFR 200 for grants. DCAA negotiates and audits rates. Provisional rates used during performance, final rates established after audit. SBIR Phase I: $275K cap (DOD). Phase II: $1.75M cap. Indirect costs within caps."
+      },
+      "submission_portal": {
+        "name": "Grants.gov / DSIP",
+        "url": "https://www.grants.gov",
+        "notes": "Research grants through Grants.gov. SBIR/STTR through Defense SBIR/STTR Innovation Portal (DSIP). DARPA has program-specific portals. Each service branch runs its own programs."
+      },
+      "ai_context": "DOD grants are primarily for BASIC RESEARCH. Applied research uses contracts or Other Transactions (OTs). DOD is the LARGEST SBIR/STTR funder (~60% of all federal SBIR). ITAR restrictions are pervasive -- many topics restrict foreign national participation. DFARS cybersecurity requirements (NIST SP 800-171) apply to CUI. Cost Accounting Standards apply to large awards. DCAA audits are thorough -- need adequate accounting system BEFORE award. DARPA grants are limited to nonprofits and universities (companies get contracts). Each service branch (Army, Navy, Air Force) runs SBIR independently."
     },
     "fema": {
       "name": "FEMA (Federal Emergency Management Agency)",
       "full_name": "Federal Emergency Management Agency",
-      "forms": ["SF424", "SF424A", "Project Narrative", "Budget", "Environmental/Historic Preservation", "Narrative Justification"],
+      "forms": [
+        "SF424",
+        "SF424A",
+        "Project Narrative",
+        "Budget",
+        "Environmental/Historic Preservation",
+        "Narrative Justification"
+      ],
       "cfda": "97.046",
       "system": "Grants.gov / FEMA GO",
-      "eligibility": "State, local, tribal governments, nonprofits, some private entities",
+      "eligibility": {
+        "eligible_applicants": [
+          "state_government",
+          "tribal_nation",
+          "territory"
+        ],
+        "conditionally_eligible": [
+          "local_government",
+          "nonprofit"
+        ],
+        "ineligible_applicants": [
+          "individual",
+          "for_profit"
+        ],
+        "grant_type": "competitive",
+        "direct_apply": false,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration at SAM.gov is required. Allow 4+ weeks for new registration."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov."
+          },
+          {
+            "id": "fema_go",
+            "name": "FEMA GO Registration",
+            "required": true,
+            "description": "FEMA Grants Outcomes portal required for all FEMA grants. AOR must create account and assign roles."
+          },
+          {
+            "id": "hazard_mitigation_plan",
+            "name": "FEMA-Approved Hazard Mitigation Plan",
+            "required": true,
+            "description": "State, tribal, or local plan must be FEMA-approved and current (not expired). Valid for 5 years. Required for HMGP, BRIC, FMA."
+          }
+        ]
+      },
       "required_sections": [
         {
           "id": "project_abstract",
@@ -1238,13 +3170,22 @@
           "required": true,
           "max_pages": 15,
           "guidance": "Include: (1) statement of problem/need, (2) scope of work, (3) methodology, (4) timeline/milestones, (5) evaluation criteria, (6) sustainability.",
-          "components": ["problem", "scope", "methodology", "timeline", "evaluation", "sustainability"]
+          "components": [
+            "problem",
+            "scope",
+            "methodology",
+            "timeline",
+            "evaluation",
+            "sustainability"
+          ]
         },
         {
           "id": "budget",
           "name": "Budget",
           "required": true,
-          "forms_required": ["SF424A"],
+          "forms_required": [
+            "SF424A"
+          ],
           "guidance": "Detailed budget. FEMA grants require cost sharing in many programs - document match clearly. Justify all costs."
         },
         {
@@ -1290,15 +3231,120 @@
           "can_generate": false,
           "upload_instructions": "Upload FEMA flood map for the project location"
         }
-      ]
+      ],
+      "compliance": {
+        "davis_bacon": {
+          "applies": true,
+          "conditional": "construction_projects",
+          "description": "Applies to FEMA-funded construction projects over $2,000. Weekly certified payroll reports required. Applies to HMGP, BRIC, and Public Assistance construction."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "HUD requirement. Not applicable to FEMA."
+        },
+        "nepa": {
+          "applies": true,
+          "description": "FEMA conducts environmental review (not the applicant) per 44 CFR Part 10. Categorical Exclusions common for standard mitigation. Section 106 historic preservation review required."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "Not a standard FEMA requirement for mitigation grants."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit."
+        },
+        "irb": {
+          "applies": false,
+          "description": "Not applicable to FEMA grants."
+        },
+        "iacuc": {
+          "applies": false,
+          "description": "Not applicable to FEMA grants."
+        },
+        "matching": {
+          "required": true,
+          "ratio": "75/25",
+          "description": "HMGP: 75% federal / 25% non-federal (up to 90% for small impoverished communities). Preparedness SHSP/UASI: no match. EMPG: 50/50."
+        },
+        "benefit_cost_analysis": {
+          "applies": true,
+          "description": "Benefit-Cost Ratio must be >= 1.0 using FEMA BCA Toolkit (Version 6.0+). Discount rate 3.1%. Required for all HMA project subapplications."
+        },
+        "hazard_mitigation_plan": {
+          "applies": true,
+          "description": "FEMA-approved hazard mitigation plan is a prerequisite. Plans valid 5 years. Enhanced plans unlock 20% HMGP funding (vs 15%)."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 15,
+        "max_rate": null,
+        "notes": "FEMA follows 2 CFR 200. Management costs capped at 15% for state and 10% for local (different from indirect costs). Standard negotiated rate or de minimis applies."
+      },
+      "submission_portal": {
+        "name": "FEMA GO",
+        "url": "https://go.fema.gov",
+        "notes": "FEMA GO is separate from Grants.gov. Some programs use Grants.gov for initial application. Local governments must apply through state emergency management agency."
+      },
+      "ai_context": "FEMA grants are heavily intermediated -- local governments CANNOT apply directly and must go through their State Emergency Management Agency. HMGP is only available after a Presidential disaster declaration. Benefit-Cost Analysis is a unique FEMA requirement using their specific BCA Toolkit. Hazard mitigation plan is a prerequisite -- no plan, no funding. BRIC program was canceled in April 2025. NEPA review is conducted by FEMA (not the applicant). Cost share is typically 75/25 federal/non-federal. Private nonprofits have very limited direct access."
     },
     "dol": {
       "name": "Department of Labor (DOL)",
       "full_name": "United States Department of Labor",
-      "forms": ["SF424", "SF424A", "Project Narrative", "Budget", "Budget Justification", "Organizational Capacity"],
+      "forms": [
+        "SF424",
+        "SF424A",
+        "Project Narrative",
+        "Budget",
+        "Budget Justification",
+        "Organizational Capacity"
+      ],
       "cfda": "17.258",
       "system": "Grants.gov / DOL EGrants",
-      "eligibility": "State workforce agencies, local governments, nonprofits, educational institutions, tribal organizations",
+      "eligibility": {
+        "eligible_applicants": [
+          "state_workforce_agency",
+          "local_government",
+          "nonprofit",
+          "community_organization",
+          "tribal_nation",
+          "university"
+        ],
+        "ineligible_applicants": [
+          "individual",
+          "for_profit"
+        ],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration at SAM.gov is required."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov."
+          },
+          {
+            "id": "grants_gov",
+            "name": "Grants.gov Account",
+            "required": true,
+            "description": "AOR registration required for competitive grant applications."
+          },
+          {
+            "id": "eta_reporting",
+            "name": "ETA-9130 Reporting Capability",
+            "required": true,
+            "description": "Must be able to submit quarterly financial reports via ETA system."
+          }
+        ]
+      },
       "required_sections": [
         {
           "id": "project_summary",
@@ -1313,7 +3359,12 @@
           "required": true,
           "max_pages": 3,
           "guidance": "Describe: labor market need, target population characteristics, gaps in services, why federal intervention needed. Use data.",
-          "components": ["market_need", "population", "gaps", "data"]
+          "components": [
+            "market_need",
+            "population",
+            "gaps",
+            "data"
+          ]
         },
         {
           "id": "project_description",
@@ -1321,13 +3372,22 @@
           "required": true,
           "max_pages": 15,
           "guidance": "Include: (1) program design, (2) services/activities, (3) target population, (4) partnerships, (5) timeline, (6) expected outcomes.",
-          "components": ["design", "services", "population", "partnerships", "timeline", "outcomes"]
+          "components": [
+            "design",
+            "services",
+            "population",
+            "partnerships",
+            "timeline",
+            "outcomes"
+          ]
         },
         {
           "id": "budget",
           "name": "Budget",
           "required": true,
-          "forms_required": ["SF424A"],
+          "forms_required": [
+            "SF424A"
+          ],
           "guidance": "Detailed budget. Many DOL programs require cost sharing - document match. Follow DOL cost principles."
         },
         {
@@ -1373,15 +3433,125 @@
           "can_generate": true,
           "generate_prompt": "Draft a letter of commitment from an employer for a DOL workforce grant"
         }
-      ]
+      ],
+      "compliance": {
+        "davis_bacon": {
+          "applies": true,
+          "conditional": "construction_training",
+          "description": "Applies to YouthBuild construction training and any DOL grant with construction component. Participants doing construction must be paid prevailing wages."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "HUD requirement. Not applicable to DOL."
+        },
+        "nepa": {
+          "applies": false,
+          "description": "DOL grants generally do not trigger NEPA review."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "Not applicable to DOL workforce grants."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit."
+        },
+        "irb": {
+          "applies": false,
+          "description": "Not applicable to DOL workforce grants."
+        },
+        "iacuc": {
+          "applies": false,
+          "description": "Not applicable to DOL grants."
+        },
+        "matching": {
+          "required": false,
+          "ratio": null,
+          "description": "Some DOL programs require cost sharing. EMPG requires 50/50. Check specific FOA."
+        },
+        "wioa_performance": {
+          "applies": true,
+          "description": "Six WIOA Primary Indicators: employment 2nd/4th quarter after exit, median earnings, credential attainment, measurable skill gains, employer effectiveness. Failure to meet targets triggers sanctions."
+        },
+        "eeo": {
+          "applies": true,
+          "description": "Must designate Equal Opportunity Officer, maintain EEO policies, provide language access for LEP individuals, and conduct periodic self-assessments per 29 CFR Part 38."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 15,
+        "max_rate": null,
+        "notes": "DOL follows 2 CFR 200 with DOL-specific deviations in 2 CFR Part 2900. Some FOAs cap admin/indirect costs at a percentage of the award (often 10%). Check each FOA."
+      },
+      "submission_portal": {
+        "name": "Grants.gov / DOL EGrants",
+        "url": "https://www.grants.gov",
+        "notes": "Competitive grants submitted through Grants.gov. Post-award management through DOL EGrants system."
+      },
+      "ai_context": "DOL proposals must demonstrate strong employer engagement and demand-driven workforce development. WIOA performance indicators are critical -- must track and report six specific outcome measures. YouthBuild requires construction skills training with Davis-Bacon compliance. Many programs require serving specific populations: disconnected youth, returning citizens, veterans. Logic models or theories of change typically required. DOL strongly emphasizes partnerships with employers and workforce boards. Quarterly financial (ETA-9130) and performance reports required."
     },
     "doj": {
       "name": "DOJ (Department of Justice)",
       "full_name": "United States Department of Justice",
-      "forms": ["SF424", "SF424A", "Project Narrative", "Budget", "Budget Justification", "Program Narrative", "Abstract"],
+      "forms": [
+        "SF424",
+        "SF424A",
+        "Project Narrative",
+        "Budget",
+        "Budget Justification",
+        "Program Narrative",
+        "Abstract"
+      ],
       "cfda": "16.575",
       "system": "Grants.gov / OJP Grants Management System",
-      "eligibility": "State and local governments, nonprofits, tribal organizations, educational institutions",
+      "eligibility": {
+        "eligible_applicants": [
+          "state_government",
+          "local_government",
+          "tribal_nation",
+          "nonprofit",
+          "university"
+        ],
+        "ineligible_applicants": [
+          "individual"
+        ],
+        "grant_type": "competitive",
+        "direct_apply": true,
+        "prerequisites": [
+          {
+            "id": "sam_gov",
+            "name": "SAM.gov Registration",
+            "required": true,
+            "description": "Active registration at SAM.gov is required."
+          },
+          {
+            "id": "uei",
+            "name": "Unique Entity Identifier (UEI)",
+            "required": true,
+            "description": "12-character identifier from SAM.gov."
+          },
+          {
+            "id": "grants_gov",
+            "name": "Grants.gov Account",
+            "required": true,
+            "description": "For initial application submission."
+          },
+          {
+            "id": "justgrants",
+            "name": "JustGrants Account",
+            "required": true,
+            "description": "DOJ JustGrants system (justicegrants.usdoj.gov) for application completion and award management."
+          },
+          {
+            "id": "doj_assurances",
+            "name": "DOJ Certified Standard Assurances",
+            "required": true,
+            "description": "Must acknowledge DOJ standard assurances in JustGrants."
+          }
+        ]
+      },
       "required_sections": [
         {
           "id": "project_abstract",
@@ -1396,7 +3566,12 @@
           "required": true,
           "max_pages": 5,
           "guidance": "Describe the crime/public safety problem: data, trends, root causes, impact on community. Show why intervention needed.",
-          "components": ["problem", "data", "trends", "impact"]
+          "components": [
+            "problem",
+            "data",
+            "trends",
+            "impact"
+          ]
         },
         {
           "id": "project_design",
@@ -1404,13 +3579,22 @@
           "required": true,
           "max_pages": 10,
           "guidance": "Describe: (1) goals/objectives, (2) activities/services, (3) how addresses problem, (4) innovation, (5) partnerships, (6) timeline.",
-          "components": ["goals", "activities", "approach", "innovation", "partnerships", "timeline"]
+          "components": [
+            "goals",
+            "activities",
+            "approach",
+            "innovation",
+            "partnerships",
+            "timeline"
+          ]
         },
         {
           "id": "budget",
           "name": "Budget",
           "required": true,
-          "forms_required": ["SF424A"],
+          "forms_required": [
+            "SF424A"
+          ],
           "guidance": "Complete detailed budget. DOJ requires cost sharing for some programs. Justify all costs."
         },
         {
@@ -1457,7 +3641,65 @@
           "can_generate": true,
           "generate_prompt": "Draft a memorandum of understanding between a grantee and law enforcement for a DOJ grant"
         }
-      ]
+      ],
+      "compliance": {
+        "davis_bacon": {
+          "applies": false,
+          "description": "DOJ grants rarely involve construction."
+        },
+        "section_3": {
+          "applies": false,
+          "description": "HUD requirement. Not applicable to DOJ."
+        },
+        "nepa": {
+          "applies": false,
+          "description": "DOJ grants typically do not trigger NEPA."
+        },
+        "buy_america": {
+          "applies": false,
+          "description": "Not applicable to DOJ grants."
+        },
+        "single_audit": {
+          "applies": true,
+          "threshold": 1000000,
+          "description": "Organizations spending $1M+ in federal funds per year must have a Single Audit."
+        },
+        "irb": {
+          "applies": true,
+          "conditional": "research_evaluation_grants",
+          "description": "IRB approval required for research and evaluation grants (NIJ, OJJDP research) involving human subjects. Privacy certificate also required."
+        },
+        "iacuc": {
+          "applies": false,
+          "description": "Not applicable to DOJ grants."
+        },
+        "matching": {
+          "required": false,
+          "ratio": null,
+          "description": "Some programs require cost sharing. Check specific NOFO. JAG formula does not require match."
+        },
+        "vawa_confidentiality": {
+          "applies": true,
+          "conditional": "ovw_grants",
+          "description": "OVW grants require strict victim confidentiality per VAWA. Cannot disclose personally identifying information without informed consent. Cannot require victims to participate in services as condition of receiving other services."
+        },
+        "performance_reporting": {
+          "applies": true,
+          "description": "All DOJ recipients must collect and report performance data demonstrating measurable results."
+        }
+      },
+      "indirect_cost_rules": {
+        "de_minimis_allowed": true,
+        "de_minimis_rate": 15,
+        "max_rate": null,
+        "notes": "DOJ accepts negotiated NICRA or de minimis 15%. DOJ Financial Guide 2024 governs cost principles. Check specific NOFO for additional restrictions."
+      },
+      "submission_portal": {
+        "name": "JustGrants",
+        "url": "https://justicegrants.usdoj.gov",
+        "notes": "Initial application via Grants.gov, then complete and manage in JustGrants. JustGrants replaced GMS as of October 2020."
+      },
+      "ai_context": "DOJ proposals must address crime/public safety problems with data on trends and impact. Key offices: BJA (justice assistance), OVW (violence against women), OJJDP (juvenile justice), COPS (policing), OVC (victims of crime). OVW grants have strict VAWA confidentiality requirements -- victim information cannot be shared without informed consent. JustGrants is the primary portal (different from Grants.gov). DOJ Financial Guide governs cost principles. Performance measurement plans required. Faith-based organizations eligible but cannot use funds for religious activities."
     }
   },
   "common_requirements": {
