@@ -4042,11 +4042,56 @@ def grant_checklist(grant_id):
     data = _build_checklist_data(grant_id, user_id, template_name)
     consistency_issues = validate_budget_consistency(grant_id)
 
+    # Check if consistency check has been run and passed
+    conn2 = get_db()
+    check_row = conn2.execute(
+        "SELECT completed FROM grant_checklist WHERE grant_id = ? AND item_type = 'consistency_check'",
+        (grant_id,)).fetchone()
+    conn2.close()
+    consistency_passed = bool(check_row and check_row['completed']) if check_row else False
+    # If there are issues, it can't be passed
+    if consistency_issues:
+        consistency_passed = False
+
     return render_template('grant_checklist.html',
                            grant=grant,
                            template_name=template_name,
                            consistency_issues=consistency_issues,
+                           consistency_passed=consistency_passed,
                            **data)
+
+
+@app.route('/grant/<grant_id>/run-consistency-check', methods=['POST'])
+@login_required
+@paid_required
+@csrf_required
+def run_consistency_check(grant_id):
+    """Run final consistency validation before submission."""
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    issues = validate_budget_consistency(grant_id)
+
+    conn = get_db()
+    user = get_current_user()
+    now = datetime.now().isoformat()
+
+    if not issues:
+        # Mark consistency check as passed
+        check_id = f"check-consistency-{grant_id}"
+        conn.execute(
+            """INSERT INTO grant_checklist (id, grant_id, user_id, item_type, item_name, description, required, completed, completed_at)
+               VALUES (?, ?, ?, 'consistency_check', 'Final Consistency Check', 'Automated validation of budget, titles, and personnel', TRUE, TRUE, ?)
+               ON CONFLICT (id) DO UPDATE SET completed = TRUE, completed_at = EXCLUDED.completed_at""",
+            (check_id, grant_id, user['id'], now))
+        conn.commit()
+        flash('Consistency check passed! Your application is ready to submit.', 'success')
+    else:
+        flash(f'Consistency check found {len(issues)} issue(s). Please fix them before submitting.', 'warning')
+
+    conn.close()
+    return redirect(url_for('grant_checklist', grant_id=grant_id))
 
 
 @app.route('/grant/<grant_id>/upload-document', methods=['POST'])

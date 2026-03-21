@@ -17,12 +17,12 @@
 <div class="card" style="margin-bottom: 2rem;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <h2 style="margin: 0;">Submission Readiness</h2>
-        <span style="font-size: 2rem; font-weight: 700; color: {% if readiness_pct >= 80 %}#10b981{% elif readiness_pct >= 50 %}#f59e0b{% else %}#dc3545{% endif %};">
+        <span style="font-size: 2rem; font-weight: 700; color: {% if readiness_pct >= 100 %}#10b981{% elif readiness_pct >= 50 %}#f59e0b{% else %}#dc3545{% endif %};">
             {{ readiness_pct }}%
         </span>
     </div>
     <div style="background: var(--bg-secondary, #1a1a2e); border-radius: 8px; height: 16px; overflow: hidden;">
-        <div style="background: {% if readiness_pct >= 80 %}#10b981{% elif readiness_pct >= 50 %}#f59e0b{% else %}#dc3545{% endif %}; height: 100%; width: {{ readiness_pct }}%; border-radius: 8px; transition: width 0.5s ease;"></div>
+        <div style="background: {% if readiness_pct >= 100 %}#10b981{% elif readiness_pct >= 50 %}#f59e0b{% else %}#dc3545{% endif %}; height: 100%; width: {{ readiness_pct }}%; border-radius: 8px; transition: width 0.5s ease;"></div>
     </div>
     <p style="color: var(--text-secondary); margin-top: 0.75rem; font-size: 0.9rem;">
         {{ completed_count }} of {{ total_required }} required items complete
@@ -195,14 +195,51 @@
     {% endif %}
 </div>
 
+{# ---- Print Draft (always available) ---- #}
+<div class="card" style="margin-bottom: 1.5rem; text-align: center; padding: 1.5rem;">
+    <h3 style="margin-bottom: 0.5rem;">Print Draft for Review</h3>
+    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
+        Print whatever you have so far. Draft PDFs are watermarked "DRAFT — NOT FOR SUBMISSION."
+    </p>
+    <a href="/grant/{{ grant.id }}/download/pdf?draft=1" class="btn btn-secondary" style="padding: 0.6rem 1.5rem;">
+        🖨️ Print Draft ({{ readiness_pct }}% complete)
+    </a>
+</div>
+
 {# ---- Generate Submission Package ---- #}
 <div class="card" style="margin-bottom: 2rem; text-align: center; padding: 2rem;">
-    {% if readiness_pct >= 100 %}
-    <h2 style="color: #10b981;">Ready to Submit!</h2>
-    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">All required items are complete. Generate your submission package.</p>
+    {% if readiness_pct >= 100 and consistency_passed %}
+    <h2 style="color: #10b981;">✓ Ready to Submit!</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">All required items are complete. Consistency check passed.</p>
+    <p style="color: #10b981; font-size: 0.85rem; margin-bottom: 1.5rem;">
+        Budget math verified · Titles consistent · Personnel matched · Page limits OK
+    </p>
     <a href="/grant/{{ grant.id }}/paper-submission" class="btn btn-success" style="font-size: 1.1rem; padding: 0.75rem 2rem;">
-        Generate Submission Package
+        Generate Final Submission Package
     </a>
+    {% elif readiness_pct >= 100 %}
+    <h2 style="color: #f59e0b;">Almost Ready — Consistency Check Required</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+        All items are checked, but a final consistency review is needed before submission.
+    </p>
+    {% if consistency_issues %}
+    <div style="text-align: left; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+        <h4 style="color: #f59e0b; margin-bottom: 0.5rem;">Issues Found:</h4>
+        <ul style="color: var(--text-secondary); font-size: 0.9rem; margin: 0; padding-left: 1.5rem;">
+        {% for issue in consistency_issues %}
+            <li style="margin-bottom: 0.4rem;">{{ issue }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    <p style="color: var(--text-muted); font-size: 0.85rem;">Fix these issues, then the package will be ready to generate.</p>
+    {% else %}
+    <form method="POST" action="/grant/{{ grant.id }}/run-consistency-check" style="display: inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-primary" style="font-size: 1.1rem; padding: 0.75rem 2rem;">
+            Run Final Consistency Check
+        </button>
+    </form>
+    {% endif %}
     {% else %}
     <h2 style="color: var(--text-muted);">Submission Package</h2>
     <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
