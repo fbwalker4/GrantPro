@@ -2289,24 +2289,20 @@ class GrantResearcher:
     def get_all_grants(self):
         """Get all known grants -- prefer DB-backed catalog, fall back to hardcoded."""
         try:
-            import sqlite3 as _sql
-            db_path = Path.home() / ".hermes" / "grant-system" / "tracking" / "grants.db"
-            if db_path.exists():
-                conn = _sql.connect(str(db_path))
-                conn.row_factory = _sql.Row
-                rows = conn.execute(
-                    "SELECT * FROM grants_catalog WHERE status = 'active' ORDER BY close_date ASC"
-                ).fetchall()
-                conn.close()
-                if rows:
-                    grants = []
-                    for r in rows:
-                        g = dict(r)
-                        # Ensure deadline key exists for backward compat
-                        if 'deadline' not in g:
-                            g['deadline'] = g.get('close_date', '')
-                        grants.append(g)
-                    return grants
+            from db_connection import get_connection
+            conn = get_connection()
+            rows = conn.execute(
+                "SELECT * FROM grants_catalog WHERE status = 'active' ORDER BY close_date ASC"
+            ).fetchall()
+            conn.close()
+            if rows:
+                grants = []
+                for r in rows:
+                    g = dict(r)
+                    if 'deadline' not in g:
+                        g['deadline'] = g.get('close_date', '')
+                    grants.append(g)
+                return grants
         except Exception:
             pass  # Fall back to hardcoded data
         return self._get_federal_grants()
@@ -2314,15 +2310,13 @@ class GrantResearcher:
     def get_grants_count(self):
         """Return count of active grants in the catalog DB."""
         try:
-            import sqlite3 as _sql
-            db_path = Path.home() / ".hermes" / "grant-system" / "tracking" / "grants.db"
-            if db_path.exists():
-                conn = _sql.connect(str(db_path))
-                count = conn.execute(
-                    "SELECT COUNT(*) FROM grants_catalog WHERE status = 'active'"
-                ).fetchone()[0]
-                conn.close()
-                return count
+            from db_connection import get_connection
+            conn = get_connection()
+            count = conn.execute(
+                "SELECT COUNT(*) FROM grants_catalog WHERE status = 'active'"
+            ).fetchone()[0]
+            conn.close()
+            return count
         except Exception:
             pass
         return len(self._get_federal_grants())
