@@ -26,30 +26,44 @@ from pathlib import Path
 
 
 # ---------------------------------------------------------------------------
-# Local SQLite path (unchanged from previous behaviour)
+# Load .env file for local development (if present)
 # ---------------------------------------------------------------------------
-_default_path = Path.home() / ".hermes" / "grant-system" / "tracking" / "grants.db"
-_env_path = os.getenv("DATABASE_PATH")
-if _env_path:
-    LOCAL_DB_PATH = Path(_env_path)
-elif os.getenv("VERCEL"):
-    LOCAL_DB_PATH = Path("/tmp/grants.db")
-else:
-    LOCAL_DB_PATH = _default_path
+def _load_dotenv():
+    """Load GP_ vars from .env file if it exists."""
+    for env_path in [
+        Path(__file__).parent.parent / ".env",
+        Path.home() / ".hermes" / "grant-system" / ".env",
+    ]:
+        if env_path.exists():
+            with open(env_path) as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        key, _, val = line.partition('=')
+                        os.environ.setdefault(key.strip(), val.strip())
+            break
+
+_load_dotenv()
+
 
 # ---------------------------------------------------------------------------
 # Supabase / Postgres configuration (GP- prefixed env vars)
 # ---------------------------------------------------------------------------
-# os.environ keys cannot contain hyphens on some shells, but Vercel injects
-# them fine.  We try both the hyphenated name and an underscore variant so
-# local .env loaders (which may auto-convert) also work.
 def _gp_env(name: str) -> str | None:
-    """Return env var trying GP-NAME then GP_NAME."""
-    return os.environ.get(f"GP-{name}") or os.environ.get(f"GP_{name}")
+    """Return env var trying GP_NAME then GP-NAME."""
+    return os.environ.get(f"GP_{name}") or os.environ.get(f"GP-{name}")
 
 GP_DATABASE_URL = _gp_env("DATABASE_URL")
 GP_SUPABASE_URL = _gp_env("SUPABASE_URL")
 GP_SUPABASE_KEY = _gp_env("SUPABASE_KEY")
+
+
+# ---------------------------------------------------------------------------
+# SQLite fallback path (emergency only — Supabase is primary for all envs)
+# ---------------------------------------------------------------------------
+LOCAL_DB_PATH = Path("/tmp/grants.db") if os.getenv("VERCEL") else (
+    Path.home() / ".hermes" / "grant-system" / "tracking" / "grants.db"
+)
 
 
 # ===================================================================
