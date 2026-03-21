@@ -389,6 +389,12 @@ def about():
     return render_template('about.html')
 
 
+@app.route('/how-it-works')
+def how_it_works():
+    """How It Works page - public"""
+    return render_template('how_it_works.html')
+
+
 @app.route('/pricing')
 def pricing():
     """Pricing page"""

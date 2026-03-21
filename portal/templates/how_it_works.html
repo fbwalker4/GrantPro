@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How It Works - Grant Pro</title>
+    <meta name="description" content="See exactly how Grant Pro works — from creating your free profile to submitting a complete, consistent grant application. Step-by-step walkthrough.">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%232563eb'/%3E%3Cstop offset='100%25' stop-color='%231d4ed8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='20' y='26' text-anchor='middle' fill='white' font-family='Inter,Helvetica,Arial,sans-serif' font-weight='700' font-size='16'%3EGP%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fc;
+            --bg-tertiary: #f1f3f6;
+            --border-color: #e2e5ed;
+            --text-primary: #1a1f36;
+            --text-secondary: #5e6278;
+            --text-muted: #8993a4;
+            --accent-primary: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-success: #059669;
+            --accent-warning: #d97706;
+            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.875rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg { width: 22px; height: 22px; fill: white; }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.15s;
+        }
+
+        .nav a:hover { color: var(--text-primary); }
+        .nav a.active { color: var(--accent-primary); font-weight: 600; }
+
+        .nav-btn {
+            background: var(--gradient-primary);
+            color: white !important;
+            padding: 0.6rem 1.25rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .nav-btn:hover { box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+
+        .mobile-nav {
+            display: none;
+            flex-direction: column;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 2rem 1rem;
+        }
+
+        .mobile-nav.open { display: flex; }
+        .mobile-nav a { padding: 0.6rem 0; color: var(--text-secondary); text-decoration: none; font-weight: 500; font-size: 0.95rem; border-bottom: 1px solid var(--border-color); }
+        .mobile-nav a:last-child { border-bottom: none; }
+
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .hamburger svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--text-primary);
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            text-align: center;
+            padding: 4rem 2rem 3rem;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .hero h1 span {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Steps */
+        .steps-container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 2rem 2rem 4rem;
+        }
+
+        .step {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.75rem;
+            vertical-align: middle;
+        }
+
+        .badge-free {
+            background: #ecfdf5;
+            color: var(--accent-success);
+        }
+
+        .badge-paid {
+            background: #eff6ff;
+            color: var(--accent-primary);
+        }
+
+        .step h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .step-desc {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.7;
+        }
+
+        .step-details {
+            list-style: none;
+            margin-bottom: 1.25rem;
+        }
+
+        .step-details li {
+            padding: 0.4rem 0;
+            padding-left: 1.75rem;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .step-details li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0.7rem;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            opacity: 0.6;
+        }
+
+        .step-quote {
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--accent-primary);
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Connector line between steps */
+        .step::after {
+            content: "";
+            position: absolute;
+            bottom: -2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 2rem;
+            background: var(--border-color);
+        }
+
+        .step:last-child::after {
+            display: none;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--accent-primary);
+            padding: 3rem 2.5rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .cta-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .cta-section p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .cta-btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .cta-btn-primary:hover {
+            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+        }
+
+        .cta-btn-outline {
+            border: 2px solid var(--accent-primary);
+            color: var(--accent-primary);
+            background: transparent;
+        }
+
+        .cta-btn-outline:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-top: 2rem;
+        }
+
+        .footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: var(--accent-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav { display: none; }
+            .hamburger { display: block; }
+
+            .hero { padding: 3rem 1.5rem 2rem; }
+            .hero h1 { font-size: 2rem; }
+            .hero p { font-size: 1rem; }
+
+            .steps-container { padding: 1.5rem 1rem 3rem; }
+            .step { padding: 1.75rem 1.5rem; }
+            .step h2 { font-size: 1.25rem; }
+
+            .cta-section { padding: 2rem 1.5rem; }
+            .cta-section h2 { font-size: 1.5rem; }
+            .cta-buttons { flex-direction: column; align-items: center; }
+            .cta-btn { width: 100%; max-width: 300px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo" aria-label="Grant Pro home">
+                <div class="logo-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" role="img" aria-label="Grant Pro logo"><defs><linearGradient id="gp-hdr" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2563eb"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs><rect width="40" height="40" rx="8" fill="url(#gp-hdr)"/><text x="20" y="26" text-anchor="middle" fill="white" font-family="Inter,Helvetica,Arial,sans-serif" font-weight="700" font-size="16">GP</text></svg>
+                </div>
+                <span class="logo-text">Grant Pro</span>
+            </a>
+            <nav class="nav" role="navigation" aria-label="Main navigation">
+                <a href="/">Home</a>
+                <a href="/how-it-works" class="active">How It Works</a>
+                <a href="/search">Search Grants</a>
+                <a href="/guide">Grant Writing Guide</a>
+                <a href="/pricing">Pricing</a>
+                <a href="/login">Sign In</a>
+                <a href="/signup?plan=monthly" class="nav-btn">Get Started</a>
+            </nav>
+            <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileNav">
+                <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="mobile-nav" id="mobileNav" role="navigation" aria-label="Mobile navigation">
+            <a href="/">Home</a>
+            <a href="/how-it-works">How It Works</a>
+            <a href="/search">Search Grants</a>
+            <a href="/guide">Grant Writing Guide</a>
+            <a href="/pricing">Pricing</a>
+            <a href="/login">Sign In</a>
+            <a href="/signup?plan=monthly" class="nav-btn">Get Started</a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>How <span>Grant Pro</span> Works</h1>
+        <p>From sign-up to submission in 8 steps. See exactly how the platform guides you through every stage of a winning grant application.</p>
+    </section>
+
+    <div class="steps-container">
+
+        <!-- Step 1 -->
+        <div class="step">
+            <div class="step-number">1</div>
+            <h2>Create Your Profile <span class="step-badge badge-free">Free</span></h2>
+            <p class="step-desc">Your organization profile is the foundation for everything Grant Pro does. The more complete it is, the better your AI-generated content and the more accurate your eligibility matching.</p>
+            <ul class="step-details">
+                <li>Sign up with your email &mdash; no credit card required</li>
+                <li>Complete your organization profile: name, EIN, UEI, address, and mission statement</li>
+                <li>Fill out the Grant Readiness Profile: applicant type, SAM.gov registration status, and federal registrations</li>
+                <li>Add key personnel, board members, and organizational capacity details</li>
+            </ul>
+            <div class="step-quote">The more you tell us, the better your AI-generated content and the more accurate your eligibility matching.</div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step">
+            <div class="step-number">2</div>
+            <h2>Find Your Grant <span class="step-badge badge-free">Free</span></h2>
+            <p class="step-desc">Use our research tools to find the grants you actually qualify for. No more wasting weeks chasing grants you were never eligible for.</p>
+            <ul class="step-details">
+                <li>Use the <strong>Grant Finder Wizard</strong> &mdash; answer 3 questions and get ranked matches based on your organization profile</li>
+                <li>Or browse the full database with filters: agency, category, funding amount, deadline</li>
+                <li>Or search by keyword across thousands of federal grant opportunities</li>
+                <li>Eligibility screening automatically checks which grants your organization qualifies for</li>
+                <li>Ineligible grants are clearly flagged so you can focus your time on real opportunities</li>
+            </ul>
+            <div class="step-quote">Ineligible grants are flagged so you don't waste time on grants you can't get.</div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step">
+            <div class="step-number">3</div>
+            <h2>Build Your Budget <span class="step-badge badge-paid">$19.95/mo</span></h2>
+            <p class="step-desc">The Budget Builder creates a detailed, accurate budget that becomes the single source of truth for your entire application. Every section references these exact numbers.</p>
+            <ul class="step-details">
+                <li>Use the <strong>Budget Builder</strong> to enter your actual line items by category</li>
+                <li>Personnel: name each person, their role, level of effort (%), and salary</li>
+                <li>The system auto-calculates fringe benefits, MTDC (Modified Total Direct Costs), and indirect costs based on your rate</li>
+                <li>Add travel, equipment, supplies, contractual, and other direct cost categories</li>
+                <li>Your budget becomes the single source of truth &mdash; every narrative section references these exact numbers</li>
+            </ul>
+            <div class="step-quote">No more budget inconsistencies across sections. Change a number once, and it updates everywhere.</div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step">
+            <div class="step-number">4</div>
+            <h2>Generate Your Application <span class="step-badge badge-paid">$19.95/mo</span></h2>
+            <p class="step-desc">AI writes each section using your organization data, your budget numbers, and the specific agency template. You review and refine &mdash; the AI drafts, you make it yours.</p>
+            <ul class="step-details">
+                <li>AI generates each section using your org profile + budget data + the agency's template requirements</li>
+                <li>Each section sees the previous ones &mdash; consistent project title, personnel names, and budget numbers throughout</li>
+                <li>Review and edit each section directly in the editor</li>
+                <li>Character and word counter shows you're within page limits before you submit</li>
+                <li>Regenerate any section if you want a different approach or emphasis</li>
+            </ul>
+            <div class="step-quote">The AI drafts, you refine. Every section is specific to YOUR organization, YOUR budget, and YOUR project.</div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="step">
+            <div class="step-number">5</div>
+            <h2>Complete the Checklist <span class="step-badge badge-paid">$19.95/mo</span></h2>
+            <p class="step-desc">The submission checklist tracks every single requirement &mdash; forms, narrative sections, supporting documents, and certifications. Nothing gets missed.</p>
+            <ul class="step-details">
+                <li>Submission checklist tracks EVERY requirement: SF-424 forms, narrative sections, supporting documents, and certifications</li>
+                <li>Upload letters of support, MOUs, organizational charts, resumes, and other attachments</li>
+                <li>AI can draft MOUs and letters of support for you to customize and send to partners</li>
+                <li>Self-certify required items: SAM.gov active registration, Grants.gov account created, board authorization obtained</li>
+                <li>Visual progress bar shows exactly how close you are to a complete submission package</li>
+            </ul>
+            <div class="step-quote">Nothing submits until every box is checked &mdash; no missing forms, no incomplete sections, no last-minute scrambles.</div>
+        </div>
+
+        <!-- Step 6 -->
+        <div class="step">
+            <div class="step-number">6</div>
+            <h2>Final Consistency Check <span class="step-badge badge-paid">$19.95/mo</span></h2>
+            <p class="step-desc">Before you submit, our AI reviewer reads your entire application and checks for the cross-section inconsistencies that get grants rejected.</p>
+            <ul class="step-details">
+                <li>AI reviews the entire application for cross-section consistency</li>
+                <li>Checks budget math: do personnel costs match the budget justification? Do totals add up?</li>
+                <li>Checks consistency: project title, personnel names, indirect cost rate, and timeline match across all sections</li>
+                <li>Rule-based validation catches page limits, missing required sections, and funding amount mismatches</li>
+                <li>Get a clear report of issues to fix before submission</li>
+            </ul>
+            <div class="step-quote">Our AI reviewer catches the mistakes that get grants rejected &mdash; before you submit.</div>
+        </div>
+
+        <!-- Step 7 -->
+        <div class="step">
+            <div class="step-number">7</div>
+            <h2>Generate &amp; Submit <span class="step-badge badge-paid">$19.95/mo</span></h2>
+            <p class="step-desc">One click generates your complete submission package. Download it, print it, or use our guided submission mode to paste directly into the grant portal.</p>
+            <ul class="step-details">
+                <li>Download a final <strong>PDF</strong> (unbranded, clean formatting) for paper or email submission</li>
+                <li>Use <strong>Guided Submission</strong> for online portals &mdash; copy-paste each field with progress tracking</li>
+                <li>Download as <strong>DOCX</strong> for editing in Word or Google Docs</li>
+                <li>Download as <strong>TXT</strong> for plain text portal fields</li>
+                <li>Print a draft anytime for board review or internal sign-off</li>
+            </ul>
+            <div class="step-quote">One click generates your complete submission package &mdash; formatted, consistent, and ready to go.</div>
+        </div>
+
+        <!-- Step 8 -->
+        <div class="step">
+            <div class="step-number">8</div>
+            <h2>Track &amp; Reuse <span class="step-badge badge-paid">$19.95/mo</span></h2>
+            <p class="step-desc">After submission, track your application status and reuse your work for the next funding cycle. The hardest grant is the first one &mdash; after that, you clone and update.</p>
+            <ul class="step-details">
+                <li>Mark as submitted with your confirmation number for your records</li>
+                <li>Track status through the lifecycle: submitted, under review, funded, or rejected</li>
+                <li>Clone any application for next year's funding cycle &mdash; update the budget and timeline, keep the narrative</li>
+                <li>Deadline reminders with calendar export so you never miss a resubmission window</li>
+            </ul>
+            <div class="step-quote">The hardest grant is the first one. After that, you clone, update, and resubmit in a fraction of the time.</div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-section">
+            <h2>Ready to get started?</h2>
+            <p>Create your free account, find grants you qualify for, and start writing today.</p>
+            <div class="cta-buttons">
+                <a href="/signup" class="cta-btn cta-btn-primary">Start Free</a>
+                <a href="/pricing" class="cta-btn cta-btn-outline">View Pricing</a>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 Grant Pro by Futurespec Consulting &middot; <a href="/terms">Terms</a> &middot; <a href="/privacy">Privacy</a> &middot; <a href="/contact">Contact</a></p>
+    </footer>
+
+    <script>
+    (function() {
+        var btn = document.getElementById('hamburger');
+        var nav = document.getElementById('mobileNav');
+        if (btn && nav) {
+            btn.addEventListener('click', function() {
+                nav.classList.toggle('open');
+                btn.setAttribute('aria-expanded', nav.classList.contains('open'));
+            });
+        }
+    })();
+    </script>
+</body>
+</html>
