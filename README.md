@@ -16,19 +16,25 @@ An end-to-end grant writing platform powered by Google Gemini AI. Built for cons
 4. [Database Schema](#database-schema)
 5. [Route Map](#route-map)
 6. [Features](#features)
-7. [Template System](#template-system)
-8. [Subscription Model](#subscription-model)
-9. [Grants.gov Integration](#grantsgov-integration)
-10. [Automated Jobs](#automated-jobs)
-11. [Award Detection & Testimonials](#award-detection--testimonials)
-12. [PDF Branding](#pdf-branding)
-13. [Environment Variables](#environment-variables)
-14. [Getting Started](#getting-started)
-15. [Production Deployment](#production-deployment)
-16. [Vercel Deployment](#vercel-deployment)
-17. [Security](#security)
-18. [File Reference](#file-reference)
-19. [Changelog](#changelog)
+7. [Grant Readiness Profile](#grant-readiness-profile)
+8. [Eligibility Screening](#eligibility-screening)
+9. [Agency Regulatory Intelligence](#agency-regulatory-intelligence)
+10. [Submission Checklist](#submission-checklist)
+11. [Document Upload & MOU Generator](#document-upload--mou-generator)
+12. [AI Generation with Regulatory Context](#ai-generation-with-regulatory-context)
+13. [Template System](#template-system)
+14. [Subscription Model](#subscription-model)
+15. [Grants.gov Integration](#grantsgov-integration)
+16. [Automated Jobs](#automated-jobs)
+17. [Award Detection & Testimonials](#award-detection--testimonials)
+18. [PDF Branding](#pdf-branding)
+19. [Environment Variables](#environment-variables)
+20. [Getting Started](#getting-started)
+21. [Production Deployment](#production-deployment)
+22. [Vercel Deployment](#vercel-deployment)
+23. [Security](#security)
+24. [File Reference](#file-reference)
+25. [Changelog](#changelog)
 
 ---
 
@@ -658,6 +664,136 @@ All routes are defined in `portal/app.py`. Decorators are listed in order of app
 
 ---
 
+## Grant Readiness Profile
+
+The onboarding wizard now collects a comprehensive Grant Readiness Profile that drives eligibility screening across the entire platform. This smart onboarding replaces the original basic org-details wizard with a structured assessment of federal grant readiness.
+
+### What It Collects
+
+- **Applicant Type**: The user's organization category (nonprofit 501(c)(3), state government, local government, tribal, institution of higher education, small business, individual, etc.). This maps directly to the `eligible_applicant_types` field in agency templates.
+- **Federal Registrations**: Whether the organization has an active SAM.gov registration, a Unique Entity Identifier (UEI), and a Grants.gov account. These are prerequisites for virtually all federal grants.
+- **Capacity Indicators**: Whether the organization has construction/renovation experience, a dedicated grants administrator, and the largest grant previously managed. These inform eligibility for programs with capacity requirements (e.g., HUD, FEMA, DOT construction grants).
+- **Funding Preferences**: Preferred funding range and focus areas, used to prioritize the grants catalog.
+
+### How It Drives the System
+
+The profile data is stored in the user's record and referenced throughout the platform:
+
+1. **Grants list**: Each grant is checked against the user's applicant type and registration status. Ineligible grants are visually flagged.
+2. **AI generation**: The full profile is injected into AI prompts so generated content reflects the organization's actual capacity and type.
+3. **Checklist**: Missing registrations (SAM.gov, UEI) surface as warnings on the submission checklist.
+4. **Wizard recommendations**: Grant matching weights profile data alongside focus areas and funding range.
+
+---
+
+## Eligibility Screening
+
+The grants catalog now performs real-time eligibility screening against the user's Grant Readiness Profile. Every grant in the list is evaluated before display.
+
+### How It Works
+
+- Each agency template defines `eligible_applicant_types` (e.g., HUD grants require state/local government or nonprofit; SBIR requires small businesses).
+- When a user views the grants list, the system compares their profile's applicant type against each grant's eligible types.
+- **Ineligible grants** are shown grayed out with a clear explanation of why (e.g., "This grant requires a state or local government applicant").
+- **Formula/entitlement grants** (non-competitive programs distributed by formula) are blocked with an explanation that they are not discretionary competitive grants.
+- **Warning badges** appear for missing prerequisites: no SAM.gov registration, no UEI, no Grants.gov account. These do not block the grant but alert the user to complete registration before applying.
+- Eligible grants display normally with full interaction available.
+
+### Visual Indicators
+
+| Badge | Meaning |
+|-------|---------|
+| Grayed-out card | Applicant type not eligible for this program |
+| "Formula Grant" label | Non-competitive; not available for application |
+| SAM.gov warning | User has not confirmed active SAM.gov registration |
+| UEI warning | User has not provided a Unique Entity Identifier |
+
+---
+
+## Agency Regulatory Intelligence
+
+All 21 agency templates have been enriched with comprehensive regulatory and compliance metadata. This data is sourced from `research/agency_compliance_batch1.json` and `research/agency_regulatory_requirements_batch2.json` and integrated into the template system.
+
+### What Each Template Now Includes
+
+- **Eligible Applicant Types**: Explicit list of organization types that can apply (e.g., nonprofits, state agencies, tribal governments, institutions of higher education). Used for eligibility screening.
+- **Compliance Requirements**: Agency-specific regulatory obligations that apply to funded projects. Examples:
+  - **Davis-Bacon Act**: Prevailing wage requirements for construction projects (HUD, DOT, FEMA)
+  - **Section 3**: Economic opportunities for low-income residents (HUD)
+  - **NEPA**: National Environmental Policy Act environmental review (DOE, DOT, HUD, FEMA)
+  - **Buy America / Buy American Act**: Domestic sourcing requirements (DOT, FEMA, DOD)
+  - **IRB (Institutional Review Board)**: Human subjects research protections (NIH, NSF, DOJ)
+  - **OMB Uniform Guidance (2 CFR 200)**: Federal cost principles and audit requirements (all agencies)
+  - **Single Audit (A-133)**: Required for organizations expending $750K+ in federal awards
+- **Indirect Cost Rate Rules**: Whether the agency accepts a negotiated indirect cost rate agreement (NICRA), offers a de minimis 10% rate, or has agency-specific caps.
+- **Submission Portal Information**: The specific portal for submission (Grants.gov, Research.gov, NSPIRES, eBRAP, etc.) and any agency-specific submission system requirements.
+- **AI Context Guidance**: Structured notes that are injected into AI generation prompts so the AI references the correct compliance framework when generating narrative content.
+
+---
+
+## Submission Checklist
+
+The submission checklist (`portal/templates/grant_checklist.html`) provides a comprehensive pre-submission readiness tracker. Nothing submits until every item is checked.
+
+### Checklist Categories
+
+- **Standard Forms**: SF-424, SF-424A (Budget), SF-424B (Assurances), and any agency-specific forms. Pre-filled where possible from organization data.
+- **Narrative Sections**: Every required section from the agency template, tracked for completion. Links directly to the section editor.
+- **Required Documents**: Documents required by the specific agency template (e.g., letters of support, organizational chart, audit report, indirect cost rate agreement). Tracked via the document upload system.
+- **Self-Certifications**: Attestations required by the funding agency (lobbying disclosure, drug-free workplace, debarment/suspension). Presented as checkboxes.
+- **Consistency Checks**: Automated validation that catches common errors:
+  - Budget total matches the requested amount in SF-424
+  - Project dates are within the grant's period of performance
+  - All required sections have content (not blank)
+  - Organization name is consistent across all forms
+
+### Workflow
+
+1. User opens the checklist from the grant application page
+2. Items are auto-checked as sections are completed and documents uploaded
+3. Manual items (self-certifications) require explicit user confirmation
+4. A progress bar shows overall completion percentage
+5. **Print Draft** is available at any time to generate a PDF of the current application state
+6. The "Submit" action is only enabled when the checklist reaches 100%
+
+---
+
+## Document Upload & MOU Generator
+
+### Document Uploads
+
+Users can upload supporting documents required by the grant application. Each agency template specifies which documents are required (e.g., letters of support, organizational charts, audit reports, indirect cost rate agreements).
+
+- Uploaded documents are stored in the `documents/` directory and tracked in the `documents` database table
+- Each document is associated with a specific grant application and document type
+- The submission checklist tracks which required documents have been uploaded and which are still missing
+- Supported formats: PDF, DOCX, DOC, JPG, PNG
+
+### MOU / Letter Generator
+
+The system can generate draft Memoranda of Understanding (MOUs) and letters of support using AI:
+
+- **MOU drafts**: Generated based on the grant's scope of work, partner organizations, and roles. The AI uses the agency template's compliance requirements to include relevant regulatory language.
+- **Letters of support**: Draft letters for partner organizations, pre-populated with project details and the partner's role. Users can customize and send to partners for signature.
+- Generated drafts are saved to the `drafts/` directory and can be downloaded as DOCX or PDF
+- All generated documents reference the grant's specific agency template for regulatory accuracy
+
+---
+
+## AI Generation with Regulatory Context
+
+AI content generation now operates with full regulatory awareness. When generating any section of a grant application, the AI receives:
+
+1. **Agency-specific compliance rules**: The full set of regulatory requirements from the agency template (Davis-Bacon, NEPA, Section 3, Buy America, etc.). The AI references applicable regulations in narrative sections where relevant.
+2. **User's Grant Readiness Profile**: The organization's type, capacity indicators, federal registrations, and funding history. This ensures generated content accurately reflects the applicant's qualifications and experience.
+3. **Template guidance**: Section-specific instructions including page limits, character limits, required components, and agency-specific formatting expectations.
+4. **Indirect cost rate context**: Whether to reference a NICRA, de minimis rate, or agency-specific cap in budget justification narratives.
+5. **Submission portal context**: References to the correct submission system in procedural sections.
+
+This contextual injection ensures that AI-generated narratives are not generic boilerplate but are tailored to the specific agency's expectations, the specific grant program's requirements, and the applicant's actual organizational profile.
+
+---
+
 ## Template System
 
 ### 21 Agency Templates
@@ -1108,6 +1244,9 @@ A custom WSGI middleware (`_ServerHeaderStripper`) overrides the `Server` header
 | `portal/templates/testimonial_form.html` | Token-based testimonial submission form |
 | `portal/templates/testimonial_thankyou.html` | Testimonial submission confirmation page |
 | `portal/templates/admin_testimonials.html` | Admin testimonial approval workflow |
+| `research/agency_compliance_batch1.json` | Agency regulatory compliance data (batch 1: eligible types, compliance rules, indirect costs) |
+| `research/agency_regulatory_requirements_batch2.json` | Agency regulatory compliance data (batch 2: additional agencies and submission portals) |
+| `portal/templates/grant_checklist.html` | Submission readiness checklist (forms, narratives, documents, certifications, consistency checks) |
 | `AI_PROMPTS.md` | Prompt templates for AI section generation |
 | `INTAKE_QUESTIONS.md` | 37 client intake questions |
 | `DOCUMENT_CHECKLIST.md` | Required documents by grant type |
@@ -1121,6 +1260,26 @@ A custom WSGI middleware (`_ServerHeaderStripper`) overrides the `Server` header
 ---
 
 ## Changelog
+
+### 2026-03-21 (Waves 12-13: Regulatory Intelligence & Submission Readiness)
+
+- Added agency regulatory compliance data for all 21 templates (`research/agency_compliance_batch1.json`, `research/agency_regulatory_requirements_batch2.json`)
+- Enriched every agency template with eligible applicant types, compliance requirements (Davis-Bacon, Section 3, NEPA, Buy America, IRB, OMB Uniform Guidance), indirect cost rate rules, and submission portal information
+- Added AI context guidance fields to templates for regulatory-aware content generation
+- Added submission checklist page (`portal/templates/grant_checklist.html`) with standard forms, narrative sections, required documents, self-certifications, and consistency checks
+- Added document upload tracking per agency template requirements
+- Added MOU and letter of support draft generation via AI
+- Added Print Draft functionality for in-progress applications
+- Submit action now gated behind 100% checklist completion
+
+### 2026-03-21 (Steps 1-4: Grant Readiness Profile & Eligibility Screening)
+
+- Expanded onboarding wizard to collect Grant Readiness Profile: applicant type, SAM.gov/UEI/Grants.gov registration status, capacity indicators (construction experience, grants admin, largest grant managed), and funding preferences
+- Added real-time eligibility screening on grants list: ineligible grants shown grayed out with explanation
+- Added formula/entitlement grant blocking with non-competitive program explanation
+- Added warning badges for missing federal prerequisites (SAM.gov, UEI, Grants.gov)
+- AI generation now receives full regulatory context (agency compliance rules, user profile, template guidance, indirect cost rate rules, submission portal info)
+- Profile data injected into all AI prompts for organization-accurate content generation
 
 ### 2026-03-20 (Wave 11: Supabase Postgres Migration)
 
