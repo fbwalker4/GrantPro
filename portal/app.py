@@ -79,8 +79,8 @@ app.wsgi_app = _ServerHeaderStripper(app.wsgi_app, header_value='GrantPro')
 # ============ END WSGI MIDDLEWARE =================================
 
 
-# Secure secret key - use environment variable or generate random
-app.secret_key = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
+# Secure secret key - use GP_ prefixed env var, then fallback
+app.secret_key = os.environ.get('GP_SECRET_KEY') or os.environ.get('SECRET_KEY') or secrets.token_hex(32)
 
 # Store the key in a file for persistence if generated (skip on Vercel/serverless)
 if not os.environ.get('SECRET_KEY') and not os.environ.get('VERCEL'):
@@ -2366,18 +2366,19 @@ Write the complete section content now:"""
         import os
         from google import genai
         
-        # Get API key from .env file
-        api_key = None
-        env_path = os.path.expanduser('~/.hermes/.env')
-        if os.path.exists(env_path):
-            with open(env_path) as f:
-                for line in f:
-                    if line.startswith('GOOGLE_API_KEY='):
-                        api_key = line.split('=', 1)[1].strip()
-                        if api_key == '***' or not api_key:
-                            api_key = None
-                        break
-        
+        # Get API key — check GP_ prefixed env var first, then .env file
+        api_key = os.environ.get('GP_GOOGLE_API_KEY') or os.environ.get('GOOGLE_API_KEY')
+        if not api_key:
+            env_path = os.path.expanduser('~/.hermes/.env')
+            if os.path.exists(env_path):
+                with open(env_path) as f:
+                    for line in f:
+                        if line.startswith('GOOGLE_API_KEY='):
+                            api_key = line.split('=', 1)[1].strip()
+                            if api_key == '***' or not api_key:
+                                api_key = None
+                            break
+
         if not api_key:
             # Fall back to template if no API key
             generated_content = f"""# {section_info.get('name', section_id)}
@@ -4093,7 +4094,6 @@ def validate_budget_consistency(grant_id):
     # Check 4: personnel mentioned in budget should appear in key personnel section
     personnel_content = sections.get('biographical_sketches', '') or sections.get('biographical', '') or sections.get('key_personnel', '')
     if budget_content and personnel_content:
-        # Simple heuristic: if "personnel" or "salary" in budget but bio section is very short
         if ('personnel' in budget_content.lower() or 'salary' in budget_content.lower()):
             if len(personnel_content) < 200:
                 issues.append({
@@ -4101,6 +4101,95 @@ def validate_budget_consistency(grant_id):
                     'message': 'Budget mentions personnel costs but biographical section is brief. Ensure all key personnel are documented.',
                     'severity': 'warning'
                 })
+
+    # Check 5: Dollar amounts between budget and justification should match
+    if budget_content and budget_just_content and grant_amount > 0:
+        import re
+        def extract_totals(text):
+            """Find dollar amounts near 'total' keywords."""
+            totals = []
+            for match in re.finditer(r'(?:total|TOTAL|Total)[^\$]{0,30}\$([\d,]+)', text):
+                try:
+                    totals.append(float(match.group(1).replace(',', '')))
+                except ValueError:
+                    pass
+            return totals
+
+        budget_totals = extract_totals(budget_content)
+        just_totals = extract_totals(budget_just_content)
+
+        if budget_totals and just_totals:
+            bt = max(budget_totals)
+            jt = max(just_totals)
+            if abs(bt - jt) > 100 and bt > 0 and jt > 0:
+                issues.append({
+                    'title': 'Budget vs Justification Mismatch',
+                    'message': f'Budget total (${bt:,.0f}) differs from Budget Justification total (${jt:,.0f}). These must match exactly.',
+                    'severity': 'error'
+                })
+
+    # Check 6: Project title consistency across ALL sections
+    all_content = ' '.join(sections.values())
+    grant_title = grant.get('grant_name', '')
+    if grant_title and len(grant_title) > 10:
+        # Check for alternative project titles (different names in different sections)
+        import re
+        title_patterns = re.findall(r'(?:project|initiative|program)\s+(?:titled?|called?|named?)\s+["\']([^"\']+)["\']', all_content, re.IGNORECASE)
+        unique_titles = set(t.strip().lower() for t in title_patterns if len(t) > 5)
+        if len(unique_titles) > 1:
+            issues.append({
+                'title': 'Multiple Project Titles',
+                'message': f'Found {len(unique_titles)} different project titles across sections. Use one consistent title throughout.',
+                'severity': 'error'
+            })
+
+    # Check 7: Indirect cost rate consistency
+    if budget_content:
+        import re
+        rate_matches = re.findall(r'(\d+(?:\.\d+)?)\s*%\s*(?:indirect|IDC|MTDC|de minimis|F&A)', budget_content, re.IGNORECASE)
+        rate_matches += re.findall(r'(?:indirect|IDC|MTDC|de minimis|F&A)\s*(?:rate|cost)?\s*(?:of|at|is)?\s*(\d+(?:\.\d+)?)\s*%', budget_content, re.IGNORECASE)
+        if budget_just_content:
+            rate_matches += re.findall(r'(\d+(?:\.\d+)?)\s*%\s*(?:indirect|IDC|MTDC|de minimis|F&A)', budget_just_content, re.IGNORECASE)
+
+        rates = set()
+        for r in rate_matches:
+            try:
+                rates.add(float(r))
+            except ValueError:
+                pass
+        if len(rates) > 1:
+            issues.append({
+                'title': 'Inconsistent Indirect Cost Rate',
+                'message': f'Multiple indirect cost rates found: {", ".join(f"{r}%" for r in sorted(rates))}. Use one consistent rate.',
+                'severity': 'error'
+            })
+
+    # Check 8: Section completeness — all required sections should have substantial content
+    template_name = grant.get('template', 'generic')
+    try:
+        with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates', 'agency_templates.json')) as tf:
+            tmpls = json.load(tf)
+        tmpl_sections = tmpls.get('agencies', {}).get(template_name, {}).get('required_sections', [])
+        for ts in tmpl_sections:
+            sid = ts.get('id', '')
+            content = sections.get(sid, '')
+            max_pages = ts.get('max_pages')
+            if ts.get('required', True) and not content:
+                issues.append({
+                    'title': f'Missing Required Section: {ts.get("name", sid)}',
+                    'message': f'The {ts.get("name", sid)} section is required but has no content.',
+                    'severity': 'error'
+                })
+            elif content and max_pages and max_pages > 0:
+                est_pages = len(content) / 3000
+                if est_pages > max_pages * 1.2:
+                    issues.append({
+                        'title': f'Section Over Page Limit: {ts.get("name", sid)}',
+                        'message': f'Estimated {est_pages:.1f} pages but limit is {max_pages}. Reduce content.',
+                        'severity': 'warning'
+                    })
+    except Exception:
+        pass
 
     return issues
 
@@ -4495,16 +4584,17 @@ Write the complete document now:"""
         import os
         from google import genai
 
-        api_key = None
-        env_path = os.path.expanduser('~/.hermes/.env')
-        if os.path.exists(env_path):
-            with open(env_path) as f:
-                for line in f:
-                    if line.startswith('GOOGLE_API_KEY='):
-                        api_key = line.split('=', 1)[1].strip()
-                        if api_key == '***' or not api_key:
-                            api_key = None
-                        break
+        api_key = os.environ.get('GP_GOOGLE_API_KEY') or os.environ.get('GOOGLE_API_KEY')
+        if not api_key:
+            env_path = os.path.expanduser('~/.hermes/.env')
+            if os.path.exists(env_path):
+                with open(env_path) as f:
+                    for line in f:
+                        if line.startswith('GOOGLE_API_KEY='):
+                            api_key = line.split('=', 1)[1].strip()
+                            if api_key == '***' or not api_key:
+                                api_key = None
+                            break
 
         if api_key:
             max_retries = 3
