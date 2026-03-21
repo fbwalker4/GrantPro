@@ -27,15 +27,32 @@ def health():
         steps.append(f"raw GP_DATABASE_URL env: {'SET (' + raw_url[:30] + '...)' if raw_url != 'NONE' else 'NONE'}")
         steps.append(f"VERCEL={os.environ.get('VERCEL', 'not set')}")
 
-        # Test direct connection
+        # Test psycopg2 import
+        try:
+            import psycopg2
+            steps.append(f"psycopg2 imported OK: {psycopg2.__version__}")
+        except ImportError as ie:
+            steps.append(f"psycopg2 IMPORT FAILED: {ie}")
+
+        # Test direct Postgres connection
+        try:
+            url = os.environ.get('GP_DATABASE_URL')
+            import psycopg2 as pg2
+            raw = pg2.connect(url)
+            cur = raw.cursor()
+            cur.execute("SELECT COUNT(*) FROM users")
+            cnt = cur.fetchone()[0]
+            steps.append(f"direct pg connect: {cnt} users")
+            raw.close()
+        except Exception as ce:
+            steps.append(f"direct pg error: {ce}")
+
+        # Test via get_connection
         try:
             conn = db_connection.get_connection()
-            steps.append(f"connection type: {type(conn).__name__}")
-            row = conn.execute("SELECT COUNT(*) as cnt FROM users").fetchone()
-            steps.append(f"users count: {row[0] if row else 'null'}")
-            conn.close()
+            steps.append(f"get_connection type: {type(conn).__name__}")
         except Exception as ce:
-            steps.append(f"connection error: {ce}")
+            steps.append(f"get_connection error: {ce}")
 
         import user_models
         steps.append("user_models OK")
