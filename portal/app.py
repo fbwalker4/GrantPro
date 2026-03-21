@@ -4637,6 +4637,21 @@ def _build_checklist_data(grant_id, user_id, template_name):
     docs = conn.execute('SELECT * FROM grant_documents WHERE grant_id = ?', (grant_id,)).fetchall()
     uploaded_types = {d['doc_type']: d for d in docs}
 
+    # Fetch budget data to check if budget actually exists
+    budget_row = conn.execute('SELECT * FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
+    budget_dict = dict(budget_row) if budget_row else {}
+    has_budget = bool(budget_dict.get('grand_total') and float(budget_dict['grand_total'] or 0) > 0)
+
+    # Fetch grant info for org data checks
+    grant_row = conn.execute('''
+        SELECT g.*, c.organization_name, c.ein, c.uei
+        FROM grants g
+        JOIN clients c ON g.client_id = c.id
+        WHERE g.id = ?
+    ''', (grant_id,)).fetchone()
+    grant_dict = dict(grant_row) if grant_row else {}
+    has_org_info = bool(grant_dict.get('organization_name'))
+
     # Fetch checklist items (self-certifications)
     checklist_items = conn.execute('SELECT * FROM grant_checklist WHERE grant_id = ? AND user_id = ?', (grant_id, user_id)).fetchall()
     cert_map = {c['item_type'] + ':' + c['item_name']: c for c in checklist_items}
@@ -4644,11 +4659,49 @@ def _build_checklist_data(grant_id, user_id, template_name):
     conn.close()
 
     # --- 1. Standard Forms ---
-    checklist_forms = [
-        {'name': 'SF-424 (Application for Federal Assistance)', 'status': 'auto'},
-        {'name': 'SF-424A (Budget Information)', 'status': 'auto'},
-        {'name': 'SF-424B (Assurances)', 'status': 'auto'},
-    ]
+    # Check actual data availability instead of blindly marking complete
+    checklist_forms = []
+
+    # SF-424: needs org info + project info
+    if has_org_info and grant_dict.get('title'):
+        sf424_status = 'ready'
+        sf424_note = 'Ready to generate from org/project data'
+    else:
+        sf424_status = 'incomplete'
+        sf424_note = 'Missing: ' + ('' if has_org_info else 'organization info, ') + ('' if grant_dict.get('title') else 'project title, ')
+        sf424_note = sf424_note.rstrip(', ')
+    checklist_forms.append({
+        'name': 'SF-424 (Application for Federal Assistance)',
+        'status': sf424_status,
+        'note': sf424_note,
+    })
+
+    # SF-424A: needs actual budget data
+    if has_budget:
+        sf424a_status = 'ready'
+        sf424a_note = 'Ready to generate from budget data'
+    else:
+        sf424a_status = 'incomplete'
+        sf424a_note = 'No budget data entered. Complete the Budget section first.'
+    checklist_forms.append({
+        'name': 'SF-424A (Budget Information)',
+        'status': sf424a_status,
+        'note': sf424a_note,
+    })
+
+    # SF-424B: requires signature upload, cannot auto-generate
+    sf424b_uploaded = uploaded_types.get('sf_424b')
+    if sf424b_uploaded:
+        sf424b_status = 'complete'
+        sf424b_note = 'Signed assurances uploaded'
+    else:
+        sf424b_status = 'incomplete'
+        sf424b_note = 'Download SF-424B from Grants.gov, sign, and upload'
+    checklist_forms.append({
+        'name': 'SF-424B (Assurances)',
+        'status': sf424b_status,
+        'note': sf424b_note,
+    })
 
     # --- 2. Narrative Sections ---
     checklist_sections = []
@@ -4668,19 +4721,102 @@ def _build_checklist_data(grant_id, user_id, template_name):
         })
 
     # --- 3. Required Documents ---
+    # Load FULL required_documents from template and check actual status
     checklist_documents = []
     for doc in template_data.get('required_documents', []):
         doc_type = doc.get('type', '')
+        can_generate = doc.get('can_generate', False)
         uploaded = uploaded_types.get(doc_type)
-        checklist_documents.append({
-            'type': doc_type,
-            'name': doc.get('name', doc_type),
-            'description': doc.get('description', ''),
-            'required': doc.get('required', False),
-            'can_generate': doc.get('can_generate', False),
-            'uploaded': uploaded is not None,
-            'doc_id': uploaded['id'] if uploaded else None,
-        })
+        form_number = doc.get('form_number', '')
+
+        if can_generate:
+            # For auto-generatable docs, check if the data needed actually exists
+            data_ready = False
+            status_note = ''
+
+            # Budget-dependent forms
+            if doc_type in ('sf_424a', 'budget_detail_worksheet', 'hud_424_cb',
+                            'hud_424_cbw', 'budget_narrative'):
+                data_ready = has_budget
+                if not data_ready:
+                    status_note = 'No budget data entered. Complete the Budget section first.'
+                else:
+                    status_note = 'Ready to generate from budget data'
+
+            # Org-info-dependent forms
+            elif doc_type in ('sf_424', 'org_chart', 'epa_5700_54', 'nsf_cover_sheet'):
+                data_ready = bool(has_org_info)
+                if not data_ready:
+                    status_note = 'Organization profile incomplete. Update your org info first.'
+                else:
+                    status_note = 'Ready to generate from organization data'
+
+            # SF-LLL: can always generate (even with N/A)
+            elif doc_type == 'sf_lll':
+                data_ready = True
+                status_note = 'Ready to generate'
+
+            # Forms generated from project info
+            elif doc_type in ('position_descriptions', 'timeline', 'duplication_disclosure',
+                              'pending_applications', 'research_independence', 'data_management_plan',
+                              'mentoring_plan', 'qapp_commitment', 'qapp'):
+                # Check if project narrative exists
+                has_narrative = any(
+                    existing_sections.get(sid, {}).get('content')
+                    for sid in ('project_description', 'project_narrative', 'project_design',
+                                'statement_of_need', 'need_statement')
+                )
+                data_ready = bool(has_narrative or grant_dict.get('title'))
+                if not data_ready:
+                    status_note = 'Enter project details first (title or narrative sections)'
+                else:
+                    status_note = 'Ready to generate from project data'
+
+            # Default for other generatable docs
+            else:
+                data_ready = True
+                status_note = 'Ready to generate'
+
+            # If already uploaded, mark as complete regardless
+            if uploaded:
+                checklist_documents.append({
+                    'type': doc_type,
+                    'name': doc.get('name', doc_type),
+                    'description': doc.get('description', ''),
+                    'required': doc.get('required', False),
+                    'can_generate': True,
+                    'uploaded': True,
+                    'doc_id': uploaded['id'],
+                    'form_number': form_number,
+                    'status_note': 'Document uploaded',
+                })
+            else:
+                checklist_documents.append({
+                    'type': doc_type,
+                    'name': doc.get('name', doc_type),
+                    'description': doc.get('description', ''),
+                    'required': doc.get('required', False),
+                    'can_generate': True,
+                    'uploaded': False,
+                    'doc_id': None,
+                    'data_ready': data_ready,
+                    'form_number': form_number,
+                    'status_note': status_note,
+                })
+        else:
+            # User must upload -- check if document exists in grant_documents
+            upload_instructions = doc.get('upload_instructions', 'Upload the required document (PDF)')
+            checklist_documents.append({
+                'type': doc_type,
+                'name': doc.get('name', doc_type),
+                'description': doc.get('description', ''),
+                'required': doc.get('required', False),
+                'can_generate': False,
+                'uploaded': uploaded is not None,
+                'doc_id': uploaded['id'] if uploaded else None,
+                'form_number': form_number,
+                'status_note': 'Document uploaded' if uploaded else upload_instructions,
+            })
 
     # --- 4. Self-Certifications ---
     standard_certs = [
@@ -4703,14 +4839,17 @@ def _build_checklist_data(grant_id, user_id, template_name):
         })
 
     # --- Compute readiness ---
+    # ALL items count toward readiness: forms, sections, documents, certifications
     total_required = 0
     completed_count = 0
     total_count = 0
 
-    # Forms always complete
-    total_required += len(checklist_forms)
-    completed_count += len(checklist_forms)
-    total_count += len(checklist_forms)
+    # Standard Forms -- check actual status instead of auto-complete
+    for f in checklist_forms:
+        total_count += 1
+        total_required += 1
+        if f['status'] in ('ready', 'complete'):
+            completed_count += 1
 
     # Sections
     for s in checklist_sections:
@@ -4723,13 +4862,16 @@ def _build_checklist_data(grant_id, user_id, template_name):
             if s['status'] == 'complete':
                 completed_count += 1
 
-    # Documents
+    # Documents -- check actual upload/readiness status
     for d in checklist_documents:
         total_count += 1
         if d['required']:
             total_required += 1
             if d['uploaded']:
                 completed_count += 1
+            elif d.get('can_generate') and d.get('data_ready'):
+                # Generatable and data exists -- count as ready (not complete until generated)
+                pass  # Not counted as complete -- must actually generate/upload
         else:
             if d['uploaded']:
                 completed_count += 1

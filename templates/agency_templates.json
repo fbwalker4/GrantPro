@@ -110,36 +110,103 @@
       ],
       "required_documents": [
         {
-          "type": "letters_of_collaboration",
-          "name": "Letters of Collaboration",
-          "description": "Letters from partner organizations confirming their role",
+          "type": "nsf_cover_sheet",
+          "name": "NSF Cover Sheet",
+          "description": "Cover sheet generated within Research.gov including program announcement, proposal title, PI info, and international cooperation boxes.",
           "required": true,
           "can_generate": true,
-          "generate_prompt": "Draft a letter of collaboration from a partner organization"
+          "generate_prompt": "Generate NSF Cover Sheet data from organization profile, project info, and PI information",
+          "form_number": "NSF Cover Sheet"
+        },
+        {
+          "type": "biographical_sketches",
+          "name": "Biographical Sketches (SciENcv format)",
+          "description": "Biographical sketch for each senior/key person. MUST be prepared via SciENcv as of May 2024. Separate sketch per person.",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload biographical sketches prepared via SciENcv (https://www.ncbi.nlm.nih.gov/sciencv/). One PDF per senior/key person.",
+          "form_number": "NSF Biosketch"
+        },
+        {
+          "type": "synergistic_activities",
+          "name": "Synergistic Activities",
+          "description": "Lists up to 5 examples of synergistic activities per senior/key person. Separated from biographical sketch as of May 2024.",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload Synergistic Activities document for each senior/key person. Up to 5 examples per person. Separate from biosketch.",
+          "form_number": "NSF Synergistic"
+        },
+        {
+          "type": "collaborators_affiliations",
+          "name": "Collaborators and Other Affiliations (COA)",
+          "description": "Required per PAPPG for each senior/key person. Must use NSF COA template.",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload Collaborators and Other Affiliations using the NSF COA template for each senior/key person.",
+          "form_number": "NSF COA"
+        },
+        {
+          "type": "current_pending_support",
+          "name": "Current and Pending (Other) Support (SciENcv)",
+          "description": "Current and pending support for each senior/key person. MUST be prepared via SciENcv. PDF uploaded to Research.gov.",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload Current and Pending Support prepared via SciENcv for each senior/key person.",
+          "form_number": "NSF C&P Support"
+        },
+        {
+          "type": "data_management_plan",
+          "name": "Data Management and Sharing Plan",
+          "description": "Plan describing data types produced, standards used, access/sharing provisions, and archiving/preservation strategy. Max 2 pages.",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a Data Management and Sharing Plan describing data types, standards, access/sharing, and preservation (max 2 pages)",
+          "form_number": "NSF DMP"
+        },
+        {
+          "type": "mentoring_plan",
+          "name": "Mentoring Plan",
+          "description": "Required if postdocs or graduate students are supported. Describes mentoring activities, career development, and responsible research training. Max 1 page.",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Generate a Mentoring Plan for postdoctoral researchers and/or graduate students (max 1 page)",
+          "form_number": "NSF Mentoring Plan"
+        },
+        {
+          "type": "letters_of_collaboration",
+          "name": "Letters of Collaboration",
+          "description": "Letters from partner organizations confirming their role. Must use NSF-approved format with brief, factual statements only.",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a letter of collaboration in NSF-approved format from a partner organization",
+          "form_number": "N/A"
         },
         {
           "type": "501c3_determination",
           "name": "IRS 501(c)(3) Determination Letter",
-          "description": "Proof of tax-exempt status",
-          "required": true,
+          "description": "Proof of tax-exempt status for nonprofit applicants.",
+          "required": false,
           "can_generate": false,
-          "upload_instructions": "Upload your IRS determination letter (PDF)"
+          "upload_instructions": "Upload your IRS determination letter (PDF)",
+          "form_number": "N/A"
         },
         {
           "type": "board_resolution",
           "name": "Board Resolution",
-          "description": "Board authorization to apply for this grant",
+          "description": "Board authorization to apply for this grant.",
           "required": false,
           "can_generate": true,
-          "generate_prompt": "Draft a board resolution authorizing the grant application"
+          "generate_prompt": "Draft a board resolution authorizing the grant application",
+          "form_number": "N/A"
         },
         {
           "type": "audit_report",
           "name": "Most Recent Audit Report",
-          "description": "Independent financial audit or Single Audit (if >$750K federal)",
+          "description": "Independent financial audit or Single Audit (if >$1M federal expenditures per year).",
           "required": false,
           "can_generate": false,
-          "upload_instructions": "Upload your most recent independent audit (PDF)"
+          "upload_instructions": "Upload your most recent independent audit (PDF)",
+          "form_number": "SF-SAC"
         }
       ],
       "eligibility": {
@@ -905,20 +972,58 @@
       ],
       "required_documents": [
         {
+          "type": "epa_4700_4",
+          "name": "EPA 4700-4 Preaward Compliance Review Report",
+          "description": "Civil rights preaward review form. Must be completely filled out or EPA will follow up. Version 5.0 current.",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Complete and upload EPA Form 4700-4 Preaward Compliance Review Report. All fields must be filled or EPA will require follow-up.",
+          "form_number": "EPA 4700-4"
+        },
+        {
+          "type": "epa_5700_54",
+          "name": "EPA 5700-54 Key Contacts Form",
+          "description": "Lists key project contacts including PI, project officer, and additional contacts.",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate EPA 5700-54 Key Contacts Form from project contact information",
+          "form_number": "EPA 5700-54"
+        },
+        {
+          "type": "qapp_commitment",
+          "name": "QAPP Commitment Letter",
+          "description": "Commitment to develop a Quality Assurance Project Plan within 30-90 days after award for projects collecting environmental data. Cannot begin data collection until EPA approves QAPP.",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Draft a QAPP commitment letter stating the organization will develop a Quality Assurance Project Plan per EPA QA/R-5 requirements within 90 days of award",
+          "form_number": "N/A"
+        },
+        {
+          "type": "budget_narrative",
+          "name": "Budget Narrative",
+          "description": "Detailed justification for each budget category explaining why costs are reasonable, necessary, and allowable.",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a budget narrative justifying each budget category for an EPA grant application",
+          "form_number": "N/A"
+        },
+        {
           "type": "qapp",
           "name": "Quality Assurance Project Plan (QAPP)",
-          "description": "Quality assurance plan for environmental data collection",
+          "description": "Full quality assurance plan for environmental data collection. Typically required post-award within 30-90 days.",
           "required": false,
           "can_generate": true,
-          "generate_prompt": "Draft a Quality Assurance Project Plan outline for an EPA grant"
+          "generate_prompt": "Draft a Quality Assurance Project Plan outline for an EPA grant per QA/R-5 requirements",
+          "form_number": "N/A"
         },
         {
           "type": "environmental_permits",
           "name": "Environmental Permits",
-          "description": "Any existing environmental permits relevant to the project",
+          "description": "Any existing environmental permits relevant to the project.",
           "required": false,
           "can_generate": false,
-          "upload_instructions": "Upload copies of any relevant environmental permits"
+          "upload_instructions": "Upload copies of any relevant environmental permits",
+          "form_number": "N/A"
         }
       ],
       "eligibility": {
@@ -1403,28 +1508,76 @@
       ],
       "required_documents": [
         {
-          "type": "501c3_determination",
-          "name": "IRS 501(c)(3) Determination Letter",
-          "description": "Proof of tax-exempt status (if nonprofit applicant)",
+          "type": "sf_424",
+          "name": "SF-424 Application for Federal Assistance",
+          "description": "Core application form required for virtually all federal grants. Version 4.0 current.",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-424 Application for Federal Assistance from organization profile, project info, and contact data",
+          "form_number": "SF-424"
+        },
+        {
+          "type": "sf_424a",
+          "name": "SF-424A Budget Information - Non-Construction Programs",
+          "description": "Standard federal budget form for non-construction programs. Details budget by category and funding period.",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-424A Budget Information form from budget data",
+          "form_number": "SF-424A"
+        },
+        {
+          "type": "sf_424b",
+          "name": "SF-424B Assurances - Non-Construction Programs",
+          "description": "Standard assurances for non-construction programs. Requires authorized representative signature.",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Download SF-424B from Grants.gov, have your Authorized Representative sign it, and upload the signed form.",
+          "form_number": "SF-424B"
+        },
+        {
+          "type": "sf_lll",
+          "name": "SF-LLL Disclosure of Lobbying Activities",
+          "description": "Required if award exceeds $100,000. Discloses any paid lobbying activities. Submit with 'N/A' if no lobbying.",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-LLL Disclosure of Lobbying Activities form",
+          "form_number": "SF-LLL"
+        },
+        {
+          "type": "indirect_cost_documentation",
+          "name": "Indirect Cost Rate Documentation",
+          "description": "Federally-approved NICRA or de minimis 15% rate certification per 2 CFR 200.414(f). De minimis only if org has never had a negotiated rate.",
           "required": false,
           "can_generate": false,
-          "upload_instructions": "Upload your IRS determination letter (PDF)"
+          "upload_instructions": "Upload your current federally-approved Indirect Cost Rate Agreement (NICRA), or certify use of the 15% de minimis rate.",
+          "form_number": "NICRA"
+        },
+        {
+          "type": "501c3_determination",
+          "name": "IRS 501(c)(3) Determination Letter",
+          "description": "Proof of tax-exempt status (if nonprofit applicant).",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Upload your IRS determination letter (PDF)",
+          "form_number": "N/A"
         },
         {
           "type": "letters_of_support",
           "name": "Letters of Support",
-          "description": "Letters from collaborators, partners, or stakeholders",
+          "description": "Letters from collaborators, partners, or stakeholders confirming their commitment to the project.",
           "required": false,
           "can_generate": true,
-          "generate_prompt": "Draft a letter of support for a federal grant application"
+          "generate_prompt": "Draft a letter of support for a federal grant application",
+          "form_number": "N/A"
         },
         {
           "type": "board_resolution",
           "name": "Board Resolution",
-          "description": "Board authorization to apply for this grant",
+          "description": "Board authorization to apply for this grant.",
           "required": false,
           "can_generate": true,
-          "generate_prompt": "Draft a board resolution authorizing the grant application"
+          "generate_prompt": "Draft a board resolution authorizing the grant application",
+          "form_number": "N/A"
         }
       ],
       "eligibility": {
@@ -2600,44 +2753,94 @@
       ],
       "required_documents": [
         {
-          "type": "mou_chdo",
-          "name": "MOU with CHDO or Service Provider",
-          "description": "Memorandum of Understanding with Community Housing Development Organization or service provider partner",
+          "type": "hud_2880",
+          "name": "HUD-2880 Applicant/Recipient Disclosure/Update Report",
+          "description": "HUD-specific disclosure form reporting all financial assistance received and pending. Must be kept updated.",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Complete and upload HUD-2880. Discloses all financial assistance received and pending from HUD and other sources.",
+          "form_number": "HUD-2880"
+        },
+        {
+          "type": "hud_424_b",
+          "name": "HUD-424-B Assurances and Certifications",
+          "description": "HUD-specific assurances replacing SF-424B. Covers civil rights certifications, nondiscrimination, and compliance assurances.",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Complete and sign HUD-424-B Assurances and Certifications. Covers civil rights, Title VI, Title VIII, Section 504, and Age Discrimination Act.",
+          "form_number": "HUD-424-B"
+        },
+        {
+          "type": "hud_424_cb",
+          "name": "HUD-424-CB Detailed Budget Form",
+          "description": "HUD-specific detailed budget form with entity information and subrecipient certifications.",
           "required": true,
           "can_generate": true,
-          "generate_prompt": "Draft a Memorandum of Understanding between a grantee and a Community Housing Development Organization (CHDO) or service provider for a HUD grant"
+          "generate_prompt": "Generate HUD-424-CB Detailed Budget Form from budget data with entity information and cost categories",
+          "form_number": "HUD-424-CB"
+        },
+        {
+          "type": "hud_424_cbw",
+          "name": "HUD-424-CBW Detailed Budget Worksheet",
+          "description": "Worksheet supporting the HUD-424-CB with line-item detail for each budget category.",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate HUD-424-CBW Detailed Budget Worksheet with line-item detail supporting the HUD-424-CB",
+          "form_number": "HUD-424-CBW"
+        },
+        {
+          "type": "fair_housing_certification",
+          "name": "Affirmatively Furthering Fair Housing Certification",
+          "description": "Certification that applicant will affirmatively further fair housing per Fair Housing Act and EO 12892.",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload your signed Affirmatively Furthering Fair Housing Certification.",
+          "form_number": "HUD AFFH Cert"
+        },
+        {
+          "type": "match_documentation",
+          "name": "Match / Leverage Documentation",
+          "description": "Documentation of committed matching funds. HOME requires 25% match. Most competitive HUD programs score leveraged resources heavily.",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload documentation of all committed matching funds and leveraged resources. Include commitment letters from each match source.",
+          "form_number": "N/A"
+        },
+        {
+          "type": "mou_chdo",
+          "name": "MOU with CHDO or Service Provider",
+          "description": "Memorandum of Understanding with Community Housing Development Organization or service provider partner.",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a Memorandum of Understanding between a grantee and a Community Housing Development Organization (CHDO) or service provider for a HUD grant",
+          "form_number": "N/A"
         },
         {
           "type": "environmental_review",
           "name": "Environmental Review Record",
-          "description": "Environmental review documentation per 24 CFR Part 58 requirements",
+          "description": "Environmental review documentation per 24 CFR Part 58. HUD uniquely delegates environmental review to the grantee.",
           "required": true,
           "can_generate": false,
-          "upload_instructions": "Upload your Environmental Review Record (ERR) per 24 CFR Part 58"
+          "upload_instructions": "Upload your Environmental Review Record (ERR) per 24 CFR Part 58. No funds may be committed until review complete and HUD issues Release of Funds.",
+          "form_number": "ERR"
         },
         {
           "type": "citizen_participation_plan",
           "name": "Citizen Participation Plan",
-          "description": "Plan describing how citizens will be involved in the project planning and implementation",
+          "description": "Plan describing how citizens will be involved in the project planning and implementation.",
           "required": true,
           "can_generate": true,
-          "generate_prompt": "Draft a Citizen Participation Plan for a HUD-funded community development project"
+          "generate_prompt": "Draft a Citizen Participation Plan for a HUD-funded community development project",
+          "form_number": "N/A"
         },
         {
           "type": "board_resolution",
           "name": "Board Resolution",
-          "description": "Board authorization to apply for this HUD grant and accept funding obligations",
+          "description": "Board authorization to apply for this HUD grant and accept funding obligations.",
           "required": true,
           "can_generate": true,
-          "generate_prompt": "Draft a board resolution authorizing application for a HUD grant"
-        },
-        {
-          "type": "fair_housing_certification",
-          "name": "Fair Housing Certification",
-          "description": "Certification of compliance with fair housing requirements",
-          "required": true,
-          "can_generate": false,
-          "upload_instructions": "Upload your signed fair housing certification"
+          "generate_prompt": "Draft a board resolution authorizing application for a HUD grant",
+          "form_number": "N/A"
         }
       ],
       "compliance": {
@@ -3626,20 +3829,139 @@
       ],
       "required_documents": [
         {
-          "type": "letters_of_support",
-          "name": "Letters of Support",
-          "description": "Letters from law enforcement, community organizations, or government officials",
+          "type": "sf_424",
+          "name": "SF-424 Application for Federal Assistance",
+          "description": "Core application form required for all federal grants. Submit via Grants.gov at least 48 hours before JustGrants deadline.",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-424 Application for Federal Assistance from organization profile, project info, and contact data",
+          "form_number": "SF-424"
+        },
+        {
+          "type": "sf_lll",
+          "name": "Disclosure of Lobbying Activities",
+          "description": "Discloses any paid lobbying activities. Required if award exceeds $100,000. Submit 'N/A' if no lobbying.",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate SF-LLL Disclosure of Lobbying Activities form from organization lobbying data",
+          "form_number": "SF-LLL"
+        },
+        {
+          "type": "budget_detail_worksheet",
+          "name": "Budget Detail Worksheet",
+          "description": "Detailed line-item budget covering Personnel, Fringe, Travel, Equipment, Supplies, Construction, Consultants/Contracts, Other Costs, and Indirect Costs.",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate DOJ Budget Detail Worksheet from budget data with all cost categories and justifications",
+          "form_number": "DOJ Budget Detail"
+        },
+        {
+          "type": "doj_certifications",
+          "name": "DOJ Certifications Regarding Lobbying, Debarment, Suspension, Drug-Free Workplace",
+          "description": "Signed certification document covering lobbying, debarment/suspension, drug-free workplace, and coordination requirements.",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Sign and upload the DOJ Certifications document from JustGrants. Must be signed by the Authorized Representative.",
+          "form_number": "DOJ Certifications"
+        },
+        {
+          "type": "duplication_disclosure",
+          "name": "Applicant Disclosure of Duplication in Cost Items",
+          "description": "Discloses any pending applications at other agencies for the same or similar project to avoid duplicate funding.",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate Duplication Disclosure listing any pending applications for similar projects at other federal agencies",
+          "form_number": "DOJ Duplication Disclosure"
+        },
+        {
+          "type": "pending_applications",
+          "name": "Applicant Disclosure of Pending Applications",
+          "description": "Lists all other federal/state funding applications currently pending for this or related projects.",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate Pending Applications Disclosure listing all other funding applications currently pending",
+          "form_number": "DOJ Pending Applications"
+        },
+        {
+          "type": "research_independence",
+          "name": "Research and Evaluation Independence and Integrity Statement",
+          "description": "Statement addressing actual/potential conflicts of interest for research or evaluation projects. Includes mitigation plan.",
           "required": false,
           "can_generate": true,
-          "generate_prompt": "Draft a letter of support from a law enforcement agency for a DOJ grant"
+          "generate_prompt": "Draft a Research Independence and Integrity Statement addressing potential conflicts of interest and mitigation measures",
+          "form_number": "DOJ Research Independence"
+        },
+        {
+          "type": "org_chart",
+          "name": "Organizational Chart",
+          "description": "Chart showing reporting structure and placement of project staff within the organization.",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate an organizational chart showing reporting structure and project staff placement",
+          "form_number": "N/A"
+        },
+        {
+          "type": "position_descriptions",
+          "name": "Position Descriptions for Key Personnel",
+          "description": "Job descriptions for each key position funded by the grant, including duties, qualifications, and time commitment.",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate position descriptions for key personnel including duties, qualifications, and percent time on project",
+          "form_number": "N/A"
+        },
+        {
+          "type": "key_personnel_resumes",
+          "name": "Curriculum Vitae / Resumes for Key Personnel",
+          "description": "Resumes or CVs for all key personnel implementing the project. Include description of experience/skills for unfilled positions.",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload resumes/CVs for all key personnel. For unfilled positions, upload a description of required experience and skills.",
+          "form_number": "N/A"
+        },
+        {
+          "type": "indirect_cost_agreement",
+          "name": "Indirect Cost Rate Agreement (NICRA)",
+          "description": "Federally-approved indirect cost rate agreement, or certification of de minimis 15% rate per 2 CFR 200.414(f).",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Upload your current federally-approved NICRA, or certify use of 15% de minimis rate. De minimis only available if org has NEVER had a negotiated rate.",
+          "form_number": "NICRA"
+        },
+        {
+          "type": "financial_management_questionnaire",
+          "name": "Financial Management and System of Internal Controls Questionnaire",
+          "description": "Questionnaire assessing financial management capability including high-risk disclosure from other agencies.",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Complete the Financial Management Questionnaire in JustGrants. Assesses your organization's financial controls and management capability.",
+          "form_number": "DOJ FMQ"
+        },
+        {
+          "type": "timeline",
+          "name": "Timeline / Project Schedule",
+          "description": "Project timeline showing key activities, milestones, and completion dates by month or quarter.",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Generate a project timeline with key activities, milestones, and target completion dates organized by quarter",
+          "form_number": "N/A"
+        },
+        {
+          "type": "letters_of_support",
+          "name": "Letters of Support",
+          "description": "Letters from law enforcement, community organizations, or government officials confirming partnership and support.",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a letter of support from a law enforcement agency for a DOJ grant",
+          "form_number": "N/A"
         },
         {
           "type": "mou_partners",
           "name": "MOU with Partner Agencies",
-          "description": "Memoranda of understanding with law enforcement, courts, or service providers",
+          "description": "Memoranda of understanding with law enforcement, courts, or service providers detailing roles, services, and duration.",
           "required": false,
           "can_generate": true,
-          "generate_prompt": "Draft a memorandum of understanding between a grantee and law enforcement for a DOJ grant"
+          "generate_prompt": "Draft a memorandum of understanding between a grantee and law enforcement for a DOJ grant",
+          "form_number": "N/A"
         }
       ],
       "compliance": {

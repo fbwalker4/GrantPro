@@ -1,0 +1,1539 @@
+{
+  "_metadata": {
+    "title": "Complete Federal Grant Required Forms by Agency",
+    "researched": "2026-03-21",
+    "sources": [
+      "https://www.ojp.gov/funding/apply/ojp-grant-application-resource-guide",
+      "https://justicegrants.usdoj.gov/training/checklist-application-submission",
+      "https://www.nsf.gov/policies/pappg/24-1/ch-2-exhibit-1",
+      "https://grants.nih.gov/grants/how-to-apply-application-guide/forms-i/research-forms-i.pdf",
+      "https://grants.nih.gov/grants/how-to-apply-application-guide/forms-i/general-forms-i.pdf",
+      "https://www.hud.gov/sites/dfiles/CFO/images/Standard-Application-Forms.pdf",
+      "https://www.epa.gov/grants/epa-grantee-forms",
+      "https://www.fema.gov/grants/preparedness/homeland-security/fy-25-nofo",
+      "https://www.grants.gov/forms/forms-repository/sf-424-family"
+    ],
+    "notes": "Forms lists are comprehensive but individual NOFOs may add or remove requirements. Always cross-check against the specific solicitation."
+  },
+
+  "universal_forms": {
+    "description": "Required by ALL federal agencies for virtually all grant applications",
+    "prerequisites": [
+      {
+        "id": "sam_gov",
+        "name": "SAM.gov Registration",
+        "required": true,
+        "renewal": "Annual (every 365 days)",
+        "can_auto_generate": false,
+        "notes": "Must be active at time of application AND throughout award period"
+      },
+      {
+        "id": "uei",
+        "name": "Unique Entity Identifier (UEI)",
+        "required": true,
+        "can_auto_generate": false,
+        "notes": "12-character identifier issued via SAM.gov. Replaced DUNS April 2022."
+      },
+      {
+        "id": "ein",
+        "name": "Employer Identification Number (EIN/TIN)",
+        "required": true,
+        "can_auto_generate": false,
+        "notes": "IRS-issued. Required for all organizational applicants."
+      }
+    ],
+    "standard_forms": [
+      {
+        "form_number": "SF-424",
+        "name": "Application for Federal Assistance",
+        "required": true,
+        "construction_variant": false,
+        "can_auto_generate": true,
+        "generate_from": ["org_profile", "project_info", "contact_info"],
+        "notes": "Core application form. Nearly every federal grant requires this. Version 4.0 current.",
+        "official_pdf_required": true,
+        "submit_via": "Grants.gov"
+      },
+      {
+        "form_number": "SF-424A",
+        "name": "Budget Information - Non-Construction Programs",
+        "required": true,
+        "construction_variant": false,
+        "can_auto_generate": true,
+        "generate_from": ["budget_data"],
+        "notes": "Required for non-construction programs. Use SF-424C for construction.",
+        "official_pdf_required": true,
+        "submit_via": "Grants.gov"
+      },
+      {
+        "form_number": "SF-424B",
+        "name": "Assurances - Non-Construction Programs",
+        "required": true,
+        "construction_variant": false,
+        "can_auto_generate": false,
+        "notes": "Standard assurances. Requires authorized representative signature. Use SF-424D for construction.",
+        "official_pdf_required": true,
+        "submit_via": "Grants.gov"
+      },
+      {
+        "form_number": "SF-424C",
+        "name": "Budget Information - Construction Programs",
+        "required": false,
+        "construction_variant": true,
+        "can_auto_generate": true,
+        "generate_from": ["budget_data"],
+        "notes": "Required ONLY for construction programs. Replaces SF-424A.",
+        "official_pdf_required": true,
+        "submit_via": "Grants.gov"
+      },
+      {
+        "form_number": "SF-424D",
+        "name": "Assurances - Construction Programs",
+        "required": false,
+        "construction_variant": true,
+        "can_auto_generate": false,
+        "notes": "Required ONLY for construction programs. Replaces SF-424B.",
+        "official_pdf_required": true,
+        "submit_via": "Grants.gov"
+      },
+      {
+        "form_number": "SF-LLL",
+        "name": "Disclosure of Lobbying Activities",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["org_profile", "lobbying_info"],
+        "notes": "Required if award exceeds $100,000. Must disclose any paid lobbying. Even if no lobbying, many agencies require the form with 'N/A'.",
+        "official_pdf_required": true,
+        "submit_via": "Grants.gov"
+      },
+      {
+        "form_number": "Lobbying Certification",
+        "name": "Certification Regarding Lobbying",
+        "required": true,
+        "can_auto_generate": false,
+        "notes": "Separate from SF-LLL. Certifies no federal funds used for lobbying. Some agencies embed this in their own certification forms.",
+        "official_pdf_required": false,
+        "submit_via": "varies"
+      }
+    ],
+    "universal_documents": [
+      {
+        "id": "indirect_cost_rate",
+        "name": "Indirect Cost Rate Agreement (NICRA) or De Minimis Certification",
+        "required": true,
+        "conditional": "if_claiming_indirect_costs",
+        "can_auto_generate": false,
+        "notes": "Upload current federally-approved NICRA, or certify use of 15% de minimis rate per 2 CFR 200.414(f). De minimis only available if org has NEVER had a negotiated rate."
+      },
+      {
+        "id": "single_audit",
+        "name": "Single Audit Report (SF-SAC)",
+        "required": true,
+        "conditional": "if_expending_over_1M_federal_funds",
+        "can_auto_generate": false,
+        "notes": "Per 2 CFR 200 Subpart F. Threshold is $1,000,000 in federal expenditures per fiscal year. Must be submitted to Federal Audit Clearinghouse."
+      },
+      {
+        "id": "org_501c3",
+        "name": "IRS 501(c)(3) Determination Letter",
+        "required": true,
+        "conditional": "if_nonprofit",
+        "can_auto_generate": false,
+        "notes": "Proof of tax-exempt status for nonprofit applicants."
+      }
+    ]
+  },
+
+  "doj": {
+    "agency": "Department of Justice (DOJ/OJP)",
+    "portal": "JustGrants",
+    "portal_url": "https://justicegrants.usdoj.gov",
+    "two_step_submission": true,
+    "step1_system": "Grants.gov",
+    "step2_system": "JustGrants",
+
+    "step1_grants_gov_forms": [
+      {
+        "form_number": "SF-424",
+        "name": "Application for Federal Assistance",
+        "required": true,
+        "can_auto_generate": true,
+        "notes": "Submit at least 48 hours before JustGrants deadline"
+      },
+      {
+        "form_number": "SF-LLL",
+        "name": "Disclosure of Lobbying Activities",
+        "required": true,
+        "can_auto_generate": true,
+        "notes": "Downloaded from Grants.gov, completed, and uploaded"
+      }
+    ],
+
+    "step2_justgrants_web_forms": [
+      {
+        "id": "standard_applicant_info",
+        "name": "Standard Applicant Information",
+        "required": true,
+        "can_auto_generate": true,
+        "notes": "Pre-populated from SF-424. Must review, verify ZIP codes, confirm Authorized Representative."
+      },
+      {
+        "id": "proposal_abstract",
+        "name": "Proposal Abstract",
+        "required": true,
+        "max_chars": 2000,
+        "can_auto_generate": true,
+        "generate_from": ["project_narrative"],
+        "notes": "Summary of proposed project. Cannot contain PII."
+      },
+      {
+        "id": "financial_management_questionnaire",
+        "name": "Financial Management and System of Internal Controls Questionnaire",
+        "required": true,
+        "can_auto_generate": false,
+        "notes": "Assesses financial management capability. Includes high-risk disclosure from other agencies. Required for all except individuals."
+      },
+      {
+        "id": "agency_funding_priorities",
+        "name": "Agency Funding Priorities Inventory",
+        "required": true,
+        "conditional": "if_specified_in_nofo",
+        "can_auto_generate": false,
+        "notes": "Answer inventory questions in web form."
+      },
+      {
+        "id": "proposal_narrative",
+        "name": "Proposal Narrative / Project Description",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["project_info", "goals", "methods"],
+        "components": [
+          "Description of Need/Problem Statement",
+          "Project Goals and Objectives",
+          "Project Design and Implementation Plan",
+          "Capabilities and Competencies",
+          "Plan for Collecting Performance Data"
+        ],
+        "notes": "Follow NOFO-specific formatting requirements."
+      },
+      {
+        "id": "budget_detail",
+        "name": "Budget Detail (Web-based or Attachment)",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["budget_data"],
+        "categories": [
+          "Personnel",
+          "Fringe Benefits",
+          "Travel",
+          "Equipment",
+          "Supplies",
+          "Construction",
+          "Consultants/Contracts",
+          "Other Costs",
+          "Indirect Costs"
+        ],
+        "notes": "Two methods: web-based form (new competitive) or separate attachment (continuation). Must show salary rates and % time."
+      },
+      {
+        "id": "budget_narrative",
+        "name": "Budget Narrative",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["budget_data", "project_info"],
+        "notes": "Brief descriptions supporting all budget line items."
+      },
+      {
+        "id": "consolidated_category_summary",
+        "name": "Consolidated Category Summary",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["budget_data"],
+        "notes": "High-level overview by category, year, and total. Includes federal funds, match, program income."
+      },
+      {
+        "id": "duplication_disclosure",
+        "name": "Applicant Disclosure of Duplication in Cost Items",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["pending_applications"],
+        "notes": "Discloses pending applications for same project at other agencies."
+      },
+      {
+        "id": "pending_applications",
+        "name": "Applicant Disclosure of Pending Applications",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["pending_applications"],
+        "notes": "Lists other federal/state funding agencies and NOFO/project names."
+      }
+    ],
+
+    "step2_justgrants_certifications": [
+      {
+        "id": "doj_standard_assurances",
+        "name": "DOJ Certified Standard Assurances",
+        "required": true,
+        "can_auto_generate": false,
+        "notes": "Review and accept in JustGrants. Covers civil rights compliance and nondiscrimination."
+      },
+      {
+        "id": "doj_certifications",
+        "name": "DOJ Certifications Regarding Lobbying, Debarment, Suspension, Drug-Free Workplace, and Coordination",
+        "required": true,
+        "can_auto_generate": false,
+        "notes": "Must sign certification document in JustGrants system."
+      }
+    ],
+
+    "step2_justgrants_attachments": [
+      {
+        "id": "indirect_cost_rate",
+        "name": "Indirect Cost Rate Agreement (NICRA)",
+        "required": true,
+        "conditional": "if_claiming_indirect_costs",
+        "can_auto_generate": false,
+        "notes": "Upload current federally-approved rate agreement, or de minimis certification."
+      },
+      {
+        "id": "research_independence",
+        "name": "Research and Evaluation Independence and Integrity Statement",
+        "required": true,
+        "conditional": "if_proposing_research_or_evaluation",
+        "can_auto_generate": true,
+        "generate_from": ["org_profile", "key_personnel"],
+        "notes": "Address actual/potential conflicts of interest. Include mitigation plan."
+      },
+      {
+        "id": "mou",
+        "name": "Memorandum of Understanding (MOU)",
+        "required": true,
+        "conditional": "if_partners_named",
+        "can_auto_generate": true,
+        "generate_from": ["partner_info"],
+        "notes": "One document for all named partners. Include org names, services, duration. Should be signed."
+      },
+      {
+        "id": "letters_of_support",
+        "name": "Letters of Support",
+        "required": true,
+        "conditional": "if_applicable",
+        "can_auto_generate": true,
+        "generate_from": ["partner_info", "project_info"],
+        "notes": "One combined attachment. Must be signed."
+      },
+      {
+        "id": "resumes_cvs",
+        "name": "Curriculum Vitae / Resumes for Key Personnel",
+        "required": true,
+        "can_auto_generate": false,
+        "notes": "For all key personnel implementing project. OR description of experience/skills if position not yet filled."
+      },
+      {
+        "id": "org_chart",
+        "name": "Organizational Chart",
+        "required": true,
+        "conditional": "if_specified_in_nofo",
+        "can_auto_generate": false,
+        "notes": "Shows reporting structure and project staff placement."
+      },
+      {
+        "id": "position_descriptions",
+        "name": "Position Descriptions for Key Personnel",
+        "required": true,
+        "conditional": "if_specified_in_nofo",
+        "can_auto_generate": true,
+        "generate_from": ["key_personnel", "project_info"],
+        "notes": "Job descriptions for each key position."
+      },
+      {
+        "id": "timeline",
+        "name": "Timeline / Project Schedule",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["project_info", "milestones"],
+        "notes": "Key activities, milestones, months/quarters for completion."
+      },
+      {
+        "id": "tribal_resolution",
+        "name": "Tribal Authorizing Resolution",
+        "required": true,
+        "conditional": "if_tribal_applicant_or_tribal_lands",
+        "can_auto_generate": false,
+        "notes": "Resolution, letter, or affidavit demonstrating tribal authorization. Consortium bylaws if applicable."
+      },
+      {
+        "id": "human_subjects",
+        "name": "Human Subjects Protection Documentation",
+        "required": true,
+        "conditional": "if_human_subjects_research",
+        "can_auto_generate": false,
+        "notes": "IRB approval or exemption documentation."
+      },
+      {
+        "id": "privacy_certificate",
+        "name": "Privacy Certificate",
+        "required": true,
+        "conditional": "if_specified_in_nofo",
+        "can_auto_generate": false,
+        "notes": "Required for projects collecting PII."
+      },
+      {
+        "id": "executive_compensation",
+        "name": "Disclosure of Process Related to Executive Compensation",
+        "required": true,
+        "conditional": "if_nonprofit_per_nofo",
+        "can_auto_generate": false,
+        "notes": "Describes compensation determination processes for nonprofits claiming IRC 26 CFR 53.4958-6 compliance."
+      },
+      {
+        "id": "high_risk_disclosure",
+        "name": "DOJ High-Risk Grantee Applicant Disclosure and Justification",
+        "required": true,
+        "conditional": "if_designated_high_risk_by_doj",
+        "can_auto_generate": false,
+        "notes": "Describes corrective actions and risk mitigation."
+      },
+      {
+        "id": "bibliography",
+        "name": "Bibliography / References",
+        "required": true,
+        "conditional": "if_specified_in_nofo",
+        "can_auto_generate": false,
+        "notes": "Supporting references for proposal."
+      },
+      {
+        "id": "tools_instruments",
+        "name": "Tools, Instruments, Questionnaires, Tables, Charts, Graphs, or Maps",
+        "required": true,
+        "conditional": "if_specified_in_nofo",
+        "can_auto_generate": false,
+        "notes": "Submit as directed by NOFO."
+      },
+      {
+        "id": "list_of_individuals",
+        "name": "List of Individuals in Application",
+        "required": true,
+        "conditional": "if_specified_in_nofo",
+        "can_auto_generate": true,
+        "notes": "Roster of all individuals named in the application."
+      }
+    ]
+  },
+
+  "nsf": {
+    "agency": "National Science Foundation (NSF)",
+    "portal": "Research.gov",
+    "portal_url": "https://www.research.gov",
+    "governing_document": "PAPPG NSF 24-1 (effective May 20, 2024)",
+
+    "required_forms_and_sections": [
+      {
+        "id": "cover_sheet",
+        "name": "NSF Cover Sheet",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["org_profile", "project_info", "pi_info"],
+        "components": [
+          "Program announcements/solicitations identification",
+          "Proposal title (with prefix if required)",
+          "Previous award number (renewals)",
+          "Letter of intent number",
+          "Preliminary proposal number",
+          "International cooperation boxes with country names"
+        ],
+        "notes": "Generated within Research.gov system."
+      },
+      {
+        "id": "project_summary",
+        "name": "Project Summary",
+        "required": true,
+        "max_pages": 1,
+        "can_auto_generate": true,
+        "generate_from": ["project_info"],
+        "components": [
+          "Overview",
+          "Intellectual Merit",
+          "Broader Impacts"
+        ],
+        "notes": "MUST contain all three labeled sections. Critical for compliance."
+      },
+      {
+        "id": "project_description",
+        "name": "Project Description",
+        "required": true,
+        "max_pages": 15,
+        "can_auto_generate": true,
+        "generate_from": ["project_info", "methods", "prior_work"],
+        "components": [
+          "Objectives and expected significance",
+          "Methods and procedures",
+          "Relation to current knowledge",
+          "Work plan",
+          "Separate Broader Impacts section",
+          "Results from Prior NSF Support (if applicable, max 5 pages)"
+        ],
+        "notes": "Must be self-contained - no URLs. Solicitation may set different page limit."
+      },
+      {
+        "id": "references_cited",
+        "name": "References Cited",
+        "required": true,
+        "max_pages": null,
+        "can_auto_generate": true,
+        "generate_from": ["bibliography"],
+        "notes": "Bibliographic citations only. Discipline-appropriate format."
+      },
+      {
+        "id": "biographical_sketch",
+        "name": "Biographical Sketch(es)",
+        "required": true,
+        "per_person": true,
+        "can_auto_generate": false,
+        "notes": "MUST be prepared via SciENcv (as of May 2024). Separate sketch per senior/key person. Synergistic activities now in separate document."
+      },
+      {
+        "id": "current_and_pending",
+        "name": "Current and Pending (Other) Support",
+        "required": true,
+        "per_person": true,
+        "can_auto_generate": false,
+        "notes": "MUST be prepared via SciENcv. Separate document per senior/key person. PDF uploaded to Research.gov."
+      },
+      {
+        "id": "collaborators_affiliations",
+        "name": "Collaborators and Other Affiliations (COA)",
+        "required": true,
+        "per_person": true,
+        "can_auto_generate": false,
+        "notes": "Required per PAPPG. NSF COA template must be used."
+      },
+      {
+        "id": "synergistic_activities",
+        "name": "Synergistic Activities",
+        "required": true,
+        "per_person": true,
+        "can_auto_generate": false,
+        "notes": "NEW as of May 2024 - separated from biographical sketch. Lists up to 5 examples."
+      },
+      {
+        "id": "budget",
+        "name": "Proposal Budget",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["budget_data"],
+        "notes": "Documentation and justification for each line item. Contracts on Line G6. Indirect costs with negotiated rates."
+      },
+      {
+        "id": "budget_justification",
+        "name": "Budget Justification",
+        "required": true,
+        "max_pages": 5,
+        "can_auto_generate": true,
+        "generate_from": ["budget_data", "project_info"],
+        "notes": "5-page max per proposing organization. Justification for each budget category."
+      },
+      {
+        "id": "facilities",
+        "name": "Facilities, Equipment, and Other Resources",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["org_profile", "facilities_info"],
+        "notes": "Aggregated description. In-kind contributions. NO quantifiable financial info. Must include statement even if no resources."
+      },
+      {
+        "id": "data_management",
+        "name": "Data Management and Sharing Plan",
+        "required": true,
+        "max_pages": 2,
+        "can_auto_generate": true,
+        "generate_from": ["project_info", "data_types"],
+        "notes": "Types of data, standards, access/sharing plan, archiving."
+      },
+      {
+        "id": "mentoring_plan",
+        "name": "Mentoring Plan",
+        "required": true,
+        "conditional": "if_postdocs_or_grad_students_supported",
+        "max_pages": 1,
+        "can_auto_generate": true,
+        "generate_from": ["personnel_info"],
+        "notes": "Covers both postdoctoral researchers AND graduate students."
+      },
+      {
+        "id": "collaboration_plan",
+        "name": "Collaboration Plan / Multi-Organization Arrangements",
+        "required": true,
+        "conditional": "if_multi_organization",
+        "can_auto_generate": true,
+        "generate_from": ["partner_info"],
+        "notes": "Required for collaborative proposals from multiple organizations."
+      },
+      {
+        "id": "letters_of_collaboration",
+        "name": "Letters of Collaboration",
+        "required": true,
+        "conditional": "if_collaborative_arrangements",
+        "can_auto_generate": true,
+        "generate_from": ["partner_info"],
+        "notes": "Must use NSF-approved format. Brief, factual statements only."
+      },
+      {
+        "id": "sf_lll",
+        "name": "SF-LLL Disclosure of Lobbying Activities",
+        "required": true,
+        "conditional": "if_applicable",
+        "can_auto_generate": true,
+        "notes": "Required if lobbying activities occurred."
+      },
+      {
+        "id": "deviation_authorization",
+        "name": "Authorization to Deviate from NSF Proposal Preparation Requirements",
+        "required": true,
+        "conditional": "if_deviating",
+        "can_auto_generate": false,
+        "notes": "Required if any deviation from PAPPG guidelines."
+      }
+    ],
+
+    "single_copy_documents": [
+      {
+        "id": "suggested_reviewers",
+        "name": "List of Suggested Reviewers or Reviewers Not To Include",
+        "required": false,
+        "can_auto_generate": false,
+        "notes": "Optional but recommended."
+      }
+    ],
+
+    "prerequisites": [
+      "SAM.gov registration with valid UEI",
+      "NSF ID for PI (via Research.gov)",
+      "Research.gov organizational profile",
+      "Authorized Organizational Representative (AOR)"
+    ]
+  },
+
+  "nih": {
+    "agency": "National Institutes of Health (NIH)",
+    "portal": "eRA Commons / ASSIST",
+    "portal_url": "https://public.era.nih.gov/assist",
+    "governing_document": "NIH Application Guide Forms-I (effective January 25, 2025)",
+    "submission_via": "Grants.gov to eRA Commons",
+
+    "sf424_rr_forms": [
+      {
+        "form_number": "SF 424 (R&R)",
+        "name": "Application for Federal Assistance (Research & Related)",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["org_profile", "project_info", "pi_info"],
+        "notes": "Core application form. Version I for due dates on/after Jan 25, 2025."
+      },
+      {
+        "form_number": "R&R Other Project Information",
+        "name": "R&R Other Project Information Form",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["project_info"],
+        "components": [
+          "Project Summary/Abstract (max 30 lines)",
+          "Project Narrative (2-3 sentences, public health relevance)",
+          "Bibliography & References Cited",
+          "Facilities & Other Resources",
+          "Equipment",
+          "Other Attachments"
+        ],
+        "notes": "Contains multiple critical attachments."
+      },
+      {
+        "form_number": "Project/Performance Site Location(s)",
+        "name": "Project/Performance Site Location(s) Form",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["org_profile", "site_info"],
+        "notes": "All performance sites must be listed."
+      },
+      {
+        "form_number": "R&R Senior/Key Person Profile (Expanded)",
+        "name": "R&R Senior/Key Person Profile (Expanded) Form",
+        "required": true,
+        "can_auto_generate": false,
+        "notes": "Includes biographical sketch attachment for each person. NIH biosketch format required."
+      },
+      {
+        "form_number": "R&R Budget",
+        "name": "R&R Budget Form (Detailed)",
+        "required": true,
+        "conditional": "if_direct_costs_over_250K_per_year_or_specified",
+        "can_auto_generate": true,
+        "generate_from": ["budget_data"],
+        "notes": "Detailed line-item budget. Required for direct costs >$250K/year."
+      },
+      {
+        "form_number": "R&R Subaward Budget Attachment(s)",
+        "name": "R&R Subaward Budget Attachment(s) Form",
+        "required": true,
+        "conditional": "if_subawards",
+        "can_auto_generate": true,
+        "generate_from": ["subaward_budget_data"],
+        "notes": "Separate budget for each subaward/consortium."
+      }
+    ],
+
+    "phs_forms": [
+      {
+        "form_number": "PHS 398 Cover Page Supplement",
+        "name": "PHS 398 Cover Page Supplement Form",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["project_info", "pi_info"],
+        "notes": "Includes human subjects, vertebrate animals, stem cells info."
+      },
+      {
+        "form_number": "PHS 398 Modular Budget",
+        "name": "PHS 398 Modular Budget Form",
+        "required": true,
+        "conditional": "if_direct_costs_up_to_250K_per_year",
+        "can_auto_generate": true,
+        "generate_from": ["budget_data"],
+        "notes": "Modular budget in $25K increments. For R01s with direct costs ≤$250K/year."
+      },
+      {
+        "form_number": "PHS 398 Research Plan",
+        "name": "PHS 398 Research Plan Form",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["project_info", "research_plan"],
+        "components": [
+          "Specific Aims (1 page)",
+          "Research Strategy (12 pages for R01, 6 for R03/R21)",
+          "  - Significance",
+          "  - Innovation",
+          "  - Approach",
+          "Progress Report (renewals only)",
+          "Human Subjects Sections (if applicable)",
+          "Inclusion of Women and Minorities",
+          "Inclusion of Children",
+          "Vertebrate Animals Section (if applicable)",
+          "Select Agent Research (if applicable)",
+          "Multiple PD/PI Leadership Plan (if applicable)",
+          "Consortium/Contractual Arrangements",
+          "Letters of Support",
+          "Resource Sharing Plan(s)",
+          "Authentication of Key Biological and/or Chemical Resources"
+        ],
+        "notes": "Core research content. Page limits vary by mechanism."
+      },
+      {
+        "form_number": "PHS Human Subjects and Clinical Trials Information",
+        "name": "PHS Human Subjects and Clinical Trials Information Form",
+        "required": true,
+        "conditional": "if_human_subjects",
+        "can_auto_generate": false,
+        "notes": "Detailed human subjects protection information. Includes clinical trial fields if applicable."
+      },
+      {
+        "form_number": "PHS Assignment Request",
+        "name": "PHS Assignment Request Form",
+        "required": false,
+        "can_auto_generate": false,
+        "notes": "Optional. Request specific study section or institute assignment."
+      }
+    ],
+
+    "required_attachments": [
+      {
+        "id": "specific_aims",
+        "name": "Specific Aims",
+        "required": true,
+        "max_pages": 1,
+        "can_auto_generate": true,
+        "generate_from": ["project_info", "research_questions"],
+        "notes": "Goals, objectives, expected outcomes, impact on field."
+      },
+      {
+        "id": "research_strategy",
+        "name": "Research Strategy",
+        "required": true,
+        "max_pages": 12,
+        "can_auto_generate": true,
+        "generate_from": ["project_info", "methods"],
+        "notes": "12 pages for R01. Three sections: Significance, Innovation, Approach."
+      },
+      {
+        "id": "project_summary",
+        "name": "Project Summary/Abstract",
+        "required": true,
+        "max_lines": 30,
+        "can_auto_generate": true,
+        "generate_from": ["project_info"],
+        "notes": "Suitable for public dissemination."
+      },
+      {
+        "id": "project_narrative",
+        "name": "Project Narrative",
+        "required": true,
+        "max_lines": 3,
+        "can_auto_generate": true,
+        "generate_from": ["project_info"],
+        "notes": "2-3 sentences on public health relevance in lay terms."
+      },
+      {
+        "id": "bibliography",
+        "name": "Bibliography & References Cited",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["references"],
+        "notes": "No page limit. All authors, full citation."
+      },
+      {
+        "id": "facilities",
+        "name": "Facilities & Other Resources",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["org_profile", "facilities_info"],
+        "notes": "Lab, animal, computer, office, clinical facilities."
+      },
+      {
+        "id": "equipment",
+        "name": "Equipment",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["equipment_list"],
+        "notes": "Major equipment already available. Locations and capabilities."
+      },
+      {
+        "id": "biosketch",
+        "name": "NIH Biographical Sketch",
+        "required": true,
+        "per_person": true,
+        "max_pages": 5,
+        "can_auto_generate": false,
+        "notes": "NIH format. Personal statement, positions, contributions, scholastic performance (trainees). Via SciENcv or NIH format."
+      },
+      {
+        "id": "other_support",
+        "name": "Other Support (Current and Pending)",
+        "required": true,
+        "conditional": "just_in_time_before_award",
+        "can_auto_generate": false,
+        "notes": "NOT submitted with application. Requested Just-in-Time before award."
+      },
+      {
+        "id": "budget_justification",
+        "name": "Budget Justification",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["budget_data"],
+        "notes": "Personnel justification always required. Full justification for detailed budgets."
+      },
+      {
+        "id": "vertebrate_animals",
+        "name": "Vertebrate Animals Section",
+        "required": true,
+        "conditional": "if_vertebrate_animals",
+        "can_auto_generate": true,
+        "generate_from": ["animal_protocol"],
+        "notes": "Description of procedures, justification of species, minimization of pain/distress."
+      },
+      {
+        "id": "human_subjects",
+        "name": "Human Subjects Protection Documentation",
+        "required": true,
+        "conditional": "if_human_subjects",
+        "can_auto_generate": false,
+        "notes": "IRB approval/exemption, informed consent, data safety monitoring plan."
+      },
+      {
+        "id": "select_agent",
+        "name": "Select Agent Research",
+        "required": true,
+        "conditional": "if_select_agents",
+        "can_auto_generate": false,
+        "notes": "IBC approval, registration with CDC/APHIS."
+      },
+      {
+        "id": "multiple_pi_plan",
+        "name": "Multiple PD/PI Leadership Plan",
+        "required": true,
+        "conditional": "if_multiple_pis",
+        "can_auto_generate": true,
+        "generate_from": ["pi_info"],
+        "notes": "Describes roles, governance, communication."
+      },
+      {
+        "id": "consortium_arrangements",
+        "name": "Consortium/Contractual Arrangements",
+        "required": true,
+        "conditional": "if_consortium",
+        "can_auto_generate": true,
+        "generate_from": ["partner_info"],
+        "notes": "Describe roles, performance sites, administrative arrangements."
+      },
+      {
+        "id": "letters_of_support",
+        "name": "Letters of Support",
+        "required": true,
+        "conditional": "if_applicable",
+        "can_auto_generate": true,
+        "generate_from": ["partner_info"],
+        "notes": "From collaborators, consultants, or resource providers."
+      },
+      {
+        "id": "resource_sharing",
+        "name": "Resource Sharing Plan(s)",
+        "required": true,
+        "conditional": "if_applicable",
+        "can_auto_generate": true,
+        "generate_from": ["project_info"],
+        "notes": "Data sharing, model organisms, genomic data sharing (GDS) policy compliance."
+      },
+      {
+        "id": "authentication",
+        "name": "Authentication of Key Biological and/or Chemical Resources",
+        "required": true,
+        "conditional": "if_applicable",
+        "can_auto_generate": true,
+        "generate_from": ["project_info"],
+        "notes": "Plan for authenticating key resources (cell lines, specialty chemicals, antibodies, etc.)."
+      },
+      {
+        "id": "cover_letter",
+        "name": "Cover Letter",
+        "required": false,
+        "can_auto_generate": true,
+        "generate_from": ["project_info"],
+        "notes": "Optional but encouraged. Required for mentored CDAs (must include list of referees). Do NOT use for assignment preferences."
+      },
+      {
+        "id": "inclusion_women_minorities",
+        "name": "Inclusion of Women and Minorities",
+        "required": true,
+        "conditional": "if_human_subjects",
+        "can_auto_generate": true,
+        "notes": "Inclusion enrollment report. Targeted/planned enrollment table."
+      },
+      {
+        "id": "inclusion_children",
+        "name": "Inclusion of Children",
+        "required": true,
+        "conditional": "if_human_subjects",
+        "can_auto_generate": true,
+        "notes": "Justification for inclusion or exclusion of children."
+      }
+    ],
+
+    "prerequisites": [
+      "SAM.gov registration with valid UEI",
+      "eRA Commons account for PI and all senior/key personnel",
+      "Grants.gov registration for institutional submission",
+      "Institutional Profile in eRA Commons",
+      "Signing Official (SO) designation in eRA Commons"
+    ]
+  },
+
+  "hud": {
+    "agency": "Department of Housing and Urban Development (HUD)",
+    "portal": "Grants.gov",
+    "portal_url": "https://www.grants.gov",
+
+    "required_forms": [
+      {
+        "form_number": "SF-424",
+        "name": "Application for Federal Assistance",
+        "required": true,
+        "can_auto_generate": true,
+        "notes": "Version 4.0 current."
+      },
+      {
+        "form_number": "HUD-424-B",
+        "name": "Assurances and Certifications for Recipients and Applicants",
+        "required": true,
+        "can_auto_generate": false,
+        "notes": "HUD-SPECIFIC. Replaces SF-424B and SF-424D. Covers civil rights certifications."
+      },
+      {
+        "form_number": "SF-424A",
+        "name": "Budget Information - Non-Construction Programs",
+        "required": true,
+        "conditional": "non_construction",
+        "can_auto_generate": true,
+        "generate_from": ["budget_data"],
+        "notes": "One of several budget form options."
+      },
+      {
+        "form_number": "HUD-424-CB",
+        "name": "Detailed Budget Form / Entity Information and Subrecipient Certifications",
+        "required": true,
+        "conditional": "per_nofo",
+        "can_auto_generate": true,
+        "generate_from": ["budget_data"],
+        "notes": "HUD-specific detailed budget form. Alternative to SF-424A depending on program."
+      },
+      {
+        "form_number": "HUD-424-CBW",
+        "name": "Detailed Budget Worksheet",
+        "required": true,
+        "conditional": "per_nofo",
+        "can_auto_generate": true,
+        "generate_from": ["budget_data"],
+        "notes": "Worksheet supporting HUD-424-CB."
+      },
+      {
+        "form_number": "HUD-424-M",
+        "name": "HUD Funding Matrix",
+        "required": true,
+        "conditional": "per_nofo",
+        "can_auto_generate": true,
+        "generate_from": ["budget_data", "funding_sources"],
+        "notes": "Shows all funding sources for the project."
+      },
+      {
+        "form_number": "SF-LLL",
+        "name": "Disclosure of Lobbying Activities",
+        "required": true,
+        "can_auto_generate": true,
+        "notes": "Version 2.0."
+      },
+      {
+        "form_number": "GG Lobbying Form",
+        "name": "Certification Regarding Lobbying",
+        "required": true,
+        "can_auto_generate": false,
+        "notes": "Version 1.1. Separate from SF-LLL."
+      },
+      {
+        "form_number": "HUD-2880",
+        "name": "Applicant/Recipient Disclosure/Update Report",
+        "required": true,
+        "can_auto_generate": false,
+        "notes": "Discloses all financial assistance received and pending. Must be updated."
+      },
+      {
+        "form_number": "HUD-96011",
+        "name": "Third Party Documentation Facsimile Transmittal",
+        "required": true,
+        "conditional": "if_third_party_docs_faxed",
+        "can_auto_generate": false,
+        "notes": "Cover page for faxed third-party documentation. Uses OCR - must use official form."
+      },
+      {
+        "form_number": "SF-424B",
+        "name": "Assurances - Non-Construction Programs",
+        "required": true,
+        "conditional": "if_specified_in_nofo_in_addition_to_HUD-424-B",
+        "can_auto_generate": false,
+        "notes": "May be required in addition to HUD-424-B per specific NOFO."
+      },
+      {
+        "form_number": "SF-424D",
+        "name": "Assurances - Construction Programs",
+        "required": true,
+        "conditional": "if_construction_project",
+        "can_auto_generate": false,
+        "notes": "Required for construction activities."
+      }
+    ],
+
+    "required_attachments": [
+      {
+        "id": "project_abstract",
+        "name": "Project Abstract",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["project_info"],
+        "notes": "Summary of proposed project."
+      },
+      {
+        "id": "project_narrative",
+        "name": "Project Narrative",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["project_info"],
+        "notes": "Detailed description per NOFO requirements."
+      },
+      {
+        "id": "consistency_certification",
+        "name": "Certification of Consistency with RC/EZ/EC-II Strategic Plan",
+        "required": true,
+        "conditional": "if_renewal_community_or_empowerment_zone",
+        "can_auto_generate": false,
+        "notes": "Required for projects in designated zones."
+      },
+      {
+        "id": "civil_rights_certifications",
+        "name": "Civil Rights Certifications",
+        "required": true,
+        "can_auto_generate": false,
+        "notes": "Embedded in HUD-424-B. Covers Title VI, Title VIII, Section 504, Age Discrimination Act, etc."
+      },
+      {
+        "id": "affirmatively_furthering_fair_housing",
+        "name": "Affirmatively Furthering Fair Housing Certification",
+        "required": true,
+        "conditional": "if_applicable_per_nofo",
+        "can_auto_generate": false,
+        "notes": "Certification that applicant will affirmatively further fair housing."
+      },
+      {
+        "id": "match_documentation",
+        "name": "Match / Leverage Documentation",
+        "required": true,
+        "conditional": "if_match_required",
+        "can_auto_generate": false,
+        "notes": "Documentation of committed matching funds."
+      },
+      {
+        "id": "capacity_narrative",
+        "name": "Organizational Capacity Narrative",
+        "required": true,
+        "conditional": "per_nofo",
+        "can_auto_generate": true,
+        "generate_from": ["org_profile"],
+        "notes": "Demonstrates organizational ability to carry out the project."
+      }
+    ],
+
+    "prerequisites": [
+      "SAM.gov registration with valid UEI",
+      "Grants.gov registration",
+      "Active HUD-2880 on file"
+    ]
+  },
+
+  "epa": {
+    "agency": "Environmental Protection Agency (EPA)",
+    "portal": "Grants.gov",
+    "portal_url": "https://www.grants.gov",
+
+    "required_forms_pre_award": [
+      {
+        "form_number": "SF-424",
+        "name": "Application for Federal Assistance",
+        "required": true,
+        "can_auto_generate": true,
+        "notes": "With authorized signature."
+      },
+      {
+        "form_number": "SF-424A",
+        "name": "Budget Information - Non-Construction Programs",
+        "required": true,
+        "conditional": "non_construction",
+        "can_auto_generate": true
+      },
+      {
+        "form_number": "SF-424B",
+        "name": "Assurances - Non-Construction Programs",
+        "required": true,
+        "conditional": "non_construction",
+        "can_auto_generate": false
+      },
+      {
+        "form_number": "SF-424C",
+        "name": "Budget Information - Construction Programs",
+        "required": true,
+        "conditional": "construction",
+        "can_auto_generate": true
+      },
+      {
+        "form_number": "SF-424D",
+        "name": "Assurances - Construction Programs",
+        "required": true,
+        "conditional": "construction",
+        "can_auto_generate": false
+      },
+      {
+        "form_number": "SF-LLL",
+        "name": "Disclosure of Lobbying Activities",
+        "required": true,
+        "can_auto_generate": true
+      },
+      {
+        "form_number": "EPA 4700-4",
+        "name": "Preaward Compliance Review Report",
+        "required": true,
+        "can_auto_generate": false,
+        "notes": "Civil rights preaward review. Must be completely filled out or EPA will follow up. Version 5.0 current."
+      },
+      {
+        "form_number": "EPA 5700-54",
+        "name": "Key Contacts Form",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["contact_info"],
+        "notes": "Includes Additional Contacts Form."
+      },
+      {
+        "form_number": "EPA 5700-54-2",
+        "name": "Key Contact Form for Multiple Principal Investigator",
+        "required": true,
+        "conditional": "if_multiple_PIs",
+        "can_auto_generate": true,
+        "generate_from": ["pi_info"]
+      },
+      {
+        "form_number": "EPA 6600-06",
+        "name": "Certification Regarding Lobbying",
+        "required": true,
+        "can_auto_generate": false,
+        "notes": "EPA-specific lobbying certification. Required for awards >$100,000. Must have current authorized signature."
+      },
+      {
+        "form_number": "EPA 6600-01",
+        "name": "Limited Scope Administrative and Financial Review Questionnaire",
+        "required": true,
+        "conditional": "per_nofo",
+        "can_auto_generate": false,
+        "notes": "Assesses administrative and financial capability."
+      },
+      {
+        "form_number": "NCER Form 5",
+        "name": "Current and Pending Support",
+        "required": true,
+        "conditional": "if_research_grant",
+        "can_auto_generate": false,
+        "notes": "For research grants through NCER."
+      }
+    ],
+
+    "required_attachments": [
+      {
+        "id": "work_plan",
+        "name": "Detailed Work Plan",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["project_info", "milestones"],
+        "notes": "Project objectives, methods, timeline, deliverables."
+      },
+      {
+        "id": "budget_narrative",
+        "name": "Budget Narrative",
+        "required": true,
+        "can_auto_generate": true,
+        "generate_from": ["budget_data"],
+        "notes": "Justification for each budget category."
+      },
+      {
+        "id": "qapp",
+        "name": "Quality Assurance Project Plan (QAPP)",
+        "required": true,
+        "conditional": "if_environmental_data_collection",
+        "can_auto_generate": false,
+        "notes": "Required post-award (within 30-90 days) for projects collecting environmental data. Cannot begin data collection until EPA approves. Must meet QAPP Standard per July 2023 requirements."
+      },
+      {
+        "id": "nepa",
+        "name": "National Environmental Policy Act (NEPA) Documentation",
+        "required": true,
+        "conditional": "if_construction_or_physical_environment_impact",
+        "can_auto_generate": false,
+        "notes": "EPA must complete NEPA process before issuing award for construction activities."
+      },
+      {
+        "id": "indirect_cost_rate",
+        "name": "Indirect Cost Rate Agreement",
+        "required": true,
+        "conditional": "if_claiming_indirect_costs",
+        "can_auto_generate": false,
+        "notes": "Current NICRA or de minimis certification."
+      }
+    ],
+
+    "post_award_forms": [
+      {
+        "form_number": "EPA 5700-52A",
+        "name": "MBE/WBE Utilization Under Federal Grants and Cooperative Agreements",
+        "required": true,
+        "conditional": "currently_suspended",
+        "notes": "Minority/Women Business Enterprise reporting. Currently suspended."
+      },
+      {
+        "form_number": "EPA 5700-53",
+        "name": "Lobbying and Litigation Certificate",
+        "required": true,
+        "notes": "Annual reporting requirement."
+      },
+      {
+        "form_number": "EPA 6600-08A",
+        "name": "Certificate of Indirect Costs (State/Local/Tribal)",
+        "required": true,
+        "conditional": "state_local_tribal"
+      },
+      {
+        "form_number": "EPA 6600-08B",
+        "name": "Lobbying Indirect Cost Certificate (Non-Profits)",
+        "required": true,
+        "conditional": "nonprofits"
+      },
+      {
+        "form_number": "SF-425",
+        "name": "Federal Financial Report",
+        "required": true,
+        "notes": "Periodic financial reporting."
+      },
+      {
+        "form_number": "SF-428",
+        "name": "Tangible Personal Property Report",
+        "required": true,
+        "conditional": "if_equipment_purchased",
+        "notes": "Includes variants: SF-428-A (Annual), SF-428-B (Final), SF-428-C (Disposition), SF-428S (Supplement)."
+      },
+      {
+        "form_number": "SF-429",
+        "name": "Real Property Status Report",
+        "required": true,
+        "conditional": "if_real_property"
+      },
+      {
+        "form_number": "SF-SAC",
+        "name": "Data Collection Form for Single Audits",
+        "required": true,
+        "conditional": "if_single_audit_required"
+      }
+    ],
+
+    "prerequisites": [
+      "SAM.gov registration with valid UEI",
+      "Grants.gov registration"
+    ]
+  },
+
+  "fema": {
+    "agency": "Federal Emergency Management Agency (FEMA)",
+    "portal": "FEMA GO (Grants Outcomes) / Grants.gov",
+    "portal_url": "https://go.fema.gov",
+    "governing_documents": [
+      "HMA Program and Policy Guide Version 2.1 (January 2025)",
+      "Preparedness Grants Manual FM-207-23-001 (August 2025)"
+    ],
+
+    "standard_federal_forms": [
+      {
+        "form_number": "SF-424",
+        "name": "Application for Federal Assistance",
+        "required": true,
+        "can_auto_generate": true
+      },
+      {
+        "form_number": "SF-424A",
+        "name": "Budget Information - Non-Construction Programs",
+        "required": true,
+        "conditional": "non_construction",
+        "can_auto_generate": true
+      },
+      {
+        "form_number": "SF-424B",
+        "name": "Assurances - Non-Construction Programs",
+        "required": true,
+        "conditional": "non_construction",
+        "can_auto_generate": false
+      },
+      {
+        "form_number": "SF-424C",
+        "name": "Budget Information - Construction Programs",
+        "required": true,
+        "conditional": "construction",
+        "can_auto_generate": true
+      },
+      {
+        "form_number": "SF-424D",
+        "name": "Assurances - Construction Programs",
+        "required": true,
+        "conditional": "construction",
+        "can_auto_generate": false
+      },
+      {
+        "form_number": "SF-LLL",
+        "name": "Disclosure of Lobbying Activities",
+        "required": true,
+        "can_auto_generate": true
+      },
+      {
+        "form_number": "Lobbying Certification",
+        "name": "Certification Regarding Lobbying",
+        "required": true,
+        "can_auto_generate": false
+      }
+    ],
+
+    "hazard_mitigation_forms": {
+      "programs": ["BRIC", "HMGP", "FMA", "STRLF"],
+      "forms": [
+        {
+          "id": "bca",
+          "name": "Benefit-Cost Analysis (BCA)",
+          "required": true,
+          "can_auto_generate": false,
+          "notes": "Must use FEMA BCA Toolkit. Discount rate reduced to 3.1% (from 7%). Required to demonstrate cost-effectiveness."
+        },
+        {
+          "id": "ehp_screening",
+          "name": "Environmental and Historic Preservation (EHP) Screening Form",
+          "form_number": "FEMA Form 024-0-1",
+          "required": true,
+          "conditional": "if_physical_project",
+          "can_auto_generate": false,
+          "notes": "Initiates EHP compliance review for projects modifying buildings/structures or new construction."
+        },
+        {
+          "id": "scope_of_work",
+          "name": "Scope of Work",
+          "required": true,
+          "can_auto_generate": true,
+          "generate_from": ["project_info"],
+          "notes": "Detailed project description with schedule and budget."
+        },
+        {
+          "id": "cost_estimate",
+          "name": "Cost Estimate",
+          "required": true,
+          "can_auto_generate": false,
+          "notes": "Detailed cost breakdown supporting the budget."
+        },
+        {
+          "id": "hazard_mitigation_plan",
+          "name": "FEMA-Approved Hazard Mitigation Plan",
+          "required": true,
+          "can_auto_generate": false,
+          "notes": "Applicant's jurisdiction must have a FEMA-approved plan."
+        }
+      ]
+    },
+
+    "preparedness_grant_forms": {
+      "programs": ["HSGP/SHSP", "UASI", "OPSG"],
+      "forms": [
+        {
+          "id": "investment_justification",
+          "name": "Investment Justification (IJ)",
+          "required": true,
+          "can_auto_generate": true,
+          "generate_from": ["project_info", "capabilities"],
+          "notes": "Min 2, max 12 strategic investments. Must show core capability alignment. LETPA compliance (>=35%)."
+        },
+        {
+          "id": "detailed_budget",
+          "name": "Detailed Budget (Web-based in FEMA GO)",
+          "required": true,
+          "can_auto_generate": true,
+          "generate_from": ["budget_data"]
+        },
+        {
+          "id": "sac_charter",
+          "name": "Senior Advisory Committee (SAC) Charter and Membership",
+          "required": true,
+          "conditional": "SHSP",
+          "can_auto_generate": false,
+          "notes": "Charter plus membership list with POC info."
+        },
+        {
+          "id": "uawg_charter",
+          "name": "Urban Area Working Group (UAWG) Charter and Membership",
+          "required": true,
+          "conditional": "UASI",
+          "can_auto_generate": false,
+          "notes": "Charter plus membership list with POC info."
+        },
+        {
+          "id": "operations_orders",
+          "name": "Operations Orders",
+          "required": true,
+          "conditional": "OPSG_post_award",
+          "can_auto_generate": false
+        },
+        {
+          "id": "indirect_cost_rate",
+          "name": "Indirect Cost Rate Agreement",
+          "required": true,
+          "conditional": "if_claiming_indirect_costs",
+          "can_auto_generate": false
+        },
+        {
+          "id": "pre_award_costs",
+          "name": "Pre-Award Costs Request Letter",
+          "required": true,
+          "conditional": "if_requesting_pre_award_costs",
+          "can_auto_generate": true,
+          "notes": "Must be signed by Authorized Organization Representative."
+        }
+      ]
+    },
+
+    "prerequisites": [
+      "SAM.gov registration with valid UEI",
+      "Grants.gov registration",
+      "FEMA GO account"
+    ]
+  },
+
+  "auto_generation_summary": {
+    "description": "Summary of which forms the GrantPro system can auto-generate vs. requiring upload",
+    "can_auto_generate_from_user_data": [
+      "SF-424 (Application for Federal Assistance) - from org profile + project info",
+      "SF-424A (Budget - Non-Construction) - from budget data",
+      "SF-424C (Budget - Construction) - from budget data",
+      "SF-LLL (Lobbying Disclosure) - from org profile",
+      "Project Summaries / Abstracts - from project description AI",
+      "Project Narratives - from project description AI",
+      "Budget Detail Worksheets - from budget data",
+      "Budget Narratives / Justifications - from budget data + AI",
+      "Timelines / Project Schedules - from milestones",
+      "Letters of Support / Collaboration - from partner info + AI templates",
+      "MOUs - from partner info + AI templates",
+      "Position Descriptions - from key personnel + project info",
+      "Research Independence Statements - from org profile + AI",
+      "Scope of Work documents - from project info + AI",
+      "Investment Justifications - from project info + capabilities + AI",
+      "NSF Cover Sheet fields - from org profile + project info",
+      "NIH Specific Aims - from research questions + AI",
+      "NIH Research Strategy sections - from project info + methods + AI",
+      "EPA Key Contacts Form (5700-54) - from contact info",
+      "HUD Funding Matrix (424-M) - from budget + funding sources",
+      "Consolidated Category Summary (DOJ) - from budget data"
+    ],
+    "must_be_uploaded_by_user": [
+      "SF-424B/D (Assurances) - requires authorized signature on official form",
+      "Lobbying Certifications - requires authorized signature",
+      "IRS 501(c)(3) Determination Letter",
+      "Indirect Cost Rate Agreement (NICRA)",
+      "Single Audit Report",
+      "Resumes / CVs for key personnel",
+      "Biographical Sketches (NSF via SciENcv, NIH via NIH format)",
+      "Current and Pending Support (NSF via SciENcv, NIH Just-in-Time)",
+      "Collaborators and Other Affiliations (NSF COA template)",
+      "Synergistic Activities (NSF)",
+      "IRB Approval / Human Subjects Documentation",
+      "IACUC Approval / Vertebrate Animals Documentation",
+      "EPA Form 4700-4 (Preaward Compliance Review)",
+      "EPA Form 6600-06 (Lobbying Certification)",
+      "EPA Form 6600-01 (Admin/Financial Review Questionnaire)",
+      "FEMA BCA Toolkit output (Benefit-Cost Analysis)",
+      "FEMA EHP Screening Form (024-0-1)",
+      "FEMA-Approved Hazard Mitigation Plan",
+      "HUD-2880 (Disclosure/Update Report)",
+      "HUD-424-B (Assurances and Certifications)",
+      "HUD-96011 (Facsimile Transmittal)",
+      "Tribal Authorizing Resolutions",
+      "Board Resolutions",
+      "Financial Management Questionnaire responses (DOJ)",
+      "Select Agent Research documentation",
+      "Quality Assurance Project Plan (EPA - post-award)"
+    ],
+    "can_generate_reasonable_draft_for_user_review": [
+      "DOJ Budget Detail Worksheet - generate pre-filled, user verifies",
+      "DOJ Proposal Narrative - AI draft from intake data",
+      "NIH Specific Aims page - AI draft from research questions",
+      "NIH Research Strategy - AI draft sections from project info",
+      "NSF Project Summary - AI draft with 3 required sections",
+      "NSF Project Description - AI draft framework",
+      "NSF Data Management Plan - AI draft from project type template",
+      "NSF Mentoring Plan - AI draft from personnel info",
+      "EPA Work Plan - AI draft from project objectives",
+      "FEMA Investment Justification - AI draft from capabilities assessment",
+      "Letters of Support - AI template for partner to customize and sign",
+      "MOUs - AI template with standard clauses",
+      "Position Descriptions - AI draft from role requirements"
+    ]
+  }
+}
