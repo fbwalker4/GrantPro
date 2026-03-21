@@ -194,6 +194,19 @@ def init_db():
             updated_at TEXT
         )''')
 
+        # Grant shares table - shareable read-only links for review
+        c.execute('''CREATE TABLE IF NOT EXISTS grant_shares (
+            id TEXT PRIMARY KEY,
+            grant_id TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            share_token TEXT UNIQUE NOT NULL,
+            recipient_name TEXT,
+            recipient_email TEXT,
+            permission TEXT DEFAULT 'view',
+            expires_at TEXT,
+            created_at TEXT
+        )''')
+
         # Grant checklist table - submission readiness checklist items
         c.execute('''CREATE TABLE IF NOT EXISTS grant_checklist (
             id TEXT PRIMARY KEY,

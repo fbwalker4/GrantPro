@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ grant.grant_name }} - Grant Application Review</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --bg-card: #ffffff;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+        .header {
+            text-align: center;
+            padding: 2.5rem 1rem 2rem;
+            border-bottom: 2px solid var(--accent);
+            margin-bottom: 2rem;
+        }
+        .header h1 { font-size: 1.75rem; margin-bottom: 0.25rem; color: var(--text); }
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .header .shared-by {
+            display: inline-block;
+            background: var(--accent-light);
+            color: var(--accent);
+            padding: 0.35rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 0.75rem;
+        }
+        .meta-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+        .meta-card p { font-size: 0.95rem; }
+        .meta-card strong { color: var(--text); }
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+        .section-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            color: var(--accent);
+            text-transform: capitalize;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+        .section-card .content {
+            white-space: pre-wrap;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .budget-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 4px solid #059669;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+        .budget-card h3 { color: #059669; margin-bottom: 1rem; }
+        .budget-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+        .budget-row:last-child { border-bottom: none; }
+        .budget-row.total { font-weight: 700; font-size: 1.05rem; border-top: 2px solid var(--border); padding-top: 0.75rem; margin-top: 0.5rem; }
+        .print-btn {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .print-btn:hover { opacity: 0.9; }
+        .footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        .no-sections {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 2rem;
+            font-style: italic;
+        }
+        @media print {
+            .print-btn { display: none; }
+            body { background: #fff; }
+            .container { padding: 0; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>{{ grant.grant_name }}</h1>
+        <p class="subtitle">{{ grant.organization_name }}{% if grant.agency %} &mdash; {{ grant.agency }}{% endif %}</p>
+        <div class="shared-by">
+            Shared by {{ sharer_name }}{% if recipient_name %} for {{ recipient_name }}{% endif %} for review
+        </div>
+    </div>
+
+    <div class="meta-card">
+        <p><strong>Organization:</strong> {{ grant.organization_name }}</p>
+        <p><strong>Agency:</strong> {{ grant.agency or 'N/A' }}</p>
+        <p><strong>Amount:</strong> ${{ "{:,.0f}".format(grant.amount) if grant.amount else 'N/A' }}</p>
+        <p><strong>Deadline:</strong> {{ grant.deadline or 'N/A' }}</p>
+        <p><strong>Status:</strong> {{ grant.status or 'N/A' }}</p>
+        {% if grant.template %}
+        <p><strong>Template:</strong> {{ grant.template|upper }}</p>
+        {% endif %}
+    </div>
+
+    {% if drafts and drafts|length > 0 %}
+        {% for draft in drafts %}
+        <div class="section-card">
+            <h3>{{ draft.section|replace('_', ' ') }}</h3>
+            <div class="content">{{ draft.content }}</div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-sections">No sections have been drafted yet.</div>
+    {% endif %}
+
+    {% if budget %}
+    <div class="budget-card">
+        <h3>Budget Summary</h3>
+        {% if budget.project_title %}
+        <p style="margin-bottom:1rem;"><strong>Project:</strong> {{ budget.project_title }}</p>
+        {% endif %}
+        {% set personnel_total = budget.fringe_total or 0 %}
+        {% if budget.personnel %}
+            {% set pdata = budget.personnel %}
+            {% if pdata is string %}
+                {% set pdata = [] %}
+            {% endif %}
+        {% endif %}
+        <div class="budget-row"><span>Travel</span><span>${{ "{:,.2f}".format(budget.travel_total or 0) }}</span></div>
+        <div class="budget-row"><span>Equipment</span><span>${{ "{:,.2f}".format(budget.equipment_total or 0) }}</span></div>
+        <div class="budget-row"><span>Supplies</span><span>${{ "{:,.2f}".format(budget.supplies_total or 0) }}</span></div>
+        <div class="budget-row"><span>Contractual</span><span>${{ "{:,.2f}".format(budget.contractual_total or 0) }}</span></div>
+        <div class="budget-row"><span>Other</span><span>${{ "{:,.2f}".format(budget.other_total or 0) }}</span></div>
+        <div class="budget-row"><span>Total Direct Costs</span><span>${{ "{:,.2f}".format(budget.total_direct or 0) }}</span></div>
+        <div class="budget-row"><span>Indirect Costs ({{ budget.indirect_rate or 0 }}%)</span><span>${{ "{:,.2f}".format(budget.indirect_total or 0) }}</span></div>
+        <div class="budget-row total"><span>Grand Total</span><span>${{ "{:,.2f}".format(budget.grand_total or 0) }}</span></div>
+        {% if budget.match_total and budget.match_total > 0 %}
+        <div class="budget-row" style="margin-top:0.75rem;color:#059669;"><span>Cost Share / Match</span><span>${{ "{:,.2f}".format(budget.match_total) }}</span></div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div style="text-align:center; margin: 2rem 0;">
+        <button class="print-btn" onclick="window.print()">Print this page</button>
+    </div>
+
+    <div class="footer">
+        Shared via <strong>GrantPro.org</strong>
+    </div>
+</div>
+</body>
+</html>

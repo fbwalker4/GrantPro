@@ -387,3 +387,18 @@ CREATE INDEX IF NOT EXISTS idx_guest_saves_grant_id ON guest_saves(grant_id);
 -- Leads
 CREATE INDEX IF NOT EXISTS idx_leads_email ON leads(email);
 CREATE INDEX IF NOT EXISTS idx_leads_status ON leads(status);
+
+-- Grant shares - shareable read-only links for review
+CREATE TABLE IF NOT EXISTS grant_shares (
+    id TEXT PRIMARY KEY,
+    grant_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    share_token TEXT UNIQUE NOT NULL,
+    recipient_name TEXT,
+    recipient_email TEXT,
+    permission TEXT DEFAULT 'view',
+    expires_at TEXT,
+    created_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_grant_shares_token ON grant_shares(share_token);
+CREATE INDEX IF NOT EXISTS idx_grant_shares_grant_id ON grant_shares(grant_id);

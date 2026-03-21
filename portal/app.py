@@ -5600,6 +5600,91 @@ def _ensure_checklist_certs(grant_id, user_id):
     conn.close()
 
 
+# ============ SHARE FOR REVIEW ============
+
+@app.route('/grant/<grant_id>/share', methods=['POST'])
+@login_required
+@paid_required
+@csrf_required
+def grant_share(grant_id):
+    """Generate a shareable read-only link for grant review"""
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    user = get_current_user()
+    recipient_name = request.form.get('recipient_name', '').strip()
+    recipient_email = request.form.get('recipient_email', '').strip()
+
+    share_token = secrets.token_urlsafe(32)
+    share_id = f"share-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
+    now = datetime.now().isoformat()
+
+    conn = get_db()
+    conn.execute('''
+        INSERT INTO grant_shares (id, grant_id, user_id, share_token, recipient_name, recipient_email, permission, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, 'view', ?)
+    ''', (share_id, grant_id, user['id'], share_token, recipient_name or None, recipient_email or None, now))
+    conn.commit()
+    conn.close()
+
+    share_url = request.host_url.rstrip('/') + f'/shared/{share_token}'
+    flash(f'Share link created! Send this link: {share_url}', 'success')
+    return redirect(url_for('grant_detail', grant_id=grant_id))
+
+
+@app.route('/shared/<token>')
+def shared_grant_view(token):
+    """Public read-only view of a shared grant"""
+    conn = get_db()
+
+    share = conn.execute('SELECT * FROM grant_shares WHERE share_token = ?', (token,)).fetchone()
+    if not share:
+        conn.close()
+        return "This share link is invalid or has expired.", 404
+
+    # Check expiry
+    if share['expires_at']:
+        from datetime import datetime as _dt
+        try:
+            expires = _dt.fromisoformat(share['expires_at'])
+            if _dt.now() > expires:
+                conn.close()
+                return "This share link has expired.", 410
+        except (ValueError, TypeError):
+            pass
+
+    grant = conn.execute('''
+        SELECT g.*, c.organization_name, c.contact_name
+        FROM grants g
+        JOIN clients c ON g.client_id = c.id
+        WHERE g.id = ?
+    ''', (share['grant_id'],)).fetchone()
+
+    if not grant:
+        conn.close()
+        return "Grant not found.", 404
+
+    drafts = conn.execute('''
+        SELECT * FROM drafts WHERE grant_id = ? ORDER BY section
+    ''', (share['grant_id'],)).fetchall()
+
+    budget = conn.execute('SELECT * FROM grant_budget WHERE grant_id = ?', (share['grant_id'],)).fetchone()
+
+    # Get sharer name
+    sharer = user_models.get_user_by_id(share['user_id'])
+    sharer_name = sharer.get('name', sharer.get('email', 'A GrantPro user')) if sharer else 'A GrantPro user'
+
+    conn.close()
+
+    return render_template('grant_shared.html',
+                           grant=grant,
+                           drafts=drafts,
+                           budget=budget,
+                           sharer_name=sharer_name,
+                           recipient_name=share['recipient_name'])
+
+
 # ============ MAIN ============
 
 if __name__ == '__main__':
