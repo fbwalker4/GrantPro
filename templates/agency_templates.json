@@ -316,7 +316,23 @@
         "url": "https://www.research.gov",
         "notes": "FastLane being phased out; Research.gov is primary submission system. Biosketches must use SciENcv format."
       },
-      "ai_context": "NSF proposals must clearly address Intellectual Merit and Broader Impacts as the two foundational review criteria. The Project Summary must contain three labeled sections: Overview, Intellectual Merit, and Broader Impacts. The PAPPG (currently NSF 24-1) governs all proposal requirements. Nearly all NSF funding is competitive with peer review. Biosketches must use SciENcv format. Senior personnel must certify non-participation in Malign Foreign Talent Recruitment Programs."
+      "ai_context": "NSF proposals must clearly address Intellectual Merit and Broader Impacts as the two foundational review criteria. The Project Summary must contain three labeled sections: Overview, Intellectual Merit, and Broader Impacts. The PAPPG (currently NSF 24-1) governs all proposal requirements. Nearly all NSF funding is competitive with peer review. Biosketches must use SciENcv format. Senior personnel must certify non-participation in Malign Foreign Talent Recruitment Programs.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 11,
+        "font_size_max": 12,
+        "caption_font_size_min": 10,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial",
+          "Computer Modern",
+          "Palatino Linotype"
+        ],
+        "notes": "Research.gov auto-checks compliance. Minimum 11pt for body text, 10pt for captions/footnotes."
+      }
     },
     "doe": {
       "name": "Department of Energy (DOE)",
@@ -579,7 +595,20 @@
         "url": "https://www.grants.gov",
         "notes": "ARPA-E uses eXCHANGE portal (arpa-e-foa.energy.gov). EERE uses EERE Exchange. Office of Science uses PAMS."
       },
-      "ai_context": "DOE proposals must address relevance to DOE mission areas (energy, environment, nuclear security). NEPA compliance is critical -- include environmental questionnaire. Buy America applies to infrastructure projects. For ARPA-E, emphasize transformative potential and technology-to-market pathway. DOE has specific cost principles for for-profit entities under 2 CFR 910. Davis-Bacon applies to construction projects, especially under IIJA/BIL funding."
+      "ai_context": "DOE proposals must address relevance to DOE mission areas (energy, environment, nuclear security). NEPA compliance is critical -- include environmental questionnaire. Buy America applies to infrastructure projects. For ARPA-E, emphasize transformative potential and technology-to-market pathway. DOE has specific cost principles for for-profit entities under 2 CFR 910. Davis-Bacon applies to construction projects, especially under IIJA/BIL funding.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 11,
+        "font_size_max": 12,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial"
+        ],
+        "notes": "11pt minimum. Times New Roman or Arial."
+      }
     },
     "nih": {
       "name": "National Institutes of Health (NIH)",
@@ -804,7 +833,23 @@
         "url": "https://era.nih.gov",
         "notes": "Applications submitted via ASSIST or Grants.gov, managed through eRA Commons. Biosketches must use SciENcv format."
       },
-      "ai_context": "NIH proposals must address Significance, Innovation, and Approach in the Research Strategy section. Specific Aims page (1 page) is the most critical component. Use PHS398 budget forms. Biosketches must use NIH SciENcv format. IRB approval required for human subjects; IACUC for animal research. Financial Conflict of Interest disclosure mandatory. Data Management and Sharing Plan required since Jan 2023. NIH indirect cost rate cap controversy: court blocked 15% cap in Apr 2025, appeal pending."
+      "ai_context": "NIH proposals must address Significance, Innovation, and Approach in the Research Strategy section. Specific Aims page (1 page) is the most critical component. Use PHS398 budget forms. Biosketches must use NIH SciENcv format. IRB approval required for human subjects; IACUC for animal research. Financial Conflict of Interest disclosure mandatory. Data Management and Sharing Plan required since Jan 2023. NIH indirect cost rate cap controversy: court blocked 15% cap in Apr 2025, appeal pending.",
+      "formatting_rules": {
+        "font": "Arial",
+        "font_size_min": 11,
+        "font_size_max": 11,
+        "figure_font_size_min": 6,
+        "line_spacing": 1.0,
+        "margins_inches": 0.5,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Arial",
+          "Georgia",
+          "Helvetica",
+          "Palatino Linotype"
+        ],
+        "notes": "No less than 11pt for body text. No less than 6pt for figures, legends, and footnotes. 0.5-inch margins minimum."
+      }
     },
     "usda": {
       "name": "USDA (Rural Development / SBIR)",
@@ -1026,7 +1071,21 @@
         "url": "https://www.grants.gov",
         "notes": "NIFA uses specific application systems for some programs. SBIR applications may have separate submission requirements."
       },
-      "ai_context": "USDA proposals should emphasize relevance to agriculture, food systems, or rural development. NIFA research grants have a unique 30% statutory cap on indirect costs. Land-grant institutions (1862, 1890, 1994) have priority for many NIFA programs. Environmental review (NEPA) applies. Civil rights compliance is actively audited by USDA. Rural Development programs generally serve communities under 50,000 population."
+      "ai_context": "USDA proposals should emphasize relevance to agriculture, food systems, or rural development. NIFA research grants have a unique 30% statutory cap on indirect costs. Land-grant institutions (1862, 1890, 1994) have priority for many NIFA programs. Environmental review (NEPA) applies. Civil rights compliance is actively audited by USDA. Rural Development programs generally serve communities under 50,000 population.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial",
+          "Helvetica"
+        ],
+        "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
+      }
     },
     "epa": {
       "name": "EPA (Environmental Protection Agency)",
@@ -1225,7 +1284,20 @@
         "url": "https://www.grants.gov",
         "notes": "EPA also has its own Grants Management portal for post-award management."
       },
-      "ai_context": "EPA proposals must clearly describe environmental outcomes and benefits. Quality Assurance Project Plans (QAPPs) are required for any environmental data collection, typically due 30-90 days after award. MBE/WBE utilization targets must be addressed. Brownfields programs require state environmental authority letter of acknowledgment. Environmental Justice grants should address disproportionate environmental impacts on underserved communities. Title VI compliance is especially important for EJ programs."
+      "ai_context": "EPA proposals must clearly describe environmental outcomes and benefits. Quality Assurance Project Plans (QAPPs) are required for any environmental data collection, typically due 30-90 days after award. MBE/WBE utilization targets must be addressed. Brownfields programs require state environmental authority letter of acknowledgment. Environmental Justice grants should address disproportionate environmental impacts on underserved communities. Title VI compliance is especially important for EJ programs.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial"
+        ],
+        "notes": "Single-spaced. 12pt Times New Roman or Arial."
+      }
     },
     "dot": {
       "name": "DOT (Department of Transportation)",
@@ -1445,7 +1517,21 @@
         "url": "https://www.grants.gov",
         "notes": "DOT has a DOT Navigator web resource to help first-time applicants. BUILD/RAISE grants submit through Grants.gov."
       },
-      "ai_context": "DOT proposals must address merit criteria including safety, economic competitiveness, quality of life, environmental sustainability, innovation, and state of good repair. Benefit-Cost Analysis (BCA) is required for BUILD/RAISE/INFRA grants using DOT methodology and 3.1% discount rate. Davis-Bacon and Buy America are strictly enforced. NEPA review must be completed before construction funds are obligated. DBE utilization goals required. Match requirements vary: 80/20 standard, up to 100% federal for rural and equity areas. BUILD grants were rebranded from RAISE in FY2026."
+      "ai_context": "DOT proposals must address merit criteria including safety, economic competitiveness, quality of life, environmental sustainability, innovation, and state of good repair. Benefit-Cost Analysis (BCA) is required for BUILD/RAISE/INFRA grants using DOT methodology and 3.1% discount rate. Davis-Bacon and Buy America are strictly enforced. NEPA review must be completed before construction funds are obligated. DBE utilization goals required. Match requirements vary: 80/20 standard, up to 100% federal for rural and equity areas. BUILD grants were rebranded from RAISE in FY2026.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial",
+          "Helvetica"
+        ],
+        "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
+      }
     },
     "nist": {
       "name": "NIST (National Institute of Standards and Technology)",
@@ -1635,7 +1721,21 @@
         "url": "https://www.grants.gov",
         "notes": "NIST is a relatively small granting agency. MEP and SBIR are the primary external grant programs."
       },
-      "ai_context": "NIST proposals must connect to standards, measurement, or manufacturing missions. Bayh-Dole IP provisions are critical -- NIST is the lead agency on march-in rights interpretation. MEP Centers require 1:1 matching and use NIST MEP performance measurement system. SBIR awards are among the smallest across agencies (Phase I: $100K). Cybersecurity grants may require alignment with NIST Cybersecurity Framework. NIST provides substantial involvement through cooperative agreements, not just funding."
+      "ai_context": "NIST proposals must connect to standards, measurement, or manufacturing missions. Bayh-Dole IP provisions are critical -- NIST is the lead agency on march-in rights interpretation. MEP Centers require 1:1 matching and use NIST MEP performance measurement system. SBIR awards are among the smallest across agencies (Phase I: $100K). Cybersecurity grants may require alignment with NIST Cybersecurity Framework. NIST provides substantial involvement through cooperative agreements, not just funding.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial",
+          "Helvetica"
+        ],
+        "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
+      }
     },
     "generic": {
       "name": "Generic Federal Grant",
@@ -1866,7 +1966,21 @@
         "url": "https://www.grants.gov",
         "notes": "Some agencies use additional portals. Check the specific NOFO for submission instructions."
       },
-      "ai_context": "This is a generic federal grant template. When generating content, follow standard federal grant writing conventions: clear statement of need with data, measurable objectives, detailed methodology, realistic budget, and strong evaluation plan. Ensure all costs are allowable, reasonable, and allocable per 2 CFR 200. Address all selection criteria from the NOFO in the order presented."
+      "ai_context": "This is a generic federal grant template. When generating content, follow standard federal grant writing conventions: clear statement of need with data, measurable objectives, detailed methodology, realistic budget, and strong evaluation plan. Ensure all costs are allowable, reasonable, and allocable per 2 CFR 200. Address all selection criteria from the NOFO in the order presented.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial",
+          "Helvetica"
+        ],
+        "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
+      }
     },
     "nea": {
       "name": "NEA - Grants for Arts Projects",
@@ -2077,7 +2191,21 @@
         "url": "https://www.grants.gov",
         "notes": "NEA applications submitted through Grants.gov. Two annual deadlines (typically February and July). Late applications rejected without review."
       },
-      "ai_context": "NEA proposals emphasize artistic quality above all other criteria -- unlike most federal grants. Work samples are critical and must demonstrate artistic merit. All grants require 1:1 non-federal match. No subgranting allowed (cannot regrant funds). Accessibility/ADA compliance must be explicitly addressed. Content restrictions apply (no obscenity per Miller test). NEA grants are small ($10K-$100K) but carry full federal compliance burden. NEA acknowledgment and logo required in all published materials."
+      "ai_context": "NEA proposals emphasize artistic quality above all other criteria -- unlike most federal grants. Work samples are critical and must demonstrate artistic merit. All grants require 1:1 non-federal match. No subgranting allowed (cannot regrant funds). Accessibility/ADA compliance must be explicitly addressed. Content restrictions apply (no obscenity per Miller test). NEA grants are small ($10K-$100K) but carry full federal compliance burden. NEA acknowledgment and logo required in all published materials.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial",
+          "Helvetica"
+        ],
+        "notes": "12pt, clear legible font, standard margins."
+      }
     },
     "nea_challenge": {
       "name": "NEA - Challenge America",
@@ -2271,7 +2399,21 @@
         "url": "https://www.grants.gov",
         "notes": "Challenge America was folded into Grants for Arts Projects as a discipline for FY2026."
       },
-      "ai_context": "Challenge America targets small organizations (budgets under $250,000), first-time NEA applicants, and underserved communities. Grant is fixed at $10,000 with required 1:1 match. Narrative is shorter than standard GAP (4,000 characters). Focus on reaching new audiences and underserved populations. Artistic merit and community impact are key criteria. Now operates within the Grants for Arts Projects framework as of FY2026."
+      "ai_context": "Challenge America targets small organizations (budgets under $250,000), first-time NEA applicants, and underserved communities. Grant is fixed at $10,000 with required 1:1 match. Narrative is shorter than standard GAP (4,000 characters). Focus on reaching new audiences and underserved populations. Artistic merit and community impact are key criteria. Now operates within the Grants for Arts Projects framework as of FY2026.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial",
+          "Helvetica"
+        ],
+        "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
+      }
     },
     "artist_individual": {
       "name": "Artist Individual Grant",
@@ -2422,7 +2564,21 @@
         "url": null,
         "notes": "State arts councils, private foundations, and individual artist programs each have their own submission systems."
       },
-      "ai_context": "Individual artist grants prioritize artistic quality and creative vision. Work samples are the most important component. Artist statement should convey unique voice and approach. Budget should be straightforward listing of project expenses. No nonprofit status required for most programs. These are typically from state arts councils or private foundations, not federal agencies (except NEA Literature Fellowships and Jazz Masters)."
+      "ai_context": "Individual artist grants prioritize artistic quality and creative vision. Work samples are the most important component. Artist statement should convey unique voice and approach. Budget should be straightforward listing of project expenses. No nonprofit status required for most programs. These are typically from state arts councils or private foundations, not federal agencies (except NEA Literature Fellowships and Jazz Masters).",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial",
+          "Helvetica"
+        ],
+        "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
+      }
     },
     "micro_grant": {
       "name": "Micro-Grant (Under $5K)",
@@ -2553,7 +2709,21 @@
         "url": null,
         "notes": "Awesome Foundation, local community foundations, and other micro-grant programs each have their own simple application processes."
       },
-      "ai_context": "Micro-grants (under $5K) have minimal compliance requirements and simple applications. Focus on a compelling idea, clear impact, and realistic budget. Keep language plain and accessible. No jargon needed. Most programs value creativity, community impact, and feasibility over organizational capacity."
+      "ai_context": "Micro-grants (under $5K) have minimal compliance requirements and simple applications. Focus on a compelling idea, clear impact, and realistic budget. Keep language plain and accessible. No jargon needed. Most programs value creativity, community impact, and feasibility over organizational capacity.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial",
+          "Helvetica"
+        ],
+        "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
+      }
     },
     "small_business_grant": {
       "name": "Small Business Grant",
@@ -2743,7 +2913,21 @@
         "url": null,
         "notes": "State programs, private competitions, and SBA-affiliated programs each have their own portals."
       },
-      "ai_context": "Small business grants emphasize business viability, market opportunity, job creation, and economic impact. Include concrete metrics (revenue projections, jobs created, customers served). Show clear use of funds tied to growth. Demonstrate market demand and competitive advantage. Financial information should show business sustainability beyond the grant period."
+      "ai_context": "Small business grants emphasize business viability, market opportunity, job creation, and economic impact. Include concrete metrics (revenue projections, jobs created, customers served). Show clear use of funds tied to growth. Demonstrate market demand and competitive advantage. Financial information should show business sustainability beyond the grant period.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial",
+          "Helvetica"
+        ],
+        "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
+      }
     },
     "community_project": {
       "name": "Community Project Grant",
@@ -2921,7 +3105,21 @@
         "url": null,
         "notes": "Community foundations, local government grant programs, and neighborhood development organizations each have their own application processes."
       },
-      "ai_context": "Community project grants emphasize demonstrated community need (with data), community engagement and support, and sustainable impact. Letters of support from community stakeholders are critical. Show how the project addresses an urgent local need and has buy-in from residents. Sustainability plan should explain how benefits continue after the grant period. Budget should maximize direct community benefit."
+      "ai_context": "Community project grants emphasize demonstrated community need (with data), community engagement and support, and sustainable impact. Letters of support from community stakeholders are critical. Show how the project addresses an urgent local need and has buy-in from residents. Sustainability plan should explain how benefits continue after the grant period. Budget should maximize direct community benefit.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial",
+          "Helvetica"
+        ],
+        "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
+      }
     },
     "education": {
       "name": "Department of Education (ED)",
@@ -3181,7 +3379,19 @@
         "url": "https://www.grants.gov",
         "notes": "Applications submitted through Grants.gov. Post-award management through G5 system. ED has been subject to restructuring in 2025-2026 which may affect administration."
       },
-      "ai_context": "ED proposals must address absolute, competitive, and invitational priorities from the NOFO. Logic models or theories of change are typically required. FERPA compliance is critical for any project involving student data. GEPA Section 427 statement (equitable access for special populations) is uniquely required by ED. Supplement-not-supplant rules apply to formula programs with restricted indirect cost rates. ED uses 8% de minimis rate (lower than the standard 15%). EDGAR governs all discretionary grants. Title I uses four different allocation formulas. Higher ed institutions need special eligibility designations (HSI, HBCU, TCU, AANAPISI) for certain programs."
+      "ai_context": "ED proposals must address absolute, competitive, and invitational priorities from the NOFO. Logic models or theories of change are typically required. FERPA compliance is critical for any project involving student data. GEPA Section 427 statement (equitable access for special populations) is uniquely required by ED. Supplement-not-supplant rules apply to formula programs with restricted indirect cost rates. ED uses 8% de minimis rate (lower than the standard 15%). EDGAR governs all discretionary grants. Title I uses four different allocation formulas. Higher ed institutions need special eligibility designations (HSI, HBCU, TCU, AANAPISI) for certain programs.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 2.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman"
+        ],
+        "notes": "Double-spaced per EDGAR requirements. 1-inch margins. 12pt font."
+      }
     },
     "hud": {
       "name": "HUD (Housing and Urban Development)",
@@ -3454,7 +3664,19 @@
         "url": "https://www.grants.gov",
         "notes": "Applications submitted via Grants.gov. HUD Exchange (hudexchange.info) provides technical assistance and post-award resources. JustGrants is NOT used by HUD."
       },
-      "ai_context": "HUD proposals must address housing and community development needs with strong data. CDBG is an entitlement program for metropolitan cities (50,000+) and urban counties -- formula-based, not competitive. HOME funds go to Participating Jurisdictions with 15% CHDO set-aside. Davis-Bacon prevailing wage requirements apply to all construction over $2,000. Section 3 requires directing employment to low-income residents. Environmental review is uniquely delegated to the grantee (not HUD). Fair housing obligations are proactive, not just non-discrimination. Matching/leveraging is heavily scored in competitive programs."
+      "ai_context": "HUD proposals must address housing and community development needs with strong data. CDBG is an entitlement program for metropolitan cities (50,000+) and urban counties -- formula-based, not competitive. HOME funds go to Participating Jurisdictions with 15% CHDO set-aside. Davis-Bacon prevailing wage requirements apply to all construction over $2,000. Section 3 requires directing employment to low-income residents. Environmental review is uniquely delegated to the grantee (not HUD). Fair housing obligations are proactive, not just non-discrimination. Matching/leveraging is heavily scored in competitive programs.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 1.5,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman"
+        ],
+        "notes": "Single or 1.5 spacing depending on program. Check specific NOFA for spacing requirements."
+      }
     },
     "nasa": {
       "name": "NASA (National Aeronautics and Space Administration)",
@@ -3695,7 +3917,21 @@
         "url": "https://nspires.nasaprs.com",
         "notes": "NSPIRES is NASA proprietary system, different from Grants.gov. ROSES has 50+ sub-programs per year. SBIR uses sbir.nasa.gov. Transitioning to BAA model in 2026."
       },
-      "ai_context": "NASA proposals must demonstrate direct relevance to NASA mission areas and strategic priorities. ROSES (Research Opportunities in Space and Earth Sciences) has 50+ sub-programs annually. Export control (ITAR/EAR) is MORE restrictive for NASA than most agencies because space technology overlaps with missile technology (USML Category IV). Foreign nationals on the team must be disclosed and may require Technology Assistance Agreements. EPSCoR is limited to 28 eligible jurisdictions. NSPIRES is a separate system from Grants.gov with its own learning curve. New Technology reporting is mandatory for all inventions."
+      "ai_context": "NASA proposals must demonstrate direct relevance to NASA mission areas and strategic priorities. ROSES (Research Opportunities in Space and Earth Sciences) has 50+ sub-programs annually. Export control (ITAR/EAR) is MORE restrictive for NASA than most agencies because space technology overlaps with missile technology (USML Category IV). Foreign nationals on the team must be disclosed and may require Technology Assistance Agreements. EPSCoR is limited to 28 eligible jurisdictions. NSPIRES is a separate system from Grants.gov with its own learning curve. New Technology reporting is mandatory for all inventions.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial",
+          "Helvetica"
+        ],
+        "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
+      }
     },
     "dod": {
       "name": "DOD (Department of Defense)",
@@ -3960,7 +4196,21 @@
         "url": "https://www.grants.gov",
         "notes": "Research grants through Grants.gov. SBIR/STTR through Defense SBIR/STTR Innovation Portal (DSIP). DARPA has program-specific portals. Each service branch runs its own programs."
       },
-      "ai_context": "DOD grants are primarily for BASIC RESEARCH. Applied research uses contracts or Other Transactions (OTs). DOD is the LARGEST SBIR/STTR funder (~60% of all federal SBIR). ITAR restrictions are pervasive -- many topics restrict foreign national participation. DFARS cybersecurity requirements (NIST SP 800-171) apply to CUI. Cost Accounting Standards apply to large awards. DCAA audits are thorough -- need adequate accounting system BEFORE award. DARPA grants are limited to nonprofits and universities (companies get contracts). Each service branch (Army, Navy, Air Force) runs SBIR independently."
+      "ai_context": "DOD grants are primarily for BASIC RESEARCH. Applied research uses contracts or Other Transactions (OTs). DOD is the LARGEST SBIR/STTR funder (~60% of all federal SBIR). ITAR restrictions are pervasive -- many topics restrict foreign national participation. DFARS cybersecurity requirements (NIST SP 800-171) apply to CUI. Cost Accounting Standards apply to large awards. DCAA audits are thorough -- need adequate accounting system BEFORE award. DARPA grants are limited to nonprofits and universities (companies get contracts). Each service branch (Army, Navy, Air Force) runs SBIR independently.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial",
+          "Helvetica"
+        ],
+        "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
+      }
     },
     "fema": {
       "name": "FEMA (Federal Emergency Management Agency)",
@@ -4206,7 +4456,21 @@
         "url": "https://go.fema.gov",
         "notes": "FEMA GO is separate from Grants.gov. Some programs use Grants.gov for initial application. Local governments must apply through state emergency management agency."
       },
-      "ai_context": "FEMA grants are heavily intermediated -- local governments CANNOT apply directly and must go through their State Emergency Management Agency. HMGP is only available after a Presidential disaster declaration. Benefit-Cost Analysis is a unique FEMA requirement using their specific BCA Toolkit. Hazard mitigation plan is a prerequisite -- no plan, no funding. BRIC program was canceled in April 2025. NEPA review is conducted by FEMA (not the applicant). Cost share is typically 75/25 federal/non-federal. Private nonprofits have very limited direct access."
+      "ai_context": "FEMA grants are heavily intermediated -- local governments CANNOT apply directly and must go through their State Emergency Management Agency. HMGP is only available after a Presidential disaster declaration. Benefit-Cost Analysis is a unique FEMA requirement using their specific BCA Toolkit. Hazard mitigation plan is a prerequisite -- no plan, no funding. BRIC program was canceled in April 2025. NEPA review is conducted by FEMA (not the applicant). Cost share is typically 75/25 federal/non-federal. Private nonprofits have very limited direct access.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial",
+          "Helvetica"
+        ],
+        "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
+      }
     },
     "dol": {
       "name": "Department of Labor (DOL)",
@@ -4464,7 +4728,21 @@
         "url": "https://www.grants.gov",
         "notes": "Competitive grants submitted through Grants.gov. Post-award management through DOL EGrants system."
       },
-      "ai_context": "DOL proposals must demonstrate strong employer engagement and demand-driven workforce development. WIOA performance indicators are critical -- must track and report six specific outcome measures. YouthBuild requires construction skills training with Davis-Bacon compliance. Many programs require serving specific populations: disconnected youth, returning citizens, veterans. Logic models or theories of change typically required. DOL strongly emphasizes partnerships with employers and workforce boards. Quarterly financial (ETA-9130) and performance reports required."
+      "ai_context": "DOL proposals must demonstrate strong employer engagement and demand-driven workforce development. WIOA performance indicators are critical -- must track and report six specific outcome measures. YouthBuild requires construction skills training with Davis-Bacon compliance. Many programs require serving specific populations: disconnected youth, returning citizens, veterans. Logic models or theories of change typically required. DOL strongly emphasizes partnerships with employers and workforce boards. Quarterly financial (ETA-9130) and performance reports required.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 1.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman",
+          "Arial",
+          "Helvetica"
+        ],
+        "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
+      }
     },
     "doj": {
       "name": "DOJ (Department of Justice)",
@@ -4792,7 +5070,19 @@
         "url": "https://justicegrants.usdoj.gov",
         "notes": "Initial application via Grants.gov, then complete and manage in JustGrants. JustGrants replaced GMS as of October 2020."
       },
-      "ai_context": "DOJ proposals must address crime/public safety problems with data on trends and impact. Key offices: BJA (justice assistance), OVW (violence against women), OJJDP (juvenile justice), COPS (policing), OVC (victims of crime). OVW grants have strict VAWA confidentiality requirements -- victim information cannot be shared without informed consent. JustGrants is the primary portal (different from Grants.gov). DOJ Financial Guide governs cost principles. Performance measurement plans required. Faith-based organizations eligible but cannot use funds for religious activities."
+      "ai_context": "DOJ proposals must address crime/public safety problems with data on trends and impact. Key offices: BJA (justice assistance), OVW (violence against women), OJJDP (juvenile justice), COPS (policing), OVC (victims of crime). OVW grants have strict VAWA confidentiality requirements -- victim information cannot be shared without informed consent. JustGrants is the primary portal (different from Grants.gov). DOJ Financial Guide governs cost principles. Performance measurement plans required. Faith-based organizations eligible but cannot use funds for religious activities.",
+      "formatting_rules": {
+        "font": "Times New Roman",
+        "font_size_min": 12,
+        "font_size_max": 12,
+        "line_spacing": 2.0,
+        "margins_inches": 1.0,
+        "page_size": "letter",
+        "allowed_fonts": [
+          "Times New Roman"
+        ],
+        "notes": "Double-spaced. Page limits strictly enforced. Times New Roman preferred."
+      }
     }
   },
   "common_requirements": {

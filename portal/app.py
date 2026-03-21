@@ -2439,7 +2439,25 @@ Do NOT include placeholder text — use the actual organization data provided be
     except Exception:
         pass
 
+    # Load formatting rules for writing style guidance
+    formatting_notes = ""
+    try:
+        fmt_rules = agency_tmpl.get('formatting_rules', {})
+        if fmt_rules:
+            formatting_notes = f"\nFORMATTING: Use {fmt_rules.get('font', 'Times New Roman')} {fmt_rules.get('font_size_min', 12)}pt, {fmt_rules.get('line_spacing', 1.0)} spacing, {fmt_rules.get('margins_inches', 1.0)}-inch margins."
+    except Exception:
+        pass
+
     prompt += f"""
+**WRITING STANDARDS:**
+- Follow APA 7th Edition formatting unless the agency specifies otherwise
+- Use APA citation style for any references (Author, Year)
+- Use professional, formal academic/federal grant language
+- Headings should follow APA hierarchy (bold, flush left)
+- Numbers: spell out below 10, use numerals for 10 and above
+- Use active voice where possible
+{formatting_notes}
+
 **TASK:**
 Write COMPELLING, GRANT-SPECIFIC content for this section that:
 1. Directly addresses {agency}'s exact requirements listed above
@@ -2448,9 +2466,10 @@ Write COMPELLING, GRANT-SPECIFIC content for this section that:
 4. Uses the EXACT budget data provided above — do not invent different numbers
 5. Includes specific details about the applicant organization (use real data, not placeholders)
 6. Fits within the funding amount: ${amount_min:,.0f} - ${amount_max:,.0f}
-7. Is ready to submit — professional federal grant language, not generic filler
+7. Is ready to submit — follows APA standards and agency-specific formatting rules
 8. Addresses the section's page/character limits appropriately
 9. Do NOT repeat large blocks of text that appear in other sections
+10. Citations must be real, verifiable publications — do NOT fabricate references
 
 Write the complete section content now:"""
     
@@ -3561,22 +3580,67 @@ def download_grant(grant_id, fmt):
             from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
             from reportlab.lib.enums import TA_CENTER, TA_LEFT
 
+            # --- Load agency-specific formatting rules ---
+            fmt_rules = {}
+            try:
+                fmt_template = _tdata.get('agencies', {}).get(template_name, {}).get('formatting_rules', {})
+                if fmt_template:
+                    fmt_rules = fmt_template
+            except Exception:
+                pass
+
+            # Font mapping: agency font names -> reportlab built-in fonts
+            _font_map = {
+                'Times New Roman': 'Times-Roman',
+                'Arial': 'Helvetica',
+                'Helvetica': 'Helvetica',
+                'Georgia': 'Times-Roman',
+                'Palatino Linotype': 'Times-Roman',
+                'Palatino': 'Times-Roman',
+                'Computer Modern': 'Times-Roman',
+            }
+            _font_bold_map = {
+                'Times-Roman': 'Times-Bold',
+                'Helvetica': 'Helvetica-Bold',
+            }
+
+            agency_font_name = fmt_rules.get('font', 'Times New Roman')
+            rl_font = _font_map.get(agency_font_name, 'Times-Roman')
+            rl_font_bold = _font_bold_map.get(rl_font, 'Times-Bold')
+            font_size = fmt_rules.get('font_size_min', 12)
+            line_spacing = fmt_rules.get('line_spacing', 1.0)
+            margin_inches = fmt_rules.get('margins_inches', 1.0)
+
+            # Calculate leading (line height) based on spacing
+            # single = font_size * 1.2, 1.5 = font_size * 1.5, double = font_size * 2.0
+            if line_spacing >= 2.0:
+                leading = font_size * 2.0
+            elif line_spacing >= 1.5:
+                leading = font_size * 1.5
+            else:
+                leading = font_size * 1.2
+
             buffer = io.BytesIO()
             doc = SimpleDocTemplate(buffer, pagesize=letter,
-                leftMargin=0.9*inch, rightMargin=0.9*inch,
-                topMargin=0.7*inch, bottomMargin=0.7*inch)
+                leftMargin=margin_inches*inch, rightMargin=margin_inches*inch,
+                topMargin=margin_inches*inch, bottomMargin=margin_inches*inch)
             styles = getSampleStyleSheet()
 
             title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'],
-                alignment=TA_CENTER, fontSize=18, spaceAfter=20)
+                alignment=TA_CENTER, fontSize=18, spaceAfter=20,
+                fontName=rl_font_bold)
             cover_meta_style = ParagraphStyle('CoverMeta', parent=styles['Normal'],
-                alignment=TA_CENTER, fontSize=12, spaceAfter=8)
+                alignment=TA_CENTER, fontSize=font_size, spaceAfter=8,
+                fontName=rl_font)
             cover_amount_style = ParagraphStyle('CoverAmount', parent=styles['Normal'],
-                alignment=TA_CENTER, fontSize=14, spaceAfter=8, fontName='Helvetica-Bold')
+                alignment=TA_CENTER, fontSize=font_size + 2, spaceAfter=8,
+                fontName=rl_font_bold)
             body_style = ParagraphStyle('Body', parent=styles['Normal'],
-                fontSize=10.5, leading=14, spaceAfter=6)
+                fontSize=font_size, leading=leading, spaceAfter=6,
+                fontName=rl_font)
             heading3_style = ParagraphStyle('SubHeading', parent=styles['Heading3'],
-                fontSize=12, spaceAfter=8, spaceBefore=10)
+                fontSize=font_size, spaceAfter=8, spaceBefore=10,
+                fontName=rl_font_bold)
 
             # Check for draft watermark and branding toggle
             is_draft = request.args.get('draft') == '1'
@@ -4628,6 +4692,38 @@ def validate_budget_consistency(grant_id):
         from pdf_utils import detect_redundant_sentences
         redundancy_issues = detect_redundant_sentences(sections, min_words=20)
         issues.extend(redundancy_issues)
+    except Exception:
+        pass
+
+    # Check 10: Formatting rules — load and display agency-specific PDF formatting requirements
+    template_name_fmt = grant.get('template', 'generic') or 'generic'
+    try:
+        with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates', 'agency_templates.json')) as tf2:
+            tmpls2 = json.load(tf2)
+        fmt_rules = tmpls2.get('agencies', {}).get(template_name_fmt, {}).get('formatting_rules', {})
+        if fmt_rules:
+            font = fmt_rules.get('font', 'Times New Roman')
+            size_min = fmt_rules.get('font_size_min', 12)
+            size_max = fmt_rules.get('font_size_max', 12)
+            spacing = fmt_rules.get('line_spacing', 1.0)
+            margins = fmt_rules.get('margins_inches', 1.0)
+            allowed = fmt_rules.get('allowed_fonts', [])
+            notes = fmt_rules.get('notes', '')
+
+            spacing_label = 'single' if spacing <= 1.0 else ('1.5' if spacing <= 1.5 else 'double')
+
+            size_str = f"{size_min}pt" if size_min == size_max else f"{size_min}-{size_max}pt"
+            font_list = ', '.join(allowed) if allowed else font
+
+            issues.append({
+                'title': 'Formatting Requirements',
+                'message': (
+                    f"Agency formatting: {font_list} at {size_str}, "
+                    f"{spacing_label}-spaced, {margins}-inch margins. "
+                    f"PDF downloads will use these settings automatically. {notes}"
+                ),
+                'severity': 'info'
+            })
     except Exception:
         pass
 
