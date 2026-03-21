@@ -243,9 +243,14 @@
                 <div class="form-group">
                     <label class="form-label" for="password">Password</label>
                     <input type="password" id="password" name="password" class="form-input" required aria-required="true" placeholder="Enter your password">
-                    <a href="/forgot-password" class="forgot-link">Forgot password?</a>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                        <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--text-secondary); cursor: pointer;">
+                            <input type="checkbox" name="remember_me" style="accent-color: var(--accent-primary);"> Remember me
+                        </label>
+                        <a href="/forgot-password" class="forgot-link">Forgot password?</a>
+                    </div>
                 </div>
-                
+
                 <button type="submit" class="btn btn-primary">
                     Sign In
                 </button>
