@@ -10,7 +10,7 @@ import secrets
 from datetime import datetime
 from pathlib import Path
 
-DB_PATH = Path.home() / ".hermes" / "grant-system" / "tracking" / "grants.db"
+from db_connection import LOCAL_DB_PATH as DB_PATH
 
 # Column order must match the CREATE TABLE + ALTER TABLE schema exactly
 USER_COLUMNS = [

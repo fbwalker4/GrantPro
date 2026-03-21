@@ -15,8 +15,17 @@ import os
 import sqlite3
 from pathlib import Path
 
-# Default local path used by all existing modules
-LOCAL_DB_PATH = Path.home() / ".hermes" / "grant-system" / "tracking" / "grants.db"
+# Database path: configurable via DATABASE_PATH env var
+# Defaults to ~/.hermes/grant-system/tracking/grants.db locally
+# On Vercel (serverless), use /tmp/grants.db
+_default_path = Path.home() / ".hermes" / "grant-system" / "tracking" / "grants.db"
+_env_path = os.getenv("DATABASE_PATH")
+if _env_path:
+    LOCAL_DB_PATH = Path(_env_path)
+elif os.getenv("VERCEL"):
+    LOCAL_DB_PATH = Path("/tmp/grants.db")
+else:
+    LOCAL_DB_PATH = _default_path
 
 # Turso / libsql configuration
 TURSO_DATABASE_URL = os.getenv("TURSO_DATABASE_URL")

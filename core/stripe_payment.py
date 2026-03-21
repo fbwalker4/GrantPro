@@ -16,7 +16,7 @@ if STRIPE_API_KEY:
     import stripe
     stripe.api_key = STRIPE_API_KEY
 
-DB_PATH = Path.home() / ".hermes" / "grant-system" / "tracking" / "grants.db"
+from db_connection import LOCAL_DB_PATH as DB_PATH
 
 # Plan pricing
 PLAN_PRICING = {

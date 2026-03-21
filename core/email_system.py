@@ -18,7 +18,7 @@ FROM_NAME = os.environ.get('FROM_NAME', 'Grant Writer Pro')
 BASE_URL = os.environ.get('BASE_URL', 'http://localhost:5001')
 
 # Database path
-DB_PATH = Path.home() / ".hermes" / "grant-system" / "tracking" / "grants.db"
+from db_connection import LOCAL_DB_PATH as DB_PATH
 EMAIL_LOG_PATH = Path.home() / ".hermes" / "grant-system" / "tracking" / "email_log.db"
 LEADS_PATH = Path.home() / ".hermes" / "grant-system" / "tracking" / "leads.db"
 

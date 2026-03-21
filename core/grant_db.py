@@ -12,7 +12,7 @@ from datetime import datetime
 from pathlib import Path
 
 # Database setup
-DB_PATH = Path.home() / ".hermes" / "grant-system" / "tracking" / "grants.db"
+from db_connection import LOCAL_DB_PATH as DB_PATH
 
 def init_db():
     """Initialize the grants database"""

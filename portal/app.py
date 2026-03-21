@@ -16,15 +16,18 @@ from werkzeug.utils import secure_filename
 import secrets
 
 # Configure logging
-LOG_DIR = Path.home() / ".hermes" / "grant-system" / "tracking"
-LOG_DIR.mkdir(parents=True, exist_ok=True)
+_log_handlers = [logging.StreamHandler()]
+if not os.environ.get('VERCEL'):
+    LOG_DIR = Path.home() / ".hermes" / "grant-system" / "tracking"
+    try:
+        LOG_DIR.mkdir(parents=True, exist_ok=True)
+        _log_handlers.append(logging.FileHandler(LOG_DIR / 'app.log'))
+    except OSError:
+        pass
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s %(levelname)s %(name)s: %(message)s',
-    handlers=[
-        logging.FileHandler(LOG_DIR / 'app.log'),
-        logging.StreamHandler()
-    ]
+    handlers=_log_handlers
 )
 logger = logging.getLogger('grantpro')
 
@@ -79,14 +82,17 @@ app.wsgi_app = _ServerHeaderStripper(app.wsgi_app, header_value='GrantPro')
 # Secure secret key - use environment variable or generate random
 app.secret_key = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
 
-# Store the key in a file for persistence if generated
-if not os.environ.get('SECRET_KEY'):
+# Store the key in a file for persistence if generated (skip on Vercel/serverless)
+if not os.environ.get('SECRET_KEY') and not os.environ.get('VERCEL'):
     key_file = Path.home() / ".hermes" / "grant-system" / ".secret_key"
-    if key_file.exists():
-        app.secret_key = key_file.read_text().strip()
-    else:
-        key_file.parent.mkdir(parents=True, exist_ok=True)
-        key_file.write_text(app.secret_key)
+    try:
+        if key_file.exists():
+            app.secret_key = key_file.read_text().strip()
+        else:
+            key_file.parent.mkdir(parents=True, exist_ok=True)
+            key_file.write_text(app.secret_key)
+    except OSError:
+        pass  # Filesystem not writable (serverless)
 
 # Session security configuration
 # HTTPS enforced when HTTPS=true env var or in production
