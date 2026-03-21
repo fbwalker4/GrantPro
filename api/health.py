@@ -22,6 +22,8 @@ def health():
     try:
         import db_connection
         steps.append(f"db_connection OK (path={db_connection.LOCAL_DB_PATH})")
+        steps.append(f"GP_DATABASE_URL={'SET' if db_connection.GP_DATABASE_URL else 'NOT SET'}")
+        steps.append(f"VERCEL={os.environ.get('VERCEL', 'not set')}")
 
         import user_models
         steps.append("user_models OK")
