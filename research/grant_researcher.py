@@ -16,10 +16,17 @@ class GrantResearcher:
     
     def __init__(self, data_dir=None):
         if data_dir is None:
-            data_dir = Path.home() / ".hermes" / "grant-system" / "research"
+            if os.environ.get('VERCEL'):
+                data_dir = Path('/tmp/research')
+            else:
+                data_dir = Path.home() / ".hermes" / "grant-system" / "research"
         self.data_dir = Path(data_dir)
-        self.data_dir.mkdir(parents=True, exist_ok=True)
-        self.templates_dir = Path.home() / ".hermes" / "grant-system" / "templates"
+        try:
+            self.data_dir.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            self.data_dir = Path('/tmp/research')
+            self.data_dir.mkdir(parents=True, exist_ok=True)
+        self.templates_dir = Path(__file__).parent.parent / "templates"
         
     def search_grants_gov(self, keyword, agency_code=None, opportunity_type=None, 
                           category=None, max_results=25):
