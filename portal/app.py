@@ -2242,9 +2242,77 @@ def generate_section_content(grant_id, section_id):
         eligibility = 'Not specified'
         focus_areas_str = 'Not specified'
     
-    prompt = f"""You are an expert grant writer specializing in federal grants for {agency}. 
+    # Load agency-specific regulatory context from template
+    agency_context = ""
+    compliance_notes = ""
+    try:
+        with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates', 'agency_templates.json')) as tf:
+            all_templates = json.load(tf)
+        agency_tmpl = all_templates.get('agencies', {}).get(template_name, {})
+        agency_context = agency_tmpl.get('ai_context', '')
+        # Build compliance notes for the AI
+        compliance = agency_tmpl.get('compliance', {})
+        comp_notes = []
+        if compliance.get('davis_bacon', {}).get('applies'):
+            comp_notes.append("Davis-Bacon Act applies: all construction must use prevailing wage rates.")
+        if compliance.get('section_3', {}).get('applies'):
+            comp_notes.append("Section 3 applies: must provide employment/contracting opportunities to low-income residents.")
+        if compliance.get('nepa', {}).get('applies'):
+            comp_notes.append("NEPA environmental review is required.")
+        if compliance.get('buy_america', {}).get('applies'):
+            comp_notes.append("Buy America requirements apply to infrastructure materials.")
+        if compliance.get('irb', {}).get('applies'):
+            comp_notes.append("IRB approval required for human subjects research.")
+        if compliance.get('matching', {}).get('required'):
+            ratio = compliance['matching'].get('ratio', '')
+            comp_notes.append(f"Matching funds required ({ratio}).")
+        idr = agency_tmpl.get('indirect_cost_rules', {})
+        if idr.get('max_rate'):
+            comp_notes.append(f"Indirect cost rate capped at {idr['max_rate']}%.")
+        compliance_notes = "\n".join(f"- {n}" for n in comp_notes) if comp_notes else ""
+    except Exception:
+        pass
 
+    # Load user's organization details from onboarding
+    user_org_info = ""
+    try:
+        user = get_current_user()
+        if user:
+            org_details = user_models.get_organization_details(user['id'])
+            if org_details:
+                od = org_details.get('details') or {}
+                op = org_details.get('profile') or {}
+                fa = org_details.get('focus_areas') or []
+                pg = org_details.get('past_grants') or []
+                if od.get('ein'):
+                    user_org_info += f"- EIN: {od['ein']}\n"
+                if od.get('uei'):
+                    user_org_info += f"- UEI: {od['uei']}\n"
+                if od.get('address_line1'):
+                    user_org_info += f"- Address: {od['address_line1']}, {od.get('city','')}, {od.get('state','')} {od.get('zip_code','')}\n"
+                if op.get('mission_statement'):
+                    user_org_info += f"- Mission: {sanitize_for_prompt(op['mission_statement'])}\n"
+                if op.get('programs_description'):
+                    user_org_info += f"- Programs: {sanitize_for_prompt(op['programs_description'])}\n"
+                if op.get('annual_revenue'):
+                    user_org_info += f"- Annual Budget: ${int(op['annual_revenue']):,}\n"
+                if op.get('employees'):
+                    user_org_info += f"- Staff: {op['employees']} employees\n"
+                if fa:
+                    user_org_info += f"- Focus Areas: {', '.join(fa)}\n"
+                if pg:
+                    for p in pg[:3]:
+                        user_org_info += f"- Past Grant: {p.get('grant_name','')} from {p.get('funding_organization','')} (${p.get('amount_received',0):,}, {p.get('status','')})\n"
+    except Exception:
+        pass
+
+    prompt = f"""You are an expert grant writer specializing in federal grants for {agency}.
+
+{"CRITICAL AGENCY-SPECIFIC GUIDANCE:" + chr(10) + agency_context + chr(10) if agency_context else ""}
+{"COMPLIANCE REQUIREMENTS FOR THIS AGENCY:" + chr(10) + compliance_notes + chr(10) if compliance_notes else ""}
 Generate content for a grant application section that is SPECIFIC to this exact grant.
+Do NOT use markdown tables. Use narrative format with clear headings.
+Do NOT include placeholder text — use the actual organization data provided below.
 
 **GRANT SPECIFICS:**
 - Grant Name: {grant_name}
@@ -2254,7 +2322,6 @@ Generate content for a grant application section that is SPECIFIC to this exact 
 - CFDA Number: {grant_cfda}
 - Eligibility: {eligibility}
 - Focus Areas: {focus_areas_str}
-- Your Organization: {org_name}
 
 **SECTION TO WRITE:**
 - Section Name: {section_info.get('name', section_id)}
@@ -2265,28 +2332,31 @@ Generate content for a grant application section that is SPECIFIC to this exact 
 **AGENCY REQUIREMENTS (must follow exactly):**
 {section_info.get('guidance', 'No specific guidance provided.')}
 
-**YOUR ORGANIZATION INFO:**
-"""
+**APPLICANT ORGANIZATION:**
+- Organization: {org_name}
+{user_org_info if user_org_info else ""}"""
 
-    # Add organization info if available
+    # Add intake data if available
     if client_info:
         if client_info.get('mission'):
-            prompt += f"- Mission:{sanitize_for_prompt(client_info['mission'])}\n"
+            prompt += f"- Mission: {sanitize_for_prompt(client_info['mission'])}\n"
         if client_info.get('description'):
-            prompt += f"- Description:{sanitize_for_prompt(client_info['description'])}\n"
+            prompt += f"- Description: {sanitize_for_prompt(client_info['description'])}\n"
         if client_info.get('programs'):
-            prompt += f"- Existing Programs:{sanitize_for_prompt(client_info['programs'])}\n"
+            prompt += f"- Programs: {sanitize_for_prompt(client_info['programs'])}\n"
         if client_info.get('budget_info'):
-            prompt += f"- Budget:{sanitize_for_prompt(json.dumps(client_info['budget_info']))}\n"
-    
+            prompt += f"- Budget Data: {sanitize_for_prompt(json.dumps(client_info['budget_info']))}\n"
+
     prompt += f"""
 **TASK:**
 Write COMPELLING, GRANT-SPECIFIC content for this section that:
 1. Directly addresses {agency}'s exact requirements listed above
-2. Includes specific details about your project that match the focus areas: {focus_areas_str}
-3. Shows you meet the eligibility requirements: {eligibility}
-4. Fits within the funding amount: ${amount_min:,.0f} - ${amount_max:,.0f}
-5. Is ready to submit (not generic filler)
+2. Follows ALL compliance requirements for this agency
+3. Includes specific details about the applicant organization (use real data above, not placeholders)
+4. Shows the applicant meets the eligibility requirements
+5. Fits within the funding amount: ${amount_min:,.0f} - ${amount_max:,.0f}
+6. Is ready to submit — professional federal grant language, not generic filler
+7. Addresses the section's page/character limits appropriately
 
 Write the complete section content now:"""
     
