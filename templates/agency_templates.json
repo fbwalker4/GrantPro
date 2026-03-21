@@ -80,6 +80,40 @@
           "conditional": "if_postdoc",
           "guidance": "If postdocs supported, describe: (1) mentoring activities, (2) career development, (3) training in responsible research. Must be separate from project description."
         }
+      ],
+      "required_documents": [
+        {
+          "type": "letters_of_collaboration",
+          "name": "Letters of Collaboration",
+          "description": "Letters from partner organizations confirming their role",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Draft a letter of collaboration from a partner organization"
+        },
+        {
+          "type": "501c3_determination",
+          "name": "IRS 501(c)(3) Determination Letter",
+          "description": "Proof of tax-exempt status",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload your IRS determination letter (PDF)"
+        },
+        {
+          "type": "board_resolution",
+          "name": "Board Resolution",
+          "description": "Board authorization to apply for this grant",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a board resolution authorizing the grant application"
+        },
+        {
+          "type": "audit_report",
+          "name": "Most Recent Audit Report",
+          "description": "Independent financial audit or Single Audit (if >$750K federal)",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Upload your most recent independent audit (PDF)"
+        }
       ]
     },
     "doe": {
@@ -136,6 +170,40 @@
           "required": true,
           "max_pages": 2,
           "guidance": "Describe how data will be managed: collection, storage, sharing, preservation. Include data types, standards, access provisions."
+        }
+      ],
+      "required_documents": [
+        {
+          "type": "letters_of_support",
+          "name": "Letters of Support",
+          "description": "Letters from collaborators and resource providers confirming commitment",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a letter of support from a collaborator for a DOE grant"
+        },
+        {
+          "type": "environmental_questionnaire",
+          "name": "Environmental Questionnaire",
+          "description": "DOE environmental compliance questionnaire (NEPA)",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Complete and upload DOE environmental questionnaire"
+        },
+        {
+          "type": "intellectual_property_plan",
+          "name": "Intellectual Property Management Plan",
+          "description": "Plan for managing intellectual property developed under the project",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft an intellectual property management plan for a DOE-funded project"
+        },
+        {
+          "type": "cost_share_commitment",
+          "name": "Cost Share Commitment Letter",
+          "description": "Letter documenting cost share commitments from partners",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a cost share commitment letter from a project partner"
         }
       ]
     },
@@ -203,6 +271,48 @@
           "conditional": "uses_humans",
           "guidance": "If using humans: describe recruitment, consent procedures, risk minimization, data protection. Include IRB plan if available."
         }
+      ],
+      "required_documents": [
+        {
+          "type": "irb_approval",
+          "name": "IRB Approval or Exemption",
+          "description": "Institutional Review Board approval for human subjects research",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Upload your IRB approval letter or exemption determination"
+        },
+        {
+          "type": "iacuc_approval",
+          "name": "IACUC Approval",
+          "description": "Institutional Animal Care and Use Committee approval for animal research",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Upload your IACUC approval letter"
+        },
+        {
+          "type": "letters_of_support",
+          "name": "Letters of Support",
+          "description": "Letters from collaborators, consultants, and resource providers",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a letter of support for an NIH research grant application"
+        },
+        {
+          "type": "consortium_agreement",
+          "name": "Consortium/Contractual Agreement",
+          "description": "Agreements with subcontracting organizations",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a consortium agreement for an NIH multi-site research project"
+        },
+        {
+          "type": "authentication_plan",
+          "name": "Authentication of Key Biological Resources",
+          "description": "Plan for authenticating cell lines, antibodies, and other biological resources",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Draft an authentication plan for key biological resources used in the project"
+        }
       ]
     },
     "usda": {
@@ -252,6 +362,32 @@
           "required": false,
           "guidance": "Include any letters showing partnerships, market interest, or technical support."
         }
+      ],
+      "required_documents": [
+        {
+          "type": "letters_of_support",
+          "name": "Letters of Support",
+          "description": "Letters showing partnerships, market interest, or technical support",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a letter of support for a USDA grant application"
+        },
+        {
+          "type": "501c3_determination",
+          "name": "IRS 501(c)(3) Determination Letter",
+          "description": "Proof of tax-exempt status (if nonprofit applicant)",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Upload your IRS determination letter (PDF)"
+        },
+        {
+          "type": "assurance_statements",
+          "name": "USDA Assurance Statements",
+          "description": "Required certifications and assurances for USDA grants",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Complete and upload USDA assurance statements"
+        }
       ]
     },
     "epa": {
@@ -289,6 +425,24 @@
           "conditional": "environmental_impacts",
           "guidance": "If project may have environmental impacts, describe compliance with all applicable environmental laws."
         }
+      ],
+      "required_documents": [
+        {
+          "type": "qapp",
+          "name": "Quality Assurance Project Plan (QAPP)",
+          "description": "Quality assurance plan for environmental data collection",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a Quality Assurance Project Plan outline for an EPA grant"
+        },
+        {
+          "type": "environmental_permits",
+          "name": "Environmental Permits",
+          "description": "Any existing environmental permits relevant to the project",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Upload copies of any relevant environmental permits"
+        }
       ]
     },
     "dot": {
@@ -324,6 +478,24 @@
           "required": false,
           "guidance": "Include letters from partners, local government support, stakeholders."
         }
+      ],
+      "required_documents": [
+        {
+          "type": "letters_of_support",
+          "name": "Letters of Support",
+          "description": "Letters from local government, partners, and stakeholders",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a letter of support from a local government official for a DOT grant"
+        },
+        {
+          "type": "cost_share_documentation",
+          "name": "Cost Share/Match Documentation",
+          "description": "Documentation of matching funds or cost share commitments",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Draft a cost share commitment letter for a DOT grant application"
+        }
       ]
     },
     "nist": {
@@ -352,6 +524,16 @@
           "name": "Budget",
           "required": true,
           "guidance": "Detailed budget with justifications. NIST often supports equipment purchases."
+        }
+      ],
+      "required_documents": [
+        {
+          "type": "letters_of_support",
+          "name": "Letters of Support",
+          "description": "Letters from industry partners and collaborators",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a letter of support from an industry partner for a NIST grant"
         }
       ]
     },
@@ -415,6 +597,32 @@
           "name": "Sustainability Plan",
           "required": false,
           "guidance": "How will project continue after grant ends? Include other funding sources, revenue generation, institutional support."
+        }
+      ],
+      "required_documents": [
+        {
+          "type": "501c3_determination",
+          "name": "IRS 501(c)(3) Determination Letter",
+          "description": "Proof of tax-exempt status (if nonprofit applicant)",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Upload your IRS determination letter (PDF)"
+        },
+        {
+          "type": "letters_of_support",
+          "name": "Letters of Support",
+          "description": "Letters from collaborators, partners, or stakeholders",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a letter of support for a federal grant application"
+        },
+        {
+          "type": "board_resolution",
+          "name": "Board Resolution",
+          "description": "Board authorization to apply for this grant",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a board resolution authorizing the grant application"
         }
       ]
     },
@@ -731,6 +939,32 @@
           "conditional": "prior_award",
           "guidance": "If you received prior ED award: explain how you addressed any weaknesses identified in prior reviews."
         }
+      ],
+      "required_documents": [
+        {
+          "type": "letters_of_support",
+          "name": "Letters of Support",
+          "description": "Letters from school districts, community partners, or stakeholders",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a letter of support from a school district for a Department of Education grant"
+        },
+        {
+          "type": "logic_model",
+          "name": "Logic Model",
+          "description": "Visual diagram showing inputs, activities, outputs, and outcomes",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Draft a logic model narrative for a Department of Education grant project"
+        },
+        {
+          "type": "mou_partners",
+          "name": "MOU with Partner Organizations",
+          "description": "Memoranda of understanding with school districts, universities, or service providers",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a memorandum of understanding between a grantee and a school district partner"
+        }
       ]
     },
     "hud": {
@@ -787,6 +1021,48 @@
           "name": "Leverage/Resources",
           "required": false,
           "guidance": "Document other resources: matching funds, in-kind contributions, partnerships that strengthen the project."
+        }
+      ],
+      "required_documents": [
+        {
+          "type": "mou_chdo",
+          "name": "MOU with CHDO or Service Provider",
+          "description": "Memorandum of Understanding with Community Housing Development Organization or service provider partner",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Draft a Memorandum of Understanding between a grantee and a Community Housing Development Organization (CHDO) or service provider for a HUD grant"
+        },
+        {
+          "type": "environmental_review",
+          "name": "Environmental Review Record",
+          "description": "Environmental review documentation per 24 CFR Part 58 requirements",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload your Environmental Review Record (ERR) per 24 CFR Part 58"
+        },
+        {
+          "type": "citizen_participation_plan",
+          "name": "Citizen Participation Plan",
+          "description": "Plan describing how citizens will be involved in the project planning and implementation",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Draft a Citizen Participation Plan for a HUD-funded community development project"
+        },
+        {
+          "type": "board_resolution",
+          "name": "Board Resolution",
+          "description": "Board authorization to apply for this HUD grant and accept funding obligations",
+          "required": true,
+          "can_generate": true,
+          "generate_prompt": "Draft a board resolution authorizing application for a HUD grant"
+        },
+        {
+          "type": "fair_housing_certification",
+          "name": "Fair Housing Certification",
+          "description": "Certification of compliance with fair housing requirements",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload your signed fair housing certification"
         }
       ]
     },
@@ -846,6 +1122,24 @@
           "conditional": "prior_nasa_award",
           "guidance": "If you have had prior NASA awards, describe results and how this proposal builds on prior work."
         }
+      ],
+      "required_documents": [
+        {
+          "type": "letters_of_support",
+          "name": "Letters of Support",
+          "description": "Letters from collaborators, NASA centers, or resource providers",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a letter of support for a NASA research grant application"
+        },
+        {
+          "type": "export_control_certification",
+          "name": "Export Control Certification",
+          "description": "Certification of compliance with ITAR/EAR export control regulations",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload your signed export control certification"
+        }
       ]
     },
     "dod": {
@@ -903,6 +1197,24 @@
           "conditional": "classified_work",
           "guidance": "If project involves classified work, describe: facility clearance level, ability to handle classified information."
         }
+      ],
+      "required_documents": [
+        {
+          "type": "security_clearance",
+          "name": "Facility Security Clearance Documentation",
+          "description": "Documentation of facility security clearance (if applicable)",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Upload facility security clearance documentation if classified work is involved"
+        },
+        {
+          "type": "cost_accounting_certification",
+          "name": "Cost Accounting Standards Certification",
+          "description": "CAS certification as required for DOD contracts and grants",
+          "required": true,
+          "can_generate": false,
+          "upload_instructions": "Upload your CAS certification or disclosure statement"
+        }
       ]
     },
     "fema": {
@@ -959,6 +1271,24 @@
           "name": "Risk Analysis",
           "required": false,
           "guidance": "For some programs: describe hazard risk being addressed, probability, consequences, how project reduces risk."
+        }
+      ],
+      "required_documents": [
+        {
+          "type": "benefit_cost_analysis",
+          "name": "Benefit-Cost Analysis",
+          "description": "Analysis showing project benefits exceed costs (required for mitigation grants)",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Upload your benefit-cost analysis using FEMA BCA toolkit"
+        },
+        {
+          "type": "floodplain_map",
+          "name": "FEMA Floodplain Map",
+          "description": "FEMA flood insurance rate map for the project area",
+          "required": false,
+          "can_generate": false,
+          "upload_instructions": "Upload FEMA flood map for the project location"
         }
       ]
     },
@@ -1025,6 +1355,24 @@
           "required": false,
           "guidance": "Document other resources: matching funds, in-kind, partnerships that supplement federal funds."
         }
+      ],
+      "required_documents": [
+        {
+          "type": "mou_partners",
+          "name": "MOU with Partner Organizations",
+          "description": "Memoranda of understanding with workforce boards, employers, or training providers",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a memorandum of understanding between a workforce development grantee and an employer partner"
+        },
+        {
+          "type": "letters_of_commitment",
+          "name": "Letters of Commitment from Employers",
+          "description": "Letters from employers committing to hire program participants",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a letter of commitment from an employer for a DOL workforce grant"
+        }
       ]
     },
     "doj": {
@@ -1090,6 +1438,24 @@
           "required": false,
           "max_pages": 1,
           "guidance": "Describe how project will continue after federal funding ends. What resources will sustain operations?"
+        }
+      ],
+      "required_documents": [
+        {
+          "type": "letters_of_support",
+          "name": "Letters of Support",
+          "description": "Letters from law enforcement, community organizations, or government officials",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a letter of support from a law enforcement agency for a DOJ grant"
+        },
+        {
+          "type": "mou_partners",
+          "name": "MOU with Partner Agencies",
+          "description": "Memoranda of understanding with law enforcement, courts, or service providers",
+          "required": false,
+          "can_generate": true,
+          "generate_prompt": "Draft a memorandum of understanding between a grantee and law enforcement for a DOJ grant"
         }
       ]
     }

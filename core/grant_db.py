@@ -146,6 +146,36 @@ def init_db():
             approved INTEGER DEFAULT 0,
             created_at TEXT
         )''')
+
+        # Grant documents table - uploaded and generated documents for submissions
+        c.execute('''CREATE TABLE IF NOT EXISTS grant_documents (
+            id TEXT PRIMARY KEY,
+            grant_id TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            doc_type TEXT NOT NULL,
+            doc_name TEXT NOT NULL,
+            file_path TEXT,
+            file_data BYTEA,
+            status TEXT DEFAULT 'pending',
+            generated BOOLEAN DEFAULT FALSE,
+            created_at TEXT,
+            updated_at TEXT
+        )''')
+
+        # Grant checklist table - submission readiness checklist items
+        c.execute('''CREATE TABLE IF NOT EXISTS grant_checklist (
+            id TEXT PRIMARY KEY,
+            grant_id TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            item_type TEXT NOT NULL,
+            item_name TEXT NOT NULL,
+            description TEXT,
+            required BOOLEAN DEFAULT TRUE,
+            completed BOOLEAN DEFAULT FALSE,
+            completed_by TEXT,
+            completed_at TEXT,
+            notes TEXT
+        )''')
     except Exception as e:
         # On Postgres the schema is managed by supabase_migration.sql
         import logging

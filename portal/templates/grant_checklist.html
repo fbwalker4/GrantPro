@@ -1,0 +1,378 @@
+{% extends "layout.html" %}
+
+{% block title %}Submission Checklist - {{ grant.grant_name }}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <h1>Submission Checklist</h1>
+        <p style="color: var(--text-secondary);">{{ grant.grant_name }} | {{ grant.agency }}</p>
+    </div>
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <a href="/grant/{{ grant.id }}" class="btn btn-secondary">Back to Grant</a>
+    </div>
+</div>
+
+{# Readiness meter #}
+<div class="card" style="margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="margin: 0;">Submission Readiness</h2>
+        <span style="font-size: 2rem; font-weight: 700; color: {% if readiness_pct >= 80 %}#10b981{% elif readiness_pct >= 50 %}#f59e0b{% else %}#dc3545{% endif %};">
+            {{ readiness_pct }}%
+        </span>
+    </div>
+    <div style="background: var(--bg-secondary, #1a1a2e); border-radius: 8px; height: 16px; overflow: hidden;">
+        <div style="background: {% if readiness_pct >= 80 %}#10b981{% elif readiness_pct >= 50 %}#f59e0b{% else %}#dc3545{% endif %}; height: 100%; width: {{ readiness_pct }}%; border-radius: 8px; transition: width 0.5s ease;"></div>
+    </div>
+    <p style="color: var(--text-secondary); margin-top: 0.75rem; font-size: 0.9rem;">
+        {{ completed_count }} of {{ total_required }} required items complete
+        {% if total_count > total_required %} ({{ total_count }} total items){% endif %}
+    </p>
+</div>
+
+{# ---- Standard Forms ---- #}
+<div class="card" style="margin-bottom: 1.5rem;">
+    <h2 style="margin-bottom: 1rem;">Standard Forms</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">
+        These forms are auto-generated from your grant data.
+    </p>
+    {% for item in checklist_forms %}
+    <div class="checklist-item" style="border-left: 4px solid #10b981;">
+        <div class="checklist-status">
+            <span class="check-icon check-done">&#10003;</span>
+            <span>{{ item.name }}</span>
+        </div>
+        <span class="badge badge-green">Auto-generated</span>
+    </div>
+    {% endfor %}
+</div>
+
+{# ---- Narrative Sections ---- #}
+<div class="card" style="margin-bottom: 1.5rem;">
+    <h2 style="margin-bottom: 1rem;">Narrative Sections</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">
+        Each section of your grant narrative. Click Edit to add content.
+    </p>
+    {% for item in checklist_sections %}
+    <div class="checklist-item" style="border-left: 4px solid {% if item.status == 'complete' %}#10b981{% elif item.status == 'draft' %}#f59e0b{% else %}#dc3545{% endif %};">
+        <div class="checklist-status">
+            {% if item.status == 'complete' %}
+            <span class="check-icon check-done">&#10003;</span>
+            {% elif item.status == 'draft' %}
+            <span class="check-icon check-progress">&#9998;</span>
+            {% else %}
+            <span class="check-icon check-missing">&#10007;</span>
+            {% endif %}
+            <div>
+                <span>{{ item.name }}</span>
+                {% if item.required %}<span class="required-badge" style="margin-left: 0.5rem;">Required</span>{% endif %}
+                {% if item.max_pages %}<span style="font-size: 0.75rem; color: var(--text-muted); margin-left: 0.5rem;">Max {{ item.max_pages }} pages</span>{% endif %}
+            </div>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+            {% if item.status == 'complete' %}
+            <span class="badge badge-green">Complete</span>
+            {% elif item.status == 'draft' %}
+            <span class="badge badge-yellow">Draft</span>
+            {% else %}
+            <span class="badge badge-red">Missing</span>
+            {% endif %}
+            <a href="/grant/{{ grant.id }}/section/{{ item.section_id }}" class="btn btn-small btn-primary">Edit</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{# ---- Required Documents ---- #}
+<div class="card" style="margin-bottom: 1.5rem;">
+    <h2 style="margin-bottom: 1rem;">Required Documents</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">
+        Upload supporting documents or generate drafts with AI.
+    </p>
+    {% if checklist_documents|length == 0 %}
+    <p style="color: var(--text-muted); font-style: italic;">No agency-specific documents required for this template.</p>
+    {% endif %}
+    {% for item in checklist_documents %}
+    <div class="checklist-item" style="border-left: 4px solid {% if item.uploaded %}#10b981{% elif item.required %}#dc3545{% else %}#f59e0b{% endif %};">
+        <div class="checklist-status">
+            {% if item.uploaded %}
+            <span class="check-icon check-done">&#10003;</span>
+            {% elif item.required %}
+            <span class="check-icon check-missing">&#10007;</span>
+            {% else %}
+            <span class="check-icon check-progress">&#8226;</span>
+            {% endif %}
+            <div>
+                <span>{{ item.name }}</span>
+                {% if item.required %}<span class="required-badge" style="margin-left: 0.5rem;">Required</span>{% endif %}
+                <div style="font-size: 0.8rem; color: var(--text-muted);">{{ item.description }}</div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            {% if item.uploaded %}
+            <span class="badge badge-green">Uploaded</span>
+            <form method="POST" action="/grant/{{ grant.id }}/document/{{ item.doc_id }}/delete" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-small" style="background:#dc3545;color:#fff;border:none;font-size:0.75rem;" onclick="return confirm('Delete this document?')">Remove</button>
+            </form>
+            {% else %}
+                {% if item.can_generate %}
+                <button class="btn btn-small btn-ai" onclick="showGenerateModal('{{ item.type }}', '{{ item.name }}')">Generate Draft</button>
+                {% endif %}
+                <button class="btn btn-small btn-primary" onclick="showUploadModal('{{ item.type }}', '{{ item.name }}')">Upload</button>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{# ---- Self-Certifications ---- #}
+<div class="card" style="margin-bottom: 1.5rem;">
+    <h2 style="margin-bottom: 1rem;">Self-Certifications</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">
+        Confirm you have completed these items outside the system.
+    </p>
+    {% for item in checklist_certifications %}
+    <div class="checklist-item" style="border-left: 4px solid {% if item.completed %}#10b981{% else %}#dc3545{% endif %};">
+        <div class="checklist-status">
+            {% if item.completed %}
+            <span class="check-icon check-done">&#10003;</span>
+            {% else %}
+            <span class="check-icon check-missing">&#10007;</span>
+            {% endif %}
+            <div>
+                <span>{{ item.name }}</span>
+                {% if item.description %}<div style="font-size: 0.8rem; color: var(--text-muted);">{{ item.description }}</div>{% endif %}
+            </div>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <form method="POST" action="/grant/{{ grant.id }}/checklist/complete-item" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="item_id" value="{{ item.id }}">
+                <input type="hidden" name="completed" value="{{ 'false' if item.completed else 'true' }}">
+                <button type="submit" class="btn btn-small {% if item.completed %}btn-secondary{% else %}btn-success{% endif %}">
+                    {% if item.completed %}Undo{% else %}Mark Done{% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{# ---- Consistency Checks ---- #}
+<div class="card" style="margin-bottom: 1.5rem;">
+    <h2 style="margin-bottom: 1rem;">Consistency Checks</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">
+        Automated checks to ensure your application is internally consistent.
+    </p>
+    {% if consistency_issues|length == 0 %}
+    <div class="checklist-item" style="border-left: 4px solid #10b981;">
+        <div class="checklist-status">
+            <span class="check-icon check-done">&#10003;</span>
+            <span>All consistency checks passed</span>
+        </div>
+        <span class="badge badge-green">OK</span>
+    </div>
+    {% else %}
+    {% for issue in consistency_issues %}
+    <div class="checklist-item" style="border-left: 4px solid {% if issue.severity == 'error' %}#dc3545{% else %}#f59e0b{% endif %};">
+        <div class="checklist-status">
+            {% if issue.severity == 'error' %}
+            <span class="check-icon check-missing">&#10007;</span>
+            {% else %}
+            <span class="check-icon check-progress">!</span>
+            {% endif %}
+            <div>
+                <span>{{ issue.title }}</span>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">{{ issue.message }}</div>
+            </div>
+        </div>
+        <span class="badge {% if issue.severity == 'error' %}badge-red{% else %}badge-yellow{% endif %}">
+            {{ issue.severity|capitalize }}
+        </span>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
+{# ---- Generate Submission Package ---- #}
+<div class="card" style="margin-bottom: 2rem; text-align: center; padding: 2rem;">
+    {% if readiness_pct >= 100 %}
+    <h2 style="color: #10b981;">Ready to Submit!</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">All required items are complete. Generate your submission package.</p>
+    <a href="/grant/{{ grant.id }}/paper-submission" class="btn btn-success" style="font-size: 1.1rem; padding: 0.75rem 2rem;">
+        Generate Submission Package
+    </a>
+    {% else %}
+    <h2 style="color: var(--text-muted);">Submission Package</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+        Complete all required items above before generating your submission package.<br>
+        <strong>{{ total_required - completed_count }} required item{{ 's' if (total_required - completed_count) != 1 else '' }} remaining.</strong>
+    </p>
+    <button class="btn btn-secondary" disabled style="font-size: 1.1rem; padding: 0.75rem 2rem; opacity: 0.5; cursor: not-allowed;">
+        Generate Submission Package
+    </button>
+    {% endif %}
+</div>
+
+{# ---- Upload Modal ---- #}
+<div id="uploadModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background: var(--bg-card, #1e1e2e); border-radius: 12px; padding: 2rem; max-width: 500px; width: 90%; margin: auto; margin-top: 15vh; border: 1px solid var(--border-color);">
+        <h3 id="uploadModalTitle" style="margin-top:0;">Upload Document</h3>
+        <form method="POST" action="/grant/{{ grant.id }}/upload-document" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="doc_type" id="uploadDocType">
+            <input type="hidden" name="doc_name" id="uploadDocName">
+            <div style="margin-bottom: 1rem;">
+                <label style="font-weight: 600;">File (PDF, DOC, DOCX - max 10MB)</label>
+                <input type="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx" required
+                       style="width:100%; padding:0.5rem; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-card); color:var(--text-primary); margin-top:0.25rem;">
+            </div>
+            <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="hideUploadModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# ---- Generate Document Modal ---- #}
+<div id="generateModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background: var(--bg-card, #1e1e2e); border-radius: 12px; padding: 2rem; max-width: 550px; width: 90%; margin: auto; margin-top: 10vh; border: 1px solid var(--border-color);">
+        <h3 id="generateModalTitle" style="margin-top:0;">Generate Document Draft</h3>
+        <form method="POST" action="/grant/{{ grant.id }}/generate-document">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="doc_type" id="genDocType">
+            <div style="margin-bottom: 1rem;">
+                <label style="font-weight: 600;">Partner Organization Name</label>
+                <input type="text" name="partner_name" required placeholder="e.g., Community Housing Corp."
+                       style="width:100%; padding:0.5rem; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-card); color:var(--text-primary); margin-top:0.25rem;">
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <label style="font-weight: 600;">Partner Role in Project</label>
+                <input type="text" name="partner_role" required placeholder="e.g., Provide case management services"
+                       style="width:100%; padding:0.5rem; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-card); color:var(--text-primary); margin-top:0.25rem;">
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <label style="font-weight: 600;">Partnership Details</label>
+                <textarea name="partnership_details" rows="4" required placeholder="Describe what the agreement covers, key responsibilities, and deliverables..."
+                          style="width:100%; padding:0.5rem; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-card); color:var(--text-primary); margin-top:0.25rem; resize:vertical;"></textarea>
+            </div>
+            <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="hideGenerateModal()">Cancel</button>
+                <button type="submit" class="btn btn-ai" style="padding:0.5rem 1rem;">Generate with AI</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.checklist-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    background: var(--bg-secondary, rgba(255,255,255,0.03));
+    border-radius: 6px;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.checklist-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 200px;
+}
+
+.check-icon {
+    font-size: 1.2rem;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.check-done {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.check-progress {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.check-missing {
+    background: rgba(220, 53, 69, 0.15);
+    color: #dc3545;
+}
+
+.badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badge-green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.badge-yellow { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.badge-red { background: rgba(220, 53, 69, 0.15); color: #dc3545; }
+
+.required-badge {
+    background: #dc3545;
+    color: white;
+    padding: 0.1rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+}
+
+.btn-ai {
+    background: #7c3aed;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+.btn-ai:hover { background: #6d28d9; }
+</style>
+
+<script>
+function showUploadModal(docType, docName) {
+    document.getElementById('uploadDocType').value = docType;
+    document.getElementById('uploadDocName').value = docName;
+    document.getElementById('uploadModalTitle').textContent = 'Upload: ' + docName;
+    document.getElementById('uploadModal').style.display = 'block';
+}
+
+function hideUploadModal() {
+    document.getElementById('uploadModal').style.display = 'none';
+}
+
+function showGenerateModal(docType, docName) {
+    document.getElementById('genDocType').value = docType;
+    document.getElementById('generateModalTitle').textContent = 'Generate: ' + docName;
+    document.getElementById('generateModal').style.display = 'block';
+}
+
+function hideGenerateModal() {
+    document.getElementById('generateModal').style.display = 'none';
+}
+
+// Close modals on backdrop click
+document.getElementById('uploadModal').addEventListener('click', function(e) {
+    if (e.target === this) hideUploadModal();
+});
+document.getElementById('generateModal').addEventListener('click', function(e) {
+    if (e.target === this) hideGenerateModal();
+});
+</script>
+{% endblock %}

@@ -12,6 +12,7 @@
         {% endif %}
     </div>
     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <a href="/grant/{{ grant.id }}/checklist" class="btn btn-primary" style="background:#7c3aed;border-color:#7c3aed;">&#9745; Submission Checklist</a>
         <a href="/grant/{{ grant.id }}/guided" class="btn btn-success">🎯 Guided Submission</a>
         <a href="/grant/{{ grant.id }}/paper-submission" class="btn btn-primary">📦 Paper Submission</a>
         {% if existing_sections and existing_sections|length > 0 %}

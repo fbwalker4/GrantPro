@@ -3758,6 +3758,626 @@ def admin_reject_testimonial(tid):
     return redirect(url_for('admin_testimonials'))
 
 
+# ============ SUBMISSION CHECKLIST, DOCUMENTS & MOU ============
+
+
+def validate_budget_consistency(grant_id):
+    """Validate budget consistency across the grant application.
+
+    Reads the grant record, budget section, and budget justification to check
+    that amounts and descriptions are consistent.
+    Returns a list of issue dicts: {title, message, severity}.
+    """
+    issues = []
+    conn = get_db()
+
+    grant = conn.execute('''
+        SELECT g.*, c.organization_name
+        FROM grants g
+        JOIN clients c ON g.client_id = c.id
+        WHERE g.id = ?
+    ''', (grant_id,)).fetchone()
+
+    if not grant:
+        conn.close()
+        return [{'title': 'Grant Not Found', 'message': 'Could not load grant data.', 'severity': 'error'}]
+
+    # Fetch relevant draft sections
+    drafts = conn.execute('SELECT section, content FROM drafts WHERE grant_id = ?', (grant_id,)).fetchall()
+    conn.close()
+
+    sections = {d['section']: d['content'] for d in drafts}
+
+    grant_amount = grant.get('amount') or 0
+
+    # Check 1: budget section exists
+    budget_content = sections.get('budget', '')
+    budget_just_content = sections.get('budget_justification', '')
+
+    if not budget_content:
+        issues.append({
+            'title': 'Budget Section Missing',
+            'message': 'No budget narrative has been written. This is required for submission.',
+            'severity': 'error'
+        })
+    if not budget_just_content:
+        issues.append({
+            'title': 'Budget Justification Missing',
+            'message': 'No budget justification narrative has been written.',
+            'severity': 'warning'
+        })
+
+    # Check 2: look for dollar amounts in budget and compare to grant amount
+    if budget_content and grant_amount > 0:
+        import re
+        dollar_amounts = re.findall(r'\$[\d,]+(?:\.\d{2})?', budget_content)
+        found_totals = []
+        for amt_str in dollar_amounts:
+            try:
+                val = float(amt_str.replace('$', '').replace(',', ''))
+                if val > 0:
+                    found_totals.append(val)
+            except ValueError:
+                pass
+
+        if found_totals:
+            max_mentioned = max(found_totals)
+            # If the largest dollar amount mentioned is vastly different from grant amount
+            if grant_amount > 0 and max_mentioned > 0:
+                ratio = max_mentioned / grant_amount
+                if ratio > 1.5:
+                    issues.append({
+                        'title': 'Budget Amount Exceeds Grant',
+                        'message': f'Budget mentions ${max_mentioned:,.0f} but grant amount is ${grant_amount:,.0f}. Verify totals match.',
+                        'severity': 'warning'
+                    })
+                elif ratio < 0.3:
+                    issues.append({
+                        'title': 'Budget Amount Low',
+                        'message': f'Largest budget figure (${max_mentioned:,.0f}) is much less than grant amount (${grant_amount:,.0f}). Ensure the full budget is documented.',
+                        'severity': 'warning'
+                    })
+
+    # Check 3: title consistency - grant name should appear in abstract/summary
+    grant_name = (grant.get('grant_name') or '').lower()
+    for section_key in ('project_summary', 'project_abstract', 'specific_aims', 'idea'):
+        content = sections.get(section_key, '')
+        if content and grant_name and len(grant_name) > 5:
+            # Just check if key words from the grant name appear
+            words = [w for w in grant_name.split() if len(w) > 3]
+            matches = sum(1 for w in words if w in content.lower())
+            if words and matches < len(words) * 0.3:
+                issues.append({
+                    'title': 'Title Consistency',
+                    'message': f'The project summary/abstract may not reference the grant focus. Ensure the narrative aligns with "{grant.get("grant_name")}".',
+                    'severity': 'warning'
+                })
+            break  # Only check first found summary section
+
+    # Check 4: personnel mentioned in budget should appear in key personnel section
+    personnel_content = sections.get('biographical_sketches', '') or sections.get('biographical', '') or sections.get('key_personnel', '')
+    if budget_content and personnel_content:
+        # Simple heuristic: if "personnel" or "salary" in budget but bio section is very short
+        if ('personnel' in budget_content.lower() or 'salary' in budget_content.lower()):
+            if len(personnel_content) < 200:
+                issues.append({
+                    'title': 'Personnel Detail',
+                    'message': 'Budget mentions personnel costs but biographical section is brief. Ensure all key personnel are documented.',
+                    'severity': 'warning'
+                })
+
+    return issues
+
+
+def _build_checklist_data(grant_id, user_id, template_name):
+    """Build the full checklist data for a grant. Returns dict with all categories."""
+    import json as _json
+
+    conn = get_db()
+
+    # Load template
+    template_path = Path(__file__).parent.parent / "templates" / "agency_templates.json"
+    template_data = {}
+    if template_path.exists():
+        with open(template_path) as f:
+            all_templates = _json.load(f)
+        template_data = all_templates.get('agencies', {}).get(template_name, {})
+
+    # Fetch drafts
+    drafts = conn.execute('SELECT section, content, status FROM drafts WHERE grant_id = ?', (grant_id,)).fetchall()
+    existing_sections = {d['section']: d for d in drafts}
+
+    # Fetch uploaded documents
+    docs = conn.execute('SELECT * FROM grant_documents WHERE grant_id = ?', (grant_id,)).fetchall()
+    uploaded_types = {d['doc_type']: d for d in docs}
+
+    # Fetch checklist items (self-certifications)
+    checklist_items = conn.execute('SELECT * FROM grant_checklist WHERE grant_id = ? AND user_id = ?', (grant_id, user_id)).fetchall()
+    cert_map = {c['item_type'] + ':' + c['item_name']: c for c in checklist_items}
+
+    conn.close()
+
+    # --- 1. Standard Forms ---
+    checklist_forms = [
+        {'name': 'SF-424 (Application for Federal Assistance)', 'status': 'auto'},
+        {'name': 'SF-424A (Budget Information)', 'status': 'auto'},
+        {'name': 'SF-424B (Assurances)', 'status': 'auto'},
+    ]
+
+    # --- 2. Narrative Sections ---
+    checklist_sections = []
+    for sec in template_data.get('required_sections', []):
+        section_id = sec.get('id', '')
+        draft = existing_sections.get(section_id)
+        if draft and draft.get('content'):
+            status = 'complete' if len(draft['content']) > 100 else 'draft'
+        else:
+            status = 'missing'
+        checklist_sections.append({
+            'section_id': section_id,
+            'name': sec.get('name', section_id),
+            'required': sec.get('required', False),
+            'max_pages': sec.get('max_pages'),
+            'status': status,
+        })
+
+    # --- 3. Required Documents ---
+    checklist_documents = []
+    for doc in template_data.get('required_documents', []):
+        doc_type = doc.get('type', '')
+        uploaded = uploaded_types.get(doc_type)
+        checklist_documents.append({
+            'type': doc_type,
+            'name': doc.get('name', doc_type),
+            'description': doc.get('description', ''),
+            'required': doc.get('required', False),
+            'can_generate': doc.get('can_generate', False),
+            'uploaded': uploaded is not None,
+            'doc_id': uploaded['id'] if uploaded else None,
+        })
+
+    # --- 4. Self-Certifications ---
+    standard_certs = [
+        {'type': 'cert', 'name': 'SAM.gov Registration Current', 'description': 'Confirm your organization is registered and active in SAM.gov with a valid UEI.'},
+        {'type': 'cert', 'name': 'Grants.gov Account Active', 'description': 'Confirm your Grants.gov account is active and authorized to submit.'},
+        {'type': 'cert', 'name': 'Authorized Representative Identified', 'description': 'Confirm the Authorized Organizational Representative (AOR) has been designated.'},
+        {'type': 'cert', 'name': 'Internal Review Complete', 'description': 'Confirm the application has been reviewed by your internal grants office or leadership.'},
+    ]
+
+    checklist_certifications = []
+    for cert in standard_certs:
+        key = cert['type'] + ':' + cert['name']
+        existing = cert_map.get(key)
+        checklist_certifications.append({
+            'id': existing['id'] if existing else '',
+            'name': cert['name'],
+            'description': cert['description'],
+            'completed': existing['completed'] if existing else False,
+            'item_type': cert['type'],
+        })
+
+    # --- Compute readiness ---
+    total_required = 0
+    completed_count = 0
+    total_count = 0
+
+    # Forms always complete
+    total_required += len(checklist_forms)
+    completed_count += len(checklist_forms)
+    total_count += len(checklist_forms)
+
+    # Sections
+    for s in checklist_sections:
+        total_count += 1
+        if s['required']:
+            total_required += 1
+            if s['status'] == 'complete':
+                completed_count += 1
+        else:
+            if s['status'] == 'complete':
+                completed_count += 1
+
+    # Documents
+    for d in checklist_documents:
+        total_count += 1
+        if d['required']:
+            total_required += 1
+            if d['uploaded']:
+                completed_count += 1
+        else:
+            if d['uploaded']:
+                completed_count += 1
+
+    # Certifications
+    for c in checklist_certifications:
+        total_count += 1
+        total_required += 1
+        if c['completed']:
+            completed_count += 1
+
+    readiness_pct = int((completed_count / total_required * 100) if total_required > 0 else 0)
+    if readiness_pct > 100:
+        readiness_pct = 100
+
+    return {
+        'checklist_forms': checklist_forms,
+        'checklist_sections': checklist_sections,
+        'checklist_documents': checklist_documents,
+        'checklist_certifications': checklist_certifications,
+        'readiness_pct': readiness_pct,
+        'completed_count': completed_count,
+        'total_required': total_required,
+        'total_count': total_count,
+    }
+
+
+@app.route('/grant/<grant_id>/checklist')
+@login_required
+@paid_required
+def grant_checklist(grant_id):
+    """Submission readiness checklist for a grant."""
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    conn = get_db()
+    grant = conn.execute('''
+        SELECT g.*, c.organization_name
+        FROM grants g
+        JOIN clients c ON g.client_id = c.id
+        WHERE g.id = ?
+    ''', (grant_id,)).fetchone()
+    conn.close()
+
+    if not grant:
+        return "Grant not found", 404
+
+    template_name = grant['template'] if 'template' in grant.keys() and grant['template'] else 'generic'
+    user = get_current_user()
+    user_id = user['id'] if user else ''
+
+    # Ensure self-certification rows exist in DB
+    _ensure_checklist_certs(grant_id, user_id)
+
+    data = _build_checklist_data(grant_id, user_id, template_name)
+    consistency_issues = validate_budget_consistency(grant_id)
+
+    return render_template('grant_checklist.html',
+                           grant=grant,
+                           template_name=template_name,
+                           consistency_issues=consistency_issues,
+                           **data)
+
+
+@app.route('/grant/<grant_id>/upload-document', methods=['POST'])
+@login_required
+@paid_required
+@csrf_required
+def upload_document(grant_id):
+    """Upload a supporting document for a grant."""
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    file = request.files.get('file')
+    doc_type = request.form.get('doc_type', 'other')
+    doc_name = request.form.get('doc_name', 'Uploaded Document')
+
+    if not file or not file.filename:
+        flash('No file selected', 'error')
+        return redirect(url_for('grant_checklist', grant_id=grant_id))
+
+    # Check file size (10MB limit)
+    file.seek(0, 2)
+    size = file.tell()
+    file.seek(0)
+    if size > 10 * 1024 * 1024:
+        flash('File too large. Maximum size is 10MB.', 'error')
+        return redirect(url_for('grant_checklist', grant_id=grant_id))
+
+    filename = secure_filename(file.filename)
+    file_data = file.read()
+
+    user = get_current_user()
+    now = datetime.now().isoformat()
+    doc_id = f"gdoc-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
+
+    conn = get_db()
+    conn.execute('''
+        INSERT INTO grant_documents (id, grant_id, user_id, doc_type, doc_name, file_path, file_data, status, generated, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'uploaded', FALSE, ?, ?)
+    ''', (doc_id, grant_id, user['id'], doc_type, doc_name + ' (' + filename + ')', filename, file_data, now, now))
+    conn.commit()
+    conn.close()
+
+    flash(f'Document "{filename}" uploaded successfully.', 'success')
+    return redirect(url_for('grant_checklist', grant_id=grant_id))
+
+
+@app.route('/grant/<grant_id>/documents')
+@login_required
+def grant_documents_list(grant_id):
+    """List all uploaded documents for a grant (JSON API)."""
+    if not user_owns_grant(grant_id):
+        return jsonify({'error': 'Access denied'}), 403
+
+    conn = get_db()
+    docs = conn.execute('''
+        SELECT id, doc_type, doc_name, status, generated, created_at
+        FROM grant_documents WHERE grant_id = ?
+        ORDER BY created_at DESC
+    ''', (grant_id,)).fetchall()
+    conn.close()
+
+    return jsonify({'documents': [dict(d) for d in docs]})
+
+
+@app.route('/grant/<grant_id>/document/<doc_id>/delete', methods=['POST'])
+@login_required
+@csrf_required
+def delete_document(grant_id, doc_id):
+    """Delete a document from a grant."""
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    conn = get_db()
+    conn.execute('DELETE FROM grant_documents WHERE id = ? AND grant_id = ?', (doc_id, grant_id))
+    conn.commit()
+    conn.close()
+
+    flash('Document removed.', 'success')
+    return redirect(url_for('grant_checklist', grant_id=grant_id))
+
+
+@app.route('/grant/<grant_id>/generate-document', methods=['POST'])
+@require_rate_limit(endpoint='generate_document', max_requests=5, window=60)
+@login_required
+@paid_required
+@csrf_required
+def generate_document(grant_id):
+    """Generate a draft document (MOU, letter of collaboration, etc.) using AI."""
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    doc_type = request.form.get('doc_type', 'mou')
+    partner_name = request.form.get('partner_name', '')
+    partner_role = request.form.get('partner_role', '')
+    partnership_details = request.form.get('partnership_details', '')
+
+    if not partner_name or not partner_role:
+        flash('Partner name and role are required.', 'error')
+        return redirect(url_for('grant_checklist', grant_id=grant_id))
+
+    conn = get_db()
+    grant = conn.execute('''
+        SELECT g.*, c.organization_name, c.contact_name
+        FROM grants g
+        JOIN clients c ON g.client_id = c.id
+        WHERE g.id = ?
+    ''', (grant_id,)).fetchone()
+    conn.close()
+
+    if not grant:
+        flash('Grant not found', 'error')
+        return redirect(url_for('dashboard'))
+
+    org_name = grant.get('organization_name', 'Applicant Organization')
+    grant_name = grant.get('grant_name', 'Grant Project')
+    agency = grant.get('agency', '')
+
+    # Document type label mapping
+    doc_type_labels = {
+        'mou': 'Memorandum of Understanding',
+        'mou_chdo': 'Memorandum of Understanding (CHDO)',
+        'mou_partners': 'Memorandum of Understanding',
+        'letters_of_collaboration': 'Letter of Collaboration',
+        'letters_of_support': 'Letter of Support',
+        'letters_of_commitment': 'Letter of Commitment',
+        'board_resolution': 'Board Resolution',
+        'letter_of_support': 'Letter of Support',
+        'citizen_participation_plan': 'Citizen Participation Plan',
+        'cost_share_commitment': 'Cost Share Commitment Letter',
+        'cost_share_documentation': 'Cost Share Commitment Letter',
+        'intellectual_property_plan': 'Intellectual Property Management Plan',
+        'consortium_agreement': 'Consortium Agreement',
+        'authentication_plan': 'Authentication of Key Biological Resources Plan',
+        'qapp': 'Quality Assurance Project Plan',
+        'logic_model': 'Logic Model',
+    }
+    doc_label = doc_type_labels.get(doc_type, doc_type.replace('_', ' ').title())
+
+    prompt = f"""You are an expert grant writer. Generate a professional {doc_label} document.
+
+**Context:**
+- Applicant Organization: {org_name}
+- Grant/Project Name: {grant_name}
+- Funding Agency: {agency}
+- Partner Organization: {partner_name}
+- Partner Role: {partner_role}
+- Partnership Details: {partnership_details}
+
+**Instructions:**
+Generate a complete, formal {doc_label} that:
+1. Includes proper headers, dates, and signature blocks
+2. Clearly states the purpose and scope
+3. Defines roles and responsibilities of each party
+4. Includes relevant terms, duration, and conditions
+5. Is formatted professionally and ready for review
+6. Uses appropriate legal and grant-writing conventions
+
+Write the complete document now:"""
+
+    generated_content = ""
+    try:
+        import os
+        from google import genai
+
+        api_key = None
+        env_path = os.path.expanduser('~/.hermes/.env')
+        if os.path.exists(env_path):
+            with open(env_path) as f:
+                for line in f:
+                    if line.startswith('GOOGLE_API_KEY='):
+                        api_key = line.split('=', 1)[1].strip()
+                        if api_key == '***' or not api_key:
+                            api_key = None
+                        break
+
+        if api_key:
+            max_retries = 3
+            retry_delay = 2
+            response = None
+            for attempt in range(max_retries):
+                try:
+                    client = genai.Client(api_key=api_key)
+                    response = client.models.generate_content(
+                        model='gemini-2.5-flash',
+                        contents=prompt
+                    )
+                    break
+                except Exception as api_error:
+                    if attempt < max_retries - 1 and ('ssl' in str(api_error).lower() or 'timeout' in str(api_error).lower() or 'connection' in str(api_error).lower()):
+                        import time as _time
+                        _time.sleep(retry_delay * (attempt + 1))
+                        continue
+                    raise
+
+            if response and response.text:
+                generated_content = response.text
+            else:
+                generated_content = f"[AI generation failed. Please draft this {doc_label} manually.]"
+        else:
+            generated_content = f"""# {doc_label}
+
+**Between:** {org_name} ("Applicant") and {partner_name} ("Partner")
+
+**Regarding:** {grant_name}
+
+**Agency:** {agency}
+
+---
+
+## Purpose
+This {doc_label} establishes the terms of collaboration between {org_name} and {partner_name} for the above-referenced project.
+
+## Partner Role
+{partner_role}
+
+## Details
+{partnership_details}
+
+## Terms
+- This agreement is effective upon signature by both parties.
+- Duration: Aligned with the grant period of performance.
+- Either party may terminate with 30 days written notice.
+
+---
+
+**Signature Blocks:**
+
+_{org_name}_
+Name: ___________________________
+Title: ___________________________
+Date: ___________________________
+
+_{partner_name}_
+Name: ___________________________
+Title: ___________________________
+Date: ___________________________
+
+---
+*DRAFT - Review and customize before finalizing.*"""
+
+    except Exception as e:
+        logger.error("Document generation error: %s", e)
+        generated_content = f"[Error generating document: {str(e)}. Please draft manually.]"
+
+    # Save the generated document
+    user = get_current_user()
+    now = datetime.now().isoformat()
+    doc_id = f"gdoc-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
+    doc_name = f"{doc_label} - {partner_name}"
+
+    conn = get_db()
+    conn.execute('''
+        INSERT INTO grant_documents (id, grant_id, user_id, doc_type, doc_name, file_path, file_data, status, generated, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'draft', TRUE, ?, ?)
+    ''', (doc_id, grant_id, user['id'], doc_type, doc_name, None, generated_content.encode('utf-8'), now, now))
+    conn.commit()
+    conn.close()
+
+    flash(f'{doc_label} draft generated successfully. Review and edit as needed.', 'success')
+    return redirect(url_for('grant_checklist', grant_id=grant_id))
+
+
+@app.route('/grant/<grant_id>/checklist/complete-item', methods=['POST'])
+@login_required
+@csrf_required
+def checklist_complete_item(grant_id):
+    """Mark a self-certification checklist item as complete or incomplete."""
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    item_id = request.form.get('item_id', '')
+    completed = request.form.get('completed', 'false') == 'true'
+    notes = request.form.get('notes', '')
+    user = get_current_user()
+    now = datetime.now().isoformat()
+
+    conn = get_db()
+
+    if item_id:
+        # Update existing item
+        conn.execute('''
+            UPDATE grant_checklist SET completed = ?, completed_by = ?, completed_at = ?, notes = ?
+            WHERE id = ? AND grant_id = ?
+        ''', (completed, user['id'] if completed else None, now if completed else None, notes, item_id, grant_id))
+    else:
+        # Create new checklist item from form context
+        # Determine item_name from the form (we get it from the button context)
+        # We need to identify which certification was toggled
+        # Parse from referer or re-build checklist to find the right cert
+        pass
+
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('grant_checklist', grant_id=grant_id))
+
+
+# Ensure self-cert items exist in DB when checklist is first viewed
+def _ensure_checklist_certs(grant_id, user_id):
+    """Create self-certification rows in grant_checklist if they don't exist yet."""
+    standard_certs = [
+        ('cert', 'SAM.gov Registration Current', 'Confirm your organization is registered and active in SAM.gov with a valid UEI.'),
+        ('cert', 'Grants.gov Account Active', 'Confirm your Grants.gov account is active and authorized to submit.'),
+        ('cert', 'Authorized Representative Identified', 'Confirm the Authorized Organizational Representative (AOR) has been designated.'),
+        ('cert', 'Internal Review Complete', 'Confirm the application has been reviewed by your internal grants office or leadership.'),
+    ]
+
+    conn = get_db()
+    existing = conn.execute(
+        'SELECT item_type, item_name FROM grant_checklist WHERE grant_id = ? AND user_id = ?',
+        (grant_id, user_id)
+    ).fetchall()
+    existing_keys = {(r['item_type'], r['item_name']) for r in existing}
+
+    now = datetime.now().isoformat()
+    for item_type, item_name, description in standard_certs:
+        if (item_type, item_name) not in existing_keys:
+            cert_id = f"chk-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
+            conn.execute('''
+                INSERT INTO grant_checklist (id, grant_id, user_id, item_type, item_name, description, required, completed)
+                VALUES (?, ?, ?, ?, ?, ?, TRUE, FALSE)
+            ''', (cert_id, grant_id, user_id, item_type, item_name, description))
+
+    conn.commit()
+    conn.close()
+
+
 # ============ MAIN ============
 
 if __name__ == '__main__':
