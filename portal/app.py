@@ -83,7 +83,7 @@ app.wsgi_app = _ServerHeaderStripper(app.wsgi_app, header_value='GrantPro')
 app.secret_key = os.environ.get('GP_SECRET_KEY') or os.environ.get('SECRET_KEY') or secrets.token_hex(32)
 
 # Store the key in a file for persistence if generated (skip on Vercel/serverless)
-if not os.environ.get('SECRET_KEY') and not os.environ.get('VERCEL'):
+if not os.environ.get('GP_SECRET_KEY') and not os.environ.get('SECRET_KEY') and not os.environ.get('VERCEL'):
     key_file = Path.home() / ".hermes" / "grant-system" / ".secret_key"
     try:
         if key_file.exists():
@@ -161,11 +161,11 @@ def csrf_required(f):
     def decorated_function(*args, **kwargs):
         if request.method == 'POST':
             # CSRF token must be present AND match session token
+            import hmac as _hmac
             token = request.form.get('csrf_token') or request.headers.get('X-CSRF-Token') or request.headers.get('X-CSRFToken')
             expected = session.get('csrf_token')
             # Both None = True (passes), but this only happens for guests with no session
-            # Any logged-in session will have a csrf_token set by generate_csrf_token()
-            if token != expected:
+            if not token or not expected or not _hmac.compare_digest(str(token), str(expected)):
                 flash('CSRF token validation failed', 'error')
                 return redirect(request.url)
         return f(*args, **kwargs)
@@ -1733,14 +1733,24 @@ def new_client():
         contact_email = request.form.get('contact_email')
 
         conn = get_db()
-        client_id = f"client-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+        # Atomic check-and-insert to prevent TOCTOU race condition
+        if client_limit is not None:
+            recheck_count = conn.execute(
+                'SELECT COUNT(*) FROM clients WHERE user_id = ?', (user['id'],)
+            ).fetchone()[0]
+            if recheck_count >= client_limit:
+                conn.close()
+                flash('Client limit reached. Upgrade your plan.', 'error')
+                return redirect(url_for('upgrade'))
+
+        client_id = f"client-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
         now = datetime.now().isoformat()
-        
+
         conn.execute('''
             INSERT INTO clients (id, user_id, organization_name, contact_name, contact_email, status, current_stage, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, 'new', 'intake', ?, ?)
         ''', (client_id, user['id'], org_name, contact_name, contact_email, now, now))
-        
+
         conn.commit()
         conn.close()
         
@@ -1820,7 +1830,7 @@ def new_grant(client_id):
     available_grants = grant_researcher.get_all_grants()
     
     if request.method == 'POST':
-        grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+        grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
         now = datetime.now().isoformat()
         
         grant_name = request.form.get('grant_name')
@@ -1937,7 +1947,7 @@ def start_application(grant_id):
             return redirect(url_for('start_application', grant_id=grant_id))
         
         # Create the grant for this client
-        new_grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+        new_grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
         
         # Use template from catalog if available, otherwise detect from agency name
         agency = research_grant.get('agency', '')
@@ -2088,7 +2098,7 @@ def grant_section(grant_id, section):
                 WHERE grant_id = ? AND section = ?
             ''', (content, now, grant_id, section))
         else:
-            draft_id = f"draft-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+            draft_id = f"draft-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
             conn.execute('''
                 INSERT INTO drafts (id, client_id, grant_id, section, content, version, created_at, updated_at, status)
                 VALUES (?, ?, ?, ?, ?, 1, ?, ?, 'draft')
@@ -4001,7 +4011,7 @@ def use_grant_template(grant_id):
     
     # Create the grant in our database
     conn = get_db()
-    db_grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    db_grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
     now = datetime.now().isoformat()
     
     conn.execute('''
@@ -4458,7 +4468,7 @@ def clone_grant(grant_id):
     drafts = conn.execute('SELECT * FROM drafts WHERE grant_id = ?', (grant_id,)).fetchall()
 
     # Create new grant ID and timestamp
-    new_grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    new_grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
     now = datetime.now().isoformat()
 
     # Insert cloned grant with " (Copy)" appended to title

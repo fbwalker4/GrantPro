@@ -77,7 +77,12 @@ def _sqlite_to_pg(sql: str) -> str:
     sql = re.sub(r'INSERT\s+OR\s+IGNORE\s+INTO', 'INSERT INTO', sql, flags=re.IGNORECASE)
     if 'INSERT INTO' in sql.upper() and 'ON CONFLICT' not in sql.upper() and 'OR IGNORE' in sql.upper():
         sql += ' ON CONFLICT DO NOTHING'
-    # INSERT OR REPLACE → INSERT ... ON CONFLICT DO UPDATE (simplified: just use INSERT for now)
+    # INSERT OR REPLACE → keep as INSERT INTO (callers should use explicit ON CONFLICT clauses)
+    # Log a warning if this translation is triggered so we can find and fix the caller
+    if re.search(r'INSERT\s+OR\s+REPLACE\s+INTO', sql, flags=re.IGNORECASE):
+        import logging
+        logging.getLogger('db_connection').warning(
+            'INSERT OR REPLACE translated to plain INSERT — caller should use ON CONFLICT clause: %s', sql[:100])
     sql = re.sub(r'INSERT\s+OR\s+REPLACE\s+INTO', 'INSERT INTO', sql, flags=re.IGNORECASE)
     # AUTOINCREMENT → SERIAL (only in CREATE TABLE context, which is already handled by migration)
     sql = re.sub(r'INTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT', 'SERIAL PRIMARY KEY', sql, flags=re.IGNORECASE)

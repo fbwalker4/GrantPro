@@ -196,12 +196,13 @@ def hash_password(password):
 
 
 def verify_password(password, stored):
-    """Verify a password against stored hash"""
+    """Verify a password against stored hash (constant-time comparison)"""
+    import hmac as _hmac
     try:
         salt, pwd_hash = stored.split('$')
         verify_hash = hashlib.pbkdf2_hmac('sha256', password.encode(), salt.encode(), 100000).hex()
-        return verify_hash == pwd_hash
-    except:
+        return _hmac.compare_digest(verify_hash, pwd_hash)
+    except (ValueError, AttributeError, TypeError):
         return False
 
 
@@ -216,7 +217,7 @@ def create_user(email, password, first_name=None, last_name=None, organization_n
         conn.close()
         return None, "Email already registered"
     
-    user_id = f"user-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    user_id = f"user-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
     now = datetime.now().isoformat()
     password_hash=hash_password(password)
     

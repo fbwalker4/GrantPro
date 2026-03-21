@@ -6,6 +6,7 @@ Local grant writing assistant using LLM
 
 import json
 import os
+import secrets
 import sqlite3
 import sys
 from datetime import datetime
@@ -402,7 +403,7 @@ def add_client(org_name, contact_name, contact_email, intake_data=None):
     conn = get_connection()
     c = conn.cursor()
     
-    client_id = f"client-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    client_id = f"client-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
     now = datetime.now().isoformat()
     
     c.execute('''INSERT INTO clients (id, organization_name, contact_name, contact_email, status, current_stage, created_at, updated_at, intake_data)
@@ -418,7 +419,7 @@ def add_grant(client_id, grant_info):
     conn = get_connection()
     c = conn.cursor()
     
-    grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
     now = datetime.now().isoformat()
     
     c.execute('''INSERT INTO grants (id, client_id, grant_name, agency, amount, deadline, status, assigned_at)
@@ -435,7 +436,7 @@ def save_draft(client_id, grant_id, section, content, version=1):
     conn = get_connection()
     c = conn.cursor()
     
-    draft_id = f"draft-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    draft_id = f"draft-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
     now = datetime.now().isoformat()
     
     c.execute('''INSERT OR REPLACE INTO drafts (id, client_id, grant_id, section, content, version, created_at, updated_at, status)
@@ -451,7 +452,7 @@ def create_invoice(client_id, invoice_type, amount, grant_id=None):
     conn = get_connection()
     c = conn.cursor()
     
-    invoice_id = f"inv-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    invoice_id = f"inv-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
     now = datetime.now().isoformat()
     
     c.execute('''INSERT INTO invoices (id, client_id, invoice_type, amount, status, created_at)
