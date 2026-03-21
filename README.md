@@ -121,7 +121,7 @@ Subscription SaaS with six tiers from free to Enterprise Unlimited ($99.95/mo), 
 │   ├── budget_builder.py           # Budget category builder
 │   ├── deadline_reminder.py        # Deadline notification system
 │   ├── pdf_utils.py                # PDF generation with "Assembled by GrantPro.org" branding
-│   ├── db_connection.py            # Database connection factory (SQLite + Turso fallback)
+│   ├── db_connection.py            # Database connection factory (Supabase Postgres + SQLite emergency fallback)
 │   └── cli.py                      # Command-line interface
 ├── jobs/                           # Automated background jobs
 │   ├── sync_grants_gov.py          # Daily Grants.gov catalog sync
@@ -129,17 +129,16 @@ Subscription SaaS with six tiers from free to Enterprise Unlimited ($99.95/mo), 
 ├── research/                       # Grant research engine
 │   ├── grant_researcher.py         # Grant search, filtering, matching
 │   ├── iot_grants_db.json          # 131 federal grant opportunities
-│   └── grants.db                   # Research SQLite database
+│   └── grants.db                   # Research SQLite database (legacy, read-only)
 ├── templates/                      # Agency template definitions
 │   └── agency_templates.json       # 21 agency templates (1,121 lines)
-├── tracking/                       # Data storage (SQLite databases)
-│   ├── grants.db                   # Main database (users, clients, grants, drafts)
-│   ├── users.db                    # User database
-│   ├── leads.db                    # Newsletter subscriber leads
-│   ├── email_log.db                # Email send log
+├── tracking/                       # Legacy data storage (no longer primary)
 │   └── clients.json                # Legacy client records
+├── archive/sqlite-deprecated/      # Archived SQLite databases (pre-migration)
 ├── data/                           # Runtime data
 │   └── deadline_reminders.json     # Reminder state
+├── supabase_migration.sql          # Supabase Postgres schema (19 tables)
+├── .env                            # Local env vars (not committed — loads GP_ vars)
 ├── archive/                        # Archived test/utility scripts
 │   ├── check_template.py
 │   ├── fix_budget_data.py
@@ -187,7 +186,7 @@ Subscription SaaS with six tiers from free to Enterprise Unlimited ($99.95/mo), 
 |-------|-----------|-----------------|
 | **Language** | Python 3.x | 3.10+ recommended |
 | **Web framework** | Flask | >= 2.3.0 |
-| **Database** | SQLite | Local file-based, zero config |
+| **Database** | Supabase Postgres | Via `psycopg2` driver; compatibility wrapper in `core/db_connection.py` |
 | **AI engine** | Google Gemini | via `google-genai` >= 1.0.0 |
 | **Payments** | Stripe | via `stripe` >= 5.0.0 |
 | **PDF generation** | ReportLab | >= 4.0.0 (SF-424 forms, paper packages) |
@@ -202,8 +201,6 @@ Subscription SaaS with six tiers from free to Enterprise Unlimited ($99.95/mo), 
 
 ### What Was Rejected (and Why)
 
-- **Supabase/Firebase** -- vendor lock-in
-- **PostgreSQL** -- overkill for local/single-server use
 - **OpenRouter** -- unnecessary middleman for AI
 - **Next.js/React** -- over-engineering for this use case
 - **Auth0/Clerk** -- adds cost and third-party dependency
@@ -212,7 +209,7 @@ Subscription SaaS with six tiers from free to Enterprise Unlimited ($99.95/mo), 
 
 ## Database Schema
 
-All tables live in `tracking/grants.db` (main app) and `tracking/leads.db` (newsletter). SQLite with `Row` factory for dict-style access.
+All 19 tables live in a single Supabase Postgres database. The schema is defined in `supabase_migration.sql` and managed via the Supabase dashboard. Both local development and production (Vercel) connect to the same Supabase Postgres instance. `core/db_connection.py` provides a compatibility wrapper that exposes a cursor-based interface (similar to SQLite's `Row` factory) over `psycopg2`. SQLite is retained only as an emergency fallback if the Postgres connection is unavailable.
 
 ### users (23 columns)
 
@@ -419,7 +416,7 @@ All tables live in `tracking/grants.db` (main app) and `tracking/leads.db` (news
 | expires_at | TEXT | | |
 | used | INTEGER | 0 | |
 
-### leads (in tracking/leads.db)
+### leads
 
 | Column | Type | Default | Notes |
 |--------|------|---------|-------|
@@ -429,7 +426,7 @@ All tables live in `tracking/grants.db` (main app) and `tracking/leads.db` (news
 | status | TEXT | `'active'` | `'active'` or `'unsubscribed'` |
 | source | TEXT | `'landing_page'` | |
 
-### guest_saves (in tracking/grants.db)
+### guest_saves
 
 | Column | Type | Notes |
 |--------|------|-------|
@@ -758,7 +755,7 @@ The `@paid_required` decorator gates these features behind a paid plan:
 
 ## Grants.gov Integration
 
-GrantPro maintains a local `grants_catalog` SQLite table that serves as the canonical source of grant opportunities.
+GrantPro maintains a `grants_catalog` Postgres table in Supabase that serves as the canonical source of grant opportunities.
 
 ### Data Pipeline
 
@@ -845,6 +842,9 @@ Every PDF generated by GrantPro (paper submission packages, SF-424 forms, grant 
 
 | Variable | Description | Example |
 |----------|-------------|---------|
+| `GP_DATABASE_URL` | Supabase Postgres pooler connection string | `postgresql://postgres.xxx:...@aws-0-us-east-1.pooler.supabase.com:6543/postgres` |
+| `GP_SUPABASE_URL` | Supabase project URL | `https://xxx.supabase.co` |
+| `GP_SUPABASE_KEY` | Supabase service role key | `eyJhbGciOi...` |
 | `GOOGLE_API_KEY` | Google AI (Gemini) API key | `AIzaSy...` |
 | `STRIPE_API_KEY` | Stripe secret key | `sk_live_...` |
 | `STRIPE_MONTHLY_PRICE_ID` | Stripe price ID for monthly plan | `price_...` |
@@ -864,12 +864,10 @@ Every PDF generated by GrantPro (paper submission packages, SF-424 forms, grant 
 | `BASE_URL` | Base URL for email links | `http://localhost:5001` |
 | `DOMAIN_NAME` | Production domain | `grantpro.org` |
 | `HTTPS` | Set to `true` to enable secure cookies | `false` |
-| `TURSO_DATABASE_URL` | Turso database URL for cloud-hosted SQLite | Local SQLite fallback |
-| `TURSO_AUTH_TOKEN` | Turso authentication token | Not used if local SQLite |
 
 ### Where to Set
 
-Store environment variables in `~/.hermes/.env` or export them in your shell profile.
+Store environment variables in `.env` at the project root (not committed). Copy `.env.example` to `.env` and fill in the values.
 
 ### How to Get API Keys
 
@@ -897,17 +895,22 @@ cd ~/.hermes/grant-system
 
 # 2. Install Python dependencies
 pip install -r portal/requirements.txt
+pip install psycopg2-binary
 
 # 3. Set up environment variables
-# Create or edit ~/.hermes/.env with at minimum:
-export GOOGLE_API_KEY="your-gemini-api-key"
+cp .env.example .env
+# Edit .env and fill in at minimum:
+#   GP_DATABASE_URL="postgresql://postgres.xxx:...@aws-0-us-east-1.pooler.supabase.com:6543/postgres"
+#   GP_SUPABASE_URL="https://xxx.supabase.co"
+#   GP_SUPABASE_KEY="eyJhbGciOi..."
+#   GOOGLE_API_KEY="your-gemini-api-key"
 
 # For Stripe (required for payments, not for local testing):
-export STRIPE_API_KEY="sk_test_..."
-export STRIPE_MONTHLY_PRICE_ID="price_..."
-export STRIPE_ANNUAL_PRICE_ID="price_..."
+#   STRIPE_API_KEY="sk_test_..."
+#   STRIPE_MONTHLY_PRICE_ID="price_..."
+#   STRIPE_ANNUAL_PRICE_ID="price_..."
 
-# 4. Start the server (initializes database automatically on first run)
+# 4. Start the server (connects to Supabase Postgres on startup — no local DB setup needed)
 cd portal
 python3 app.py
 
@@ -915,9 +918,9 @@ python3 app.py
 # http://localhost:5001
 ```
 
-### Database Initialization
+### Database
 
-The database is created automatically on first run. Both `core/grant_db.py` (`init_db()`) and `core/user_models.py` (`init_user_db()`) are called at startup. Schema migrations for new columns run automatically via `migrate_*` functions in `app.py`.
+The app connects to Supabase Postgres on startup using the `GP_DATABASE_URL` connection string. No local database initialization is required. The schema is defined in `supabase_migration.sql` (19 tables) and managed via the Supabase dashboard. Schema migrations for new columns run automatically via `migrate_*` functions in `app.py`. If the Postgres connection is unavailable, the app falls back to local SQLite as an emergency measure.
 
 ### Test Credentials
 
@@ -928,11 +931,10 @@ Test:   hermes-test-final@example.com / testpass123 (org: Gulf Coast Community D
 
 ### Creating an Admin User
 
-Sign up through `/signup`, then manually update the role in the database:
+Sign up through `/signup`, then manually update the role in the database via the Supabase SQL Editor or `psql`:
 
-```bash
-sqlite3 ~/.hermes/grant-system/tracking/grants.db \
-  "UPDATE users SET role='admin' WHERE email='your@email.com';"
+```sql
+UPDATE users SET role='admin' WHERE email='your@email.com';
 ```
 
 ---
@@ -960,7 +962,7 @@ sqlite3 ~/.hermes/grant-system/tracking/grants.db \
 
 7. **Firewall**: Allow only ports 80 and 443. The Flask app listens on port 5001 internally.
 
-8. **Backups**: Schedule regular SQLite database backups from `tracking/`.
+8. **Backups**: Supabase provides automatic daily backups. Enable Point-in-Time Recovery (PITR) for production.
 
 ### Production Checklist
 
@@ -972,7 +974,7 @@ sqlite3 ~/.hermes/grant-system/tracking/grants.db \
 - [ ] Resend API key set for email
 - [ ] Cron job for deadline reminders
 - [ ] Firewall rules (80/443 only)
-- [ ] Automated database backups
+- [ ] Supabase automatic backups enabled (PITR recommended)
 - [ ] Log rotation for `tracking/app.log`
 
 ---
@@ -985,7 +987,7 @@ GrantPro can be deployed to Vercel as a serverless Python application.
 
 - **`vercel.json`**: Routes all requests to the `api/index.py` serverless function. Configures Python runtime and build settings.
 - **`api/index.py`**: WSGI adapter that wraps the Flask app for Vercel's serverless environment.
-- **`core/db_connection.py`**: Database connection factory that uses Turso (libSQL over HTTP) when `TURSO_DATABASE_URL` is set, falling back to local SQLite for development.
+- **`core/db_connection.py`**: Database connection factory that connects to Supabase Postgres via `GP_DATABASE_URL`. Provides a compatibility wrapper (cursor-based, dict-style rows) so existing SQLite-style code works unchanged. Falls back to local SQLite only as an emergency measure.
 - **`.env.example`**: Template listing all required and optional environment variables.
 
 ### Deployment Steps
@@ -1006,8 +1008,9 @@ vercel env add STRIPE_ANNUAL_PRICE_ID
 vercel env add STRIPE_ENTERPRISE_5_PRICE_ID
 vercel env add STRIPE_ENTERPRISE_10_PRICE_ID
 vercel env add STRIPE_ENTERPRISE_UNLIMITED_PRICE_ID
-vercel env add TURSO_DATABASE_URL
-vercel env add TURSO_AUTH_TOKEN
+vercel env add GP_DATABASE_URL
+vercel env add GP_SUPABASE_URL
+vercel env add GP_SUPABASE_KEY
 vercel env add RESEND_API_KEY
 vercel env add SECRET_KEY
 
@@ -1015,9 +1018,9 @@ vercel env add SECRET_KEY
 vercel deploy
 ```
 
-### Turso Database
+### Supabase Postgres
 
-For production on Vercel, use [Turso](https://turso.tech/) as the hosted SQLite backend. `core/db_connection.py` detects the `TURSO_DATABASE_URL` environment variable and connects via libSQL over HTTP. When the variable is absent (local development), it falls back to the local `tracking/grants.db` file.
+Both local development and Vercel production connect to the same Supabase Postgres database. The pooler host is `aws-0-us-east-1.pooler.supabase.com` (port 6543, transaction mode). Set `GP_DATABASE_URL` in Vercel environment variables with the full connection string. No separate database setup is needed for Vercel -- it shares the same Supabase instance as local dev.
 
 ---
 
@@ -1064,9 +1067,8 @@ A custom WSGI middleware (`_ServerHeaderStripper`) overrides the `Server` header
 
 ### Data Privacy
 
-- All data stored locally (SQLite files on disk)
+- All data stored in Supabase Postgres (hosted, encrypted at rest)
 - No third-party analytics or tracking
-- No cloud database dependencies
 - User owns all their data
 
 ### Authorization
@@ -1092,7 +1094,7 @@ A custom WSGI middleware (`_ServerHeaderStripper`) overrides the `Server` header
 | `core/budget_builder.py` | Federal budget category definitions and builder |
 | `core/deadline_reminder.py` | File-based deadline reminder system |
 | `core/pdf_utils.py` | PDF branding utilities ("Assembled by GrantPro.org" footer) |
-| `core/db_connection.py` | Database connection factory (local SQLite + Turso fallback) |
+| `core/db_connection.py` | Database connection factory (Supabase Postgres + SQLite emergency fallback) |
 | `core/cli.py` | Command-line interface for grant operations |
 | `jobs/sync_grants_gov.py` | Daily Grants.gov catalog sync job |
 | `jobs/check_awards.py` | Award winner detection via USAspending.gov |
@@ -1120,17 +1122,28 @@ A custom WSGI middleware (`_ServerHeaderStripper`) overrides the `Server` header
 
 ## Changelog
 
+### 2026-03-20 (Wave 11: Supabase Postgres Migration)
+
+- Migrated primary database from SQLite to Supabase Postgres (19 tables)
+- Added `supabase_migration.sql` defining the full schema
+- Updated `core/db_connection.py` with psycopg2 driver and compatibility wrapper (cursor-based, dict-style rows)
+- Both local dev and Vercel production now connect to the same Supabase Postgres instance
+- SQLite retained only as emergency fallback
+- Archived all SQLite `.db` files to `archive/sqlite-deprecated/`
+- Added `GP_DATABASE_URL`, `GP_SUPABASE_URL`, `GP_SUPABASE_KEY` environment variables
+- Removed Turso (libSQL) dependency
+
 ### 2026-03-20 (Wave 10: Vercel Deployment & Database Abstraction)
 
 - Added Vercel serverless deployment support (`vercel.json`, `api/index.py`)
-- Added `core/db_connection.py` with Turso (libSQL) fallback for cloud-hosted SQLite
+- Added `core/db_connection.py` with database abstraction layer
 - Added `.env.example` documenting all environment variables
 - Deployment-ready configuration for `vercel deploy`
 
 ### 2026-03-20 (Wave 9: Grants.gov Sync, Awards, Enterprise Tiers, PDF Branding)
 
 - Added three enterprise subscription tiers: Enterprise 5 ($44.95/mo), Enterprise 10 ($74.95/mo), Enterprise Unlimited ($99.95/mo)
-- Added `grants_catalog` SQLite table with seed data from original 131 grants
+- Added `grants_catalog` table with seed data from original 131 grants
 - Added `jobs/sync_grants_gov.py` for daily Grants.gov API sync with auto-archiving of expired grants
 - Added `jobs/check_awards.py` for award winner detection via USAspending.gov API
 - Added congratulations email flow with token-based testimonial submission
