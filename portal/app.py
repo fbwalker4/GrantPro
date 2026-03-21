@@ -7,6 +7,7 @@ Local Flask app for managing clients, grants, and guided submission
 import json
 import logging
 import os
+import re
 import sqlite3
 from datetime import datetime
 from pathlib import Path
@@ -209,12 +210,14 @@ def add_security_headers(response):
     # Content Security Policy - strict default
     response.headers['Content-Security-Policy'] = (
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        "script-src 'self' 'unsafe-inline'; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
         "font-src 'self' https://fonts.gstatic.com; "
         "img-src 'self' data: https:; "
         "connect-src 'self' https://api.minimax.io https://generativelanguage.googleapis.com; "
-        "frame-ancestors 'none';"
+        "frame-ancestors 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self';"
     )
     # Referrer policy
     response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
@@ -446,7 +449,7 @@ def login():
     if request.method == 'POST':
         # Rate limiting check - prevent brute force
         ip = request.remote_addr or 'unknown'
-        if not check_rate_limit(ip, 'login', max_requests=20, window=60):
+        if not check_rate_limit(ip, 'login', max_requests=5, window=60):
             flash('Too many login attempts. Please wait a minute.', 'error')
             return render_template('login.html')
         
@@ -500,8 +503,9 @@ def signup():
         first_name = request.form.get('first_name', '')
         last_name = request.form.get('last_name', '')
         organization_name = request.form.get('organization', '')
-        selected_plan = request.form.get('plan', 'free')
-        
+        selected_plan = 'free'  # Always free on signup; paid activated after payment
+        requested_plan = request.form.get('plan', 'free')  # Used only for redirect to checkout
+
         # Validation
         if not email or '@' not in email:
             flash('Please enter a valid email address', 'error')
@@ -524,11 +528,11 @@ def signup():
         if error:
             flash(error, 'error')
         else:
-            logger.info(f'New user registered: {email} (plan: {selected_plan})')
-            # If they selected a paid plan, redirect to payment
-            if selected_plan in ['monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_unlimited']:
+            logger.info(f'New user registered: {email} (plan: free)')
+            # If they requested a paid plan, redirect to payment checkout
+            if requested_plan in ['monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_unlimited']:
                 session['user_id'] = user_id
-                session['selected_plan'] = selected_plan
+                session['selected_plan'] = requested_plan
                 return redirect(url_for('payment_checkout'))
             else:
                 # Auto-login and send to onboarding
@@ -1379,6 +1383,7 @@ def api_save_grant():
     data = request.json or {}
     grant_id = data.get('grant_id') or request.form.get('grant_id')
     notes = data.get('notes', '') or request.form.get('notes', '')
+    notes = re.sub(r'<[^>]+>', '', notes)  # Strip HTML tags
     email = (data.get('email', '') or request.form.get('email', '')).strip().lower()
     
     # Check if user is logged in
@@ -2199,458 +2204,457 @@ def generate_section_content(grant_id, section_id):
         return jsonify({'error': 'Access denied'}), 403
     
     conn = get_db()
-    
-    # Get grant info
-    grant = conn.execute('''
-        SELECT g.*, c.organization_name, c.contact_name, c.intake_data
-        FROM grants g 
-        JOIN clients c ON g.client_id = c.id 
-        WHERE g.id = ?
-    ''', (grant_id,)).fetchone()
-    
-    if not grant:
-        conn.close()
-        return jsonify({'error': 'Grant not found'}), 404
-    
-    # Get template section info
-    template_name = grant['template'] if 'template' in grant.keys() and grant['template'] else 'generic'
-    template_sections = grant_researcher.get_template_sections(template_name)
-    
-    section_info = None
-    if template_sections:
-        for s in template_sections:
-            if s.get('id') == section_id:
-                section_info = s
-                break
-    
-    if not section_info:
-        # Try to find in drafts
-        existing = conn.execute('''
-            SELECT content FROM drafts WHERE grant_id = ? AND section = ?
-        ''', (grant_id, section_id)).fetchone()
-        conn.close()
-        
-        if existing:
-            existing_content = existing['content'] if 'content' in existing.keys() and existing['content'] else ''
-            return jsonify({
-                'content': existing_content,
-                'message': 'Using existing content'
-            })
-        return jsonify({'error': 'Section not found in template'}), 404
-    
-    # Parse intake data if available
-    client_info = {}
-    grant_intake = grant['intake_data'] if 'intake_data' in grant.keys() and grant['intake_data'] else None
-    if grant_intake:
-        try:
-            client_info = json.loads(grant['intake_data'])
-        except (json.JSONDecodeError, TypeError) as e:
-            logger.warning(f'Failed to parse intake data for grant {grant.get("id")}: {e}')
-    
-    # Build prompt for AI - include ALL grant-specific info
-    agency = grant['agency'] if 'agency' in grant.keys() and grant['agency'] else 'Unknown'
-    grant_name = grant['grant_name'] if 'grant_name' in grant.keys() and grant['grant_name'] else 'Untitled Grant'
-    org_name = grant['organization_name'] if 'organization_name' in grant.keys() and grant['organization_name'] else ''
-    
-    # Get full grant info from research database
-    amount_val = grant.get('amount', 0)
-    grant_deadline = grant.get('deadline', 'Not specified')
-    grant_cfda = grant.get('cfda', 'Not specified')
-    
-    # Also check research database for more details
-    research_grant_info = None
     try:
-        # Try to find in research database
-        all_research_grants = grant_researcher.get_all_grants()
-        for rg in all_research_grants:
-            if rg.get('name') == grant_name or rg.get('id') == grant.get('id'):
-                research_grant_info = rg
-                break
-    except Exception as e:
-        logger.warning(f'Research grant lookup failed: {e}')
-    
-    if research_grant_info:
-        amount_min = research_grant_info.get('amount_min', amount_val)
-        amount_max = research_grant_info.get('amount_max', amount_val)
-        grant_deadline = research_grant_info.get('deadline', grant_deadline)
-        grant_cfda = research_grant_info.get('cfda', grant_cfda)
-        eligibility = research_grant_info.get('eligibility', 'Not specified')
-        focus_areas = research_grant_info.get('focus_areas', [])
-        focus_areas_str = ', '.join(focus_areas) if focus_areas else 'Not specified'
-    else:
-        amount_min = amount_max = amount_val
-        eligibility = 'Not specified'
-        focus_areas_str = 'Not specified'
-    
-    # Load agency-specific regulatory context from template
-    agency_context = ""
-    compliance_notes = ""
-    try:
-        with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates', 'agency_templates.json')) as tf:
-            all_templates = json.load(tf)
-        agency_tmpl = all_templates.get('agencies', {}).get(template_name, {})
-        agency_context = agency_tmpl.get('ai_context', '')
-        # Build compliance notes for the AI
-        compliance = agency_tmpl.get('compliance', {})
-        comp_notes = []
-        if compliance.get('davis_bacon', {}).get('applies'):
-            comp_notes.append("Davis-Bacon Act applies: all construction must use prevailing wage rates.")
-        if compliance.get('section_3', {}).get('applies'):
-            comp_notes.append("Section 3 applies: must provide employment/contracting opportunities to low-income residents.")
-        if compliance.get('nepa', {}).get('applies'):
-            comp_notes.append("NEPA environmental review is required.")
-        if compliance.get('buy_america', {}).get('applies'):
-            comp_notes.append("Buy America requirements apply to infrastructure materials.")
-        if compliance.get('irb', {}).get('applies'):
-            comp_notes.append("IRB approval required for human subjects research.")
-        if compliance.get('matching', {}).get('required'):
-            ratio = compliance['matching'].get('ratio', '')
-            comp_notes.append(f"Matching funds required ({ratio}).")
-        idr = agency_tmpl.get('indirect_cost_rules', {})
-        if idr.get('max_rate'):
-            comp_notes.append(f"Indirect cost rate capped at {idr['max_rate']}%.")
-        compliance_notes = "\n".join(f"- {n}" for n in comp_notes) if comp_notes else ""
-    except Exception:
-        pass
+        # Get grant info
+        grant = conn.execute('''
+            SELECT g.*, c.organization_name, c.contact_name, c.intake_data
+            FROM grants g
+            JOIN clients c ON g.client_id = c.id
+            WHERE g.id = ?
+        ''', (grant_id,)).fetchone()
 
-    # Load user's organization details from onboarding
-    user_org_info = ""
-    try:
-        user = get_current_user()
-        if user:
-            org_details = user_models.get_organization_details(user['id'])
-            if org_details:
-                od = org_details.get('details') or {}
-                op = org_details.get('profile') or {}
-                fa = org_details.get('focus_areas') or []
-                pg = org_details.get('past_grants') or []
-                if od.get('ein'):
-                    user_org_info += f"- EIN: {od['ein']}\n"
-                if od.get('uei'):
-                    user_org_info += f"- UEI: {od['uei']}\n"
-                if od.get('address_line1'):
-                    user_org_info += f"- Address: {od['address_line1']}, {od.get('city','')}, {od.get('state','')} {od.get('zip_code','')}\n"
-                if op.get('mission_statement'):
-                    user_org_info += f"- Mission: {sanitize_for_prompt(op['mission_statement'])}\n"
-                if op.get('programs_description'):
-                    user_org_info += f"- Programs: {sanitize_for_prompt(op['programs_description'])}\n"
-                if op.get('annual_revenue'):
-                    user_org_info += f"- Annual Budget: ${int(op['annual_revenue']):,}\n"
-                if op.get('employees'):
-                    user_org_info += f"- Staff: {op['employees']} employees\n"
-                if fa:
-                    user_org_info += f"- Focus Areas: {', '.join(fa)}\n"
-                if pg:
-                    for p in pg[:3]:
-                        user_org_info += f"- Past Grant: {p.get('grant_name','')} from {p.get('funding_organization','')} (${p.get('amount_received',0):,}, {p.get('status','')})\n"
-    except Exception:
-        pass
+        if not grant:
+            return jsonify({'error': 'Grant not found'}), 404
 
-    # Load structured budget data (single source of truth for all budget numbers)
-    budget_prompt_block = ""
-    try:
-        budget_conn = get_db()
-        budget_row = budget_conn.execute('SELECT * FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
-        budget_conn.close()
-        if budget_row:
-            bd = dict(budget_row) if hasattr(budget_row, 'keys') else {}
-            if bd and bd.get('grand_total', 0) > 0:
-                lines = ["\n**BUDGET DATA (use these EXACT numbers — do not change or approximate):**"]
-                # Personnel
-                try:
-                    personnel_list = json.loads(bd.get('personnel', '[]')) if isinstance(bd.get('personnel'), str) else bd.get('personnel', [])
-                except (json.JSONDecodeError, TypeError):
-                    personnel_list = []
-                if personnel_list:
-                    lines.append("Personnel:")
-                    for p in personnel_list:
-                        lines.append(f"- {p.get('name','TBD')}, {p.get('role','')}, {p.get('effort_pct',0)}% effort, ${float(p.get('annual_salary',0)):,.0f} salary, {p.get('years',1)} year(s) = ${float(p.get('total',0)):,.2f}")
-                if bd.get('fringe_total', 0) > 0:
-                    lines.append(f"Fringe Benefits: {bd.get('fringe_rate',30)}% = ${bd['fringe_total']:,.2f}")
-                if bd.get('travel_total', 0) > 0:
-                    lines.append(f"Travel: ${bd['travel_total']:,.2f}")
-                    try:
-                        travel_list = json.loads(bd.get('travel_items', '[]')) if isinstance(bd.get('travel_items'), str) else bd.get('travel_items', [])
-                    except (json.JSONDecodeError, TypeError):
-                        travel_list = []
-                    for t in travel_list:
-                        lines.append(f"  - {t.get('description','Travel')}: {t.get('trips',0)} trips x ${float(t.get('cost_per_trip',0)):,.0f} = ${float(t.get('total',0)):,.2f}")
-                if bd.get('equipment_total', 0) > 0:
-                    lines.append(f"Equipment: ${bd['equipment_total']:,.2f}")
-                if bd.get('supplies_total', 0) > 0:
-                    lines.append(f"Supplies: ${bd['supplies_total']:,.2f}")
-                    if bd.get('supplies_description'):
-                        lines.append(f"  ({bd['supplies_description']})")
-                if bd.get('contractual_total', 0) > 0:
-                    lines.append(f"Contractual: ${bd['contractual_total']:,.2f}")
-                if bd.get('construction_total', 0) > 0:
-                    lines.append(f"Construction: ${bd['construction_total']:,.2f}")
-                if bd.get('other_total', 0) > 0:
-                    lines.append(f"Other Direct Costs: ${bd['other_total']:,.2f}")
-                if bd.get('participant_support_total', 0) > 0:
-                    lines.append(f"Participant Support: ${bd['participant_support_total']:,.2f}")
-                lines.append(f"Total Direct Costs: ${bd.get('total_direct',0):,.2f}")
-                lines.append(f"Indirect Costs ({bd.get('indirect_rate',15)}% MTDC): ${bd.get('indirect_total',0):,.2f}")
-                lines.append(f"GRAND TOTAL: ${bd.get('grand_total',0):,.2f}")
-                if bd.get('match_total', 0) > 0:
-                    lines.append(f"Cost Share/Match: ${bd['match_total']:,.2f} (Cash: ${bd.get('match_cash',0):,.2f}, In-Kind: ${bd.get('match_inkind',0):,.2f})")
-                if bd.get('project_duration_months'):
-                    lines.append(f"Project Duration: {bd['project_duration_months']} months")
-                budget_prompt_block = "\n".join(lines) + "\n"
-    except Exception as e:
-        logger.warning(f'Budget data load for AI prompt failed: {e}')
+        # Get template section info
+        template_name = grant['template'] if 'template' in grant.keys() and grant['template'] else 'generic'
+        template_sections = grant_researcher.get_template_sections(template_name)
 
-    prompt = f"""You are an expert grant writer specializing in federal grants for {agency}.
-
-{"CRITICAL AGENCY-SPECIFIC GUIDANCE:" + chr(10) + agency_context + chr(10) if agency_context else ""}
-{"COMPLIANCE REQUIREMENTS FOR THIS AGENCY:" + chr(10) + compliance_notes + chr(10) if compliance_notes else ""}
-{budget_prompt_block}
-Generate content for a grant application section that is SPECIFIC to this exact grant.
-Do NOT use markdown tables. Use narrative format with clear headings.
-Do NOT include placeholder text — use the actual organization data provided below.
-
-**GRANT SPECIFICS:**
-- Grant Name: {grant_name}
-- Agency: {agency}
-- Funding Amount: ${amount_min:,.0f} - ${amount_max:,.0f}
-- Deadline: {grant_deadline}
-- CFDA Number: {grant_cfda}
-- Eligibility: {eligibility}
-- Focus Areas: {focus_areas_str}
-
-**SECTION TO WRITE:**
-- Section Name: {section_info.get('name', section_id)}
-- Required: {'Yes' if section_info.get('required') else 'No'}
-- Character Limit: {section_info.get('max_chars', 'N/A')}
-- Page Limit: {section_info.get('max_pages', 'N/A')}
-
-**AGENCY REQUIREMENTS (must follow exactly):**
-{section_info.get('guidance', 'No specific guidance provided.')}
-
-**APPLICANT ORGANIZATION:**
-- Organization: {org_name}
-{user_org_info if user_org_info else ""}"""
-
-    # Add intake data if available
-    if client_info:
-        if client_info.get('mission'):
-            prompt += f"- Mission: {sanitize_for_prompt(client_info['mission'])}\n"
-        if client_info.get('description'):
-            prompt += f"- Description: {sanitize_for_prompt(client_info['description'])}\n"
-        if client_info.get('programs'):
-            prompt += f"- Programs: {sanitize_for_prompt(client_info['programs'])}\n"
-        if client_info.get('budget_info'):
-            prompt += f"- Budget Data: {sanitize_for_prompt(json.dumps(client_info['budget_info']))}\n"
-
-    # Load all existing sections for cross-section consistency
-    existing_sections = conn.execute(
-        'SELECT section, content FROM drafts WHERE grant_id = ? AND content IS NOT NULL ORDER BY section',
-        (grant_id,)).fetchall()
-
-    if existing_sections:
-        prompt += "\n**OTHER SECTIONS ALREADY WRITTEN (maintain consistency with these — use the same project title, personnel names, dollar amounts, and timeline):**\n"
-        for es in existing_sections:
-            es_name = es['section'].replace('_', ' ').title()
-            es_content = es['content'][:2000]  # First 2000 chars to stay within limits
-            prompt += f"\n--- {es_name} (excerpt) ---\n{sanitize_for_prompt(es_content)}\n"
-
-    # Load project title axiom from budget builder if set
-    try:
-        budget_row = conn.execute('SELECT project_title FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
-        if budget_row and budget_row['project_title']:
-            prompt += f"\n**PROJECT TITLE (use this exact title throughout): {budget_row['project_title']}**\n"
-    except Exception:
-        pass
-
-    # Load formatting rules for writing style guidance
-    formatting_notes = ""
-    try:
-        fmt_rules = agency_tmpl.get('formatting_rules', {})
-        if fmt_rules:
-            formatting_notes = f"\nFORMATTING: Use {fmt_rules.get('font', 'Times New Roman')} {fmt_rules.get('font_size_min', 12)}pt, {fmt_rules.get('line_spacing', 1.0)} spacing, {fmt_rules.get('margins_inches', 1.0)}-inch margins."
-    except Exception:
-        pass
-
-    prompt += f"""
-**WRITING STANDARDS:**
-- Follow APA 7th Edition formatting unless the agency specifies otherwise
-- Use APA citation style for any references (Author, Year)
-- Use professional, formal academic/federal grant language
-- Headings should follow APA hierarchy (bold, flush left)
-- Numbers: spell out below 10, use numerals for 10 and above
-- Use active voice where possible
-{formatting_notes}
-
-**TASK:**
-Write COMPELLING, GRANT-SPECIFIC content for this section that:
-1. Directly addresses {agency}'s exact requirements listed above
-2. Follows ALL compliance requirements for this agency
-3. Is CONSISTENT with the other sections already written (same project title, same personnel, same numbers)
-4. Uses the EXACT budget data provided above — do not invent different numbers
-5. Includes specific details about the applicant organization (use real data, not placeholders)
-6. Fits within the funding amount: ${amount_min:,.0f} - ${amount_max:,.0f}
-7. Is ready to submit — follows APA standards and agency-specific formatting rules
-8. Addresses the section's page/character limits appropriately
-9. Do NOT repeat large blocks of text that appear in other sections
-10. Citations must be real, verifiable publications — do NOT fabricate references
-
-Write the complete section content now:"""
-    
-    # Call AI API to generate content using Google AI (gemini-2.5-flash)
-    generated_content = ""
-    try:
-        import os
-        from google import genai
-        
-        # Get API key — check GP_ prefixed env var first, then .env file
-        api_key = os.environ.get('GP_GOOGLE_API_KEY') or os.environ.get('GOOGLE_API_KEY')
-        if not api_key:
-            env_path = os.path.expanduser('~/.hermes/.env')
-            if os.path.exists(env_path):
-                with open(env_path) as f:
-                    for line in f:
-                        if line.startswith('GOOGLE_API_KEY='):
-                            api_key = line.split('=', 1)[1].strip()
-                            if api_key == '***' or not api_key:
-                                api_key = None
-                            break
-
-        if not api_key:
-            # Fall back to template if no API key
-            generated_content = f"""# {section_info.get('name', section_id)}
-
-## Agency Requirements
-{section_info.get('guidance', 'No specific guidance provided.')}
-
-## Page/Character Limits
-- Maximum: {section_info.get('max_chars', 'N/A')} characters
-- Maximum Pages: {section_info.get('max_pages', 'N/A')} pages
-- Required: {'Yes' if section_info.get('required') else 'No'}
-
----
-
-## Write Your Content Here
-
-Based on the guidance above, write your section content. 
-
-Tips for this section:
-- Be specific to {agency}
-- Address all required components
-- Use data and evidence where possible
-- Connect your project to the agency's mission
-"""
-        else:
-            # Use Google AI to generate content
-            full_prompt = f"""You are an expert grant writer with 20+ years of experience writing successful federal grants. 
-
-Generate high-quality, professional grant content for the following section.
-
-**Grant Details:**
-- Grant Name: {grant_name}
-- Funding Agency: {agency}
-- Applicant Organization: {org_name}
-
-**Section Details:**
-- Section Name: {section_info.get('name', section_id)}
-- Requirements: {section_info.get('guidance', 'See agency requirements')}
-- Character Limit: {section_info.get('max_chars', 'N/A')}
-- Page Limit: {section_info.get('max_pages', 'N/A')}
-
-{f"Organization Mission:{sanitize_for_prompt(client_info.get('mission', ''))}" if client_info.get('mission') else ""}
-{f"Organization Description:{sanitize_for_prompt(client_info.get('description', ''))}" if client_info.get('description') else ""}
-
-{f"Budget Information:{sanitize_for_prompt(json.dumps(client_info.get('budget_info', {})))}" if client_info.get('budget_info') else ""}
-
-Please write compelling, specific, and competitive grant content that:
-1. Directly addresses the agency's requirements
-2. Uses strong, active voice
-3. Includes specific details and examples
-4. Aligns with the agency's priorities and mission
-5. Is ready to submit (not a placeholder)
-
-Write the complete section content now:"""
-
-            # Retry logic for transient errors
-            max_retries = 3
-            retry_delay = 2
-            
-            for attempt in range(max_retries):
-                try:
-                    client = genai.Client(api_key=api_key)
-                    response = client.models.generate_content(
-                        model='gemini-2.5-flash',
-                        contents=full_prompt
-                    )
+        section_info = None
+        if template_sections:
+            for s in template_sections:
+                if s.get('id') == section_id:
+                    section_info = s
                     break
-                except Exception as api_error:
-                    if attempt < max_retries - 1 and ('ssl' in str(api_error).lower() or 'timeout' in str(api_error).lower() or 'connection' in str(api_error).lower()):
-                        import time
-                        time.sleep(retry_delay * (attempt + 1))
-                        continue
-                    raise
+
+        if not section_info:
+            # Try to find in drafts
+            existing = conn.execute('''
+                SELECT content FROM drafts WHERE grant_id = ? AND section = ?
+            ''', (grant_id, section_id)).fetchone()
+
+            if existing:
+                existing_content = existing['content'] if 'content' in existing.keys() and existing['content'] else ''
+                return jsonify({
+                    'content': existing_content,
+                    'message': 'Using existing content'
+                })
+            return jsonify({'error': 'Section not found in template'}), 404
+
+        # Parse intake data if available
+        client_info = {}
+        grant_intake = grant['intake_data'] if 'intake_data' in grant.keys() and grant['intake_data'] else None
+        if grant_intake:
+            try:
+                client_info = json.loads(grant['intake_data'])
+            except (json.JSONDecodeError, TypeError) as e:
+                logger.warning(f'Failed to parse intake data for grant {grant.get("id")}: {e}')
+    
+        # Build prompt for AI - include ALL grant-specific info
+        agency = grant['agency'] if 'agency' in grant.keys() and grant['agency'] else 'Unknown'
+        grant_name = grant['grant_name'] if 'grant_name' in grant.keys() and grant['grant_name'] else 'Untitled Grant'
+        org_name = grant['organization_name'] if 'organization_name' in grant.keys() and grant['organization_name'] else ''
+    
+        # Get full grant info from research database
+        amount_val = grant.get('amount', 0)
+        grant_deadline = grant.get('deadline', 'Not specified')
+        grant_cfda = grant.get('cfda', 'Not specified')
+    
+        # Also check research database for more details
+        research_grant_info = None
+        try:
+            # Try to find in research database
+            all_research_grants = grant_researcher.get_all_grants()
+            for rg in all_research_grants:
+                if rg.get('name') == grant_name or rg.get('id') == grant.get('id'):
+                    research_grant_info = rg
+                    break
+        except Exception as e:
+            logger.warning(f'Research grant lookup failed: {e}')
+    
+        if research_grant_info:
+            amount_min = research_grant_info.get('amount_min', amount_val)
+            amount_max = research_grant_info.get('amount_max', amount_val)
+            grant_deadline = research_grant_info.get('deadline', grant_deadline)
+            grant_cfda = research_grant_info.get('cfda', grant_cfda)
+            eligibility = research_grant_info.get('eligibility', 'Not specified')
+            focus_areas = research_grant_info.get('focus_areas', [])
+            focus_areas_str = ', '.join(focus_areas) if focus_areas else 'Not specified'
+        else:
+            amount_min = amount_max = amount_val
+            eligibility = 'Not specified'
+            focus_areas_str = 'Not specified'
+    
+        # Load agency-specific regulatory context from template
+        agency_context = ""
+        compliance_notes = ""
+        try:
+            with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates', 'agency_templates.json')) as tf:
+                all_templates = json.load(tf)
+            agency_tmpl = all_templates.get('agencies', {}).get(template_name, {})
+            agency_context = agency_tmpl.get('ai_context', '')
+            # Build compliance notes for the AI
+            compliance = agency_tmpl.get('compliance', {})
+            comp_notes = []
+            if compliance.get('davis_bacon', {}).get('applies'):
+                comp_notes.append("Davis-Bacon Act applies: all construction must use prevailing wage rates.")
+            if compliance.get('section_3', {}).get('applies'):
+                comp_notes.append("Section 3 applies: must provide employment/contracting opportunities to low-income residents.")
+            if compliance.get('nepa', {}).get('applies'):
+                comp_notes.append("NEPA environmental review is required.")
+            if compliance.get('buy_america', {}).get('applies'):
+                comp_notes.append("Buy America requirements apply to infrastructure materials.")
+            if compliance.get('irb', {}).get('applies'):
+                comp_notes.append("IRB approval required for human subjects research.")
+            if compliance.get('matching', {}).get('required'):
+                ratio = compliance['matching'].get('ratio', '')
+                comp_notes.append(f"Matching funds required ({ratio}).")
+            idr = agency_tmpl.get('indirect_cost_rules', {})
+            if idr.get('max_rate'):
+                comp_notes.append(f"Indirect cost rate capped at {idr['max_rate']}%.")
+            compliance_notes = "\n".join(f"- {n}" for n in comp_notes) if comp_notes else ""
+        except Exception:
+            pass
+
+        # Load user's organization details from onboarding
+        user_org_info = ""
+        try:
+            user = get_current_user()
+            if user:
+                org_details = user_models.get_organization_details(user['id'])
+                if org_details:
+                    od = org_details.get('details') or {}
+                    op = org_details.get('profile') or {}
+                    fa = org_details.get('focus_areas') or []
+                    pg = org_details.get('past_grants') or []
+                    if od.get('ein'):
+                        user_org_info += f"- EIN: {od['ein']}\n"
+                    if od.get('uei'):
+                        user_org_info += f"- UEI: {od['uei']}\n"
+                    if od.get('address_line1'):
+                        user_org_info += f"- Address: {od['address_line1']}, {od.get('city','')}, {od.get('state','')} {od.get('zip_code','')}\n"
+                    if op.get('mission_statement'):
+                        user_org_info += f"- Mission: {sanitize_for_prompt(op['mission_statement'])}\n"
+                    if op.get('programs_description'):
+                        user_org_info += f"- Programs: {sanitize_for_prompt(op['programs_description'])}\n"
+                    if op.get('annual_revenue'):
+                        user_org_info += f"- Annual Budget: ${int(op['annual_revenue']):,}\n"
+                    if op.get('employees'):
+                        user_org_info += f"- Staff: {op['employees']} employees\n"
+                    if fa:
+                        user_org_info += f"- Focus Areas: {', '.join(fa)}\n"
+                    if pg:
+                        for p in pg[:3]:
+                            user_org_info += f"- Past Grant: {p.get('grant_name','')} from {p.get('funding_organization','')} (${p.get('amount_received',0):,}, {p.get('status','')})\n"
+        except Exception:
+            pass
+
+        # Load structured budget data (single source of truth for all budget numbers)
+        budget_prompt_block = ""
+        try:
+            budget_conn = get_db()
+            budget_row = budget_conn.execute('SELECT * FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
+            budget_conn.close()
+            if budget_row:
+                bd = dict(budget_row) if hasattr(budget_row, 'keys') else {}
+                if bd and bd.get('grand_total', 0) > 0:
+                    lines = ["\n**BUDGET DATA (use these EXACT numbers — do not change or approximate):**"]
+                    # Personnel
+                    try:
+                        personnel_list = json.loads(bd.get('personnel', '[]')) if isinstance(bd.get('personnel'), str) else bd.get('personnel', [])
+                    except (json.JSONDecodeError, TypeError):
+                        personnel_list = []
+                    if personnel_list:
+                        lines.append("Personnel:")
+                        for p in personnel_list:
+                            lines.append(f"- {p.get('name','TBD')}, {p.get('role','')}, {p.get('effort_pct',0)}% effort, ${float(p.get('annual_salary',0)):,.0f} salary, {p.get('years',1)} year(s) = ${float(p.get('total',0)):,.2f}")
+                    if bd.get('fringe_total', 0) > 0:
+                        lines.append(f"Fringe Benefits: {bd.get('fringe_rate',30)}% = ${bd['fringe_total']:,.2f}")
+                    if bd.get('travel_total', 0) > 0:
+                        lines.append(f"Travel: ${bd['travel_total']:,.2f}")
+                        try:
+                            travel_list = json.loads(bd.get('travel_items', '[]')) if isinstance(bd.get('travel_items'), str) else bd.get('travel_items', [])
+                        except (json.JSONDecodeError, TypeError):
+                            travel_list = []
+                        for t in travel_list:
+                            lines.append(f"  - {t.get('description','Travel')}: {t.get('trips',0)} trips x ${float(t.get('cost_per_trip',0)):,.0f} = ${float(t.get('total',0)):,.2f}")
+                    if bd.get('equipment_total', 0) > 0:
+                        lines.append(f"Equipment: ${bd['equipment_total']:,.2f}")
+                    if bd.get('supplies_total', 0) > 0:
+                        lines.append(f"Supplies: ${bd['supplies_total']:,.2f}")
+                        if bd.get('supplies_description'):
+                            lines.append(f"  ({bd['supplies_description']})")
+                    if bd.get('contractual_total', 0) > 0:
+                        lines.append(f"Contractual: ${bd['contractual_total']:,.2f}")
+                    if bd.get('construction_total', 0) > 0:
+                        lines.append(f"Construction: ${bd['construction_total']:,.2f}")
+                    if bd.get('other_total', 0) > 0:
+                        lines.append(f"Other Direct Costs: ${bd['other_total']:,.2f}")
+                    if bd.get('participant_support_total', 0) > 0:
+                        lines.append(f"Participant Support: ${bd['participant_support_total']:,.2f}")
+                    lines.append(f"Total Direct Costs: ${bd.get('total_direct',0):,.2f}")
+                    lines.append(f"Indirect Costs ({bd.get('indirect_rate',15)}% MTDC): ${bd.get('indirect_total',0):,.2f}")
+                    lines.append(f"GRAND TOTAL: ${bd.get('grand_total',0):,.2f}")
+                    if bd.get('match_total', 0) > 0:
+                        lines.append(f"Cost Share/Match: ${bd['match_total']:,.2f} (Cash: ${bd.get('match_cash',0):,.2f}, In-Kind: ${bd.get('match_inkind',0):,.2f})")
+                    if bd.get('project_duration_months'):
+                        lines.append(f"Project Duration: {bd['project_duration_months']} months")
+                    budget_prompt_block = "\n".join(lines) + "\n"
+        except Exception as e:
+            logger.warning(f'Budget data load for AI prompt failed: {e}')
+
+        prompt = f"""You are an expert grant writer specializing in federal grants for {agency}.
+
+    {"CRITICAL AGENCY-SPECIFIC GUIDANCE:" + chr(10) + agency_context + chr(10) if agency_context else ""}
+    {"COMPLIANCE REQUIREMENTS FOR THIS AGENCY:" + chr(10) + compliance_notes + chr(10) if compliance_notes else ""}
+    {budget_prompt_block}
+    Generate content for a grant application section that is SPECIFIC to this exact grant.
+    Do NOT use markdown tables. Use narrative format with clear headings.
+    Do NOT include placeholder text — use the actual organization data provided below.
+
+    **GRANT SPECIFICS:**
+    - Grant Name: {grant_name}
+    - Agency: {agency}
+    - Funding Amount: ${amount_min:,.0f} - ${amount_max:,.0f}
+    - Deadline: {grant_deadline}
+    - CFDA Number: {grant_cfda}
+    - Eligibility: {eligibility}
+    - Focus Areas: {focus_areas_str}
+
+    **SECTION TO WRITE:**
+    - Section Name: {section_info.get('name', section_id)}
+    - Required: {'Yes' if section_info.get('required') else 'No'}
+    - Character Limit: {section_info.get('max_chars', 'N/A')}
+    - Page Limit: {section_info.get('max_pages', 'N/A')}
+
+    **AGENCY REQUIREMENTS (must follow exactly):**
+    {section_info.get('guidance', 'No specific guidance provided.')}
+
+    **APPLICANT ORGANIZATION:**
+    - Organization: {org_name}
+    {user_org_info if user_org_info else ""}"""
+
+        # Add intake data if available
+        if client_info:
+            if client_info.get('mission'):
+                prompt += f"- Mission: {sanitize_for_prompt(client_info['mission'])}\n"
+            if client_info.get('description'):
+                prompt += f"- Description: {sanitize_for_prompt(client_info['description'])}\n"
+            if client_info.get('programs'):
+                prompt += f"- Programs: {sanitize_for_prompt(client_info['programs'])}\n"
+            if client_info.get('budget_info'):
+                prompt += f"- Budget Data: {sanitize_for_prompt(json.dumps(client_info['budget_info']))}\n"
+
+        # Load all existing sections for cross-section consistency
+        existing_sections = conn.execute(
+            'SELECT section, content FROM drafts WHERE grant_id = ? AND content IS NOT NULL ORDER BY section',
+            (grant_id,)).fetchall()
+
+        if existing_sections:
+            prompt += "\n**OTHER SECTIONS ALREADY WRITTEN (maintain consistency with these — use the same project title, personnel names, dollar amounts, and timeline):**\n"
+            for es in existing_sections:
+                es_name = es['section'].replace('_', ' ').title()
+                es_content = es['content'][:2000]  # First 2000 chars to stay within limits
+                prompt += f"\n--- {es_name} (excerpt) ---\n{sanitize_for_prompt(es_content)}\n"
+
+        # Load project title axiom from budget builder if set
+        try:
+            budget_row = conn.execute('SELECT project_title FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
+            if budget_row and budget_row['project_title']:
+                prompt += f"\n**PROJECT TITLE (use this exact title throughout): {budget_row['project_title']}**\n"
+        except Exception:
+            pass
+
+        # Load formatting rules for writing style guidance
+        formatting_notes = ""
+        try:
+            fmt_rules = agency_tmpl.get('formatting_rules', {})
+            if fmt_rules:
+                formatting_notes = f"\nFORMATTING: Use {fmt_rules.get('font', 'Times New Roman')} {fmt_rules.get('font_size_min', 12)}pt, {fmt_rules.get('line_spacing', 1.0)} spacing, {fmt_rules.get('margins_inches', 1.0)}-inch margins."
+        except Exception:
+            pass
+
+        prompt += f"""
+    **WRITING STANDARDS:**
+    - Follow APA 7th Edition formatting unless the agency specifies otherwise
+    - Use APA citation style for any references (Author, Year)
+    - Use professional, formal academic/federal grant language
+    - Headings should follow APA hierarchy (bold, flush left)
+    - Numbers: spell out below 10, use numerals for 10 and above
+    - Use active voice where possible
+    {formatting_notes}
+
+    **TASK:**
+    Write COMPELLING, GRANT-SPECIFIC content for this section that:
+    1. Directly addresses {agency}'s exact requirements listed above
+    2. Follows ALL compliance requirements for this agency
+    3. Is CONSISTENT with the other sections already written (same project title, same personnel, same numbers)
+    4. Uses the EXACT budget data provided above — do not invent different numbers
+    5. Includes specific details about the applicant organization (use real data, not placeholders)
+    6. Fits within the funding amount: ${amount_min:,.0f} - ${amount_max:,.0f}
+    7. Is ready to submit — follows APA standards and agency-specific formatting rules
+    8. Addresses the section's page/character limits appropriately
+    9. Do NOT repeat large blocks of text that appear in other sections
+    10. Citations must be real, verifiable publications — do NOT fabricate references
+
+    Write the complete section content now:"""
+    
+        # Call AI API to generate content using Google AI (gemini-2.5-flash)
+        generated_content = ""
+        try:
+            import os
+            from google import genai
+        
+            # Get API key — check GP_ prefixed env var first, then .env file
+            api_key = os.environ.get('GP_GOOGLE_API_KEY') or os.environ.get('GOOGLE_API_KEY')
+            if not api_key:
+                env_path = os.path.expanduser('~/.hermes/.env')
+                if os.path.exists(env_path):
+                    with open(env_path) as f:
+                        for line in f:
+                            if line.startswith('GOOGLE_API_KEY='):
+                                api_key = line.split('=', 1)[1].strip()
+                                if api_key == '***' or not api_key:
+                                    api_key = None
+                                break
+
+            if not api_key:
+                # Fall back to template if no API key
+                generated_content = f"""# {section_info.get('name', section_id)}
+
+    ## Agency Requirements
+    {section_info.get('guidance', 'No specific guidance provided.')}
+
+    ## Page/Character Limits
+    - Maximum: {section_info.get('max_chars', 'N/A')} characters
+    - Maximum Pages: {section_info.get('max_pages', 'N/A')} pages
+    - Required: {'Yes' if section_info.get('required') else 'No'}
+
+    ---
+
+    ## Write Your Content Here
+
+    Based on the guidance above, write your section content. 
+
+    Tips for this section:
+    - Be specific to {agency}
+    - Address all required components
+    - Use data and evidence where possible
+    - Connect your project to the agency's mission
+    """
+            else:
+                # Use Google AI to generate content
+                full_prompt = f"""You are an expert grant writer with 20+ years of experience writing successful federal grants. 
+
+    Generate high-quality, professional grant content for the following section.
+
+    **Grant Details:**
+    - Grant Name: {grant_name}
+    - Funding Agency: {agency}
+    - Applicant Organization: {org_name}
+
+    **Section Details:**
+    - Section Name: {section_info.get('name', section_id)}
+    - Requirements: {section_info.get('guidance', 'See agency requirements')}
+    - Character Limit: {section_info.get('max_chars', 'N/A')}
+    - Page Limit: {section_info.get('max_pages', 'N/A')}
+
+    {f"Organization Mission:{sanitize_for_prompt(client_info.get('mission', ''))}" if client_info.get('mission') else ""}
+    {f"Organization Description:{sanitize_for_prompt(client_info.get('description', ''))}" if client_info.get('description') else ""}
+
+    {f"Budget Information:{sanitize_for_prompt(json.dumps(client_info.get('budget_info', {})))}" if client_info.get('budget_info') else ""}
+
+    Please write compelling, specific, and competitive grant content that:
+    1. Directly addresses the agency's requirements
+    2. Uses strong, active voice
+    3. Includes specific details and examples
+    4. Aligns with the agency's priorities and mission
+    5. Is ready to submit (not a placeholder)
+
+    Write the complete section content now:"""
+
+                # Retry logic for transient errors
+                max_retries = 3
+                retry_delay = 2
             
+                for attempt in range(max_retries):
+                    try:
+                        client = genai.Client(api_key=api_key)
+                        response = client.models.generate_content(
+                            model='gemini-2.5-flash',
+                            contents=full_prompt
+                        )
+                        break
+                    except Exception as api_error:
+                        if attempt < max_retries - 1 and ('ssl' in str(api_error).lower() or 'timeout' in str(api_error).lower() or 'connection' in str(api_error).lower()):
+                            import time
+                            time.sleep(retry_delay * (attempt + 1))
+                            continue
+                        raise
+            
+                generated_content = f"""# {section_info.get('name', section_id)}
+
+    ## Agency Requirements
+    {section_info.get('guidance', 'No specific guidance provided.')}
+
+    ---
+
+    {response.text}
+
+    ---
+
+    *Generated by AI - Review and customize for your specific project before submitting.*"""
+            
+        except Exception as e:
+            # Fall back to template on error
             generated_content = f"""# {section_info.get('name', section_id)}
 
-## Agency Requirements
-{section_info.get('guidance', 'No specific guidance provided.')}
+    ## Agency Requirements
+    {section_info.get('guidance', 'No specific guidance provided.')}
 
----
+    ## Page/Character Limits
+    - Maximum: {section_info.get('max_chars', 'N/A')} characters
+    - Maximum Pages: {section_info.get('max_pages', 'N/A')} pages
+    - Required: {'Yes' if section_info.get('required') else 'No'}
 
-{response.text}
+    ---
 
----
+    ## Write Your Content Here
 
-*Generated by AI - Review and customize for your specific project before submitting.*"""
-            
-    except Exception as e:
-        # Fall back to template on error
-        generated_content = f"""# {section_info.get('name', section_id)}
+    Based on the guidance above, write your section content. 
 
-## Agency Requirements
-{section_info.get('guidance', 'No specific guidance provided.')}
-
-## Page/Character Limits
-- Maximum: {section_info.get('max_chars', 'N/A')} characters
-- Maximum Pages: {section_info.get('max_pages', 'N/A')} pages
-- Required: {'Yes' if section_info.get('required') else 'No'}
-
----
-
-## Write Your Content Here
-
-Based on the guidance above, write your section content. 
-
-Tips for this section:
-- Be specific to {agency}
-- Address all required components
-- Use data and evidence where possible
-- Connect your project to the agency's mission
-"""
+    Tips for this section:
+    - Be specific to {agency}
+    - Address all required components
+    - Use data and evidence where possible
+    - Connect your project to the agency's mission
+    """
     
-    # Check if draft exists
-    existing = conn.execute('''
-        SELECT id FROM drafts WHERE grant_id = ? AND section = ?
-    ''', (grant_id, section_id)).fetchone()
+        # Check if draft exists
+        existing = conn.execute('''
+            SELECT id FROM drafts WHERE grant_id = ? AND section = ?
+        ''', (grant_id, section_id)).fetchone()
     
-    now = datetime.now().isoformat()
+        now = datetime.now().isoformat()
     
-    if existing:
-        # Update existing draft
-        conn.execute('''
-            UPDATE drafts SET content = ?, updated_at = ?, status = 'ai_generated'
-            WHERE grant_id = ? AND section = ?
-        ''', (generated_content, now, grant_id, section_id))
-    else:
-        # Create new draft
-        draft_id = f"draft-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{section_id}"
-        conn.execute('''
-            INSERT INTO drafts (id, client_id, grant_id, section, content, version, created_at, updated_at, status)
-            VALUES (?, ?, ?, ?, ?, 1, ?, ?, 'ai_generated')
-        ''', (draft_id, grant['client_id'], grant_id, section_id, generated_content, now, now))
+        if existing:
+            # Update existing draft
+            conn.execute('''
+                UPDATE drafts SET content = ?, updated_at = ?, status = 'ai_generated'
+                WHERE grant_id = ? AND section = ?
+            ''', (generated_content, now, grant_id, section_id))
+        else:
+            # Create new draft
+            draft_id = f"draft-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{section_id}"
+            conn.execute('''
+                INSERT INTO drafts (id, client_id, grant_id, section, content, version, created_at, updated_at, status)
+                VALUES (?, ?, ?, ?, ?, 1, ?, ?, 'ai_generated')
+            ''', (draft_id, grant['client_id'], grant_id, section_id, generated_content, now, now))
     
-    conn.commit()
-    conn.close()
-    
+        conn.commit()
+    finally:
+        conn.close()
+
     return jsonify({
         'content': generated_content,
         'message': 'AI content generated successfully'
@@ -2805,8 +2809,11 @@ def budget_builder(grant_id):
         indirect_rate_type = request.form.get('indirect_rate_type', 'de_minimis')
         if indirect_rate_type == 'none':
             indirect_rate = 0.0
+        elif indirect_rate_type == 'de_minimis':
+            indirect_rate = 15.0  # De minimis rate is always 15% per 2 CFR 200.414(f)
         else:
             indirect_rate = safe_float(request.form.get('indirect_rate'), 15.0)
+            indirect_rate = min(indirect_rate, 60.0)  # Cap negotiated rates at 60%
         indirect_total = round(mtdc_base * indirect_rate / 100.0, 2)
 
         grand_total = round(total_direct + indirect_total, 2)
@@ -4420,8 +4427,12 @@ def grant_calendar_ics(grant_id):
     if len(deadline_clean) < 8:
         deadline_clean = datetime.now().strftime('%Y%m%d')
 
-    grant_title = grant['grant_name'] or 'Grant'
-    grant_agency = grant['agency'] or ''
+    def ics_escape(text):
+        """Escape ICS special characters to prevent content injection."""
+        return text.replace('\\', '\\\\').replace(';', '\\;').replace(',', '\\,').replace('\n', '\\n').replace('\r', '')
+
+    grant_title = ics_escape(grant['grant_name'] or 'Grant')
+    grant_agency = ics_escape(grant['agency'] or '')
 
     ics_content = (
         "BEGIN:VCALENDAR\r\n"
@@ -4464,6 +4475,22 @@ def clone_grant(grant_id):
         flash('Grant not found', 'error')
         return redirect(url_for('my_grants'))
 
+    source_dict = dict(source)
+
+    # Verify user owns the client associated with this grant
+    if not user_owns_client(source_dict.get('client_id')):
+        conn.close()
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    # Check grant limit before cloning
+    user_id = session.get('user_id')
+    can_create, limit_msg, _remaining = user_models.check_grant_limit(user_id)
+    if not can_create:
+        conn.close()
+        flash(limit_msg, 'error')
+        return redirect(url_for('my_grants'))
+
     # Read all draft sections from the source grant
     drafts = conn.execute('SELECT * FROM drafts WHERE grant_id = ?', (grant_id,)).fetchall()
 
@@ -4472,7 +4499,6 @@ def clone_grant(grant_id):
     now = datetime.now().isoformat()
 
     # Insert cloned grant with " (Copy)" appended to title
-    source_dict = dict(source)
     new_name = (source_dict.get('grant_name') or 'Grant') + ' (Copy)'
 
     conn.execute('''
@@ -4510,6 +4536,9 @@ def clone_grant(grant_id):
 
     conn.commit()
     conn.close()
+
+    # Increment user's monthly grant count
+    user_models.increment_grant_count(user_id)
 
     flash(f'Grant cloned: {new_name}', 'success')
     return redirect(url_for('grant_detail', grant_id=new_grant_id))
@@ -5747,6 +5776,17 @@ def not_found(e):
 def server_error(e):
     return render_template('message.html', title='Server Error',
         message='Something went wrong. Please try again later.'), 500
+
+
+# ============ SECURITY.TXT ============
+
+@app.route('/.well-known/security.txt')
+def security_txt():
+    """Serve security.txt for vulnerability disclosure."""
+    return send_file(
+        os.path.join(app.static_folder, '.well-known', 'security.txt'),
+        mimetype='text/plain'
+    )
 
 
 # ============ MAIN ============
