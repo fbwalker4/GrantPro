@@ -49,11 +49,11 @@ import stripe_payment
 
 app = Flask(__name__)
 
-# Serve static images (logo, etc.)
-@app.route("/static/images/<path:filename>")
-def serve_image(filename):
+# Serve static files (images, PDFs, etc.)
+@app.route("/static/<path:filename>")
+def serve_static(filename):
     from flask import send_from_directory
-    return send_from_directory(str(Path(__file__).parent / "static" / "images"), filename)
+    return send_from_directory(str(Path(__file__).parent / "static"), filename)
 
 # ============ WSGI MIDDLEWARE: Server Header Stripping ============
 # Werkzeug sets Server: Werkzeug/X.Y.Z Python/X.Y.Z AFTER Flask's after_request.
