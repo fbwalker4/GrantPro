@@ -4875,7 +4875,7 @@ def _build_checklist_data(grant_id, user_id, template_name):
 
     # Fetch grant info for org data checks
     grant_row = conn.execute('''
-        SELECT g.*, c.organization_name, c.ein, c.uei
+        SELECT g.*, c.organization_name
         FROM grants g
         JOIN clients c ON g.client_id = c.id
         WHERE g.id = ?
@@ -4894,13 +4894,16 @@ def _build_checklist_data(grant_id, user_id, template_name):
     checklist_forms = []
 
     # SF-424: needs org info + project info
-    if has_org_info and grant_dict.get('title'):
+    has_project_title = bool(grant_dict.get('grant_name') or (budget_dict and budget_dict.get('project_title')))
+    if has_org_info and has_project_title:
         sf424_status = 'ready'
         sf424_note = 'Ready to generate from org/project data'
     else:
+        missing = []
+        if not has_org_info: missing.append('organization info')
+        if not has_project_title: missing.append('project title')
         sf424_status = 'incomplete'
-        sf424_note = 'Missing: ' + ('' if has_org_info else 'organization info, ') + ('' if grant_dict.get('title') else 'project title, ')
-        sf424_note = sf424_note.rstrip(', ')
+        sf424_note = 'Missing: ' + ', '.join(missing) if missing else 'Incomplete'
     checklist_forms.append({
         'name': 'SF-424 (Application for Federal Assistance)',
         'status': sf424_status,
