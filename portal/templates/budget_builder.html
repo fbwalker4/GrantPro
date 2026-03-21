@@ -1,0 +1,567 @@
+{% extends "layout.html" %}
+
+{% block title %}Budget Builder - {{ grant.grant_name }}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <div>
+        <h1 style="margin-bottom: 0.25rem;">Budget Builder</h1>
+        <p style="color: var(--text-secondary);">{{ grant.grant_name }} &mdash; {{ grant.organization_name }}</p>
+    </div>
+    <a href="/grant/{{ grant.id }}" class="btn btn-secondary">Back to Grant</a>
+</div>
+
+<!-- Grand Total Banner -->
+<div id="grand-total-banner" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <div style="font-size: 0.85rem; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.05em;">Grand Total (Direct + Indirect)</div>
+        <div id="display-grand-total" style="font-size: 2rem; font-weight: 700;">$0.00</div>
+    </div>
+    <div style="display: flex; gap: 2rem; text-align: center;">
+        <div>
+            <div style="font-size: 0.75rem; opacity: 0.8;">Direct</div>
+            <div id="display-direct" style="font-size: 1.1rem; font-weight: 600;">$0.00</div>
+        </div>
+        <div>
+            <div style="font-size: 0.75rem; opacity: 0.8;">Indirect</div>
+            <div id="display-indirect" style="font-size: 1.1rem; font-weight: 600;">$0.00</div>
+        </div>
+        <div>
+            <div style="font-size: 0.75rem; opacity: 0.8;">Match</div>
+            <div id="display-match" style="font-size: 1.1rem; font-weight: 600;">$0.00</div>
+        </div>
+    </div>
+</div>
+
+<form method="POST" id="budget-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <!-- Hidden fields for JSON arrays -->
+    <input type="hidden" name="personnel" id="personnel-json" value='{{ budget.personnel | tojson }}'>
+    <input type="hidden" name="travel_items" id="travel-json" value='{{ budget.travel_items | tojson }}'>
+    <input type="hidden" name="equipment_items" id="equipment-json" value='{{ budget.equipment_items | tojson }}'>
+    <input type="hidden" name="contractual_items" id="contractual-json" value='{{ budget.contractual_items | tojson }}'>
+    <input type="hidden" name="other_items" id="other-json" value='{{ budget.other_items | tojson }}'>
+
+    <!-- Project Info -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <h2>Project Info</h2>
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+            <div>
+                <label class="bb-label">Project Title</label>
+                <input type="text" name="project_title" value="{{ budget.project_title or '' }}" class="bb-input" placeholder="Title used across all sections">
+            </div>
+            <div>
+                <label class="bb-label">Duration (months)</label>
+                <select name="project_duration_months" class="bb-input">
+                    {% for m in [6,12,18,24,30,36,48,60] %}
+                    <option value="{{ m }}" {{ 'selected' if budget.project_duration_months == m }}>{{ m }} months</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- A. Personnel -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>A. Personnel</h2>
+            <span id="personnel-subtotal" class="bb-subtotal">$0.00</span>
+        </div>
+        <p class="bb-helper">List all staff charging time to this grant. % Effort = portion of their time dedicated to this project.</p>
+        <div id="personnel-rows">
+            <!-- JS populated -->
+        </div>
+        <button type="button" class="btn btn-small btn-primary" onclick="addPersonnel()" style="margin-top: 0.75rem;">+ Add Person</button>
+    </div>
+
+    <!-- B. Fringe Benefits -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>B. Fringe Benefits</h2>
+            <span id="fringe-subtotal" class="bb-subtotal">$0.00</span>
+        </div>
+        <p class="bb-helper">Standard fringe includes health insurance, retirement, FICA, workers comp. Use your organization's actual rate.</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 400px;">
+            <div>
+                <label class="bb-label">Fringe Rate (%)</label>
+                <input type="number" name="fringe_rate" id="fringe-rate" value="{{ budget.fringe_rate or 30 }}" step="0.1" min="0" max="100" class="bb-input" oninput="recalcAll()">
+            </div>
+            <div>
+                <label class="bb-label">Fringe Total</label>
+                <input type="text" id="fringe-display" class="bb-input" readonly style="background: var(--bg-tertiary);">
+            </div>
+        </div>
+    </div>
+
+    <!-- C. Travel -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>C. Travel</h2>
+            <span id="travel-subtotal" class="bb-subtotal">$0.00</span>
+        </div>
+        <p class="bb-helper">Include PI meetings, conference presentations, site visits.</p>
+        <div id="travel-rows"></div>
+        <button type="button" class="btn btn-small btn-primary" onclick="addTravel()" style="margin-top: 0.75rem;">+ Add Trip</button>
+    </div>
+
+    <!-- D. Equipment -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>D. Equipment</h2>
+            <span id="equipment-subtotal" class="bb-subtotal">$0.00</span>
+        </div>
+        <p class="bb-helper">Items costing $5,000+ with useful life of 1+ year. Excluded from indirect cost base.</p>
+        <div id="equipment-rows"></div>
+        <button type="button" class="btn btn-small btn-primary" onclick="addEquipment()" style="margin-top: 0.75rem;">+ Add Equipment</button>
+    </div>
+
+    <!-- E. Supplies -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>E. Supplies</h2>
+            <span id="supplies-subtotal" class="bb-subtotal">$0.00</span>
+        </div>
+        <p class="bb-helper">Items under $5,000: office supplies, workshop materials, software licenses.</p>
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem;">
+            <div>
+                <label class="bb-label">Total Amount ($)</label>
+                <input type="number" name="supplies_total" id="supplies-total" value="{{ budget.supplies_total or 0 }}" step="0.01" min="0" class="bb-input" oninput="recalcAll()">
+            </div>
+            <div>
+                <label class="bb-label">Description</label>
+                <input type="text" name="supplies_description" value="{{ budget.supplies_description or '' }}" class="bb-input" placeholder="Office supplies, lab materials, etc.">
+            </div>
+        </div>
+    </div>
+
+    <!-- F. Contractual -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>F. Contractual</h2>
+            <span id="contractual-subtotal" class="bb-subtotal">$0.00</span>
+        </div>
+        <p class="bb-helper">Subcontracts, consultants, external evaluators.</p>
+        <div id="contractual-rows"></div>
+        <button type="button" class="btn btn-small btn-primary" onclick="addContractual()" style="margin-top: 0.75rem;">+ Add Item</button>
+    </div>
+
+    <!-- Construction -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Construction</h2>
+            <span id="construction-subtotal" class="bb-subtotal">$0.00</span>
+        </div>
+        <div style="max-width: 300px;">
+            <label class="bb-label">Construction Total ($)</label>
+            <input type="number" name="construction_total" id="construction-total" value="{{ budget.construction_total or 0 }}" step="0.01" min="0" class="bb-input" oninput="recalcAll()">
+        </div>
+    </div>
+
+    <!-- G. Other Direct Costs -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>G. Other Direct Costs</h2>
+            <span id="other-subtotal" class="bb-subtotal">$0.00</span>
+        </div>
+        <div id="other-rows"></div>
+        <button type="button" class="btn btn-small btn-primary" onclick="addOther()" style="margin-top: 0.75rem;">+ Add Item</button>
+    </div>
+
+    <!-- H. Participant Support -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>H. Participant Support</h2>
+            <span id="participant-subtotal" class="bb-subtotal">$0.00</span>
+        </div>
+        <p class="bb-helper">Stipends, training allowances for participants. Excluded from indirect cost base per NSF/NIH policy.</p>
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem;">
+            <div>
+                <label class="bb-label">Total Amount ($)</label>
+                <input type="number" name="participant_support_total" id="participant-support-total" value="{{ budget.participant_support_total or 0 }}" step="0.01" min="0" class="bb-input" oninput="recalcAll()">
+            </div>
+            <div>
+                <label class="bb-label">Description</label>
+                <input type="text" name="participant_support_description" value="{{ budget.participant_support_description or '' }}" class="bb-input" placeholder="Stipends, travel allowances, etc.">
+            </div>
+        </div>
+    </div>
+
+    <!-- Indirect Costs -->
+    <div class="card" style="margin-bottom: 1.5rem; border-left: 4px solid #f59e0b;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Indirect Costs (F&A)</h2>
+            <span id="indirect-subtotal" class="bb-subtotal">$0.00</span>
+        </div>
+        <p class="bb-helper">MTDC = Total Direct minus Equipment and Participant Support. De minimis rate is 15% (updated 2024).</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+            <div>
+                <label class="bb-label">Rate Type</label>
+                <select name="indirect_rate_type" id="indirect-rate-type" class="bb-input" onchange="handleIndirectType()">
+                    <option value="de_minimis" {{ 'selected' if budget.indirect_rate_type == 'de_minimis' }}>De Minimis (15%)</option>
+                    <option value="negotiated" {{ 'selected' if budget.indirect_rate_type == 'negotiated' }}>Negotiated Rate</option>
+                    <option value="none" {{ 'selected' if budget.indirect_rate_type == 'none' }}>None (0%)</option>
+                </select>
+            </div>
+            <div>
+                <label class="bb-label">Rate (%)</label>
+                <input type="number" name="indirect_rate" id="indirect-rate" value="{{ budget.indirect_rate or 15 }}" step="0.1" min="0" max="100" class="bb-input" oninput="recalcAll()">
+            </div>
+            <div>
+                <label class="bb-label">MTDC Base</label>
+                <input type="text" id="mtdc-display" class="bb-input" readonly style="background: var(--bg-tertiary);">
+            </div>
+        </div>
+    </div>
+
+    <!-- Match / Cost Share -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Match / Cost Share</h2>
+            <span id="match-subtotal" class="bb-subtotal">$0.00</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 500px;">
+            <div>
+                <label class="bb-label">Cash Match ($)</label>
+                <input type="number" name="match_cash" id="match-cash" value="{{ budget.match_cash or 0 }}" step="0.01" min="0" class="bb-input" oninput="recalcAll()">
+            </div>
+            <div>
+                <label class="bb-label">In-Kind Match ($)</label>
+                <input type="number" name="match_inkind" id="match-inkind" value="{{ budget.match_inkind or 0 }}" step="0.01" min="0" class="bb-input" oninput="recalcAll()">
+            </div>
+        </div>
+    </div>
+
+    <!-- Save -->
+    <div style="display: flex; justify-content: center; margin: 2rem 0;">
+        <button type="submit" class="btn btn-success" style="padding: 0.75rem 3rem; font-size: 1.1rem;">Save Budget</button>
+    </div>
+</form>
+
+<style>
+.bb-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.3rem;
+}
+.bb-input {
+    width: 100%;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+.bb-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
+}
+.bb-helper {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    margin: 0.25rem 0 0.75rem 0;
+    font-style: italic;
+}
+.bb-subtotal {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #34d399;
+    white-space: nowrap;
+}
+.bb-row {
+    display: grid;
+    gap: 0.5rem;
+    align-items: end;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+}
+.bb-row-personnel { grid-template-columns: 2fr 2fr 1fr 1.5fr 1fr 1.2fr 40px; }
+.bb-row-travel { grid-template-columns: 3fr 1fr 1.5fr 1.5fr 40px; }
+.bb-row-equipment { grid-template-columns: 3fr 1fr 1.5fr 1.5fr 40px; }
+.bb-row-contractual { grid-template-columns: 4fr 1.5fr 1.5fr 40px; }
+.bb-row-other { grid-template-columns: 4fr 1.5fr 1.5fr 40px; }
+.bb-remove {
+    background: rgba(220,38,38,0.15);
+    color: #f87171;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.bb-remove:hover { background: rgba(220,38,38,0.3); }
+.bb-row-header {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0 0.5rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+@media (max-width: 768px) {
+    .bb-row-personnel, .bb-row-travel, .bb-row-equipment, .bb-row-contractual, .bb-row-other {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+</style>
+
+<script>
+// === Data ===
+var personnelData = {{ budget.personnel | tojson }};
+var travelData = {{ budget.travel_items | tojson }};
+var equipmentData = {{ budget.equipment_items | tojson }};
+var contractualData = {{ budget.contractual_items | tojson }};
+var otherData = {{ budget.other_items | tojson }};
+
+function fmt(n) {
+    return '$' + Number(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+}
+
+// === Personnel ===
+function renderPersonnel() {
+    var container = document.getElementById('personnel-rows');
+    var html = '';
+    if (personnelData.length > 0) {
+        html += '<div class="bb-row-header bb-row-personnel"><span>Name</span><span>Role</span><span>% Effort</span><span>Annual Salary</span><span># Years</span><span>Total</span><span></span></div>';
+    }
+    for (var i = 0; i < personnelData.length; i++) {
+        var p = personnelData[i];
+        var total = (parseFloat(p.annual_salary||0) * parseFloat(p.effort_pct||0) / 100 * parseFloat(p.years||1));
+        html += '<div class="bb-row bb-row-personnel">' +
+            '<input class="bb-input" placeholder="Name" value="' + esc(p.name||'') + '" onchange="updP('+i+',\'name\',this.value)">' +
+            '<input class="bb-input" placeholder="Role" value="' + esc(p.role||'') + '" onchange="updP('+i+',\'role\',this.value)">' +
+            '<input class="bb-input" type="number" min="0" max="100" step="1" value="' + (p.effort_pct||0) + '" onchange="updP('+i+',\'effort_pct\',this.value);recalcAll()"  oninput="updP('+i+',\'effort_pct\',this.value);recalcAll()">' +
+            '<input class="bb-input" type="number" min="0" step="1" value="' + (p.annual_salary||0) + '" onchange="updP('+i+',\'annual_salary\',this.value);recalcAll()" oninput="updP('+i+',\'annual_salary\',this.value);recalcAll()">' +
+            '<input class="bb-input" type="number" min="0" step="0.5" value="' + (p.years||1) + '" onchange="updP('+i+',\'years\',this.value);recalcAll()" oninput="updP('+i+',\'years\',this.value);recalcAll()">' +
+            '<span class="bb-input" style="background:var(--bg-tertiary);display:flex;align-items:center;">' + fmt(total) + '</span>' +
+            '<button type="button" class="bb-remove" onclick="removeP('+i+')">&#10005;</button>' +
+            '</div>';
+    }
+    container.innerHTML = html;
+}
+function addPersonnel() { personnelData.push({name:'',role:'',effort_pct:100,annual_salary:0,years:1,total:0}); renderPersonnel(); recalcAll(); }
+function removeP(i) { personnelData.splice(i,1); renderPersonnel(); recalcAll(); }
+function updP(i,k,v) { personnelData[i][k] = v; renderPersonnel(); }
+
+// === Travel ===
+function renderTravel() {
+    var container = document.getElementById('travel-rows');
+    var html = '';
+    if (travelData.length > 0) {
+        html += '<div class="bb-row-header bb-row-travel"><span>Description</span><span># Trips</span><span>Cost/Trip</span><span>Total</span><span></span></div>';
+    }
+    for (var i = 0; i < travelData.length; i++) {
+        var t = travelData[i];
+        var total = parseFloat(t.trips||0) * parseFloat(t.cost_per_trip||0);
+        html += '<div class="bb-row bb-row-travel">' +
+            '<input class="bb-input" placeholder="Description" value="' + esc(t.description||'') + '" onchange="updT('+i+',\'description\',this.value)">' +
+            '<input class="bb-input" type="number" min="0" step="1" value="' + (t.trips||0) + '" oninput="updT('+i+',\'trips\',this.value);recalcAll()">' +
+            '<input class="bb-input" type="number" min="0" step="1" value="' + (t.cost_per_trip||0) + '" oninput="updT('+i+',\'cost_per_trip\',this.value);recalcAll()">' +
+            '<span class="bb-input" style="background:var(--bg-tertiary);display:flex;align-items:center;">' + fmt(total) + '</span>' +
+            '<button type="button" class="bb-remove" onclick="removeT('+i+')">&#10005;</button>' +
+            '</div>';
+    }
+    container.innerHTML = html;
+}
+function addTravel() { travelData.push({description:'',trips:1,cost_per_trip:0,total:0}); renderTravel(); recalcAll(); }
+function removeT(i) { travelData.splice(i,1); renderTravel(); recalcAll(); }
+function updT(i,k,v) { travelData[i][k] = v; renderTravel(); }
+
+// === Equipment ===
+function renderEquipment() {
+    var container = document.getElementById('equipment-rows');
+    var html = '';
+    if (equipmentData.length > 0) {
+        html += '<div class="bb-row-header bb-row-equipment"><span>Item</span><span>Qty</span><span>Unit Cost</span><span>Total</span><span></span></div>';
+    }
+    for (var i = 0; i < equipmentData.length; i++) {
+        var e = equipmentData[i];
+        var total = parseFloat(e.quantity||0) * parseFloat(e.unit_cost||0);
+        html += '<div class="bb-row bb-row-equipment">' +
+            '<input class="bb-input" placeholder="Item" value="' + esc(e.item||'') + '" onchange="updE('+i+',\'item\',this.value)">' +
+            '<input class="bb-input" type="number" min="0" step="1" value="' + (e.quantity||0) + '" oninput="updE('+i+',\'quantity\',this.value);recalcAll()">' +
+            '<input class="bb-input" type="number" min="0" step="1" value="' + (e.unit_cost||0) + '" oninput="updE('+i+',\'unit_cost\',this.value);recalcAll()">' +
+            '<span class="bb-input" style="background:var(--bg-tertiary);display:flex;align-items:center;">' + fmt(total) + '</span>' +
+            '<button type="button" class="bb-remove" onclick="removeE('+i+')">&#10005;</button>' +
+            '</div>';
+    }
+    container.innerHTML = html;
+}
+function addEquipment() { equipmentData.push({item:'',quantity:1,unit_cost:0,total:0}); renderEquipment(); recalcAll(); }
+function removeE(i) { equipmentData.splice(i,1); renderEquipment(); recalcAll(); }
+function updE(i,k,v) { equipmentData[i][k] = v; renderEquipment(); }
+
+// === Contractual ===
+function renderContractual() {
+    var container = document.getElementById('contractual-rows');
+    var html = '';
+    if (contractualData.length > 0) {
+        html += '<div class="bb-row-header bb-row-contractual"><span>Description</span><span>Amount</span><span>Total</span><span></span></div>';
+    }
+    for (var i = 0; i < contractualData.length; i++) {
+        var c = contractualData[i];
+        var total = parseFloat(c.amount||0);
+        html += '<div class="bb-row bb-row-contractual">' +
+            '<input class="bb-input" placeholder="Description" value="' + esc(c.description||'') + '" onchange="updC('+i+',\'description\',this.value)">' +
+            '<input class="bb-input" type="number" min="0" step="1" value="' + (c.amount||0) + '" oninput="updC('+i+',\'amount\',this.value);recalcAll()">' +
+            '<span class="bb-input" style="background:var(--bg-tertiary);display:flex;align-items:center;">' + fmt(total) + '</span>' +
+            '<button type="button" class="bb-remove" onclick="removeCi('+i+')">&#10005;</button>' +
+            '</div>';
+    }
+    container.innerHTML = html;
+}
+function addContractual() { contractualData.push({description:'',amount:0,total:0}); renderContractual(); recalcAll(); }
+function removeCi(i) { contractualData.splice(i,1); renderContractual(); recalcAll(); }
+function updC(i,k,v) { contractualData[i][k] = v; renderContractual(); }
+
+// === Other ===
+function renderOther() {
+    var container = document.getElementById('other-rows');
+    var html = '';
+    if (otherData.length > 0) {
+        html += '<div class="bb-row-header bb-row-other"><span>Description</span><span>Amount</span><span>Total</span><span></span></div>';
+    }
+    for (var i = 0; i < otherData.length; i++) {
+        var o = otherData[i];
+        var total = parseFloat(o.amount||0);
+        html += '<div class="bb-row bb-row-other">' +
+            '<input class="bb-input" placeholder="Description" value="' + esc(o.description||'') + '" onchange="updO('+i+',\'description\',this.value)">' +
+            '<input class="bb-input" type="number" min="0" step="1" value="' + (o.amount||0) + '" oninput="updO('+i+',\'amount\',this.value);recalcAll()">' +
+            '<span class="bb-input" style="background:var(--bg-tertiary);display:flex;align-items:center;">' + fmt(total) + '</span>' +
+            '<button type="button" class="bb-remove" onclick="removeO('+i+')">&#10005;</button>' +
+            '</div>';
+    }
+    container.innerHTML = html;
+}
+function addOther() { otherData.push({description:'',amount:0,total:0}); renderOther(); recalcAll(); }
+function removeO(i) { otherData.splice(i,1); renderOther(); recalcAll(); }
+function updO(i,k,v) { otherData[i][k] = v; renderOther(); }
+
+// === Escape HTML ===
+function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML.replace(/"/g, '&quot;'); }
+
+// === Indirect rate type handler ===
+function handleIndirectType() {
+    var sel = document.getElementById('indirect-rate-type').value;
+    var rateInput = document.getElementById('indirect-rate');
+    if (sel === 'de_minimis') { rateInput.value = 15; rateInput.readOnly = true; }
+    else if (sel === 'none') { rateInput.value = 0; rateInput.readOnly = true; }
+    else { rateInput.readOnly = false; }
+    recalcAll();
+}
+
+// === Master recalculation ===
+function recalcAll() {
+    // Personnel total
+    var pTotal = 0;
+    for (var i = 0; i < personnelData.length; i++) {
+        var p = personnelData[i];
+        pTotal += parseFloat(p.annual_salary||0) * parseFloat(p.effort_pct||0) / 100 * parseFloat(p.years||1);
+    }
+    document.getElementById('personnel-subtotal').textContent = fmt(pTotal);
+
+    // Fringe
+    var fRate = parseFloat(document.getElementById('fringe-rate').value) || 0;
+    var fTotal = pTotal * fRate / 100;
+    document.getElementById('fringe-subtotal').textContent = fmt(fTotal);
+    document.getElementById('fringe-display').value = fmt(fTotal);
+
+    // Travel
+    var tTotal = 0;
+    for (var i = 0; i < travelData.length; i++) {
+        tTotal += parseFloat(travelData[i].trips||0) * parseFloat(travelData[i].cost_per_trip||0);
+    }
+    document.getElementById('travel-subtotal').textContent = fmt(tTotal);
+
+    // Equipment
+    var eTotal = 0;
+    for (var i = 0; i < equipmentData.length; i++) {
+        eTotal += parseFloat(equipmentData[i].quantity||0) * parseFloat(equipmentData[i].unit_cost||0);
+    }
+    document.getElementById('equipment-subtotal').textContent = fmt(eTotal);
+
+    // Supplies
+    var sTotal = parseFloat(document.getElementById('supplies-total').value) || 0;
+    document.getElementById('supplies-subtotal').textContent = fmt(sTotal);
+
+    // Contractual
+    var cTotal = 0;
+    for (var i = 0; i < contractualData.length; i++) {
+        cTotal += parseFloat(contractualData[i].amount||0);
+    }
+    document.getElementById('contractual-subtotal').textContent = fmt(cTotal);
+
+    // Construction
+    var conTotal = parseFloat(document.getElementById('construction-total').value) || 0;
+    document.getElementById('construction-subtotal').textContent = fmt(conTotal);
+
+    // Other
+    var oTotal = 0;
+    for (var i = 0; i < otherData.length; i++) {
+        oTotal += parseFloat(otherData[i].amount||0);
+    }
+    document.getElementById('other-subtotal').textContent = fmt(oTotal);
+
+    // Participant support
+    var psTotal = parseFloat(document.getElementById('participant-support-total').value) || 0;
+    document.getElementById('participant-subtotal').textContent = fmt(psTotal);
+
+    // Total direct
+    var totalDirect = pTotal + fTotal + tTotal + eTotal + sTotal + cTotal + conTotal + oTotal + psTotal;
+
+    // MTDC = total direct - equipment - participant support
+    var mtdc = totalDirect - eTotal - psTotal;
+    document.getElementById('mtdc-display').value = fmt(mtdc);
+
+    // Indirect
+    var iRate = parseFloat(document.getElementById('indirect-rate').value) || 0;
+    var iTotal = mtdc * iRate / 100;
+    document.getElementById('indirect-subtotal').textContent = fmt(iTotal);
+
+    // Grand total
+    var grandTotal = totalDirect + iTotal;
+    document.getElementById('display-grand-total').textContent = fmt(grandTotal);
+    document.getElementById('display-direct').textContent = fmt(totalDirect);
+    document.getElementById('display-indirect').textContent = fmt(iTotal);
+
+    // Match
+    var mCash = parseFloat(document.getElementById('match-cash').value) || 0;
+    var mInkind = parseFloat(document.getElementById('match-inkind').value) || 0;
+    var mTotal = mCash + mInkind;
+    document.getElementById('match-subtotal').textContent = fmt(mTotal);
+    document.getElementById('display-match').textContent = fmt(mTotal);
+
+    // Update hidden JSON fields
+    document.getElementById('personnel-json').value = JSON.stringify(personnelData);
+    document.getElementById('travel-json').value = JSON.stringify(travelData);
+    document.getElementById('equipment-json').value = JSON.stringify(equipmentData);
+    document.getElementById('contractual-json').value = JSON.stringify(contractualData);
+    document.getElementById('other-json').value = JSON.stringify(otherData);
+}
+
+// === Init ===
+document.addEventListener('DOMContentLoaded', function() {
+    renderPersonnel();
+    renderTravel();
+    renderEquipment();
+    renderContractual();
+    renderOther();
+    handleIndirectType();
+    recalcAll();
+});
+</script>
+{% endblock %}

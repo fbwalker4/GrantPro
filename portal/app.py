@@ -1984,9 +1984,12 @@ def grant_detail(grant_id):
     drafts = conn.execute('''
         SELECT * FROM drafts WHERE grant_id = ? ORDER BY section
     ''', (grant_id,)).fetchall()
-    
+
+    # Load budget total if exists
+    budget_row = conn.execute('SELECT grand_total FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
+
     conn.close()
-    
+
     if not grant:
         return "Grant not found", 404
     
@@ -2009,13 +2012,18 @@ def grant_detail(grant_id):
         ]
     
     existing_sections = {d['section']: d for d in drafts}
-    
-    return render_template('grant_detail.html', 
-                         grant=grant, 
+
+    budget_total = None
+    if budget_row:
+        budget_total = budget_row['grand_total'] if hasattr(budget_row, 'keys') else budget_row[0]
+
+    return render_template('grant_detail.html',
+                         grant=grant,
                          drafts=drafts,
                          existing_sections=existing_sections,
                          template_sections=template_sections,
-                         template_name=template_name)
+                         template_name=template_name,
+                         budget_total=budget_total)
 
 @app.route('/grant/<grant_id>/section/<section>', methods=['GET', 'POST'])
 @login_required
@@ -2296,10 +2304,65 @@ def generate_section_content(grant_id, section_id):
     except Exception:
         pass
 
+    # Load structured budget data (single source of truth for all budget numbers)
+    budget_prompt_block = ""
+    try:
+        budget_conn = get_db()
+        budget_row = budget_conn.execute('SELECT * FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
+        budget_conn.close()
+        if budget_row:
+            bd = dict(budget_row) if hasattr(budget_row, 'keys') else {}
+            if bd and bd.get('grand_total', 0) > 0:
+                lines = ["\n**BUDGET DATA (use these EXACT numbers — do not change or approximate):**"]
+                # Personnel
+                try:
+                    personnel_list = json.loads(bd.get('personnel', '[]')) if isinstance(bd.get('personnel'), str) else bd.get('personnel', [])
+                except (json.JSONDecodeError, TypeError):
+                    personnel_list = []
+                if personnel_list:
+                    lines.append("Personnel:")
+                    for p in personnel_list:
+                        lines.append(f"- {p.get('name','TBD')}, {p.get('role','')}, {p.get('effort_pct',0)}% effort, ${float(p.get('annual_salary',0)):,.0f} salary, {p.get('years',1)} year(s) = ${float(p.get('total',0)):,.2f}")
+                if bd.get('fringe_total', 0) > 0:
+                    lines.append(f"Fringe Benefits: {bd.get('fringe_rate',30)}% = ${bd['fringe_total']:,.2f}")
+                if bd.get('travel_total', 0) > 0:
+                    lines.append(f"Travel: ${bd['travel_total']:,.2f}")
+                    try:
+                        travel_list = json.loads(bd.get('travel_items', '[]')) if isinstance(bd.get('travel_items'), str) else bd.get('travel_items', [])
+                    except (json.JSONDecodeError, TypeError):
+                        travel_list = []
+                    for t in travel_list:
+                        lines.append(f"  - {t.get('description','Travel')}: {t.get('trips',0)} trips x ${float(t.get('cost_per_trip',0)):,.0f} = ${float(t.get('total',0)):,.2f}")
+                if bd.get('equipment_total', 0) > 0:
+                    lines.append(f"Equipment: ${bd['equipment_total']:,.2f}")
+                if bd.get('supplies_total', 0) > 0:
+                    lines.append(f"Supplies: ${bd['supplies_total']:,.2f}")
+                    if bd.get('supplies_description'):
+                        lines.append(f"  ({bd['supplies_description']})")
+                if bd.get('contractual_total', 0) > 0:
+                    lines.append(f"Contractual: ${bd['contractual_total']:,.2f}")
+                if bd.get('construction_total', 0) > 0:
+                    lines.append(f"Construction: ${bd['construction_total']:,.2f}")
+                if bd.get('other_total', 0) > 0:
+                    lines.append(f"Other Direct Costs: ${bd['other_total']:,.2f}")
+                if bd.get('participant_support_total', 0) > 0:
+                    lines.append(f"Participant Support: ${bd['participant_support_total']:,.2f}")
+                lines.append(f"Total Direct Costs: ${bd.get('total_direct',0):,.2f}")
+                lines.append(f"Indirect Costs ({bd.get('indirect_rate',15)}% MTDC): ${bd.get('indirect_total',0):,.2f}")
+                lines.append(f"GRAND TOTAL: ${bd.get('grand_total',0):,.2f}")
+                if bd.get('match_total', 0) > 0:
+                    lines.append(f"Cost Share/Match: ${bd['match_total']:,.2f} (Cash: ${bd.get('match_cash',0):,.2f}, In-Kind: ${bd.get('match_inkind',0):,.2f})")
+                if bd.get('project_duration_months'):
+                    lines.append(f"Project Duration: {bd['project_duration_months']} months")
+                budget_prompt_block = "\n".join(lines) + "\n"
+    except Exception as e:
+        logger.warning(f'Budget data load for AI prompt failed: {e}')
+
     prompt = f"""You are an expert grant writer specializing in federal grants for {agency}.
 
 {"CRITICAL AGENCY-SPECIFIC GUIDANCE:" + chr(10) + agency_context + chr(10) if agency_context else ""}
 {"COMPLIANCE REQUIREMENTS FOR THIS AGENCY:" + chr(10) + compliance_notes + chr(10) if compliance_notes else ""}
+{budget_prompt_block}
 Generate content for a grant application section that is SPECIFIC to this exact grant.
 Do NOT use markdown tables. Use narrative format with clear headings.
 Do NOT include placeholder text — use the actual organization data provided below.
@@ -2509,6 +2572,273 @@ Tips for this section:
         'content': generated_content,
         'message': 'AI content generated successfully'
     })
+
+
+# ============ BUDGET BUILDER ============
+
+def safe_float(value, default=0.0):
+    """Safely convert form input to float, returning default on failure."""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+@app.route('/grant/<grant_id>/budget-builder', methods=['GET', 'POST'])
+@login_required
+@csrf_required
+def budget_builder(grant_id):
+    """Structured Budget Builder — single source of truth for all budget data."""
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    conn = get_db()
+    grant = conn.execute('''
+        SELECT g.*, c.organization_name
+        FROM grants g JOIN clients c ON g.client_id = c.id
+        WHERE g.id = ?
+    ''', (grant_id,)).fetchone()
+    if not grant:
+        conn.close()
+        return "Grant not found", 404
+
+    user = get_current_user()
+    user_id = user['id'] if user else 'unknown'
+
+    if request.method == 'POST':
+        now = datetime.now().isoformat()
+
+        # --- Parse form fields ---
+        project_title = request.form.get('project_title', '').strip()
+        project_duration_months = safe_int(request.form.get('project_duration_months'), 12)
+
+        # Personnel (JSON from hidden field)
+        personnel_json = request.form.get('personnel', '[]')
+        try:
+            personnel = json.loads(personnel_json)
+        except (json.JSONDecodeError, TypeError):
+            personnel = []
+
+        # Calculate personnel totals server-side
+        personnel_total = 0.0
+        for p in personnel:
+            try:
+                salary = float(p.get('annual_salary', 0))
+                effort = float(p.get('effort_pct', 0)) / 100.0
+                years = float(p.get('years', 1))
+                p_total = salary * effort * years
+                p['total'] = round(p_total, 2)
+                personnel_total += p_total
+            except (TypeError, ValueError):
+                p['total'] = 0
+
+        fringe_rate = safe_float(request.form.get('fringe_rate'), 30.0)
+        fringe_total = round(personnel_total * fringe_rate / 100.0, 2)
+
+        # Travel
+        travel_json = request.form.get('travel_items', '[]')
+        try:
+            travel_items = json.loads(travel_json)
+        except (json.JSONDecodeError, TypeError):
+            travel_items = []
+        travel_total = 0.0
+        for t in travel_items:
+            try:
+                trips = float(t.get('trips', 0))
+                cost = float(t.get('cost_per_trip', 0))
+                t_total = trips * cost
+                t['total'] = round(t_total, 2)
+                travel_total += t_total
+            except (TypeError, ValueError):
+                t['total'] = 0
+
+        # Equipment
+        equipment_json = request.form.get('equipment_items', '[]')
+        try:
+            equipment_items = json.loads(equipment_json)
+        except (json.JSONDecodeError, TypeError):
+            equipment_items = []
+        equipment_total = 0.0
+        for e in equipment_items:
+            try:
+                qty = float(e.get('quantity', 0))
+                uc = float(e.get('unit_cost', 0))
+                e_total = qty * uc
+                e['total'] = round(e_total, 2)
+                equipment_total += e_total
+            except (TypeError, ValueError):
+                e['total'] = 0
+
+        # Supplies
+        supplies_total = safe_float(request.form.get('supplies_total'), 0)
+        supplies_description = request.form.get('supplies_description', '').strip()
+
+        # Contractual
+        contractual_json = request.form.get('contractual_items', '[]')
+        try:
+            contractual_items = json.loads(contractual_json)
+        except (json.JSONDecodeError, TypeError):
+            contractual_items = []
+        contractual_total = 0.0
+        for ci in contractual_items:
+            try:
+                ci_amt = float(ci.get('amount', 0))
+                ci['total'] = round(ci_amt, 2)
+                contractual_total += ci_amt
+            except (TypeError, ValueError):
+                ci['total'] = 0
+
+        # Construction
+        construction_total = safe_float(request.form.get('construction_total'), 0)
+
+        # Other
+        other_json = request.form.get('other_items', '[]')
+        try:
+            other_items = json.loads(other_json)
+        except (json.JSONDecodeError, TypeError):
+            other_items = []
+        other_total = 0.0
+        for oi in other_items:
+            try:
+                oi_amt = float(oi.get('amount', 0))
+                oi['total'] = round(oi_amt, 2)
+                other_total += oi_amt
+            except (TypeError, ValueError):
+                oi['total'] = 0
+
+        # Participant support
+        participant_support_total = safe_float(request.form.get('participant_support_total'), 0)
+        participant_support_description = request.form.get('participant_support_description', '').strip()
+
+        # --- Calculated fields ---
+        total_direct = round(personnel_total + fringe_total + travel_total + equipment_total
+                             + supplies_total + contractual_total + construction_total
+                             + other_total + participant_support_total, 2)
+
+        # MTDC = total direct minus equipment and participant support (per 2 CFR 200)
+        mtdc_base = round(total_direct - equipment_total - participant_support_total, 2)
+
+        indirect_rate_type = request.form.get('indirect_rate_type', 'de_minimis')
+        if indirect_rate_type == 'none':
+            indirect_rate = 0.0
+        else:
+            indirect_rate = safe_float(request.form.get('indirect_rate'), 15.0)
+        indirect_total = round(mtdc_base * indirect_rate / 100.0, 2)
+
+        grand_total = round(total_direct + indirect_total, 2)
+
+        # Match
+        match_cash = safe_float(request.form.get('match_cash'), 0)
+        match_inkind = safe_float(request.form.get('match_inkind'), 0)
+        match_total = round(match_cash + match_inkind, 2)
+
+        # --- Upsert grant_budget ---
+        existing = conn.execute('SELECT id FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
+
+        if existing:
+            budget_id = existing['id'] if hasattr(existing, 'keys') else existing[0]
+            conn.execute('''UPDATE grant_budget SET
+                project_title=?, requested_amount=?, project_duration_months=?,
+                personnel=?, fringe_rate=?, fringe_total=?,
+                travel_items=?, travel_total=?,
+                equipment_items=?, equipment_total=?,
+                supplies_total=?, supplies_description=?,
+                contractual_items=?, contractual_total=?,
+                construction_total=?,
+                other_items=?, other_total=?,
+                participant_support_total=?, participant_support_description=?,
+                total_direct=?, indirect_rate=?, indirect_rate_type=?,
+                mtdc_base=?, indirect_total=?, grand_total=?,
+                match_cash=?, match_inkind=?, match_total=?,
+                updated_at=?
+                WHERE id=?''',
+                (project_title, grand_total, project_duration_months,
+                 json.dumps(personnel), fringe_rate, fringe_total,
+                 json.dumps(travel_items), travel_total,
+                 json.dumps(equipment_items), equipment_total,
+                 supplies_total, supplies_description,
+                 json.dumps(contractual_items), contractual_total,
+                 construction_total,
+                 json.dumps(other_items), other_total,
+                 participant_support_total, participant_support_description,
+                 total_direct, indirect_rate, indirect_rate_type,
+                 mtdc_base, indirect_total, grand_total,
+                 match_cash, match_inkind, match_total,
+                 now, budget_id))
+        else:
+            budget_id = f"budget-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+            conn.execute('''INSERT INTO grant_budget
+                (id, grant_id, user_id, project_title, requested_amount, project_duration_months,
+                 personnel, fringe_rate, fringe_total,
+                 travel_items, travel_total,
+                 equipment_items, equipment_total,
+                 supplies_total, supplies_description,
+                 contractual_items, contractual_total,
+                 construction_total,
+                 other_items, other_total,
+                 participant_support_total, participant_support_description,
+                 total_direct, indirect_rate, indirect_rate_type,
+                 mtdc_base, indirect_total, grand_total,
+                 match_cash, match_inkind, match_total,
+                 created_at, updated_at)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                (budget_id, grant_id, user_id, project_title, grand_total, project_duration_months,
+                 json.dumps(personnel), fringe_rate, fringe_total,
+                 json.dumps(travel_items), travel_total,
+                 json.dumps(equipment_items), equipment_total,
+                 supplies_total, supplies_description,
+                 json.dumps(contractual_items), contractual_total,
+                 construction_total,
+                 json.dumps(other_items), other_total,
+                 participant_support_total, participant_support_description,
+                 total_direct, indirect_rate, indirect_rate_type,
+                 mtdc_base, indirect_total, grand_total,
+                 match_cash, match_inkind, match_total,
+                 now, now))
+
+        # Update the grant record amount with grand_total
+        conn.execute('UPDATE grants SET amount = ? WHERE id = ?', (grand_total, grant_id))
+        conn.commit()
+        conn.close()
+
+        flash(f'Budget saved — Grand Total: ${grand_total:,.2f}', 'success')
+        return redirect(url_for('budget_builder', grant_id=grant_id))
+
+    # --- GET: load existing budget ---
+    budget = conn.execute('SELECT * FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
+    conn.close()
+
+    if budget:
+        budget = dict(budget) if hasattr(budget, 'keys') else budget
+        # Parse JSON fields
+        for field in ('personnel', 'travel_items', 'equipment_items', 'contractual_items', 'other_items'):
+            val = budget.get(field, '[]') if isinstance(budget, dict) else '[]'
+            try:
+                budget[field] = json.loads(val) if isinstance(val, str) else val
+            except (json.JSONDecodeError, TypeError):
+                budget[field] = []
+    else:
+        budget = {
+            'project_title': grant['grant_name'] if 'grant_name' in grant.keys() else '',
+            'project_duration_months': 12,
+            'personnel': [],
+            'fringe_rate': 30.0, 'fringe_total': 0,
+            'travel_items': [], 'travel_total': 0,
+            'equipment_items': [], 'equipment_total': 0,
+            'supplies_total': 0, 'supplies_description': '',
+            'contractual_items': [], 'contractual_total': 0,
+            'construction_total': 0,
+            'other_items': [], 'other_total': 0,
+            'participant_support_total': 0, 'participant_support_description': '',
+            'total_direct': 0,
+            'indirect_rate': 15.0, 'indirect_rate_type': 'de_minimis',
+            'mtdc_base': 0, 'indirect_total': 0,
+            'grand_total': 0,
+            'match_cash': 0, 'match_inkind': 0, 'match_total': 0,
+        }
+
+    return render_template('budget_builder.html', grant=grant, budget=budget)
 
 
 @app.route('/grant/<grant_id>/paper-submission')

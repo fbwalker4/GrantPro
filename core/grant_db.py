@@ -208,6 +208,43 @@ def init_db():
             completed_at TEXT,
             notes TEXT
         )''')
+
+        # Grant budget table - structured budget builder data
+        c.execute('''CREATE TABLE IF NOT EXISTS grant_budget (
+            id TEXT PRIMARY KEY,
+            grant_id TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            project_title TEXT,
+            requested_amount REAL DEFAULT 0,
+            project_duration_months INTEGER DEFAULT 12,
+            personnel TEXT DEFAULT '[]',
+            fringe_rate REAL DEFAULT 30,
+            fringe_total REAL DEFAULT 0,
+            travel_items TEXT DEFAULT '[]',
+            travel_total REAL DEFAULT 0,
+            equipment_items TEXT DEFAULT '[]',
+            equipment_total REAL DEFAULT 0,
+            supplies_total REAL DEFAULT 0,
+            supplies_description TEXT,
+            contractual_items TEXT DEFAULT '[]',
+            contractual_total REAL DEFAULT 0,
+            construction_total REAL DEFAULT 0,
+            other_items TEXT DEFAULT '[]',
+            other_total REAL DEFAULT 0,
+            participant_support_total REAL DEFAULT 0,
+            participant_support_description TEXT,
+            total_direct REAL DEFAULT 0,
+            indirect_rate REAL DEFAULT 15,
+            indirect_rate_type TEXT DEFAULT 'de_minimis',
+            mtdc_base REAL DEFAULT 0,
+            indirect_total REAL DEFAULT 0,
+            grand_total REAL DEFAULT 0,
+            match_cash REAL DEFAULT 0,
+            match_inkind REAL DEFAULT 0,
+            match_total REAL DEFAULT 0,
+            created_at TEXT,
+            updated_at TEXT
+        )''')
     except Exception as e:
         # On Postgres the schema is managed by supabase_migration.sql
         import logging

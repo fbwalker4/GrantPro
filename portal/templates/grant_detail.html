@@ -12,6 +12,7 @@
         {% endif %}
     </div>
     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <a href="/grant/{{ grant.id }}/budget-builder" class="btn btn-primary" style="background:#059669;border-color:#059669;">💰 Budget Builder</a>
         <a href="/grant/{{ grant.id }}/checklist" class="btn btn-primary" style="background:#7c3aed;border-color:#7c3aed;">&#9745; Submission Checklist</a>
         <a href="/grant/{{ grant.id }}/guided" class="btn btn-success">🎯 Guided Submission</a>
         <a href="/grant/{{ grant.id }}/paper-submission" class="btn btn-primary">📦 Paper Submission</a>
@@ -35,6 +36,11 @@
         <h2>Grant Details</h2>
         <p><strong>Agency:</strong> {{ grant.agency }}</p>
         <p><strong>Amount:</strong> ${{ "{:,.0f}".format(grant.amount) }}</p>
+        {% if budget_total %}
+        <p><strong>Budget Total:</strong> <span style="color:#34d399;font-weight:600;">${{ "{:,.2f}".format(budget_total) }}</span>
+            <a href="/grant/{{ grant.id }}/budget-builder" style="font-size:0.8rem;margin-left:0.5rem;">Edit Budget</a>
+        </p>
+        {% endif %}
         <p><strong>Deadline:</strong> {{ grant.deadline }}</p>
         <p><strong>Status:</strong> <span class="status-badge status-{{ grant.status }}" role="status">{{ grant.status }}</span></p>
         {% if grant.template %}
