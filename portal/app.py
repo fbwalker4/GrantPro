@@ -1430,20 +1430,8 @@ def api_save_grant():
         ip = request.remote_addr or 'unknown'
         logger.info(f'Guest save: email={email}, grant_id={grant_id}, ip={ip}')
 
-        # Save to guest_saves table (main DB on Supabase)
-        conn = get_connection()
-        try:
-            conn.execute('''
-                CREATE TABLE IF NOT EXISTS guest_saves (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    email TEXT NOT NULL,
-                    grant_id TEXT NOT NULL,
-                    notes TEXT,
-                    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            ''')
-        except Exception:
-            pass  # Table already exists on Postgres
+        # Save to guest_saves table (already created in Supabase)
+        conn = get_db()
         
         # Check if this grant already saved for this email
         existing = conn.execute(
