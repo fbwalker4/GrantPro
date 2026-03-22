@@ -5630,7 +5630,7 @@ def validate_budget_consistency(grant_id):
                          'mou_chdo', 'mou_partners')
         for _lt in _letter_types:
             gen_doc = conn_la.execute(
-                "SELECT * FROM grant_documents WHERE grant_id = ? AND doc_type = ? AND generated = 1",
+                "SELECT * FROM grant_documents WHERE grant_id = ? AND doc_type = ? AND generated = TRUE",
                 (grant_id, _lt)).fetchone()
             if gen_doc:
                 issues.append({
