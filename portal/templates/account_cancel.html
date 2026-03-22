@@ -268,8 +268,8 @@
 
     <div class="retention-card">
         <h3>Export Your Data First</h3>
-        <p>Before you go, make sure you have everything you need. Our data export feature will bundle all your grants, documents, and saved information.</p>
-        <p style="font-size: 0.85rem; color: var(--text-muted);">Data export coming soon. Your data will remain accessible on the free plan after cancellation.</p>
+        <p>Before you go, make sure you have everything you need. Our data export feature will bundle all your grants, documents, and saved information into a downloadable ZIP.</p>
+        <a href="{{ url_for('account_export_data') }}" class="btn btn-primary" style="margin-top: 0.5rem;">Download My Data</a>
     </div>
 
     {% else %}

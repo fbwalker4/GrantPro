@@ -1412,6 +1412,270 @@ def account_reactivate():
     return redirect(url_for('account_settings'))
 
 
+# ============ DATA EXPORT ============
+
+@app.route('/account/export-data')
+@login_required
+def account_export_data():
+    """Data export page - shows what will be exported and allows download"""
+    user = get_current_user()
+
+    # Count user's data
+    conn = get_connection()
+    c = conn.cursor()
+
+    c.execute('SELECT COUNT(*) FROM grants WHERE client_id IN (SELECT id FROM clients WHERE user_id = ?)', (user['id'],))
+    grant_count = c.fetchone()[0]
+
+    c.execute('SELECT COUNT(*) FROM saved_grants WHERE user_id = ?', (user['id'],))
+    saved_count = c.fetchone()[0]
+
+    c.execute('SELECT COUNT(*) FROM documents WHERE client_id IN (SELECT id FROM clients WHERE user_id = ?)', (user['id'],))
+    doc_count = c.fetchone()[0]
+
+    c.execute('SELECT COUNT(*) FROM clients WHERE user_id = ?', (user['id'],))
+    client_count = c.fetchone()[0]
+
+    try:
+        c.execute('SELECT COUNT(*) FROM grant_budget WHERE user_id = ?', (user['id'],))
+        budget_count = c.fetchone()[0]
+    except Exception:
+        budget_count = 0
+
+    # Check for existing exports
+    try:
+        c.execute("SELECT id, status, requested_at, file_path, file_size FROM data_exports WHERE user_id = ? ORDER BY requested_at DESC LIMIT 5", (user['id'],))
+        exports = [dict(row) if hasattr(row, 'keys') else dict(zip(['id', 'status', 'requested_at', 'file_path', 'file_size'], row)) for row in c.fetchall()]
+    except Exception:
+        exports = []
+
+    conn.close()
+
+    return render_template('account_export.html', user=user,
+                          grant_count=grant_count, saved_count=saved_count,
+                          doc_count=doc_count, client_count=client_count,
+                          budget_count=budget_count, exports=exports)
+
+
+@app.route('/account/export-data/generate', methods=['POST'])
+@login_required
+@csrf_required
+def account_export_generate():
+    """Generate a data export ZIP for the user"""
+    import zipfile
+    import csv
+    import io
+
+    user = get_current_user()
+    user_id = user['id']
+    now = datetime.now()
+    export_id = f"export-{now.strftime('%Y%m%d%H%M%S')}-{secrets.token_hex(4)}"
+
+    # Create export directory
+    export_dir = Path.home() / '.hermes' / 'grant-system' / 'output' / 'exports'
+    export_dir.mkdir(parents=True, exist_ok=True)
+    zip_path = export_dir / f"{export_id}.zip"
+
+    conn = get_connection()
+    c = conn.cursor()
+
+    grants = []
+    budgets = []
+    saved = []
+    clients = []
+    docs = []
+
+    try:
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+            # 1. User profile (JSON) - exclude password_hash
+            user_data = {k: v for k, v in user.items() if k not in ('password_hash',)}
+            zf.writestr('profile/user_profile.json', json.dumps(user_data, indent=2, default=str))
+
+            # 2. Organization details (JSON)
+            org = user_models.get_organization_details(user_id)
+            if org:
+                zf.writestr('profile/organization.json', json.dumps(org, indent=2, default=str))
+
+            # 3. Grants (JSON per grant + CSV summary)
+            c.execute('''SELECT g.* FROM grants g
+                        JOIN clients cl ON g.client_id = cl.id
+                        WHERE cl.user_id = ?''', (user_id,))
+            grants = c.fetchall()
+            col_names = [d[0] for d in c.description] if c.description else []
+
+            if grants:
+                grant_list = []
+                for row in grants:
+                    grant_dict = dict(row) if hasattr(row, 'keys') else dict(zip(col_names, row))
+                    grant_list.append(grant_dict)
+                    grant_id = grant_dict.get('id', 'unknown')
+                    zf.writestr(f'grants/{grant_id}/grant_data.json', json.dumps(grant_dict, indent=2, default=str))
+
+                    # Get drafts for this grant
+                    c2 = conn.cursor()
+                    c2.execute('SELECT section, content, version, updated_at FROM drafts WHERE grant_id = ? ORDER BY section, version DESC', (grant_dict.get('id'),))
+                    drafts_rows = c2.fetchall()
+                    draft_cols = [d[0] for d in c2.description] if c2.description else ['section', 'content', 'version', 'updated_at']
+                    for draft in drafts_rows:
+                        d = dict(draft) if hasattr(draft, 'keys') else dict(zip(draft_cols, draft))
+                        section_name = (d.get('section') or 'unknown').replace('/', '_')
+                        zf.writestr(f'grants/{grant_id}/sections/{section_name}_v{d.get("version", 1)}.txt', d.get('content', ''))
+
+                # CSV summary
+                if grant_list:
+                    csv_buf = io.StringIO()
+                    writer = csv.DictWriter(csv_buf, fieldnames=grant_list[0].keys())
+                    writer.writeheader()
+                    writer.writerows(grant_list)
+                    zf.writestr('grants/grants_summary.csv', csv_buf.getvalue())
+
+            # 4. Budgets (JSON + CSV)
+            try:
+                c.execute('SELECT * FROM grant_budget WHERE user_id = ?', (user_id,))
+                budgets = c.fetchall()
+                budget_cols = [d[0] for d in c.description] if c.description else []
+                if budgets:
+                    budget_list = []
+                    for row in budgets:
+                        b = dict(row) if hasattr(row, 'keys') else dict(zip(budget_cols, row))
+                        budget_list.append(b)
+                        zf.writestr(f'budgets/{b.get("grant_id", "unknown")}_budget.json', json.dumps(b, indent=2, default=str))
+
+                    csv_buf = io.StringIO()
+                    writer = csv.DictWriter(csv_buf, fieldnames=budget_list[0].keys())
+                    writer.writeheader()
+                    writer.writerows(budget_list)
+                    zf.writestr('budgets/budgets_summary.csv', csv_buf.getvalue())
+            except Exception:
+                pass  # grant_budget table may not exist
+
+            # 5. Saved grants (JSON)
+            c.execute('''SELECT sg.grant_id, sg.notes, sg.saved_at, gc.title, gc.agency
+                        FROM saved_grants sg
+                        LEFT JOIN grants_catalog gc ON sg.grant_id = gc.id
+                        WHERE sg.user_id = ?''', (user_id,))
+            saved = c.fetchall()
+            saved_cols = [d[0] for d in c.description] if c.description else ['grant_id', 'notes', 'saved_at', 'title', 'agency']
+            if saved:
+                saved_list = [dict(row) if hasattr(row, 'keys') else dict(zip(saved_cols, row)) for row in saved]
+                zf.writestr('saved_grants.json', json.dumps(saved_list, indent=2, default=str))
+
+            # 6. Clients (JSON)
+            c.execute('SELECT * FROM clients WHERE user_id = ?', (user_id,))
+            clients = c.fetchall()
+            client_cols = [d[0] for d in c.description] if c.description else []
+            if clients:
+                for row in clients:
+                    cl = dict(row) if hasattr(row, 'keys') else dict(zip(client_cols, row))
+                    zf.writestr(f'clients/{cl.get("id", "unknown")}.json', json.dumps(cl, indent=2, default=str))
+
+            # 7. Uploaded documents (copy files)
+            c.execute('''SELECT d.id, d.doc_type, d.file_path, d.uploaded_at
+                        FROM documents d
+                        JOIN clients cl ON d.client_id = cl.id
+                        WHERE cl.user_id = ?''', (user_id,))
+            docs = c.fetchall()
+            doc_cols = [d[0] for d in c.description] if c.description else ['id', 'doc_type', 'file_path', 'uploaded_at']
+            for row in docs:
+                d = dict(row) if hasattr(row, 'keys') else dict(zip(doc_cols, row))
+                if d.get('file_path') and Path(d['file_path']).exists():
+                    zf.write(d['file_path'], f'documents/{Path(d["file_path"]).name}')
+
+            # 8. Vault documents
+            try:
+                c.execute('''SELECT id, doc_type, file_path, uploaded_at FROM org_vault WHERE user_id = ?''', (user_id,))
+                vault_docs = c.fetchall()
+                vault_cols = [d[0] for d in c.description] if c.description else ['id', 'doc_type', 'file_path', 'uploaded_at']
+                for row in vault_docs:
+                    v = dict(row) if hasattr(row, 'keys') else dict(zip(vault_cols, row))
+                    if v.get('file_path') and Path(v['file_path']).exists():
+                        zf.write(v['file_path'], f'vault/{Path(v["file_path"]).name}')
+            except Exception:
+                pass  # org_vault may not exist
+
+            # 9. Export metadata
+            metadata = {
+                'export_id': export_id,
+                'user_email': user['email'],
+                'exported_at': now.isoformat(),
+                'contents': {
+                    'grants': len(grants) if grants else 0,
+                    'budgets': len(budgets) if budgets else 0,
+                    'saved_grants': len(saved) if saved else 0,
+                    'clients': len(clients) if clients else 0,
+                    'documents': len(docs) if docs else 0,
+                }
+            }
+            zf.writestr('export_metadata.json', json.dumps(metadata, indent=2))
+
+        # Record in data_exports table
+        file_size = zip_path.stat().st_size
+        try:
+            c.execute('''INSERT INTO data_exports (id, user_id, status, file_path, file_size, requested_at, completed_at, expires_at)
+                        VALUES (?, ?, 'ready', ?, ?, ?, ?, ?)''',
+                     (export_id, user_id, str(zip_path), file_size, now.isoformat(), now.isoformat(),
+                      (now + timedelta(days=7)).isoformat()))
+            conn.commit()
+        except Exception as e:
+            logger.error(f'Failed to record data export: {e}')
+            conn.commit()
+
+        flash('Your data export is ready for download.', 'success')
+    except Exception as e:
+        flash(f'Export failed: {str(e)}', 'error')
+        logger.error(f'Data export failed for {user_id}: {e}')
+    finally:
+        conn.close()
+
+    return redirect(url_for('account_export_data'))
+
+
+@app.route('/account/export-data/<export_id>/download')
+@login_required
+def account_export_download(export_id):
+    """Download a generated export ZIP"""
+    user = get_current_user()
+
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute('SELECT file_path, status, user_id FROM data_exports WHERE id = ?', (export_id,))
+    row = c.fetchone()
+
+    if not row:
+        flash('Export not found.', 'error')
+        conn.close()
+        return redirect(url_for('account_export_data'))
+
+    export = dict(row) if hasattr(row, 'keys') else dict(zip(['file_path', 'status', 'user_id'], row))
+
+    # Verify ownership
+    if export['user_id'] != user['id']:
+        flash('Access denied.', 'error')
+        conn.close()
+        return redirect(url_for('account_export_data'))
+
+    if export['status'] != 'ready':
+        flash('Export is not ready yet.', 'info')
+        conn.close()
+        return redirect(url_for('account_export_data'))
+
+    file_path = Path(export['file_path'])
+    if not file_path.exists():
+        flash('Export file no longer exists.', 'error')
+        conn.close()
+        return redirect(url_for('account_export_data'))
+
+    # Increment download count
+    try:
+        c.execute('UPDATE data_exports SET download_count = download_count + 1 WHERE id = ?', (export_id,))
+        conn.commit()
+    except Exception:
+        pass
+    conn.close()
+
+    return send_file(str(file_path), as_attachment=True, download_name=f'grantpro-export-{export_id}.zip')
+
+
 # ============ ORGANIZATION ONBOARDING ============
 
 @app.route('/onboarding', methods=['GET', 'POST'])

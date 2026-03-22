@@ -1,0 +1,183 @@
+{% extends "layout.html" %}
+{% block title %}Export Data - Grant Pro{% endblock %}
+{% block content %}
+<style>
+    .export-container { max-width: 800px; }
+    .export-container h1 { font-family: 'Playfair Display', serif; color: var(--text-primary); margin-bottom: 0.5rem; }
+    .export-container h2 { color: var(--text-primary); margin-bottom: 1rem; font-size: 1.15rem; font-weight: 600; }
+    .export-section { margin-bottom: 2rem; }
+    .data-stat {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+    }
+    .data-stat-count {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        min-width: 40px;
+    }
+    .data-stat-label { color: var(--text-secondary); font-size: 0.9rem; }
+    .export-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.9rem;
+    }
+    .export-item:last-child { border-bottom: none; }
+    .export-item-name { color: var(--text-primary); font-weight: 500; }
+    .export-item-desc { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.15rem; }
+    .export-item-format {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        background: var(--bg-tertiary);
+        padding: 0.2rem 0.5rem;
+        border-radius: var(--radius-sm);
+        white-space: nowrap;
+    }
+    .export-history-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .export-history-row:last-child { border-bottom: none; }
+    .export-history-date { color: var(--text-secondary); font-size: 0.85rem; }
+    .export-history-size { color: var(--text-muted); font-size: 0.8rem; }
+    .export-history-status {
+        display: inline-block;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .status-ready { background: rgba(5, 150, 105, 0.15); color: #10b981; }
+    .status-pending { background: rgba(217, 119, 6, 0.15); color: #d97706; }
+    .status-expired { background: var(--bg-tertiary); color: var(--text-muted); }
+</style>
+
+<div class="export-container">
+    <a href="{{ url_for('account_settings') }}" style="color: var(--text-muted); text-decoration: none; font-size: 0.85rem; display: inline-block; margin-bottom: 1rem;">&larr; Back to Settings</a>
+
+    <h1>Export Your Data</h1>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">Download all your Grant Pro data as a ZIP file. Exports include your profile, grants, budgets, documents, and more.</p>
+
+    <!-- What's included -->
+    <div class="export-section">
+        <div class="card">
+            <h2>What's Included</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.85rem;">Your export will contain the following data:</p>
+
+            <div class="export-item">
+                <div>
+                    <div class="export-item-name">User Profile</div>
+                    <div class="export-item-desc">Name, email, organization details</div>
+                </div>
+                <span class="export-item-format">JSON</span>
+            </div>
+
+            <div class="export-item">
+                <div>
+                    <div class="export-item-name">Grant Applications ({{ grant_count }})</div>
+                    <div class="export-item-desc">Full grant data, draft sections by version</div>
+                </div>
+                <span class="export-item-format">JSON + CSV</span>
+            </div>
+
+            <div class="export-item">
+                <div>
+                    <div class="export-item-name">Budgets ({{ budget_count }})</div>
+                    <div class="export-item-desc">Budget breakdowns per grant</div>
+                </div>
+                <span class="export-item-format">JSON + CSV</span>
+            </div>
+
+            <div class="export-item">
+                <div>
+                    <div class="export-item-name">Saved Grants ({{ saved_count }})</div>
+                    <div class="export-item-desc">Bookmarked grants with notes</div>
+                </div>
+                <span class="export-item-format">JSON</span>
+            </div>
+
+            <div class="export-item">
+                <div>
+                    <div class="export-item-name">Organizations ({{ client_count }})</div>
+                    <div class="export-item-desc">Client organization profiles</div>
+                </div>
+                <span class="export-item-format">JSON</span>
+            </div>
+
+            <div class="export-item">
+                <div>
+                    <div class="export-item-name">Documents ({{ doc_count }})</div>
+                    <div class="export-item-desc">Uploaded files and vault documents</div>
+                </div>
+                <span class="export-item-format">Original files</span>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <form method="POST" action="{{ url_for('account_export_generate') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-primary">Generate Export</button>
+                </form>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem;">Exports are available for download for 7 days after generation.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Previous exports -->
+    {% if exports %}
+    <div class="export-section">
+        <div class="card">
+            <h2>Previous Exports</h2>
+            {% for export in exports %}
+            <div class="export-history-row">
+                <div>
+                    <div class="export-history-date">
+                        {{ export.requested_at[:16] if export.requested_at else 'Unknown date' }}
+                    </div>
+                    {% if export.file_size %}
+                    <div class="export-history-size">
+                        {% if export.file_size > 1048576 %}
+                            {{ '%.1f' | format(export.file_size / 1048576) }} MB
+                        {% elif export.file_size > 1024 %}
+                            {{ '%.0f' | format(export.file_size / 1024) }} KB
+                        {% else %}
+                            {{ export.file_size }} bytes
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    {% if export.status == 'ready' %}
+                        <span class="export-history-status status-ready">Ready</span>
+                        <a href="{{ url_for('account_export_download', export_id=export.id) }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">Download</a>
+                    {% elif export.status == 'pending' %}
+                        <span class="export-history-status status-pending">Processing</span>
+                    {% else %}
+                        <span class="export-history-status status-expired">{{ export.status | title }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Data summary -->
+    <div class="export-section">
+        <div class="card" style="background: var(--bg-tertiary);">
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+                Your data belongs to you. Exports contain everything stored in your Grant Pro account, organized into folders with readable formats (JSON, CSV, and original document files). Password hashes are never included.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

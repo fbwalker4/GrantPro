@@ -965,6 +965,16 @@ app.run(debug=True, host='0.0.0.0', port=5001)
 
 ## Changelog
 
+### 2026-03-22 (Phase 5: Data Export)
+
+- Added /account/export-data page showing data summary and previous exports
+- Added /account/export-data/generate (POST) that creates a ZIP with: user profile (JSON), organization details, grants with all draft sections, budgets (JSON + CSV), saved grants, clients, uploaded documents, vault documents, and export metadata
+- Added /account/export-data/<id>/download for serving ZIP files with ownership verification
+- ZIP uses clean directory structure: profile/, grants/<id>/sections/, budgets/, clients/, documents/, vault/
+- Exports tracked in data_exports table with 7-day expiry and download count
+- password_hash excluded from all exports
+- Export linked from account settings and cancellation flow "switching" retention offer
+
 ### 2026-03-22 (Phase 3: Pause Subscription)
 
 - Added pause_subscription() and reactivate_subscription() to stripe_payment.py
