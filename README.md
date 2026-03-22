@@ -48,13 +48,25 @@ Subscription SaaS with six tiers from free to Enterprise Unlimited ($99.95/mo), 
 | **Free** | $0 | 0 | -- | Search grants, save favorites, eligibility checker, wizard |
 | **Monthly** | $19.95/mo | 3 | 1 | AI writing, guided submission, paper submission, downloads, cloning, templates |
 | **Annual** | $199.95/yr | 3/mo | 1 | Same as Monthly, save $39.45/year |
-| **Enterprise 5** | $44.95/mo | Unlimited | Up to 5 client agencies | Everything in Monthly + multi-client management |
-| **Enterprise 10** | $74.95/mo | Unlimited | Up to 10 clients | Everything in Enterprise 5 + white-label reports |
-| **Enterprise Unlimited** | $99.95/mo | Unlimited | Unlimited | Everything, no caps |
+| **Enterprise 5** | $44.95/mo | Unlimited | 5 total orgs | Everything in Monthly + org switcher, client management, enterprise dashboard |
+| **Enterprise 10** | $74.95/mo | Unlimited | 10 total orgs | Everything in Enterprise 5 + white-label reports |
+| **Enterprise Unlimited** | $99.95/mo | Unlimited | Unlimited orgs | Everything, no caps |
+
+Enterprise org limits are TOTAL (including the consultant's own org). A consultant who only manages clients still counts toward the limit.
+
+### Enterprise Org Switcher
+
+Enterprise users see a "Working as: [Org Name]" dropdown in the sidebar. Each client organization has:
+- Full profile (EIN, UEI, address, mission, programs, past grants — same depth as user profile)
+- Its own Organization Vault (501(c)(3) letter, audit, board resolution, etc.)
+- Its own grants, budget builders, and submission checklists
+- Separate SF-424 form data (client's credentials, not the consultant's)
+
+Switching orgs is instant — no logout/login. All data queries scope to the active org. Non-enterprise users see no switcher — everything works as before.
 
 ### Current State
 
-Production-ready. Supabase Postgres database with 23 tables, 5,277-line Flask app with 80+ routes, 21 agency templates with regulatory intelligence, structured budget builder, chained AI generation, consistency review, submission checklist with 100% gate, document uploads, MOU generation, paper submission (SF-424), post-submission tracking, award detection, and testimonial pipeline.
+Production-ready. Supabase Postgres database with 25+ tables, Flask app with 90+ routes, 21 agency templates with regulatory intelligence, structured budget builder, chained AI generation, consistency review, submission checklist with 100% gate, document uploads, MOU generation, paper submission (SF-424), post-submission tracking, award detection, testimonial pipeline, organization vault, enterprise org switcher, and 1,773 live grants from Grants.gov.
 
 ---
 
