@@ -830,6 +830,11 @@
                     <a href="{{ url_for('subscription_manage') }}" style="color: #fff; font-weight: 700; text-decoration: underline;">Update Payment</a> |
                     <a href="{{ url_for('account_settings') }}" style="color: #fff; font-weight: 700; text-decoration: underline;">Export Data</a>
                 </div>
+                {% elif _user_status == 'pending_deletion' %}
+                <div style="background: var(--accent-danger); color: #fff; padding: 12px 24px; text-align: center; font-weight: 500; font-size: 0.9rem; border-radius: var(--radius-md); margin-bottom: 1rem;">
+                    Your account is scheduled for deletion. All data will be permanently removed soon.
+                    <a href="{{ url_for('account_cancel_deletion') }}" style="color: #fff; font-weight: 700; text-decoration: underline;">Cancel Deletion</a>
+                </div>
                 {% endif %}
             {% endif %}
 

@@ -965,6 +965,19 @@ app.run(debug=True, host='0.0.0.0', port=5001)
 
 ## Changelog
 
+### 2026-03-22 (Phase 6: Account Deletion)
+
+- Added purge_user_data() function that cascades through all 20+ user-linked tables in correct FK order
+- Added soft_delete_user() for 72-hour grace period (sets pending_deletion status + deleted_at)
+- Added cancel_deletion() to undo within grace period
+- Added record_account_deletion() for compliance tombstone
+- Added /account/delete full-page 3-step flow: warning with data counts + export link, type email confirmation, final confirmation with 72-hour note
+- Added /account/cancel-deletion route
+- Deletion sends confirmation email with cancel link
+- Cron job purge_expired_deletions() runs actual purge after 72 hours
+- Account settings danger zone now has working delete link
+- Layout shows red banner for pending_deletion status
+
 ### 2026-03-22 (Phase 5: Data Export)
 
 - Added /account/export-data page showing data summary and previous exports

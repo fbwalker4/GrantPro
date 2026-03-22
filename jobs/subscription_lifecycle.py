@@ -38,7 +38,7 @@ logger = logging.getLogger("subscription_lifecycle")
 sys.path.insert(0, str(GRANT_SYSTEM / "core"))
 
 from db_connection import get_connection
-from user_models import log_subscription_event
+from user_models import log_subscription_event, purge_user_data, record_account_deletion
 
 
 # ---------------------------------------------------------------------------
@@ -302,6 +302,42 @@ def mark_pending_deletions():
 
 
 # ---------------------------------------------------------------------------
+# 5. Purge expired deletions (72-hour grace period)
+# ---------------------------------------------------------------------------
+def purge_expired_deletions():
+    """Purge accounts that are past the 72-hour grace period."""
+    conn = get_connection()
+    c = conn.cursor()
+
+    # Find users with pending_deletion status and deleted_at > 72 hours ago
+    cutoff = (datetime.now() - timedelta(hours=72)).isoformat()
+    c.execute("SELECT id, email, plan FROM users WHERE subscription_status = 'pending_deletion' AND deleted_at IS NOT NULL AND deleted_at < ?", (cutoff,))
+    users_to_purge = c.fetchall()
+    conn.close()
+
+    if not users_to_purge:
+        logger.info("No expired deletions to purge.")
+        return 0
+
+    purged_count = 0
+    for row in users_to_purge:
+        user_id = row[0] if not hasattr(row, 'keys') else row['id']
+        email = row[1] if not hasattr(row, 'keys') else row['email']
+        plan = row[2] if not hasattr(row, 'keys') else row['plan']
+
+        try:
+            tables = purge_user_data(user_id)
+            record_account_deletion(user_id, email, plan, 'user_requested', 'system', tables)
+            purged_count += 1
+            logger.info("Purged account: %s (%s)", user_id, email)
+        except Exception as e:
+            logger.error("ERROR purging %s (%s): %s", user_id, email, e)
+
+    logger.info("Purged %d expired deletion(s).", purged_count)
+    return purged_count
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 def run_all():
@@ -313,11 +349,12 @@ def run_all():
     reminder_count = send_suspension_reminders()
     warning_count = send_final_deletion_warnings()
     deletion_count = mark_pending_deletions()
+    purge_count = purge_expired_deletions()
 
     elapsed = (datetime.now() - start).total_seconds()
     logger.info(
-        "=== Job Complete (%.1fs) === renewals=%d, reminders=%d, warnings=%d, pending_deletions=%d",
-        elapsed, renewal_count, reminder_count, warning_count, deletion_count
+        "=== Job Complete (%.1fs) === renewals=%d, reminders=%d, warnings=%d, pending_deletions=%d, purged=%d",
+        elapsed, renewal_count, reminder_count, warning_count, deletion_count, purge_count
     )
 
     return {
@@ -325,6 +362,7 @@ def run_all():
         'suspension_reminders': reminder_count,
         'final_warnings': warning_count,
         'pending_deletions': deletion_count,
+        'purged_accounts': purge_count,
     }
 
 

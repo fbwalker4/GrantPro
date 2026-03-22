@@ -92,6 +92,8 @@
                         <span class="plan-badge plan-badge-paused">Paused</span>
                     {% elif sub_status and sub_status.status == 'suspended' %}
                         <span class="plan-badge plan-badge-suspended">Suspended</span>
+                    {% elif sub_status and sub_status.status == 'pending_deletion' %}
+                        <span class="plan-badge plan-badge-suspended">Pending Deletion</span>
                     {% else %}
                         <span class="plan-badge plan-badge-free">Free</span>
                     {% endif %}
@@ -203,7 +205,7 @@
         <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
             Permanently delete your account and all associated data. This action cannot be undone.
         </p>
-        <span class="text-link text-link-danger" style="cursor: default; opacity: 0.5;">Delete Account (coming soon)</span>
+        <a href="{{ url_for('account_delete') }}" class="text-link text-link-danger">Delete Account</a>
     </div>
 </div>
 {% endblock %}

@@ -1,0 +1,251 @@
+{% extends "layout.html" %}
+{% block title %}Delete Account - Grant Pro{% endblock %}
+{% block content %}
+<style>
+    .delete-container { max-width: 640px; margin: 0 auto; }
+    .delete-container h1 {
+        font-family: 'Playfair Display', serif;
+        color: var(--accent-danger);
+        margin-bottom: 0.5rem;
+        font-size: 1.5rem;
+    }
+    .delete-step-indicator {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    .delete-step-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--bg-tertiary);
+    }
+    .delete-step-dot.active { background: var(--accent-danger); }
+    .delete-step-dot.completed { background: var(--accent-danger); opacity: 0.5; }
+    .delete-warning-card {
+        background: rgba(220, 38, 38, 0.06);
+        border: 1px solid rgba(220, 38, 38, 0.25);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .delete-warning-card h2 {
+        color: var(--accent-danger);
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
+    .delete-warning-card p {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 0.75rem;
+    }
+    .delete-warning-card p:last-child { margin-bottom: 0; }
+    .data-impact {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        margin: 1.25rem 0;
+    }
+    .data-impact-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.6rem 0.75rem;
+        background: var(--bg-secondary);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-color);
+    }
+    .data-impact-count {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--accent-danger);
+        min-width: 28px;
+    }
+    .data-impact-label {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+    .delete-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+    .btn-danger {
+        display: inline-block;
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        color: #fff;
+        padding: 0.7rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: none;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: opacity 0.15s;
+        text-decoration: none;
+    }
+    .btn-danger:hover { opacity: 0.9; }
+    .btn-back {
+        display: inline-block;
+        background: var(--bg-tertiary);
+        color: var(--text-secondary);
+        padding: 0.7rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        text-decoration: none;
+        transition: border-color 0.15s;
+    }
+    .btn-back:hover { border-color: var(--text-muted); }
+    .email-confirm-input {
+        width: 100%;
+        padding: 0.7rem 1rem;
+        font-size: 0.95rem;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        margin-top: 0.5rem;
+    }
+    .email-confirm-input:focus {
+        outline: none;
+        border-color: var(--accent-danger);
+        box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15);
+    }
+    .grace-period-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        padding: 1rem;
+        background: rgba(37, 99, 235, 0.06);
+        border: 1px solid rgba(37, 99, 235, 0.2);
+        border-radius: var(--radius-md);
+        margin-top: 1.25rem;
+    }
+    .grace-period-note svg { flex-shrink: 0; margin-top: 2px; }
+    .grace-period-note p {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        line-height: 1.45;
+        margin: 0;
+    }
+</style>
+
+<div class="delete-container">
+    <h1>Delete Your Account</h1>
+    <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">This action is permanent and cannot be undone.</p>
+
+    <!-- Step indicator -->
+    <div class="delete-step-indicator">
+        <div class="delete-step-dot {% if step == 'warning' %}active{% else %}completed{% endif %}"></div>
+        <div class="delete-step-dot {% if step == 'type_email' %}active{% elif step == 'final' %}completed{% endif %}"></div>
+        <div class="delete-step-dot {% if step == 'final' %}active{% endif %}"></div>
+    </div>
+
+    {% if step == 'warning' %}
+    <!-- ========== STEP 1: WARNING ========== -->
+    <div class="delete-warning-card">
+        <h2>This action is permanent</h2>
+        <p>
+            Once your account is deleted, all of your data will be permanently removed from our systems.
+            This includes your grant applications, saved grants, documents, organization profiles, and all account data.
+        </p>
+        <p>
+            <strong>This will delete:</strong>
+        </p>
+        <div class="data-impact">
+            <div class="data-impact-item">
+                <span class="data-impact-count">{{ grant_count }}</span>
+                <span class="data-impact-label">Grant Applications</span>
+            </div>
+            <div class="data-impact-item">
+                <span class="data-impact-count">{{ saved_count }}</span>
+                <span class="data-impact-label">Saved Grants</span>
+            </div>
+            <div class="data-impact-item">
+                <span class="data-impact-count">{{ doc_count }}</span>
+                <span class="data-impact-label">Documents</span>
+            </div>
+            <div class="data-impact-item">
+                <span class="data-impact-count">{{ client_count }}</span>
+                <span class="data-impact-label">Organizations</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="padding: 1rem; background: var(--bg-tertiary); border-radius: var(--radius-md); margin-bottom: 1rem;">
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
+            We recommend <a href="{{ url_for('account_export_data') }}" style="color: var(--accent-primary); font-weight: 600;">downloading your data</a> before proceeding.
+        </p>
+    </div>
+
+    <div class="delete-actions">
+        <a href="{{ url_for('account_settings') }}" class="btn-back">Go Back</a>
+        <form method="POST" action="{{ url_for('account_delete') }}" style="margin: 0;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="step" value="show_type_email">
+            <button type="submit" class="btn-danger">I Understand, Continue</button>
+        </form>
+    </div>
+
+    {% elif step == 'type_email' %}
+    <!-- ========== STEP 2: TYPE EMAIL ========== -->
+    <div class="card" style="padding: 1.5rem;">
+        <h2 style="color: var(--text-primary); font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Confirm your identity</h2>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
+            To confirm, type your email address: <strong style="color: var(--text-primary);">{{ user.email }}</strong>
+        </p>
+        <form method="POST" action="{{ url_for('account_delete') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="step" value="confirm_type">
+            <input type="text"
+                   name="confirm_email"
+                   class="email-confirm-input"
+                   placeholder="Type your email address"
+                   autocomplete="off"
+                   autocorrect="off"
+                   autocapitalize="off"
+                   spellcheck="false"
+                   required>
+            <div class="delete-actions">
+                <a href="{{ url_for('account_settings') }}" class="btn-back">Go Back</a>
+                <button type="submit" class="btn-danger">Continue</button>
+            </div>
+        </form>
+    </div>
+
+    {% elif step == 'final' %}
+    <!-- ========== STEP 3: FINAL CONFIRMATION ========== -->
+    <div class="delete-warning-card" style="border-color: rgba(220, 38, 38, 0.5);">
+        <h2>Final confirmation</h2>
+        <p>
+            This will permanently delete all records and account data associated with <strong>{{ user.email }}</strong>.
+            When you press the button below, your account will no longer be accessible.
+        </p>
+    </div>
+
+    <div class="grace-period-note">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-primary);">
+            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+        </svg>
+        <p>
+            You will have <strong>72 hours</strong> to cancel this action by logging back in.
+            After 72 hours, your data will be permanently and irreversibly deleted.
+        </p>
+    </div>
+
+    <form method="POST" action="{{ url_for('account_delete') }}" style="margin-top: 1.5rem;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="step" value="execute">
+        <div class="delete-actions">
+            <a href="{{ url_for('account_settings') }}" class="btn-back">Cancel</a>
+            <button type="submit" class="btn-danger">Permanently Delete My Account</button>
+        </div>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

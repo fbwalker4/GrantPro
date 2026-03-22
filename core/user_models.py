@@ -740,6 +740,186 @@ def log_subscription_event(user_id, event_type, stripe_event_id=None, metadata=N
     return event_id
 
 
+def purge_user_data(user_id):
+    """Permanently delete all data for a user across all tables.
+
+    Returns list of (table_name, rows_deleted) tuples.
+
+    Order matters: delete from child tables first to avoid FK violations.
+    """
+    conn = get_connection()
+    c = conn.cursor()
+    purged = []
+
+    try:
+        # Get user's client IDs first (needed for cascading)
+        c.execute('SELECT id FROM clients WHERE user_id = ?', (user_id,))
+        client_ids = [row[0] if not hasattr(row, 'keys') else row['id'] for row in c.fetchall()]
+
+        # 1. Delete grant-linked child tables
+        for cid in client_ids:
+            c.execute('SELECT id FROM grants WHERE client_id = ?', (cid,))
+            grant_ids = [row[0] if not hasattr(row, 'keys') else row['id'] for row in c.fetchall()]
+            for gid in grant_ids:
+                c.execute('DELETE FROM drafts WHERE grant_id = ?', (gid,))
+                purged.append(('drafts', c.rowcount))
+                c.execute('DELETE FROM grant_budget WHERE grant_id = ?', (gid,))
+                purged.append(('grant_budget', c.rowcount))
+                c.execute('DELETE FROM grant_shares WHERE grant_id = ?', (gid,))
+                purged.append(('grant_shares', c.rowcount))
+                try:
+                    c.execute('DELETE FROM grant_checklist WHERE grant_id = ?', (gid,))
+                    purged.append(('grant_checklist', c.rowcount))
+                except Exception:
+                    pass
+                try:
+                    c.execute('DELETE FROM grant_documents WHERE grant_id = ?', (gid,))
+                    purged.append(('grant_documents', c.rowcount))
+                except Exception:
+                    pass
+
+        # 2. Delete grants and other client-linked tables
+        for cid in client_ids:
+            c.execute('DELETE FROM grants WHERE client_id = ?', (cid,))
+            purged.append(('grants', c.rowcount))
+            c.execute('DELETE FROM documents WHERE client_id = ?', (cid,))
+            purged.append(('documents', c.rowcount))
+            c.execute('DELETE FROM invoices WHERE client_id = ?', (cid,))
+            purged.append(('invoices', c.rowcount))
+
+        # 3. Delete clients
+        c.execute('DELETE FROM clients WHERE user_id = ?', (user_id,))
+        purged.append(('clients', c.rowcount))
+
+        # 4. Delete user-linked tables
+        for table in [
+            'saved_grants', 'user_applications', 'user_profiles',
+            'organization_details', 'organization_profile', 'mission_focus',
+            'past_grant_experience', 'subscription_events', 'data_exports',
+            'award_matches', 'testimonials',
+        ]:
+            try:
+                c.execute(f'DELETE FROM {table} WHERE user_id = ?', (user_id,))
+                purged.append((table, c.rowcount))
+            except Exception:
+                pass
+
+        # 5. Delete from tables keyed by email
+        c.execute('SELECT email FROM users WHERE id = ?', (user_id,))
+        row = c.fetchone()
+        if row:
+            email = row[0] if not hasattr(row, 'keys') else row['email']
+            for table in ['password_resets', 'leads', 'guest_saves']:
+                try:
+                    c.execute(f'DELETE FROM {table} WHERE email = ?', (email,))
+                    purged.append((table, c.rowcount))
+                except Exception:
+                    pass
+            try:
+                c.execute('DELETE FROM email_log WHERE to_email = ?', (email,))
+                purged.append(('email_log', c.rowcount))
+            except Exception:
+                pass
+
+        # 6. Vault documents
+        try:
+            c.execute('DELETE FROM org_vault WHERE user_id = ?', (user_id,))
+            purged.append(('org_vault', c.rowcount))
+        except Exception:
+            pass
+
+        # 7. Grant readiness
+        try:
+            c.execute('DELETE FROM grant_readiness WHERE user_id = ?', (user_id,))
+            purged.append(('grant_readiness', c.rowcount))
+        except Exception:
+            pass
+
+        # 8. Finally, delete the user
+        c.execute('DELETE FROM users WHERE id = ?', (user_id,))
+        purged.append(('users', c.rowcount))
+
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        raise e
+    finally:
+        conn.close()
+
+    return purged
+
+
+def record_account_deletion(user_id, email, plan, reason='user_requested', initiated_by='user', tables_purged=None):
+    """Record a tombstone after account deletion for compliance."""
+    import json as _json
+    conn = get_connection()
+    c = conn.cursor()
+    now = datetime.now()
+    deletion_id = f"del-{now.strftime('%Y%m%d%H%M%S')}-{secrets.token_hex(4)}"
+
+    c.execute('''INSERT INTO account_deletions (id, user_id, email, plan_at_deletion, deletion_reason, initiated_by, tables_purged, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+             (deletion_id, user_id, email, plan, reason, initiated_by,
+              _json.dumps(tables_purged) if tables_purged else None, now.isoformat()))
+    conn.commit()
+    conn.close()
+    return deletion_id
+
+
+def soft_delete_user(user_id):
+    """Mark user for deletion (72-hour grace period before purge)."""
+    conn = get_connection()
+    c = conn.cursor()
+    now = datetime.now()
+    c.execute('''UPDATE users SET
+                  subscription_status = 'pending_deletion',
+                  deleted_at = ?,
+                  updated_at = ?
+                  WHERE id = ?''', (now.isoformat(), now.isoformat(), user_id))
+    conn.commit()
+    conn.close()
+
+    log_subscription_event(user_id, 'deletion_requested')
+    return True
+
+
+def cancel_deletion(user_id):
+    """Cancel a pending deletion within the 72-hour grace period."""
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute('SELECT deleted_at, plan FROM users WHERE id = ?', (user_id,))
+    row = c.fetchone()
+    if not row:
+        conn.close()
+        return False, "No pending deletion"
+
+    deleted_at_val = row[0] if not hasattr(row, 'keys') else row['deleted_at']
+    plan = row[1] if not hasattr(row, 'keys') else row['plan']
+
+    if not deleted_at_val:
+        conn.close()
+        return False, "No pending deletion"
+
+    deleted_at = datetime.fromisoformat(deleted_at_val)
+    if (datetime.now() - deleted_at).total_seconds() > 72 * 3600:
+        conn.close()
+        return False, "Grace period has expired"
+
+    # Restore to previous status
+    new_status = 'active' if plan != 'free' else 'inactive'
+
+    c.execute('''UPDATE users SET
+                  subscription_status = ?,
+                  deleted_at = NULL,
+                  updated_at = ?
+                  WHERE id = ?''', (new_status, datetime.now().isoformat(), user_id))
+    conn.commit()
+    conn.close()
+
+    log_subscription_event(user_id, 'deletion_cancelled')
+    return True, "Deletion cancelled"
+
+
 if __name__ == '__main__':
     init_user_db()
     print("User database initialized")

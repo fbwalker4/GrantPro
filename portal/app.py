@@ -1676,6 +1676,119 @@ def account_export_download(export_id):
     return send_file(str(file_path), as_attachment=True, download_name=f'grantpro-export-{export_id}.zip')
 
 
+# ============ ACCOUNT DELETION ============
+
+@app.route('/account/delete', methods=['GET', 'POST'])
+@login_required
+def account_delete():
+    """Full-page account deletion flow"""
+    user = get_current_user()
+
+    if request.method == 'POST':
+        step = request.form.get('step')
+
+        if step == 'show_type_email':
+            # Transition from Step 1 to Step 2
+            return render_template('account_delete.html', user=user, step='type_email')
+
+        elif step == 'confirm_type':
+            # Step 2: User typed their email, verify it
+            typed_email = request.form.get('confirm_email', '').strip().lower()
+            if typed_email != user['email'].lower():
+                flash('The email you typed does not match your account email.', 'error')
+                return render_template('account_delete.html', user=user, step='type_email')
+            return render_template('account_delete.html', user=user, step='final')
+
+        elif step == 'execute':
+            # Step 3: Final confirmation, execute soft delete
+            # Verify CSRF
+            csrf_token = request.form.get('csrf_token')
+            if not csrf_token or not hmac.compare_digest(str(csrf_token), str(session.get('csrf_token', ''))):
+                flash('Invalid request.', 'error')
+                return redirect(url_for('account_settings'))
+
+            # Cancel Stripe subscription immediately (not at period end)
+            if user.get('stripe_subscription_id') and os.getenv('STRIPE_API_KEY'):
+                try:
+                    import stripe as _stripe
+                    _stripe.api_key = os.getenv('STRIPE_API_KEY')
+                    _stripe.Subscription.cancel(user['stripe_subscription_id'])
+                except Exception as e:
+                    logger.error(f'Stripe cancel on deletion failed: {e}')
+
+            # Soft delete (72-hour grace period)
+            user_models.soft_delete_user(user['id'])
+
+            # Send confirmation email
+            try:
+                from email_system import send_email, wrap_in_html
+                body = f'''
+                <h2 style="margin: 0 0 20px; color: #dc2626; font-size: 24px; font-weight: 700;">
+                    Account Deletion Scheduled
+                </h2>
+                <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+                    Hi {user.get('first_name', 'there')}, your GrantPro account has been scheduled for permanent deletion.
+                    All your data will be purged in <strong>72 hours</strong>.
+                </p>
+                <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+                    If this was a mistake, you can cancel the deletion by logging in within the next 72 hours.
+                </p>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+                    <tr><td align="center">
+                        <a href="{os.environ.get('APP_URL', 'http://localhost:5001')}/account/cancel-deletion" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; padding: 14px 32px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px;">
+                            Cancel Deletion
+                        </a>
+                    </td></tr>
+                </table>
+                <p style="margin: 20px 0 0; font-size: 14px; color: #666;">
+                    After 72 hours, your account and all associated data will be permanently and irreversibly deleted.
+                </p>
+                '''
+                html = wrap_in_html(body, "Account Deletion Scheduled", "Your GrantPro account will be deleted in 72 hours")
+                send_email(user['email'], "Your GrantPro account deletion is scheduled", html, "account_deletion")
+            except Exception:
+                pass
+
+            # Clear session
+            session.clear()
+
+            flash('Your account has been scheduled for deletion. All data will be permanently removed in 72 hours. Check your email for details.', 'info')
+            return redirect(url_for('index'))
+
+    # GET: Step 1 - Are you sure?
+    # Count data
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute('SELECT COUNT(*) FROM grants WHERE client_id IN (SELECT id FROM clients WHERE user_id = ?)', (user['id'],))
+    grant_count = c.fetchone()[0]
+    c.execute('SELECT COUNT(*) FROM saved_grants WHERE user_id = ?', (user['id'],))
+    saved_count = c.fetchone()[0]
+    c.execute('SELECT COUNT(*) FROM documents WHERE client_id IN (SELECT id FROM clients WHERE user_id = ?)', (user['id'],))
+    doc_count = c.fetchone()[0]
+    c.execute('SELECT COUNT(*) FROM clients WHERE user_id = ?', (user['id'],))
+    client_count = c.fetchone()[0]
+    conn.close()
+
+    return render_template('account_delete.html', user=user, step='warning',
+                          grant_count=grant_count, saved_count=saved_count,
+                          doc_count=doc_count, client_count=client_count)
+
+
+@app.route('/account/cancel-deletion', methods=['GET', 'POST'])
+@login_required
+def account_cancel_deletion():
+    """Cancel a pending account deletion within the 72-hour grace period"""
+    user = get_current_user()
+
+    success, message = user_models.cancel_deletion(user['id'])
+    if success:
+        flash('Your account deletion has been cancelled. Welcome back!', 'success')
+    else:
+        flash(message, 'error')
+
+    return redirect(url_for('account_settings'))
+
+
 # ============ ORGANIZATION ONBOARDING ============
 
 @app.route('/onboarding', methods=['GET', 'POST'])
