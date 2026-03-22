@@ -965,6 +965,17 @@ app.run(debug=True, host='0.0.0.0', port=5001)
 
 ## Changelog
 
+### 2026-03-22 (Phase 2: Cancellation + Retention Flow)
+
+- Added /account/settings page as hub for subscription management, data summary, cancel, and danger zone
+- Added /account/cancel full-page 3-step cancellation flow: exit survey (4 reasons) -> personalized retention offer (downgrade/pause/export based on reason) -> final confirmation
+- Added /account/downgrade route redirecting to Stripe portal for plan changes
+- Updated paid_required decorator to block suspended users with redirect to account settings
+- Added inject_subscription_status context processor for template-level status checks
+- Added suspension/past_due banners to layout.html (amber for past_due, red for suspended)
+- Added Account section to sidebar navigation
+- Created account_settings.html and account_cancel.html templates (dark theme, matching existing design)
+
 ### 2026-03-22 (Phase 1: Subscription Lifecycle Foundation)
 
 - Added 13 new columns to `users` table for subscription lifecycle tracking (payment_failure_count, suspended_at, data_deletion_eligible_at, pause_started_at, cancellation_reason, plan_before_suspension, etc.)

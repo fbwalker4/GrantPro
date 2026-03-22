@@ -315,6 +315,10 @@ def paid_required(f):
         if not user or user.get('plan') not in ('monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_unlimited'):
             flash('This feature requires a paid plan. Upgrade to get started.', 'info')
             return redirect(url_for('upgrade'))
+        # Block suspended users
+        if user.get('subscription_status') == 'suspended':
+            flash('Your account is suspended due to a payment issue. Please update your payment method to continue.', 'warning')
+            return redirect(url_for('account_settings'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -513,6 +517,33 @@ def inject_org_context():
 def inject_grants_count():
     """Make grants_count available in all templates"""
     return dict(grants_count=grant_researcher.get_grants_count())
+
+
+@app.context_processor
+def inject_subscription_status():
+    """Make subscription status available to all templates for banners"""
+    def get_user_subscription_status():
+        if 'user_id' in session:
+            user = user_models.get_user_by_id(session['user_id'])
+            if user:
+                return user.get('subscription_status', 'inactive')
+        return 'inactive'
+
+    def get_suspension_deletion_date():
+        if 'user_id' in session:
+            user = user_models.get_user_by_id(session['user_id'])
+            if user and user.get('data_deletion_eligible_at'):
+                try:
+                    dt = datetime.fromisoformat(user['data_deletion_eligible_at'])
+                    return dt.strftime('%B %d, %Y')
+                except (ValueError, TypeError):
+                    pass
+        return 'N/A'
+
+    return dict(
+        get_user_subscription_status=get_user_subscription_status,
+        suspension_deletion_date=get_suspension_deletion_date()
+    )
 
 
 # ============ PUBLIC ROUTES ============
@@ -1158,6 +1189,138 @@ def profile():
         return redirect(url_for('profile'))
     
     return render_template('profile.html', user=user, profile=profile or {})
+
+
+# ============ ACCOUNT MANAGEMENT ============
+
+@app.route('/account/settings')
+@login_required
+def account_settings():
+    """Account settings hub - subscription, cancellation, deletion, export"""
+    user = get_current_user()
+    sub_status = stripe_payment.get_subscription_status(user['id'])
+
+    # Count user's data for impact display
+    conn = get_connection()
+    c = conn.cursor()
+
+    c.execute('SELECT COUNT(*) FROM grants WHERE client_id IN (SELECT id FROM clients WHERE user_id = ?)', (user['id'],))
+    grant_count = c.fetchone()[0]
+
+    c.execute('SELECT COUNT(*) FROM saved_grants WHERE user_id = ?', (user['id'],))
+    saved_count = c.fetchone()[0]
+
+    c.execute('SELECT COUNT(*) FROM documents WHERE client_id IN (SELECT id FROM clients WHERE user_id = ?)', (user['id'],))
+    doc_count = c.fetchone()[0]
+
+    c.execute('SELECT COUNT(*) FROM clients WHERE user_id = ?', (user['id'],))
+    client_count = c.fetchone()[0]
+
+    conn.close()
+
+    return render_template('account_settings.html',
+                          user=user,
+                          sub_status=sub_status,
+                          grant_count=grant_count,
+                          saved_count=saved_count,
+                          doc_count=doc_count,
+                          client_count=client_count)
+
+
+@app.route('/account/cancel', methods=['GET', 'POST'])
+@login_required
+@csrf_required
+def account_cancel():
+    """Full-page cancellation flow with retention offers"""
+    user = get_current_user()
+    sub_status = stripe_payment.get_subscription_status(user['id'])
+
+    if not sub_status or sub_status.get('plan') == 'free':
+        flash('No active subscription to cancel.', 'info')
+        return redirect(url_for('account_settings'))
+
+    if request.method == 'POST':
+        step = request.form.get('step')
+
+        if step == 'survey':
+            # Step 1: Record reason, show retention offer
+            reason = request.form.get('reason', 'other')
+            session['cancel_reason'] = reason
+            # Fetch data counts for impact display on offer page
+            conn = get_connection()
+            c = conn.cursor()
+            c.execute('SELECT COUNT(*) FROM grants WHERE client_id IN (SELECT id FROM clients WHERE user_id = ?)', (user['id'],))
+            grant_count = c.fetchone()[0]
+            c.execute('SELECT COUNT(*) FROM saved_grants WHERE user_id = ?', (user['id'],))
+            saved_count = c.fetchone()[0]
+            c.execute('SELECT COUNT(*) FROM documents WHERE client_id IN (SELECT id FROM clients WHERE user_id = ?)', (user['id'],))
+            doc_count = c.fetchone()[0]
+            c.execute('SELECT COUNT(*) FROM clients WHERE user_id = ?', (user['id'],))
+            client_count = c.fetchone()[0]
+            conn.close()
+            return render_template('account_cancel.html', user=user, sub_status=sub_status, step='offer', reason=reason,
+                                  grant_count=grant_count, saved_count=saved_count, doc_count=doc_count, client_count=client_count)
+
+        elif step == 'confirm':
+            # Step 3: Actually cancel
+            reason = session.pop('cancel_reason', 'unknown')
+            success, message = stripe_payment.cancel_subscription(user['id'], reason=reason)
+
+            if success:
+                # Send confirmation email
+                try:
+                    from email_system import send_cancellation_confirmation
+                    end_date = sub_status.get('end', 'your current billing period')
+                    send_cancellation_confirmation(user['email'], user.get('first_name', 'there'), end_date)
+                except Exception:
+                    pass
+                flash('Your subscription has been canceled. You will have access until the end of your current billing period.', 'success')
+            else:
+                flash(f'Could not cancel: {message}', 'error')
+
+            return redirect(url_for('account_settings'))
+
+    # GET: Show step 1 (exit survey)
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute('SELECT COUNT(*) FROM grants WHERE client_id IN (SELECT id FROM clients WHERE user_id = ?)', (user['id'],))
+    grant_count = c.fetchone()[0]
+    c.execute('SELECT COUNT(*) FROM saved_grants WHERE user_id = ?', (user['id'],))
+    saved_count = c.fetchone()[0]
+    c.execute('SELECT COUNT(*) FROM documents WHERE client_id IN (SELECT id FROM clients WHERE user_id = ?)', (user['id'],))
+    doc_count = c.fetchone()[0]
+    c.execute('SELECT COUNT(*) FROM clients WHERE user_id = ?', (user['id'],))
+    client_count = c.fetchone()[0]
+    conn.close()
+
+    return render_template('account_cancel.html', user=user, sub_status=sub_status, step='survey',
+                          grant_count=grant_count, saved_count=saved_count, doc_count=doc_count, client_count=client_count)
+
+
+@app.route('/account/downgrade', methods=['POST'])
+@login_required
+@csrf_required
+def account_downgrade():
+    """Downgrade to a lower plan instead of canceling"""
+    user = get_current_user()
+    target_plan = request.form.get('target_plan', 'monthly')
+
+    # Validate target plan is lower than current
+    plan_order = ['free', 'monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_unlimited']
+    current_plan = user.get('plan', 'free')
+
+    if target_plan not in plan_order or plan_order.index(target_plan) >= plan_order.index(current_plan):
+        flash('Invalid downgrade target.', 'error')
+        return redirect(url_for('account_cancel'))
+
+    # Redirect to Stripe portal which handles plan changes
+    if user.get('stripe_customer_id'):
+        portal_url, error = stripe_payment.create_portal_session(user['stripe_customer_id'])
+        if portal_url:
+            return redirect(portal_url)
+
+    flash('Please contact support to change your plan.', 'info')
+    return redirect(url_for('account_settings'))
 
 
 # ============ ORGANIZATION ONBOARDING ============

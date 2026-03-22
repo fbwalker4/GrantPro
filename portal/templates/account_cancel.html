@@ -1,0 +1,347 @@
+{% extends "layout.html" %}
+{% block title %}Cancel Subscription - Grant Pro{% endblock %}
+{% block content %}
+<style>
+    .cancel-container { max-width: 640px; margin: 0 auto; }
+    .cancel-container h1 {
+        font-family: 'Playfair Display', serif;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-size: 1.5rem;
+    }
+    .cancel-container h2 {
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        font-size: 1.15rem;
+        font-weight: 600;
+    }
+    .cancel-step-indicator {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    .cancel-step-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--bg-tertiary);
+    }
+    .cancel-step-dot.active { background: var(--accent-primary); }
+    .cancel-step-dot.completed { background: var(--accent-success); }
+    .reason-option {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 1.25rem;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        margin-bottom: 0.75rem;
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+    }
+    .reason-option:hover {
+        border-color: var(--accent-primary);
+        background: rgba(37, 99, 235, 0.05);
+    }
+    .reason-option input[type="radio"] {
+        accent-color: var(--accent-primary);
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+    .reason-option label {
+        cursor: pointer;
+        font-size: 0.95rem;
+        flex: 1;
+    }
+    .impact-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .impact-list li {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+    .impact-list li:last-child { border-bottom: none; }
+    .impact-icon {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm);
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
+    .impact-icon-warn { background: rgba(217, 119, 6, 0.15); }
+    .impact-icon-ok { background: rgba(5, 150, 105, 0.15); }
+    .impact-count { font-weight: 600; color: var(--text-primary); }
+    .retention-card {
+        background: rgba(37, 99, 235, 0.06);
+        border: 1px solid rgba(37, 99, 235, 0.2);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .retention-card h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: var(--text-primary);
+    }
+    .retention-card p {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+    .btn-cancel-confirm {
+        background: var(--accent-danger);
+        color: white;
+        box-shadow: var(--shadow-sm);
+    }
+    .btn-cancel-confirm:hover {
+        background: #b91c1c;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+    .btn-row {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+    .pricing-compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+    .pricing-compare-item {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 1rem;
+        text-align: center;
+    }
+    .pricing-compare-item.current {
+        border-color: var(--text-muted);
+        opacity: 0.6;
+    }
+    .pricing-compare-item.suggested {
+        border-color: var(--accent-primary);
+    }
+    .pricing-compare-price {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    .pricing-compare-label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 0.25rem;
+    }
+</style>
+
+<div class="cancel-container">
+    <!-- Step Indicator -->
+    <div class="cancel-step-indicator">
+        <div class="cancel-step-dot {% if step == 'survey' %}active{% else %}completed{% endif %}"></div>
+        <div class="cancel-step-dot {% if step == 'offer' %}active{% elif step == 'confirm' %}completed{% endif %}"></div>
+        <div class="cancel-step-dot {% if step == 'confirm' %}active{% endif %}"></div>
+    </div>
+
+    {% if step == 'survey' %}
+    <!-- ======== STEP 1: EXIT SURVEY ======== -->
+    <h1>We're sorry to see you go</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.95rem;">
+        Before you cancel, could you tell us why? This helps us improve Grant Pro for everyone.
+    </p>
+
+    <form method="POST" action="{{ url_for('account_cancel') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="step" value="survey">
+
+        <div class="reason-option">
+            <input type="radio" name="reason" value="too_expensive" id="reason_price" required>
+            <label for="reason_price">Too expensive for my budget</label>
+        </div>
+        <div class="reason-option">
+            <input type="radio" name="reason" value="not_using" id="reason_usage">
+            <label for="reason_usage">Not using it enough right now</label>
+        </div>
+        <div class="reason-option">
+            <input type="radio" name="reason" value="switching" id="reason_switch">
+            <label for="reason_switch">Switching to another tool</label>
+        </div>
+        <div class="reason-option">
+            <input type="radio" name="reason" value="other" id="reason_other">
+            <label for="reason_other">Other reason</label>
+        </div>
+
+        <div class="btn-row">
+            <a href="{{ url_for('account_settings') }}" class="btn btn-secondary">Go Back</a>
+            <button type="submit" class="btn btn-secondary" style="border-color: var(--text-muted);">Continue</button>
+        </div>
+    </form>
+
+    {% elif step == 'offer' %}
+    <!-- ======== STEP 2: RETENTION OFFER ======== -->
+
+    {% if reason == 'too_expensive' %}
+    <!-- Price-sensitive: show downgrade options -->
+    <h1>What if you paid less?</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+        You don't have to lose access entirely. Here are some lower-cost options:
+    </p>
+
+    <div class="retention-card">
+        <h3>Downgrade Instead of Canceling</h3>
+        {% if sub_status.plan in ('enterprise_5', 'enterprise_10', 'enterprise_unlimited', 'annual') %}
+        <div class="pricing-compare">
+            <div class="pricing-compare-item current">
+                <div class="pricing-compare-label">Current Plan</div>
+                <div class="pricing-compare-price">
+                    {% if sub_status.plan == 'annual' %}$199{% elif sub_status.plan == 'enterprise_5' %}$44.95{% elif sub_status.plan == 'enterprise_10' %}$74.95{% elif sub_status.plan == 'enterprise_unlimited' %}$99.95{% endif %}<span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">/{% if sub_status.plan == 'annual' %}yr{% else %}mo{% endif %}</span>
+                </div>
+                <div class="pricing-compare-label">{{ sub_status.plan | replace('_', ' ') | title }}</div>
+            </div>
+            <div class="pricing-compare-item suggested">
+                <div class="pricing-compare-label" style="color: var(--accent-primary);">Save money</div>
+                <div class="pricing-compare-price">$19.95<span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">/mo</span></div>
+                <div class="pricing-compare-label">Standard Monthly</div>
+            </div>
+        </div>
+        <form method="POST" action="{{ url_for('account_downgrade') }}" style="margin-top: 0.75rem;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="target_plan" value="monthly">
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Downgrade to Standard Monthly</button>
+        </form>
+        {% else %}
+        <p>Your current plan is already the most affordable option at <strong>$19.95/month</strong>. If budget is tight, you might consider pausing your subscription instead.</p>
+        {% endif %}
+    </div>
+
+    {% elif reason == 'not_using' %}
+    <!-- Not using: offer pause -->
+    <h1>Take a break instead?</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+        Grant seasons come and go. You can pause your subscription and come back when you are ready.
+    </p>
+
+    <div class="retention-card">
+        <h3>Pause Your Subscription</h3>
+        <p>Your data stays safe and your account stays set up. When grant season picks back up, just unpause and you are right where you left off.</p>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Pause options coming soon. In the meantime, your subscription will remain active.</p>
+    </div>
+
+    {% elif reason == 'switching' %}
+    <!-- Switching tools: graceful goodbye + export -->
+    <h1>We understand</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+        If another tool is a better fit right now, we want to make sure you can take your data with you.
+    </p>
+
+    <div class="retention-card">
+        <h3>Export Your Data First</h3>
+        <p>Before you go, make sure you have everything you need. Our data export feature will bundle all your grants, documents, and saved information.</p>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Data export coming soon. Your data will remain accessible on the free plan after cancellation.</p>
+    </div>
+
+    {% else %}
+    <!-- Other: show impact + pause offer -->
+    <h1>Before you go</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+        We'd hate to see you lose access. Would pausing work better?
+    </p>
+
+    <div class="retention-card">
+        <h3>Consider Pausing Instead</h3>
+        <p>Keep your data and setup intact while you take a break. Resume anytime without starting over.</p>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Pause options coming soon.</p>
+    </div>
+    {% endif %}
+
+    <!-- Data Impact Summary (shown for all reasons) -->
+    <div class="card" style="margin-top: 1rem;">
+        <h2>Here's what happens if you cancel</h2>
+        <ul class="impact-list">
+            {% if grant_count is defined and grant_count > 0 %}
+            <li>
+                <span class="impact-icon impact-icon-warn">!</span>
+                Your <span class="impact-count">{{ grant_count }}</span> active grant application{{ 's' if grant_count != 1 else '' }} will become read-only
+            </li>
+            {% endif %}
+            {% if saved_count is defined and saved_count > 0 %}
+            <li>
+                <span class="impact-icon impact-icon-ok">&#10003;</span>
+                Your <span class="impact-count">{{ saved_count }}</span> saved grant{{ 's' if saved_count != 1 else '' }} will remain accessible on the free plan
+            </li>
+            {% endif %}
+            {% if doc_count is defined and doc_count > 0 %}
+            <li>
+                <span class="impact-icon impact-icon-warn">!</span>
+                Your <span class="impact-count">{{ doc_count }}</span> uploaded document{{ 's' if doc_count != 1 else '' }} will not be accessible
+            </li>
+            {% endif %}
+            {% if client_count is defined and client_count > 1 %}
+            <li>
+                <span class="impact-icon impact-icon-warn">!</span>
+                Your <span class="impact-count">{{ client_count }}</span> client organization{{ 's' if client_count != 1 else '' }} will be affected
+            </li>
+            {% endif %}
+            <li>
+                <span class="impact-icon impact-icon-ok">&#10003;</span>
+                You'll keep access until the end of your current billing period
+            </li>
+        </ul>
+    </div>
+
+    <div class="btn-row">
+        <a href="{{ url_for('account_settings') }}" class="btn btn-primary">Keep My Subscription</a>
+        <form method="POST" action="{{ url_for('account_cancel') }}" style="margin: 0;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="step" value="confirm">
+            <button type="submit" class="btn btn-secondary" style="border-color: var(--text-muted); color: var(--text-muted);">Continue to Cancel</button>
+        </form>
+    </div>
+
+    {% elif step == 'confirm' %}
+    <!-- ======== STEP 3: FINAL CONFIRMATION ======== -->
+    <h1>Are you sure?</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+        Your subscription will be canceled at the end of your current billing period.
+    </p>
+
+    <div class="card">
+        <p style="font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.75rem;">
+            {% if sub_status and sub_status.end %}
+            You'll have full access until <strong>{{ sub_status.end[:10] }}</strong>.
+            {% else %}
+            You'll have full access until the end of your current billing period.
+            {% endif %}
+        </p>
+        <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            After that, your account will be downgraded to the free plan. You can resubscribe at any time.
+        </p>
+    </div>
+
+    <div class="btn-row">
+        <a href="{{ url_for('account_settings') }}" class="btn btn-primary">Go Back</a>
+        <form method="POST" action="{{ url_for('account_cancel') }}" style="margin: 0;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="step" value="confirm">
+            <button type="submit" class="btn btn-cancel-confirm">Cancel My Subscription</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
