@@ -2688,10 +2688,10 @@ def sanitize_for_prompt(value, max_length=2000):
 # ============ AI GENERATION ============
 
 @app.route('/grant/<grant_id>/generate/<section_id>', methods=['POST'])
-@require_rate_limit(endpoint='generate_section', max_requests=10, window=60)
 @login_required
 @paid_required
 @csrf_required
+@require_rate_limit(endpoint='generate_section', max_requests=10, window=60)
 def generate_section_content(grant_id, section_id):
     """Generate AI content for a grant section"""
     # Check ownership
@@ -6451,10 +6451,10 @@ def delete_document(grant_id, doc_id):
 
 
 @app.route('/grant/<grant_id>/generate-document', methods=['POST'])
-@require_rate_limit(endpoint='generate_document', max_requests=5, window=60)
 @login_required
 @paid_required
 @csrf_required
+@require_rate_limit(endpoint='generate_document', max_requests=5, window=60)
 def generate_document(grant_id):
     """Generate a draft document (MOU, letter of collaboration, etc.) using AI."""
     if not user_owns_grant(grant_id):

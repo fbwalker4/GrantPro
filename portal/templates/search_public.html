@@ -946,8 +946,12 @@
 
             var pill = document.createElement('span');
             pill.className = 'filter-pill';
-            pill.innerHTML = f.label + ': ' + displayVal + ' <button aria-label="Remove ' + f.label + ' filter">&times;</button>';
-            pill.querySelector('button').addEventListener('click', function() {
+            pill.textContent = f.label + ': ' + displayVal + ' ';
+            var removeBtn = document.createElement('button');
+            removeBtn.setAttribute('aria-label', 'Remove ' + f.label + ' filter');
+            removeBtn.innerHTML = '&times;';
+            pill.appendChild(removeBtn);
+            removeBtn.addEventListener('click', function() {
                 if (el.tagName === 'INPUT') {
                     el.value = '';
                 } else {
