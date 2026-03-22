@@ -228,13 +228,8 @@
             <p class="login-subtitle">Start your grant writing journey</p>
         </div>
         
-        <!-- Plan Banner -->
-        {% if plan == 'free' %}
-        <div class="plan-banner" style="background: #1e293b; border: 1px solid #334155;">
-            <h3 style="color: #e2e8f0;">Free Tier Selected</h3>
-            <p style="color: #94a3b8;">Search {{ grants_count|default('thousands of') }} grants for free. No credit card required. Upgrades available after signup.</p>
-        </div>
-        {% elif plan == 'monthly' %}
+        <!-- Plan Banner — only show for paid plans, not free -->
+        {% if plan == 'monthly' %}
         <div class="plan-banner" style="background: #1e3a5f; border: 1px solid #3b82f6;">
             <h3 style="color: #60a5fa;">Monthly Plan - $19.95/mo</h3>
             <p style="color: #93c5fd;">3 grant submissions/month. Cancel anytime.</p>
@@ -300,8 +295,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="organization">Organization Name <span style="font-size: 0.7rem; color: var(--text-muted);">(optional)</span></label>
+                    <label class="form-label" for="organization">Organization Name</label>
                     <input type="text" id="organization" name="organization" class="form-input" placeholder="Your Organization">
+                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.3rem;">This is the name grant applications will be submitted under. You can update it later.</p>
                 </div>
 
                 <button type="submit" class="btn btn-primary">
