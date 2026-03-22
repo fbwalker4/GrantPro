@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAM.gov Registration Guide - Grant Pro</title>
+    <meta name="description" content="Step-by-step guide to registering on SAM.gov for federal grants. Free registration walkthrough with troubleshooting tips.">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%232563eb'/%3E%3Cstop offset='100%25' stop-color='%231d4ed8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='20' y='26' text-anchor='middle' fill='white' font-family='Inter,Helvetica,Arial,sans-serif' font-weight='700' font-size='16'%3EGP%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fc;
+            --bg-tertiary: #f1f3f6;
+            --border-color: #e2e5ed;
+            --text-primary: #1a1f36;
+            --text-secondary: #5e6278;
+            --text-muted: #8993a4;
+            --accent-primary: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-success: #059669;
+            --accent-warning: #d97706;
+            --accent-danger: #dc2626;
+            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.875rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg { width: 20px; height: 20px; fill: white; }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 1.75rem;
+        }
+
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.15s;
+        }
+
+        .nav a:hover { color: var(--text-primary); }
+        .nav a.active { color: var(--accent-primary); font-weight: 600; }
+
+        .nav-btn {
+            background: var(--gradient-primary);
+            color: white !important;
+            padding: 0.5rem 1.1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .nav-btn:hover { box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+
+        /* Hamburger */
+        .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 0.5rem; }
+        .hamburger svg { width: 24px; height: 24px; stroke: var(--text-primary); stroke-width: 2; stroke-linecap: round; fill: none; }
+
+        .mobile-nav {
+            display: none;
+            flex-direction: column;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 2rem 1rem;
+        }
+
+        .mobile-nav.open { display: flex; }
+        .mobile-nav a { padding: 0.6rem 0; color: var(--text-secondary); text-decoration: none; font-weight: 500; font-size: 0.95rem; border-bottom: 1px solid var(--border-color); }
+        .mobile-nav a:last-child { border-bottom: none; }
+
+        /* Content */
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem 4rem;
+        }
+
+        .page-hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .page-hero h1 span { color: var(--accent-primary); }
+
+        .page-hero p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Table of contents */
+        .toc {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .toc h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .toc-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem 2rem;
+        }
+
+        .toc a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .toc a:hover { text-decoration: underline; }
+
+        /* Section cards */
+        .guide-section {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .guide-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-hover);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--bg-tertiary);
+        }
+
+        .guide-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.5rem;
+        }
+
+        .guide-section p {
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .guide-section ul, .guide-section ol {
+            margin: 0.5rem 0 1rem 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .guide-section li {
+            margin-bottom: 0.4rem;
+        }
+
+        .guide-section li strong {
+            color: var(--text-primary);
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-right: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .step-heading {
+            display: flex;
+            align-items: center;
+            margin: 1.75rem 0 0.75rem;
+        }
+
+        .step-heading h3 {
+            margin: 0;
+        }
+
+        .tip-box {
+            background: rgba(37, 99, 235, 0.05);
+            border-left: 3px solid var(--accent-primary);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .tip-box strong {
+            color: var(--accent-primary);
+        }
+
+        .warning-box {
+            background: rgba(220, 38, 38, 0.05);
+            border-left: 3px solid var(--accent-danger);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .warning-box strong {
+            color: var(--accent-danger);
+        }
+
+        .success-box {
+            background: rgba(5, 150, 105, 0.05);
+            border-left: 3px solid var(--accent-success);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .success-box strong {
+            color: var(--accent-success);
+        }
+
+        .checklist {
+            list-style: none;
+            margin-left: 0 !important;
+            padding-left: 0;
+        }
+
+        .checklist li {
+            position: relative;
+            padding-left: 1.75rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .checklist li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0.35rem;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 3px;
+        }
+
+        .problem-solution {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .problem-solution .problem {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+            font-size: 0.95rem;
+        }
+
+        .problem-solution .solution {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .link-card {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-decoration: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .link-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .link-card .link-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.1rem;
+        }
+
+        .link-card .link-info .link-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--accent-primary);
+        }
+
+        .link-card .link-info .link-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* CTA */
+        .cta-box {
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            padding: 2.5rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .cta-box h2 {
+            color: white;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .cta-box p {
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-box .btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            background: white;
+            color: var(--accent-primary);
+            border-radius: 8px;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: box-shadow 0.2s;
+        }
+
+        .cta-box .btn:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--text-primary);
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+
+        footer p { color: rgba(255,255,255,0.6); font-size: 0.85rem; }
+        footer a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.8rem; }
+        footer a:hover { color: white; }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 0.75rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav { display: none; }
+            .hamburger { display: block; }
+            .container { padding: 1.5rem 1rem 3rem; }
+            .page-hero h1 { font-size: 1.75rem; }
+            .guide-section { padding: 1.5rem; }
+            .toc-columns { grid-template-columns: 1fr; }
+            .links-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo" aria-label="Grant Pro home">
+                <div class="logo-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" role="img" aria-label="Grant Pro logo"><defs><linearGradient id="gp-hdr" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2563eb"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs><rect width="40" height="40" rx="8" fill="url(#gp-hdr)"/><text x="20" y="26" text-anchor="middle" fill="white" font-family="Inter,Helvetica,Arial,sans-serif" font-weight="700" font-size="16">GP</text></svg>
+                </div>
+                <span class="logo-text">Grant Pro</span>
+            </a>
+            <nav class="nav" role="navigation" aria-label="Main navigation">
+                <a href="/">Home</a>
+                <a href="/how-it-works">How It Works</a>
+                <a href="/search">Search Grants</a>
+                <a href="/guide">Grant Writing Guide</a>
+                <a href="/pricing">Pricing</a>
+                <a href="/login">Sign In</a>
+                <a href="/signup?plan=monthly" class="nav-btn">Get Started</a>
+            </nav>
+            <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileNav">
+                <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="mobile-nav" id="mobileNav" role="navigation" aria-label="Mobile navigation">
+            <a href="/">Home</a>
+            <a href="/how-it-works">How It Works</a>
+            <a href="/search">Search Grants</a>
+            <a href="/guide">Grant Writing Guide</a>
+            <a href="/pricing">Pricing</a>
+            <a href="/login">Sign In</a>
+            <a href="/signup?plan=monthly">Get Started Free</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Hero -->
+            <div class="page-hero">
+                <h1><span>SAM.gov</span> Registration Guide</h1>
+                <p>A complete, step-by-step walkthrough for registering your organization on SAM.gov -- required for every federal grant.</p>
+            </div>
+
+            <!-- Table of Contents -->
+            <div class="toc">
+                <h2>In This Guide</h2>
+                <div class="toc-columns">
+                    <a href="#why-sam">Why You Need SAM.gov Registration</a>
+                    <a href="#what-you-need">What You Need Before You Start</a>
+                    <a href="#step-1">Step 1: Go to SAM.gov</a>
+                    <a href="#step-2">Step 2: Create Your Login.gov Account</a>
+                    <a href="#step-3">Step 3: Start Entity Registration</a>
+                    <a href="#step-4">Step 4: Core Data</a>
+                    <a href="#step-5">Step 5: Entity Information</a>
+                    <a href="#step-6">Step 6: Financial Information</a>
+                    <a href="#step-7">Step 7: Points of Contact</a>
+                    <a href="#step-8">Step 8: Assertions &amp; Representations</a>
+                    <a href="#step-9">Step 9: Review and Submit</a>
+                    <a href="#after-registration">After Registration</a>
+                    <a href="#common-problems">Common Problems &amp; Solutions</a>
+                    <a href="#helpful-links">Helpful Links</a>
+                </div>
+            </div>
+
+            <!-- Why SAM.gov -->
+            <section class="guide-section" id="why-sam">
+                <h2>Why You Need SAM.gov Registration</h2>
+                <p><strong>SAM.gov</strong> (System for Award Management) is the official U.S. government system for managing entities that do business with the federal government. If your organization wants to receive federal grants, contracts, or any form of federal financial assistance, you <strong>must</strong> be registered in SAM.gov. There are no exceptions.</p>
+                <ul>
+                    <li><strong>Required for ALL federal grants, contracts, and financial assistance.</strong> No agency can award you money without an active SAM.gov registration.</li>
+                    <li><strong>No registration = no federal funding, period.</strong> Your application will be rejected outright if your registration is not active at the time of award.</li>
+                    <li><strong>Registration is completely FREE.</strong> You will never need to pay anyone to register. The entire process is done at <a href="https://sam.gov" target="_blank">sam.gov</a> at no cost.</li>
+                    <li><strong>Must be renewed every 365 days.</strong> If your registration lapses, you cannot receive awards or payments until it is reactivated.</li>
+                </ul>
+                <div class="warning-box">
+                    <strong>Scam Warning:</strong> There are third-party websites that charge hundreds of dollars to "help" you register on SAM.gov. These are not affiliated with the federal government. SAM.gov registration is always free. If a website is asking you to pay, it is a scam. Only use <a href="https://sam.gov" target="_blank" style="color: var(--accent-danger);">sam.gov</a> directly.
+                </div>
+            </section>
+
+            <!-- What You Need -->
+            <section class="guide-section" id="what-you-need">
+                <h2>What You Need Before You Start</h2>
+                <p>Gather the following before beginning your registration. Having everything ready will save you from delays and incomplete submissions.</p>
+
+                <ul class="checklist">
+                    <li><strong>EIN (Employer Identification Number)</strong> -- Your 9-digit tax identification number from the IRS. If you do not have one, you can <a href="https://www.irs.gov/businesses/small-businesses-self-employed/apply-for-an-employer-identification-number-ein-online" target="_blank">apply for an EIN online</a> for free. The online process takes about 15 minutes and you receive your EIN immediately.</li>
+                    <li><strong>Banking information</strong> -- Your organization's bank routing number and account number. The federal government pays exclusively via Electronic Funds Transfer (EFT), so this is required.</li>
+                    <li><strong>Organization's legal name</strong> -- This must match your IRS records <em>exactly</em>, including punctuation, abbreviations, and spacing. Even a minor difference will cause your registration to be rejected.</li>
+                    <li><strong>Physical address</strong> -- A street address where your organization is physically located. PO boxes are <strong>not accepted</strong> as the primary address (but can be used as a mailing address).</li>
+                    <li><strong>NAICS code</strong> -- The North American Industry Classification System code that describes your organization's primary activity. You can look up your code at <a href="https://www.naics.com/search/" target="_blank">naics.com/search</a>. Common codes for nonprofits include 813110 (Religious Organizations), 813211 (Grantmaking Foundations), and 813312 (Environment/Conservation Organizations).</li>
+                    <li><strong>For nonprofits: 501(c)(3) determination letter date</strong> -- The date the IRS issued your tax-exempt determination letter. You will need this during the entity type selection.</li>
+                </ul>
+
+                <div class="tip-box">
+                    <strong>Tip:</strong> Pull up your IRS determination letter (or IRS CP 575 notice) before you start. Having the exact legal name and EIN visible will prevent common mismatch errors.
+                </div>
+            </section>
+
+            <!-- Step 1 -->
+            <section class="guide-section" id="step-1">
+                <h2>Step-by-Step Registration Process</h2>
+
+                <div class="step-heading">
+                    <span class="step-number">1</span>
+                    <h3>Go to SAM.gov</h3>
+                </div>
+                <p>Open your browser and navigate to <a href="https://sam.gov" target="_blank"><strong>https://sam.gov</strong></a>. This is the only official website for SAM registration.</p>
+                <ul>
+                    <li>Click <strong>"Sign In"</strong> in the upper-right corner.</li>
+                    <li>If you do not already have a Login.gov account, click <strong>"Create an Account"</strong>. SAM.gov uses Login.gov as its authentication system -- this is the federal government's shared sign-in service.</li>
+                </ul>
+            </section>
+
+            <!-- Step 2 -->
+            <section class="guide-section" id="step-2">
+                <div class="step-heading">
+                    <span class="step-number">2</span>
+                    <h3>Create Your Login.gov Account</h3>
+                </div>
+                <p>Login.gov is the federal government's single sign-on platform. Your Login.gov account will be used to access SAM.gov and many other federal systems.</p>
+                <ol>
+                    <li>Go to <a href="https://login.gov/create-an-account" target="_blank">login.gov/create-an-account</a> (or follow the link from SAM.gov).</li>
+                    <li>Enter your <strong>email address</strong> -- use a professional/organizational email, not a personal one.</li>
+                    <li>Check your email and click the <strong>confirmation link</strong>.</li>
+                    <li>Create a <strong>strong password</strong> (at least 12 characters).</li>
+                    <li>Set up <strong>two-factor authentication (2FA)</strong>. You can choose:
+                        <ul>
+                            <li>Phone/SMS (most common)</li>
+                            <li>Authentication app (Google Authenticator, Authy, etc.)</li>
+                            <li>Security key or government PIV/CAC card</li>
+                        </ul>
+                    </li>
+                </ol>
+                <div class="tip-box">
+                    <strong>Important:</strong> This is your federal identity. Store your Login.gov credentials securely. If you lose access to both your password and 2FA method, recovery is difficult and time-consuming. Consider setting up a backup authentication method.
+                </div>
+            </section>
+
+            <!-- Step 3 -->
+            <section class="guide-section" id="step-3">
+                <div class="step-heading">
+                    <span class="step-number">3</span>
+                    <h3>Start Entity Registration</h3>
+                </div>
+                <p>After logging in to SAM.gov with your Login.gov credentials:</p>
+                <ol>
+                    <li>Click <strong>"Get Started"</strong> under Entity Registration (or navigate to the Entity Registration section).</li>
+                    <li>Select the <strong>purpose of registration</strong> -- for grants, choose "I want to be able to bid on federal contracts or receive federal financial assistance (grants, loans, etc.)."</li>
+                    <li>Select your <strong>entity type</strong>:
+                        <ul>
+                            <li><strong>Business or Organization</strong> -- for companies, nonprofits, universities, tribal organizations</li>
+                            <li><strong>U.S. State or Local Government</strong> -- for government agencies</li>
+                            <li><strong>Foreign Entity</strong> -- for entities outside the U.S.</li>
+                        </ul>
+                    </li>
+                    <li>For nonprofits, select <strong>"Organization"</strong> and then <strong>"Nonprofit"</strong> from the sub-categories.</li>
+                </ol>
+                <p>The system will validate that your entity is not already registered. If it finds a match, you may need to claim an existing registration rather than creating a new one.</p>
+            </section>
+
+            <!-- Step 4 -->
+            <section class="guide-section" id="step-4">
+                <div class="step-heading">
+                    <span class="step-number">4</span>
+                    <h3>Core Data</h3>
+                </div>
+                <p>This is where you enter your organization's fundamental information:</p>
+                <ul>
+                    <li><strong>Legal Business Name</strong> -- Must match your IRS records exactly. This includes capitalization, punctuation (commas, periods), and abbreviations (Inc., LLC, Corp.). If your IRS records show "ABC Nonprofit, Inc." do not enter "ABC Nonprofit Inc" (missing comma).</li>
+                    <li><strong>Physical Address</strong> -- The street address where your organization operates. PO boxes are not accepted here. This is used for entity validation.</li>
+                    <li><strong>Mailing Address</strong> -- Where you receive mail. This can be a PO box if needed.</li>
+                    <li><strong>Start date of organization</strong> -- The date your organization was legally formed (incorporation date or date of formation).</li>
+                    <li><strong>Doing Business As (DBA)</strong> -- Only fill this in if your organization operates under a different name than its legal name. Otherwise, leave it blank.</li>
+                </ul>
+                <div class="warning-box">
+                    <strong>Common rejection reason:</strong> The legal name you enter does not exactly match what the IRS has on file. Double-check your IRS documents (CP 575 notice, determination letter, or Form SS-4 confirmation) before proceeding.
+                </div>
+            </section>
+
+            <!-- Step 5 -->
+            <section class="guide-section" id="step-5">
+                <div class="step-heading">
+                    <span class="step-number">5</span>
+                    <h3>Entity Information</h3>
+                </div>
+                <p>Provide identifying details about your organization:</p>
+                <ul>
+                    <li><strong>EIN / TIN</strong> -- Enter your 9-digit Employer Identification Number. This will be validated against IRS records.</li>
+                    <li><strong>CAGE Code</strong> -- The Commercial and Government Entity code. If you do not already have one, leave this blank. A CAGE code will be <strong>assigned automatically</strong> during the SAM registration process. You do not need to apply for one separately.</li>
+                    <li><strong>NAICS Code</strong> -- Use the built-in search tool to find the code that best describes your organization's primary activity. You can add multiple codes. Some common ones:
+                        <ul>
+                            <li>541611 -- Management Consulting Services</li>
+                            <li>541720 -- Research and Development</li>
+                            <li>611310 -- Colleges/Universities</li>
+                            <li>813110 -- Religious Organizations</li>
+                            <li>813211 -- Grantmaking Foundations</li>
+                            <li>813319 -- Social Advocacy Organizations</li>
+                            <li>624110 -- Child and Youth Services</li>
+                        </ul>
+                    </li>
+                    <li><strong>Business Type</strong> -- Select all categories that apply to your organization (e.g., Nonprofit Organization, Minority-Owned, Woman-Owned, Small Business, etc.).</li>
+                </ul>
+            </section>
+
+            <!-- Step 6 -->
+            <section class="guide-section" id="step-6">
+                <div class="step-heading">
+                    <span class="step-number">6</span>
+                    <h3>Financial Information</h3>
+                </div>
+                <p>Enter your banking details for Electronic Funds Transfer (EFT). This is how the federal government will pay your organization when grants are awarded.</p>
+                <ul>
+                    <li><strong>Bank Routing Number</strong> -- The 9-digit ABA routing number for your bank (found on checks or through your bank).</li>
+                    <li><strong>Account Number</strong> -- Your organization's bank account number.</li>
+                    <li><strong>Account Type</strong> -- Checking or savings.</li>
+                </ul>
+                <div class="tip-box">
+                    <strong>Tip:</strong> Use your organization's primary operating account. The account must be in the legal name of the entity being registered. Personal bank accounts should not be used unless you are registering as a sole proprietor.
+                </div>
+            </section>
+
+            <!-- Step 7 -->
+            <section class="guide-section" id="step-7">
+                <div class="step-heading">
+                    <span class="step-number">7</span>
+                    <h3>Points of Contact</h3>
+                </div>
+                <p>You will need to designate at least two points of contact:</p>
+                <ul>
+                    <li><strong>Entity Administrator (Government Business POC)</strong> -- The primary person responsible for managing the SAM.gov account. This person must have a valid email and phone number. They will receive all correspondence about the registration.</li>
+                    <li><strong>Alternate Government Business POC</strong> -- A backup contact in case the primary administrator is unavailable. This person can also manage the registration if needed.</li>
+                </ul>
+                <p>Both contacts will need:</p>
+                <ul>
+                    <li>Full name (first, middle initial, last)</li>
+                    <li>Title/position</li>
+                    <li>Phone number (U.S. number preferred)</li>
+                    <li>Email address</li>
+                </ul>
+                <div class="tip-box">
+                    <strong>Tip:</strong> Always designate at least two administrators. If the sole administrator leaves your organization and you lose Login.gov access, regaining control of the SAM registration is a lengthy process involving the Federal Service Desk.
+                </div>
+            </section>
+
+            <!-- Step 8 -->
+            <section class="guide-section" id="step-8">
+                <div class="step-heading">
+                    <span class="step-number">8</span>
+                    <h3>Assertions and Representations</h3>
+                </div>
+                <p>This section contains legal certifications and compliance questions:</p>
+                <ul>
+                    <li><strong>Proceedings Information</strong> -- Disclose any criminal, civil, or administrative proceedings, if applicable.</li>
+                    <li><strong>FFATA Sub-Award Reporting</strong> -- Certify compliance with the Federal Funding Accountability and Transparency Act, which requires reporting on sub-awards over $30,000.</li>
+                    <li><strong>Federal tax compliance</strong> -- Certify that your organization is not delinquent on federal taxes.</li>
+                    <li><strong>Debarment and suspension</strong> -- Certify that neither your organization nor its principals are debarred or suspended from receiving federal awards.</li>
+                    <li><strong>Size and socioeconomic representations</strong> -- For businesses, indicate if you qualify as a small business, disadvantaged business, HUBZone, etc.</li>
+                </ul>
+                <div class="warning-box">
+                    <strong>These are legally binding statements.</strong> Answer all questions truthfully and accurately. Misrepresentation can result in penalties under the False Claims Act, including fines and debarment from future federal awards.
+                </div>
+            </section>
+
+            <!-- Step 9 -->
+            <section class="guide-section" id="step-9">
+                <div class="step-heading">
+                    <span class="step-number">9</span>
+                    <h3>Review and Submit</h3>
+                </div>
+                <p>Before submitting, carefully review every section of your registration:</p>
+                <ol>
+                    <li>Verify your <strong>legal name</strong> matches IRS records exactly.</li>
+                    <li>Confirm your <strong>EIN</strong> is correct.</li>
+                    <li>Double-check your <strong>banking information</strong> (routing and account numbers).</li>
+                    <li>Review your <strong>NAICS codes</strong> and business type selections.</li>
+                    <li>Verify <strong>contact information</strong> for both points of contact.</li>
+                    <li>Click <strong>"Submit"</strong>.</li>
+                </ol>
+                <p>After submission:</p>
+                <ul>
+                    <li>You will receive a <strong>confirmation email</strong> acknowledging your submission.</li>
+                    <li>The IRS will validate your TIN/EIN and legal name (this is often the slowest part).</li>
+                    <li>A CAGE code will be assigned if you do not already have one.</li>
+                    <li>Processing typically takes <strong>7 to 10 business days</strong>, but can take up to <strong>3 weeks</strong> during peak periods or if there are validation issues.</li>
+                </ul>
+                <div class="success-box">
+                    <strong>What happens next:</strong> You will receive an email when your registration is active. You can also check your status at any time by logging in to SAM.gov and navigating to "Check Registration Status."
+                </div>
+            </section>
+
+            <!-- After Registration -->
+            <section class="guide-section" id="after-registration">
+                <h2>After Registration</h2>
+                <p>Once your registration is approved and active:</p>
+                <ul>
+                    <li><strong>Your UEI (Unique Entity Identifier) is assigned automatically.</strong> This 12-character alphanumeric ID replaces the old DUNS number. You will need this on every federal grant application.</li>
+                    <li><strong>Check your status</strong> at <a href="https://sam.gov/content/status-tracker" target="_blank">sam.gov -- Status Tracker</a> at any time.</li>
+                    <li><strong>Registration must be renewed every 365 days.</strong> Set a calendar reminder for at least 30 days before expiration. Renewal takes the same 7-10 business days to process, so do not wait until the last day.</li>
+                    <li><strong>Keep your Login.gov credentials safe.</strong> Store them in a password manager. Ensure your backup administrator also has access.</li>
+                    <li><strong>Update your GrantPro profile</strong> with your UEI number so the system can verify your grant readiness.</li>
+                </ul>
+                <div class="tip-box">
+                    <strong>Pro tip:</strong> Set two calendar reminders -- one at 60 days before expiration and another at 30 days. This gives you a comfortable buffer for the renewal processing time.
+                </div>
+            </section>
+
+            <!-- Common Problems -->
+            <section class="guide-section" id="common-problems">
+                <h2>Common Problems and Solutions</h2>
+
+                <div class="problem-solution">
+                    <div class="problem">"My legal name doesn't match"</div>
+                    <div class="solution">Your legal name must match IRS records exactly, including all punctuation, abbreviations, and spacing. Check your IRS CP 575 notice or determination letter. If you recently changed your name, file IRS Form 8822-B first, wait for confirmation, then register on SAM.gov.</div>
+                </div>
+
+                <div class="problem-solution">
+                    <div class="problem">"I don't have a CAGE code"</div>
+                    <div class="solution">You do not need one before you start. A CAGE code is assigned automatically during the SAM.gov registration process. Leave the CAGE code field blank when registering.</div>
+                </div>
+
+                <div class="problem-solution">
+                    <div class="problem">"Registration is taking too long"</div>
+                    <div class="solution">Normal processing is 7-10 business days. If it has been longer than 3 weeks, contact the Federal Service Desk at <strong>866-606-8220</strong> (Monday-Friday, 8am-8pm ET) or submit a ticket at <a href="https://www.fsd.gov" target="_blank">fsd.gov</a>.</div>
+                </div>
+
+                <div class="problem-solution">
+                    <div class="problem">"I got locked out of Login.gov"</div>
+                    <div class="solution">Go to <a href="https://login.gov" target="_blank">login.gov</a> and use the account recovery options. If you cannot recover your account, call Login.gov support at <strong>844-875-6446</strong> (available 24/7).</div>
+                </div>
+
+                <div class="problem-solution">
+                    <div class="problem">"A website is charging me to register"</div>
+                    <div class="solution">SAM.gov registration is <strong>always free</strong>. Any website or company that charges you for SAM registration is running a scam. The only legitimate site is <a href="https://sam.gov" target="_blank">sam.gov</a>. Report scam sites to the Federal Service Desk.</div>
+                </div>
+
+                <div class="problem-solution">
+                    <div class="problem">"My registration expired"</div>
+                    <div class="solution">Log in to SAM.gov and renew your registration. The renewal process is similar to the initial registration. Allow 7-10 business days for renewal processing. You cannot receive awards or payments while your registration is expired.</div>
+                </div>
+
+                <div class="problem-solution">
+                    <div class="problem">"My TIN validation failed"</div>
+                    <div class="solution">TIN mismatches are the number one cause of registration delays. Verify your EIN and legal name match IRS records by calling the IRS Business line at <strong>800-829-4933</strong>. Common issues include name changes not yet reflected in IRS systems.</div>
+                </div>
+            </section>
+
+            <!-- Helpful Links -->
+            <section class="guide-section" id="helpful-links">
+                <h2>Helpful Links</h2>
+                <div class="links-grid">
+                    <a href="https://sam.gov" target="_blank" class="link-card">
+                        <div class="link-icon">&#127970;</div>
+                        <div class="link-info">
+                            <div class="link-title">SAM.gov</div>
+                            <div class="link-desc">Official registration site</div>
+                        </div>
+                    </a>
+                    <a href="https://login.gov" target="_blank" class="link-card">
+                        <div class="link-icon">&#128274;</div>
+                        <div class="link-info">
+                            <div class="link-title">Login.gov</div>
+                            <div class="link-desc">Federal sign-in service</div>
+                        </div>
+                    </a>
+                    <a href="https://www.irs.gov/businesses/small-businesses-self-employed/apply-for-an-employer-identification-number-ein-online" target="_blank" class="link-card">
+                        <div class="link-icon">&#128196;</div>
+                        <div class="link-info">
+                            <div class="link-title">IRS EIN Application</div>
+                            <div class="link-desc">Apply online for free (~15 min)</div>
+                        </div>
+                    </a>
+                    <a href="https://www.fsd.gov" target="_blank" class="link-card">
+                        <div class="link-icon">&#128222;</div>
+                        <div class="link-info">
+                            <div class="link-title">Federal Service Desk</div>
+                            <div class="link-desc">SAM.gov help: 866-606-8220</div>
+                        </div>
+                    </a>
+                    <a href="https://www.naics.com/search/" target="_blank" class="link-card">
+                        <div class="link-icon">&#128269;</div>
+                        <div class="link-info">
+                            <div class="link-title">NAICS Code Lookup</div>
+                            <div class="link-desc">Find your industry code</div>
+                        </div>
+                    </a>
+                    <a href="https://sam.gov/content/status-tracker" target="_blank" class="link-card">
+                        <div class="link-icon">&#9989;</div>
+                        <div class="link-info">
+                            <div class="link-title">Registration Status Tracker</div>
+                            <div class="link-desc">Check your registration status</div>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- CTA -->
+            <div class="cta-box">
+                <h2>Already Registered on SAM.gov?</h2>
+                <p>Enter your UEI in your GrantPro profile to unlock grant readiness verification and start applying.</p>
+                <a href="/onboarding" class="btn">Go to Onboarding</a>
+            </div>
+        </div>
+    </main>
+
+    <footer role="contentinfo">
+        <div class="footer-inner">
+            <p>&copy; 2026 Grant Pro by Futurespec Consulting, LLC. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="/terms">Terms</a>
+                <a href="/privacy">Privacy</a>
+                <a href="/refund">Refunds</a>
+                <a href="/help">Help</a>
+                <a href="/contact">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    document.getElementById('hamburger').addEventListener('click', function() {
+        var nav = document.getElementById('mobileNav');
+        nav.classList.toggle('open');
+        this.setAttribute('aria-expanded', nav.classList.contains('open'));
+    });
+    </script>
+</body>
+</html>

@@ -441,6 +441,12 @@ def guide():
     return render_template('guide.html')
 
 
+@app.route('/guide/sam-registration')
+def sam_registration_guide():
+    """SAM.gov Registration Guide - public"""
+    return render_template('sam_guide.html')
+
+
 @app.route('/help')
 @app.route('/faq')
 def help():
