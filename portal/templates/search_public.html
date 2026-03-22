@@ -656,12 +656,12 @@
                 <div class="sort-bar">
                     <label for="sortSelect">Sort by:</label>
                     <select id="sortSelect" onchange="sortAndFilter()" aria-label="Sort grants">
+                        <option value="posted-desc" selected>Posted (newest first)</option>
+                        <option value="posted-asc">Posted (oldest)</option>
                         <option value="deadline-asc">Deadline (soonest)</option>
                         <option value="deadline-desc">Deadline (latest)</option>
                         <option value="amount-desc">Amount (highest)</option>
                         <option value="amount-asc">Amount (lowest)</option>
-                        <option value="posted-desc">Posted (newest)</option>
-                        <option value="posted-asc">Posted (oldest)</option>
                     </select>
                 </div>
                 <div class="filter-pills-bar" id="filterPills"></div>
@@ -689,7 +689,7 @@
                         {% endif %}
                     </div>
                 </div>
-                <p class="grant-desc">{{ grant.description[:180] }}{% if grant.description|length > 180 %}...{% endif %}</p>
+                <p class="grant-desc">{{ grant.description[:100] }}{% if grant.description|length > 100 %}...{% endif %}</p>
                 <div class="grant-meta">
                     <div class="grant-meta-item">
                         <div class="grant-meta-label">Funding</div>
@@ -705,12 +705,14 @@
                         <div class="grant-meta-value">{{ grant.open_date[:10] }}</div>
                     </div>
                     {% endif %}
-                    {% if grant.deadline or grant.close_date %}
                     <div class="grant-meta-item">
                         <div class="grant-meta-label">Deadline</div>
+                        {% if grant.deadline or grant.close_date %}
                         <div class="grant-meta-value deadline js-deadline-value">{{ (grant.close_date or grant.deadline)[:10] }}</div>
+                        {% else %}
+                        <div class="grant-meta-value" style="color: var(--text-muted);">Open / Rolling</div>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
                 <div class="grant-card-actions">
                     <a href="/signup" class="btn-signup">Sign Up to Apply</a>
@@ -829,6 +831,14 @@
 
             if (matchesSearch && matchesAgency && matchesCategory && matchesAmount && matchesDeadline && matchesPosted && matchesStatus) {
                 card.style.display = 'flex';
+                // Reduce visibility of $0 grants with no deadline (likely placeholder/incomplete data)
+                if (cardAmount === 0 && cardDeadline === '9999-12-31') {
+                    card.style.opacity = '0.5';
+                    card.style.order = '999';
+                } else {
+                    card.style.opacity = '1';
+                    card.style.order = '0';
+                }
                 visible++;
             } else {
                 card.style.display = 'none';
@@ -957,7 +967,7 @@
         document.getElementById('deadlineFilter').selectedIndex = 0;
         document.getElementById('postedFilter').selectedIndex = 0;
         document.getElementById('statusFilter').selectedIndex = 0;
-        document.getElementById('sortSelect').value = 'deadline-asc';
+        document.getElementById('sortSelect').value = 'posted-desc';
         sortAndFilter();
     }
 
@@ -980,7 +990,7 @@
         if (deadline) params.set('deadline', deadline);
         if (posted) params.set('posted', posted);
         if (status) params.set('status', status);
-        if (sort && sort !== 'deadline-asc') params.set('sort', sort);
+        if (sort && sort !== 'posted-desc') params.set('sort', sort);
 
         var newURL = window.location.pathname;
         var paramStr = params.toString();
@@ -1000,9 +1010,9 @@
             var valEl = card.querySelector('.js-deadline-value');
             if (!valEl) return;
             valEl.classList.remove('deadline', 'deadline-urgent', 'deadline-soon');
-            if (diff < 14) {
+            if (diff < 30) {
                 valEl.classList.add('deadline-urgent');
-            } else if (diff < 30) {
+            } else if (diff < 60) {
                 valEl.classList.add('deadline-soon');
             } else {
                 valEl.classList.add('deadline');
