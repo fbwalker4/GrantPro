@@ -857,9 +857,12 @@ def record_account_deletion(user_id, email, plan, reason='user_requested', initi
     now = datetime.now()
     deletion_id = f"del-{now.strftime('%Y%m%d%H%M%S')}-{secrets.token_hex(4)}"
 
+    # Hash the email instead of storing plaintext for privacy compliance
+    email_hash = hashlib.sha256(email.lower().encode()).hexdigest()
+
     c.execute('''INSERT INTO account_deletions (id, user_id, email, plan_at_deletion, deletion_reason, initiated_by, tables_purged, created_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
-             (deletion_id, user_id, email, plan, reason, initiated_by,
+             (deletion_id, user_id, email_hash, plan, reason, initiated_by,
               _json.dumps(tables_purged) if tables_purged else None, now.isoformat()))
     conn.commit()
     conn.close()
@@ -905,14 +908,14 @@ def cancel_deletion(user_id):
         conn.close()
         return False, "Grace period has expired"
 
-    # Restore to previous status
-    new_status = 'active' if plan != 'free' else 'inactive'
-
+    # Stripe subscription was hard-cancelled during deletion, so restore to free/inactive.
+    # User would need to re-subscribe to get a paid plan back.
     c.execute('''UPDATE users SET
-                  subscription_status = ?,
+                  plan = 'free',
+                  subscription_status = 'inactive',
                   deleted_at = NULL,
                   updated_at = ?
-                  WHERE id = ?''', (new_status, datetime.now().isoformat(), user_id))
+                  WHERE id = ?''', (datetime.now().isoformat(), user_id))
     conn.commit()
     conn.close()
 

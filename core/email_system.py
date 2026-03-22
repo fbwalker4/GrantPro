@@ -4,6 +4,7 @@ Email System for Grant Writing Business
 Uses Resend API for transactional emails
 """
 
+import html
 import os
 import sqlite3
 from pathlib import Path
@@ -1027,42 +1028,43 @@ def get_final_deletion_warning_email(first_name: str, deletion_date: str) -> Dic
 
 def send_renewal_reminder(email: str, first_name: str, plan: str, renewal_date: str, amount: float) -> Dict:
     """Send renewal reminder email"""
-    content = get_renewal_reminder_email(first_name, plan, renewal_date, amount)
+    content = get_renewal_reminder_email(html.escape(first_name), html.escape(plan), html.escape(renewal_date), amount)
     return send_email(email, content["subject"], content["html"], "renewal_reminder")
 
 
 def send_dunning_email(email: str, first_name: str, attempt_number: int, suspension_date: str = None) -> Dict:
     """Send appropriate dunning email based on attempt number"""
+    safe_name = html.escape(first_name)
     if attempt_number == 1:
-        content = get_dunning_email_1(first_name)
+        content = get_dunning_email_1(safe_name)
     elif attempt_number == 2:
-        content = get_dunning_email_2(first_name)
+        content = get_dunning_email_2(safe_name)
     else:
-        content = get_dunning_email_3(first_name, suspension_date or "soon")
+        content = get_dunning_email_3(safe_name, html.escape(suspension_date or "soon"))
     return send_email(email, content["subject"], content["html"], f"dunning_{attempt_number}")
 
 
 def send_account_suspended_email(email: str, first_name: str, deletion_date: str) -> Dict:
     """Send account suspended notification"""
-    content = get_account_suspended_email(first_name, deletion_date)
+    content = get_account_suspended_email(html.escape(first_name), html.escape(deletion_date))
     return send_email(email, content["subject"], content["html"], "account_suspended")
 
 
 def send_suspension_reminder(email: str, first_name: str, days_remaining: int, deletion_date: str) -> Dict:
     """Send periodic suspension reminder"""
-    content = get_suspension_reminder_email(first_name, days_remaining, deletion_date)
+    content = get_suspension_reminder_email(html.escape(first_name), days_remaining, html.escape(deletion_date))
     return send_email(email, content["subject"], content["html"], "suspension_reminder")
 
 
 def send_cancellation_confirmation(email: str, first_name: str, end_date: str) -> Dict:
     """Send cancellation confirmation email"""
-    content = get_cancellation_confirmation_email(first_name, end_date)
+    content = get_cancellation_confirmation_email(html.escape(first_name), html.escape(end_date))
     return send_email(email, content["subject"], content["html"], "cancellation_confirmation")
 
 
 def send_final_deletion_warning(email: str, first_name: str, deletion_date: str) -> Dict:
     """Send final deletion warning email"""
-    content = get_final_deletion_warning_email(first_name, deletion_date)
+    content = get_final_deletion_warning_email(html.escape(first_name), html.escape(deletion_date))
     return send_email(email, content["subject"], content["html"], "final_deletion_warning")
 
 
@@ -1070,7 +1072,7 @@ def send_final_deletion_warning(email: str, first_name: str, deletion_date: str)
 
 def send_welcome_email(email: str, first_name: str = "there") -> Dict:
     """Send welcome email"""
-    content = get_welcome_email(first_name)
+    content = get_welcome_email(html.escape(first_name))
     return send_email(email, content["subject"], content["html"], "welcome")
 
 

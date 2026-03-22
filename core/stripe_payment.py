@@ -189,6 +189,15 @@ def handle_webhook(payload, sig_header):
     except stripe.error.SignatureVerificationError:
         return None, "Invalid signature"
 
+    # Check idempotency -- skip already-processed events
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute("SELECT id FROM subscription_events WHERE stripe_event_id = ?", (event['id'],))
+    if c.fetchone():
+        conn.close()
+        return {"status": "duplicate", "event": event['type']}, None
+    conn.close()
+
     # Handle the event
     if event['type'] == 'checkout.session.completed':
         return handle_checkout_complete(event['data']['object'])
@@ -366,7 +375,6 @@ def handle_payment_failed(invoice):
         return {"status": "payment_failed", "customer": customer_id, "note": "user not found"}, None
 
     user_id = user.get('id')
-    current_count = (user.get('payment_failure_count') or 0) + 1
     plan = user.get('plan', 'monthly')
     suspension_threshold = 4 if plan in ENTERPRISE_PLANS else 3
 
@@ -377,14 +385,19 @@ def handle_payment_failed(invoice):
     # Record first failure timestamp
     first_failure = user.get('first_payment_failure_at') or now
 
+    # Atomic increment of payment_failure_count to avoid race conditions
     c.execute('''UPDATE users SET
                   subscription_status = 'past_due',
-                  payment_failure_count = ?,
+                  payment_failure_count = payment_failure_count + 1,
                   first_payment_failure_at = ?,
                   last_dunning_email_at = ?,
                   updated_at = ?
                   WHERE stripe_customer_id = ?''',
-              (current_count, first_failure, now, now, customer_id))
+              (first_failure, now, now, customer_id))
+
+    # Read back the new count
+    c.execute('SELECT payment_failure_count FROM users WHERE stripe_customer_id = ?', (customer_id,))
+    current_count = c.fetchone()[0]
 
     conn.commit()
     conn.close()
@@ -454,11 +467,22 @@ def handle_payment_success(invoice):
 
     # Reactivate if previously suspended or past_due
     if was_suspended:
-        c.execute('''UPDATE users SET
-                      subscription_status = 'active',
-                      updated_at = ?
-                      WHERE stripe_customer_id = ?''',
-                  (now, customer_id))
+        # If user was suspended, also restore their plan from plan_before_suspension
+        restore_plan = user.get('plan_before_suspension')
+        if restore_plan and user.get('subscription_status') == 'suspended':
+            c.execute('''UPDATE users SET
+                          subscription_status = 'active',
+                          plan = ?,
+                          plan_before_suspension = NULL,
+                          updated_at = ?
+                          WHERE stripe_customer_id = ?''',
+                      (restore_plan, now, customer_id))
+        else:
+            c.execute('''UPDATE users SET
+                          subscription_status = 'active',
+                          updated_at = ?
+                          WHERE stripe_customer_id = ?''',
+                      (now, customer_id))
 
     # Reset all dunning fields
     _reset_dunning_fields(c, customer_id, now)
@@ -569,7 +593,7 @@ def pause_subscription(user_id, months=1):
     """
     conn = get_connection()
     c = conn.cursor()
-    c.execute('SELECT stripe_subscription_id, pause_count_this_year, plan FROM users WHERE id = ?', (user_id,))
+    c.execute('SELECT stripe_subscription_id, pause_count_this_year, plan, pause_started_at FROM users WHERE id = ?', (user_id,))
     row = c.fetchone()
     conn.close()
 
@@ -579,8 +603,17 @@ def pause_subscription(user_id, months=1):
     subscription_id = row[0]
     pause_count = row[1] or 0
     plan = row[2]
+    last_pause_started = row[3]
 
-    if pause_count >= 1:
+    # Check if user has paused within the last 12 months (rolling window, not calendar year)
+    if last_pause_started:
+        try:
+            last_pause = datetime.fromisoformat(last_pause_started)
+            if (datetime.now() - last_pause).days < 365:
+                return False, "You can only pause once per 12-month period."
+        except (ValueError, TypeError):
+            pass
+    elif pause_count >= 1:
         return False, "You have already used your pause this year. Pausing is limited to once per 12 months."
 
     if months not in (1, 3):

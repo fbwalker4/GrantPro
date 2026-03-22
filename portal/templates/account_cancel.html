@@ -154,7 +154,7 @@
 <div class="cancel-container">
     <!-- Step Indicator -->
     <div class="cancel-step-indicator">
-        <div class="cancel-step-dot {% if step == 'survey' %}active{% else %}completed{% endif %}"></div>
+        <div class="cancel-step-dot {% if step == 'survey' %}active{% elif step in ('offer', 'confirm') %}completed{% endif %}"></div>
         <div class="cancel-step-dot {% if step == 'offer' %}active{% elif step == 'confirm' %}completed{% endif %}"></div>
         <div class="cancel-step-dot {% if step == 'confirm' %}active{% endif %}"></div>
     </div>
@@ -341,7 +341,7 @@
         <a href="{{ url_for('account_settings') }}" class="btn btn-primary">Keep My Subscription</a>
         <form method="POST" action="{{ url_for('account_cancel') }}" style="margin: 0;">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="step" value="confirm">
+            <input type="hidden" name="step" value="show_confirm">
             <button type="submit" class="btn btn-secondary" style="border-color: var(--text-muted); color: var(--text-muted);">Continue to Cancel</button>
         </form>
     </div>

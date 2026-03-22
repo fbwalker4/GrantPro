@@ -822,18 +822,25 @@
                 </div>
                 {% elif _user_status == 'paused' %}
                 <div style="background: var(--accent-warning); color: #000; padding: 12px 24px; text-align: center; font-weight: 500; font-size: 0.9rem; border-radius: var(--radius-md); margin-bottom: 1rem;">
-                    Your subscription is paused until {{ pause_ends_at }}. <a href="{{ url_for('account_reactivate') }}" style="color: #000; font-weight: 700; text-decoration: underline;">Reactivate Now</a>
+                    Your subscription is paused until {{ pause_ends_at }}.
+                    <form method="POST" action="{{ url_for('account_reactivate') }}" style="display: inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" style="background: none; border: none; color: #000; font-weight: 700; text-decoration: underline; cursor: pointer; font-size: inherit; font-family: inherit; padding: 0;">Reactivate Now</button>
+                    </form>
                 </div>
                 {% elif _user_status == 'suspended' %}
                 <div style="background: var(--accent-danger); color: #fff; padding: 12px 24px; text-align: center; font-weight: 500; font-size: 0.9rem; border-radius: var(--radius-md); margin-bottom: 1rem;">
                     Your account is suspended. Your data will be preserved until {{ suspension_deletion_date }}.
                     <a href="{{ url_for('subscription_manage') }}" style="color: #fff; font-weight: 700; text-decoration: underline;">Update Payment</a> |
-                    <a href="{{ url_for('account_settings') }}" style="color: #fff; font-weight: 700; text-decoration: underline;">Export Data</a>
+                    <a href="{{ url_for('account_export_data') }}" style="color: #fff; font-weight: 700; text-decoration: underline;">Export Data</a>
                 </div>
                 {% elif _user_status == 'pending_deletion' %}
                 <div style="background: var(--accent-danger); color: #fff; padding: 12px 24px; text-align: center; font-weight: 500; font-size: 0.9rem; border-radius: var(--radius-md); margin-bottom: 1rem;">
                     Your account is scheduled for deletion. All data will be permanently removed soon.
-                    <a href="{{ url_for('account_cancel_deletion') }}" style="color: #fff; font-weight: 700; text-decoration: underline;">Cancel Deletion</a>
+                    <form method="POST" action="{{ url_for('account_cancel_deletion') }}" style="display: inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" style="background: none; border: none; color: #fff; font-weight: 700; text-decoration: underline; cursor: pointer; font-size: inherit; font-family: inherit; padding: 0;">Cancel Deletion</button>
+                    </form>
                 </div>
                 {% endif %}
             {% endif %}

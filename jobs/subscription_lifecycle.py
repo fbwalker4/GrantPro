@@ -283,9 +283,10 @@ def mark_pending_deletions():
 
         c.execute('''UPDATE users SET
                       subscription_status = 'pending_deletion',
+                      deleted_at = ?,
                       updated_at = ?
                       WHERE id = ?''',
-                  (now.isoformat(), user_id))
+                  (now.isoformat(), now.isoformat(), user_id))
         count += 1
         logger.info("Marked user %s (%s) as pending_deletion.", user_id, email)
 

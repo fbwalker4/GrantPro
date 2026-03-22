@@ -965,6 +965,13 @@ app.run(debug=True, host='0.0.0.0', port=5001)
 
 ## Changelog
 
+### 2026-03-22 (Security + QA: Red Team / Blue Team Sweep)
+
+20 fixes from user agent walkthrough + red team security audit:
+- **CRITICAL:** Added CSRF protection to account_delete, account_reactivate (now POST-only), account_cancel_deletion (now POST-only). Fixed cancel flow step collision that skipped final confirmation. Fixed cancel_deletion restoring wrong status. Blocked pending_deletion users in paid_required.
+- **HIGH:** Removed duplicate cancellation email. HTML-escaped all user data in email templates (prevents phishing via crafted names). Added try/except for pause months input. Rate-limited export generation (3/hour). Added path traversal validation on export downloads. Expanded sensitive field exclusion in exports (stripe IDs, verification tokens). Hashed email in deletion tombstones for GDPR compliance.
+- **MEDIUM:** Atomic SQL increment for dunning counter (prevents race condition). Webhook idempotency check (prevents duplicate processing). Server-side validation of cancel reasons. Generic error messages (no internal detail leaks). Fixed mark_pending_deletions to set deleted_at (fixes never-purged suspended accounts). Restore plan_before_suspension on payment recovery. Fixed export link in suspended banner. Fixed plan tier ordering for downgrade validation. Changed pause limit to rolling 365-day window.
+
 ### 2026-03-22 (Phase 6: Account Deletion)
 
 - Added purge_user_data() function that cascades through all 20+ user-linked tables in correct FK order

@@ -122,7 +122,10 @@
             </div>
             <div style="margin-top: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
                 {% if sub_status and sub_status.status == 'paused' %}
-                    <a href="{{ url_for('account_reactivate') }}" class="btn btn-primary">Reactivate Now</a>
+                    <form method="POST" action="{{ url_for('account_reactivate') }}" style="display: inline; margin: 0;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-primary">Reactivate Now</button>
+                    </form>
                 {% elif sub_status and sub_status.plan != 'free' and sub_status.status not in ('canceling', 'cancelled') %}
                     <a href="{{ url_for('subscription_manage') }}" class="btn btn-secondary">Manage Billing</a>
                 {% elif not sub_status or sub_status.plan == 'free' %}

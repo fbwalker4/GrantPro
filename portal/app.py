@@ -316,10 +316,12 @@ def paid_required(f):
             flash('This feature requires a paid plan. Upgrade to get started.', 'info')
             return redirect(url_for('upgrade'))
         # Block suspended or paused users
-        if user.get('subscription_status') in ('suspended', 'paused'):
+        if user.get('subscription_status') in ('suspended', 'paused', 'pending_deletion'):
             status_label = user.get('subscription_status')
             if status_label == 'suspended':
                 flash('Your account is suspended due to a payment issue. Please update your payment method to continue.', 'warning')
+            elif status_label == 'pending_deletion':
+                flash('Your account is scheduled for deletion. Please cancel the deletion to continue.', 'warning')
             else:
                 flash('Your account is currently paused. Please reactivate to continue.', 'warning')
             return redirect(url_for('account_settings'))
@@ -1260,7 +1262,10 @@ def account_cancel():
 
         if step == 'survey':
             # Step 1: Record reason, show retention offer
+            VALID_REASONS = {'too_expensive', 'not_using', 'switching', 'other'}
             reason = request.form.get('reason', 'other')
+            if reason not in VALID_REASONS:
+                reason = 'other'
             session['cancel_reason'] = reason
             # Fetch data counts for impact display on offer page
             conn = get_connection()
@@ -1277,19 +1282,17 @@ def account_cancel():
             return render_template('account_cancel.html', user=user, sub_status=sub_status, step='offer', reason=reason,
                                   grant_count=grant_count, saved_count=saved_count, doc_count=doc_count, client_count=client_count)
 
+        elif step == 'show_confirm':
+            # Step 2.5: Show the final confirmation page
+            return render_template('account_cancel.html', user=user, sub_status=sub_status, step='confirm')
+
         elif step == 'confirm':
             # Step 3: Actually cancel
             reason = session.pop('cancel_reason', 'unknown')
             success, message = stripe_payment.cancel_subscription(user['id'], reason=reason)
 
             if success:
-                # Send confirmation email
-                try:
-                    from email_system import send_cancellation_confirmation
-                    end_date = sub_status.get('end', 'your current billing period')
-                    send_cancellation_confirmation(user['email'], user.get('first_name', 'there'), end_date)
-                except Exception:
-                    pass
+                # Email is already sent by cancel_subscription() in stripe_payment.py
                 flash('Your subscription has been canceled. You will have access until the end of your current billing period.', 'success')
             else:
                 flash(f'Could not cancel: {message}', 'error')
@@ -1322,10 +1325,11 @@ def account_downgrade():
     target_plan = request.form.get('target_plan', 'monthly')
 
     # Validate target plan is lower than current
-    plan_order = ['free', 'monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_unlimited']
+    # Annual is same tier as monthly (just different billing), so allow "downgrade" between them
+    plan_tier = {'free': 0, 'monthly': 1, 'annual': 1, 'enterprise_5': 2, 'enterprise_10': 3, 'enterprise_unlimited': 4}
     current_plan = user.get('plan', 'free')
 
-    if target_plan not in plan_order or plan_order.index(target_plan) >= plan_order.index(current_plan):
+    if target_plan not in plan_tier or plan_tier[target_plan] >= plan_tier.get(current_plan, 0):
         flash('Invalid downgrade target.', 'error')
         return redirect(url_for('account_cancel'))
 
@@ -1345,7 +1349,11 @@ def account_downgrade():
 def account_pause():
     """Pause subscription for 1 or 3 months"""
     user = get_current_user()
-    months = int(request.form.get('months', 1))
+    try:
+        months = int(request.form.get('months', 1))
+    except (ValueError, TypeError):
+        flash('Invalid pause duration.', 'error')
+        return redirect(url_for('account_settings'))
 
     if months not in (1, 3):
         flash('Invalid pause duration.', 'error')
@@ -1387,8 +1395,9 @@ def account_pause():
     return redirect(url_for('account_settings'))
 
 
-@app.route('/account/reactivate', methods=['GET', 'POST'])
+@app.route('/account/reactivate', methods=['POST'])
 @login_required
+@csrf_required
 def account_reactivate():
     """Reactivate a paused subscription"""
     user = get_current_user()
@@ -1469,15 +1478,27 @@ def account_export_generate():
     user = get_current_user()
     user_id = user['id']
     now = datetime.now()
+
+    # Check for recent exports (max 3 per hour)
+    conn = get_connection()
+    c = conn.cursor()
+    try:
+        c.execute("SELECT COUNT(*) FROM data_exports WHERE user_id = ? AND requested_at > ?",
+                  (user_id, (now - timedelta(hours=1)).isoformat()))
+        recent_count = c.fetchone()[0]
+        if recent_count >= 3:
+            flash('You can only generate 3 exports per hour. Please try again later.', 'warning')
+            conn.close()
+            return redirect(url_for('account_export_data'))
+    except Exception:
+        pass  # Table may not exist yet
+
     export_id = f"export-{now.strftime('%Y%m%d%H%M%S')}-{secrets.token_hex(4)}"
 
     # Create export directory
     export_dir = Path.home() / '.hermes' / 'grant-system' / 'output' / 'exports'
     export_dir.mkdir(parents=True, exist_ok=True)
     zip_path = export_dir / f"{export_id}.zip"
-
-    conn = get_connection()
-    c = conn.cursor()
 
     grants = []
     budgets = []
@@ -1487,8 +1508,9 @@ def account_export_generate():
 
     try:
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
-            # 1. User profile (JSON) - exclude password_hash
-            user_data = {k: v for k, v in user.items() if k not in ('password_hash',)}
+            # 1. User profile (JSON) - exclude sensitive fields
+            EXPORT_EXCLUDE = {'password_hash', 'verification_token', 'stripe_customer_id', 'stripe_subscription_id'}
+            user_data = {k: v for k, v in user.items() if k not in EXPORT_EXCLUDE}
             zf.writestr('profile/user_profile.json', json.dumps(user_data, indent=2, default=str))
 
             # 2. Organization details (JSON)
@@ -1622,7 +1644,7 @@ def account_export_generate():
 
         flash('Your data export is ready for download.', 'success')
     except Exception as e:
-        flash(f'Export failed: {str(e)}', 'error')
+        flash('Export generation failed. Please try again.', 'error')
         logger.error(f'Data export failed for {user_id}: {e}')
     finally:
         conn.close()
@@ -1660,6 +1682,11 @@ def account_export_download(export_id):
         return redirect(url_for('account_export_data'))
 
     file_path = Path(export['file_path'])
+    export_dir = Path.home() / '.hermes' / 'grant-system' / 'output' / 'exports'
+    if not file_path.resolve().is_relative_to(export_dir.resolve()):
+        flash('Invalid export path.', 'error')
+        conn.close()
+        return redirect(url_for('account_export_data'))
     if not file_path.exists():
         flash('Export file no longer exists.', 'error')
         conn.close()
@@ -1680,6 +1707,7 @@ def account_export_download(export_id):
 
 @app.route('/account/delete', methods=['GET', 'POST'])
 @login_required
+@csrf_required
 def account_delete():
     """Full-page account deletion flow"""
     user = get_current_user()
@@ -1774,8 +1802,9 @@ def account_delete():
                           doc_count=doc_count, client_count=client_count)
 
 
-@app.route('/account/cancel-deletion', methods=['GET', 'POST'])
+@app.route('/account/cancel-deletion', methods=['POST'])
 @login_required
+@csrf_required
 def account_cancel_deletion():
     """Cancel a pending account deletion within the 72-hour grace period"""
     user = get_current_user()
