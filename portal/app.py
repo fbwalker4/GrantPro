@@ -5262,19 +5262,40 @@ def _build_checklist_data(grant_id, user_id, template_name):
                 data_ready = True
                 status_note = 'Ready to generate'
 
-            # If already uploaded, mark as complete regardless
+            requires_signed = doc.get('requires_signed_upload', False)
+
+            # If already uploaded, check whether it's a signed upload or just an AI draft
             if uploaded:
-                checklist_documents.append({
-                    'type': doc_type,
-                    'name': doc.get('name', doc_type),
-                    'description': doc.get('description', ''),
-                    'required': doc.get('required', False),
-                    'can_generate': True,
-                    'uploaded': True,
-                    'doc_id': uploaded['id'],
-                    'form_number': form_number,
-                    'status_note': 'Document uploaded',
-                })
+                if requires_signed and uploaded.get('generated'):
+                    # Only an AI-generated draft exists — not complete until signed version uploaded
+                    checklist_documents.append({
+                        'type': doc_type,
+                        'name': doc.get('name', doc_type),
+                        'description': doc.get('description', ''),
+                        'required': doc.get('required', False),
+                        'can_generate': True,
+                        'requires_signed_upload': True,
+                        'uploaded': True,
+                        'draft_only': True,
+                        'doc_id': uploaded['id'],
+                        'data_ready': True,
+                        'form_number': form_number,
+                        'status_note': 'Draft generated. Upload the signed version to complete this requirement.',
+                    })
+                else:
+                    checklist_documents.append({
+                        'type': doc_type,
+                        'name': doc.get('name', doc_type),
+                        'description': doc.get('description', ''),
+                        'required': doc.get('required', False),
+                        'can_generate': True,
+                        'requires_signed_upload': requires_signed,
+                        'uploaded': True,
+                        'draft_only': False,
+                        'doc_id': uploaded['id'],
+                        'form_number': form_number,
+                        'status_note': 'Signed document uploaded' if requires_signed else 'Document uploaded',
+                    })
             else:
                 checklist_documents.append({
                     'type': doc_type,
@@ -5282,7 +5303,9 @@ def _build_checklist_data(grant_id, user_id, template_name):
                     'description': doc.get('description', ''),
                     'required': doc.get('required', False),
                     'can_generate': True,
+                    'requires_signed_upload': requires_signed,
                     'uploaded': False,
+                    'draft_only': False,
                     'doc_id': None,
                     'data_ready': data_ready,
                     'form_number': form_number,
@@ -5352,13 +5375,13 @@ def _build_checklist_data(grant_id, user_id, template_name):
         total_count += 1
         if d['required']:
             total_required += 1
-            if d['uploaded']:
+            if d['uploaded'] and not d.get('draft_only'):
                 completed_count += 1
             elif d.get('can_generate') and d.get('data_ready'):
                 # Generatable and data exists -- count as ready (not complete until generated)
                 pass  # Not counted as complete -- must actually generate/upload
         else:
-            if d['uploaded']:
+            if d['uploaded'] and not d.get('draft_only'):
                 completed_count += 1
 
     # Certifications

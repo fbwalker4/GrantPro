@@ -177,8 +177,10 @@
           "name": "Letters of Collaboration",
           "description": "Letters from partner organizations confirming their role. Must use NSF-approved format with brief, factual statements only.",
           "required": false,
-          "can_generate": false,
-          "upload_instructions": "Upload signed letters of support from partner organizations. Each letter should be on the organization's letterhead, signed by an authorized representative, and specific to this project.",
+          "can_generate": true,
+          "requires_signed_upload": true,
+          "generate_prompt": "Draft a letter of collaboration from [partner] confirming their role in [project]. Use the NSF-approved format: brief, factual statements only. State the collaborator's name, organization, and specific contribution. Do NOT include endorsements or praise — NSF restricts letters of collaboration to factual commitments. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED.",
+          "upload_instructions": "After generating a draft, print it, have the partner review and edit it, then get it signed on their letterhead. Upload the signed version here.",
           "form_number": "N/A"
         },
         {
@@ -492,8 +494,10 @@
           "form_number": "N/A",
           "description": "Letters from collaborators, partners, and resource providers confirming their commitment and roles in the project",
           "required": false,
-          "can_generate": false,
-          "upload_instructions": "Obtain signed letters of commitment from all collaborators and partners, then upload as a single PDF."
+          "can_generate": true,
+          "requires_signed_upload": true,
+          "generate_prompt": "Draft a letter of commitment from [partner] confirming their role and resource contributions to [project] for a DOE grant application. Include the partner's specific commitments (facilities, equipment, personnel, expertise), the duration of their involvement, and any cost-sharing contributions. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED.",
+          "upload_instructions": "After generating a draft, print it, have the partner review and edit it, then get it signed on their letterhead. Upload the signed version here."
         }
       ],
       "eligibility": {
@@ -710,8 +714,10 @@
           "name": "Letters of Support",
           "description": "Letters from collaborators, consultants, and resource providers",
           "required": false,
-          "can_generate": false,
-          "upload_instructions": "Upload signed letters of support from partner organizations. Each letter should be on the organization's letterhead, signed by an authorized representative, and specific to this project."
+          "can_generate": true,
+          "requires_signed_upload": true,
+          "generate_prompt": "Draft a letter of support from [partner] confirming their role in [project] for an NIH grant application. Include the collaborator's qualifications, their specific contribution to the project, and any resources they will provide. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED.",
+          "upload_instructions": "After generating a draft, print it, have the partner review and edit it, then get it signed on their letterhead. Upload the signed version here."
         },
         {
           "type": "consortium_agreement",
@@ -1625,8 +1631,10 @@
           "form_number": "N/A",
           "description": "Letters from industry partners and collaborators confirming their roles and commitment to the project",
           "required": false,
-          "can_generate": false,
-          "upload_instructions": "Obtain signed letters of support from industry partners and collaborators, then upload as PDF."
+          "can_generate": true,
+          "requires_signed_upload": true,
+          "generate_prompt": "Draft a letter of support from [partner] confirming their role in [project] for a NIST grant application. Include the industry partner's commitment, specific technical contributions, and any cost-sharing or in-kind support. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED.",
+          "upload_instructions": "After generating a draft, print it, have the partner review and edit it, then get it signed on their letterhead. Upload the signed version here."
         }
       ],
       "eligibility": {
@@ -1874,8 +1882,10 @@
           "name": "Letters of Support",
           "description": "Letters from collaborators, partners, or stakeholders confirming their commitment to the project.",
           "required": false,
-          "can_generate": false,
-          "upload_instructions": "Upload signed letters of support from partner organizations. Each letter should be on the organization's letterhead, signed by an authorized representative, and specific to this project.",
+          "can_generate": true,
+          "requires_signed_upload": true,
+          "generate_prompt": "Draft a letter of support from [partner] confirming their role in [project] for an HHS grant application. Include the partner's qualifications, their specific commitment, and how the partnership strengthens the project. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED.",
+          "upload_instructions": "After generating a draft, print it, have the partner review and edit it, then get it signed on their letterhead. Upload the signed version here.",
           "form_number": "N/A"
         },
         {
@@ -3054,8 +3064,10 @@
           "form_number": "N/A",
           "description": "Letters from community stakeholders, local officials, partner organizations, and residents demonstrating community backing for the project",
           "required": true,
-          "can_generate": false,
-          "upload_instructions": "Obtain signed letters of support from community members, local officials, and partner organizations. Upload as a single combined PDF."
+          "can_generate": true,
+          "requires_signed_upload": true,
+          "generate_prompt": "Draft a letter of support from [partner] confirming their backing for [project] as a community project grant. Include the stakeholder's connection to the community, their specific endorsement, and how they will support or benefit from the project. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED.",
+          "upload_instructions": "After generating a draft, print it, have the partner review and edit it, then get it signed on their letterhead. Upload the signed version here."
         }
       ],
       "compliance": {
@@ -3577,8 +3589,10 @@
           "name": "MOU with CHDO or Service Provider",
           "description": "Memorandum of Understanding with Community Housing Development Organization or service provider partner.",
           "required": false,
-          "can_generate": false,
-          "upload_instructions": "Upload a signed MOU between your organization and the CHDO or service provider. The MOU must be on official letterhead, signed by authorized representatives from both parties, and specific to this project.",
+          "can_generate": true,
+          "requires_signed_upload": true,
+          "generate_prompt": "Draft a Memorandum of Understanding (MOU) between [applicant organization] and [CHDO or service provider partner] for a HUD housing project. Include the purpose of the partnership, roles and responsibilities of each party, duration of the agreement, scope of services, and any resource commitments. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED BY BOTH PARTIES.",
+          "upload_instructions": "After generating a draft, print it, have both parties review and edit it, then get it signed by authorized representatives from both organizations on official letterhead. Upload the signed version here.",
           "form_number": "N/A"
         },
         {
@@ -4999,8 +5013,10 @@
           "name": "Letters of Support",
           "description": "Letters from law enforcement, community organizations, or government officials confirming partnership and support.",
           "required": false,
-          "can_generate": false,
-          "upload_instructions": "Upload signed letters of support from partner organizations. Each letter should be on the organization's letterhead, signed by an authorized representative, and specific to this project.",
+          "can_generate": true,
+          "requires_signed_upload": true,
+          "generate_prompt": "Draft a letter of support from [partner] confirming their partnership and support for [project] as part of a DOJ grant application. Include the partner's role (law enforcement, community organization, or government office), their specific commitment, and how the partnership advances public safety or justice goals. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED.",
+          "upload_instructions": "After generating a draft, print it, have the partner review and edit it, then get it signed on their letterhead. Upload the signed version here.",
           "form_number": "N/A"
         },
         {
@@ -5008,8 +5024,10 @@
           "name": "MOU with Partner Agencies",
           "description": "Memoranda of understanding with law enforcement, courts, or service providers detailing roles, services, and duration.",
           "required": false,
-          "can_generate": false,
-          "upload_instructions": "Upload signed MOUs with all partner agencies. Each MOU must be on official letterhead, signed by authorized representatives from both parties, and detail the roles, services, and duration of the partnership.",
+          "can_generate": true,
+          "requires_signed_upload": true,
+          "generate_prompt": "Draft a Memorandum of Understanding (MOU) between [applicant organization] and [partner agency] for a DOJ grant project. Include the purpose of the partnership, roles and responsibilities of each party, specific services to be provided, duration of the agreement, data sharing provisions, and any resource commitments. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED BY BOTH PARTIES.",
+          "upload_instructions": "After generating a draft, print it, have both parties review and edit it, then get it signed by authorized representatives from both organizations on official letterhead. Upload the signed version here.",
           "form_number": "N/A"
         }
       ],
