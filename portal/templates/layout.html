@@ -717,6 +717,9 @@
                         {% endfor %}
                     </select>
                 </form>
+                {% if user and user.plan in ['enterprise_5', 'enterprise_10', 'enterprise_unlimited'] %}
+                <a href="/client/new" style="display: block; text-align: center; font-size: 0.75rem; color: var(--accent-primary); margin-top: 0.4rem; text-decoration: none;">+ Add Organization</a>
+                {% endif %}
             </div>
             {% endif %}
 
@@ -742,6 +745,12 @@
                 <a href="/clients" class="nav-link {% if request.path.startswith('/client') %}active{% endif %}">
                     <span class="nav-link-icon">👥</span>
                     Clients
+                </a>
+                {% endif %}
+                {% if user and user.plan in ['enterprise_5', 'enterprise_10', 'enterprise_unlimited'] %}
+                <a href="/enterprise-dashboard" class="nav-link {% if request.path == '/enterprise-dashboard' %}active{% endif %}">
+                    <span class="nav-link-icon">🏢</span>
+                    All Organizations
                 </a>
                 {% endif %}
                 <a href="/my-grants" class="nav-link {% if request.path == '/my-grants' %}active{% endif %}">

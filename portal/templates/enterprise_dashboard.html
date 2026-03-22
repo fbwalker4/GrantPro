@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% block title %}All Organizations - Grant Pro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">All Organizations</h1>
+        <p class="page-subtitle">Enterprise overview of all your client organizations</p>
+    </div>
+    <a href="/client/new" class="btn btn-primary">+ Add Organization</a>
+</div>
+
+{% if orgs %}
+<div class="card">
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Organization</th>
+                    <th>Active Grants</th>
+                    <th>Submitted</th>
+                    <th>Funded Amount</th>
+                    <th>Next Deadline</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for org in orgs %}
+                <tr>
+                    <td>
+                        <div style="font-weight: 600;">{{ org.organization_name }}</div>
+                        {% if org.is_primary %}<span class="badge badge-purple">Your Org</span>{% endif %}
+                    </td>
+                    <td>{{ org.active_count }}</td>
+                    <td>{{ org.submitted_count }}</td>
+                    <td style="color: var(--accent-success); font-weight: 600;">
+                        {% if org.funded_total %}${{ "{:,.0f}".format(org.funded_total) }}{% else %}-{% endif %}
+                    </td>
+                    <td>
+                        {% if org.next_deadline %}
+                        <span style="color: var(--accent-warning);">{{ org.next_deadline }}</span>
+                        {% else %}
+                        <span style="color: var(--text-muted);">None</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="POST" action="/switch-org" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="org_id" value="{{ org.id }}">
+                            {% if org.id == active_org_id %}
+                            <span class="badge badge-green">Active</span>
+                            {% else %}
+                            <button type="submit" class="btn btn-secondary" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;">Switch to</button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="empty-state">
+        <div class="empty-icon">🏢</div>
+        <div class="empty-title">No Organizations Yet</div>
+        <p class="empty-text">Create your first organization to get started.</p>
+        <a href="/client/new" class="btn btn-primary">+ Add Organization</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

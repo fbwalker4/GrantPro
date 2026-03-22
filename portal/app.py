@@ -494,7 +494,7 @@ def inject_org_context():
         user_orgs=orgs,
         active_org_id=active_org_id,
         active_org_name=active_org_name,
-        show_org_switcher=len(orgs) > 1
+        show_org_switcher=len(orgs) > 1 or (user is not None and user.get('plan', '') in ('enterprise_5', 'enterprise_10', 'enterprise_unlimited'))
     )
 
 @app.context_processor
@@ -712,6 +712,61 @@ def switch_org():
     else:
         flash('Could not switch organization', 'error')
     return redirect(request.referrer or url_for('dashboard'))
+
+
+@app.route('/enterprise-dashboard')
+@login_required
+def enterprise_dashboard():
+    """Cross-client dashboard for enterprise users"""
+    user = get_current_user()
+    if user.get('plan') not in ('enterprise_5', 'enterprise_10', 'enterprise_unlimited'):
+        flash('Enterprise plan required for this feature.', 'error')
+        return redirect(url_for('dashboard'))
+
+    conn = get_db()
+    clients = conn.execute(
+        'SELECT id, organization_name, is_primary FROM clients WHERE user_id = ? ORDER BY is_primary DESC, organization_name',
+        (user['id'],)
+    ).fetchall()
+
+    orgs = []
+    for c in clients:
+        cid = c['id']
+        # Active grants (intake, drafting, review)
+        active_count = conn.execute(
+            "SELECT COUNT(*) FROM grants WHERE client_id = ? AND status IN ('intake','drafting','review')",
+            (cid,)
+        ).fetchone()[0]
+        # Submitted grants
+        submitted_count = conn.execute(
+            "SELECT COUNT(*) FROM grants WHERE client_id = ? AND status = 'submitted'",
+            (cid,)
+        ).fetchone()[0]
+        # Funded total
+        funded_row = conn.execute(
+            "SELECT COALESCE(SUM(amount), 0) FROM grants WHERE client_id = ? AND status = 'funded'",
+            (cid,)
+        ).fetchone()
+        funded_total = funded_row[0] if funded_row else 0
+        # Next deadline
+        deadline_row = conn.execute(
+            "SELECT deadline FROM grants WHERE client_id = ? AND status IN ('intake','drafting','review') AND deadline IS NOT NULL AND deadline != '' ORDER BY deadline ASC LIMIT 1",
+            (cid,)
+        ).fetchone()
+        next_deadline = deadline_row['deadline'] if deadline_row else None
+
+        orgs.append({
+            'id': cid,
+            'organization_name': c['organization_name'],
+            'is_primary': c['is_primary'],
+            'active_count': active_count,
+            'submitted_count': submitted_count,
+            'funded_total': funded_total,
+            'next_deadline': next_deadline,
+        })
+    conn.close()
+
+    return render_template('enterprise_dashboard.html', orgs=orgs)
 
 
 @app.route('/upgrade', methods=['GET', 'POST'])
@@ -988,23 +1043,38 @@ def dashboard():
                 saved_details.append(grant_copy)
                 break
 
-    # Get active grants (in progress)
-    active_grants_list = user_models.get_user_grants(user['id'])
+    # Get active grants (in progress) - filter by active org if set
+    active_org = get_active_org_id()
+    if active_org:
+        conn = get_db()
+        active_grants_list_rows = conn.execute('''
+            SELECT g.*, c.organization_name, c.contact_name
+            FROM grants g
+            JOIN clients c ON g.client_id = c.id
+            WHERE g.client_id = ?
+            ORDER BY g.assigned_at DESC
+        ''', (active_org,)).fetchall()
+        conn.close()
+        active_grants_list = [dict(r) for r in active_grants_list_rows]
+    else:
+        # Fallback: all grants for this user (backwards compatible)
+        active_grants_list = user_models.get_user_grants(user['id'])
 
-    # Enhance with grant details
+    # Enhance with grant details from research database
     all_grants = grant_researcher.get_all_grants()
     enhanced_list = []
-    for app in active_grants_list:
+    for app_item in active_grants_list:
         grant_detail = None
+        grant_id_key = app_item.get('grant_id') or app_item.get('id')
         for g in all_grants:
-            if g['id'] == app.get('grant_id'):
+            if g['id'] == grant_id_key:
                 grant_detail = g
                 break
 
         if grant_detail:
-            app['grant'] = grant_detail
-            app['client'] = {'name': 'Direct'}
-            enhanced_list.append(app)
+            app_item['grant'] = grant_detail
+        app_item.setdefault('client', {'name': app_item.get('organization_name', 'Direct')})
+        enhanced_list.append(app_item)
 
     active_grants_list = enhanced_list
 
@@ -1136,13 +1206,54 @@ def onboarding():
                     'status': request.form.getlist('grant_status')[i] if i < len(request.form.getlist('grant_status')) else 'completed',
                 })
         
-        # Save everything
+        # Save everything to user-level org tables
         user_models.save_organization_details(user['id'], {
             'organization_details': org_details,
             'organization_profile': org_profile,
             'focus_areas': focus_areas,
             'past_grants': past_grants,
         })
+
+        # For enterprise users with an active org, also sync key fields to the client record
+        active_org = get_active_org_id()
+        if active_org:
+            try:
+                client_updates = {}
+                if org_name:
+                    client_updates['organization_name'] = org_name
+                if org_details.get('ein'):
+                    client_updates['ein'] = org_details['ein']
+                if org_details.get('uei'):
+                    client_updates['uei'] = org_details['uei']
+                if org_details.get('address_line1'):
+                    client_updates['address_line1'] = org_details['address_line1']
+                if org_details.get('city'):
+                    client_updates['city'] = org_details['city']
+                if org_details.get('state'):
+                    client_updates['state'] = org_details['state']
+                if org_details.get('zip_code'):
+                    client_updates['zip_code'] = org_details['zip_code']
+                if org_details.get('phone'):
+                    client_updates['phone'] = org_details['phone']
+                if org_details.get('website'):
+                    client_updates['website'] = org_details['website']
+                if org_type:
+                    client_updates['org_type'] = org_type
+                if org_profile.get('mission_statement'):
+                    client_updates['mission'] = org_profile['mission_statement']
+                if org_profile.get('annual_revenue'):
+                    client_updates['annual_budget'] = org_profile['annual_revenue']
+                if client_updates:
+                    set_clause = ', '.join(f"{k} = ?" for k in client_updates.keys())
+                    conn_sync = get_db()
+                    conn_sync.execute(
+                        f"UPDATE clients SET {set_clause}, updated_at = ? WHERE id = ? AND user_id = ?",
+                        list(client_updates.values()) + [datetime.now().isoformat(), active_org, user['id']]
+                    )
+                    conn_sync.commit()
+                    conn_sync.close()
+            except Exception:
+                logger.warning(f'Failed to sync onboarding data to client {active_org}')
 
         # Save grant readiness data
         funding_purposes_list = request.form.getlist('funding_purposes')
@@ -1925,15 +2036,25 @@ def my_grants():
     """List all grant applications for current user"""
     user = get_current_user()
     
-    # Get grants directly from local database
+    # Get grants directly from local database - filter by active org if set
+    active_org = get_active_org_id()
     conn = get_db()
-    my_local_grants = conn.execute('''
-        SELECT g.*, c.organization_name, c.contact_name
-        FROM grants g 
-        JOIN clients c ON g.client_id = c.id
-        WHERE c.user_id = ?
-        ORDER BY g.assigned_at DESC
-    ''', (user['id'],)).fetchall()
+    if active_org:
+        my_local_grants = conn.execute('''
+            SELECT g.*, c.organization_name, c.contact_name
+            FROM grants g
+            JOIN clients c ON g.client_id = c.id
+            WHERE g.client_id = ?
+            ORDER BY g.assigned_at DESC
+        ''', (active_org,)).fetchall()
+    else:
+        my_local_grants = conn.execute('''
+            SELECT g.*, c.organization_name, c.contact_name
+            FROM grants g
+            JOIN clients c ON g.client_id = c.id
+            WHERE c.user_id = ?
+            ORDER BY g.assigned_at DESC
+        ''', (user['id'],)).fetchall()
     
     # Convert to list of dicts
     grants = []
@@ -2030,6 +2151,12 @@ def new_client():
 
         conn.commit()
         conn.close()
+
+        # For enterprise users, switch to the new org and redirect to onboarding
+        if user.get('plan') in ('enterprise_5', 'enterprise_10', 'enterprise_unlimited'):
+            set_active_org(client_id)
+            flash(f'Organization created: {org_name}. Complete onboarding for this organization.', 'success')
+            return redirect(url_for('onboarding'))
 
         flash(f'Client created: {org_name}', 'success')
         return redirect(url_for('client_detail', client_id=client_id))
@@ -2236,7 +2363,7 @@ def start_application(grant_id):
         (user_id,)
     ).fetchall()
     conn.close()
-    
+
     if not clients:
         # Auto-create a "self" client for non-enterprise users
         user = get_current_user()
@@ -2258,16 +2385,26 @@ def start_application(grant_id):
             (user_id,)
         ).fetchall()
         conn.close()
-    
+
+    # If active org is set, auto-assign to it (enterprise org switcher)
+    active_org = get_active_org_id()
+    auto_client_id = None
+    if active_org:
+        # Verify it's in the user's client list
+        for c in clients:
+            cid = dict(c)['id'] if isinstance(c, sqlite3.Row) else c[0]
+            if cid == active_org:
+                auto_client_id = active_org
+                break
+
     # Auto-select if only one client (skip selection page)
-    if len(clients) == 1 and request.method == 'GET':
+    if not auto_client_id and len(clients) == 1 and request.method == 'GET':
         from werkzeug.datastructures import ImmutableMultiDict
         # Simulate POST with the single client
-        request_client_id = dict(clients[0])['id'] if isinstance(clients[0], sqlite3.Row) else clients[0][0]
-        # Redirect as POST by setting client_id and falling through
+        auto_client_id = dict(clients[0])['id'] if isinstance(clients[0], sqlite3.Row) else clients[0][0]
 
-    if request.method == 'POST' or (len(clients) == 1 and request.method == 'GET'):
-        client_id = request.form.get('client_id') if request.method == 'POST' else (dict(clients[0])['id'] if isinstance(clients[0], sqlite3.Row) else clients[0][0])
+    if request.method == 'POST' or auto_client_id:
+        client_id = request.form.get('client_id') if request.method == 'POST' and not auto_client_id else (auto_client_id or (dict(clients[0])['id'] if isinstance(clients[0], sqlite3.Row) else clients[0][0]))
         if not client_id:
             flash('Please select a client', 'error')
             return redirect(url_for('start_application', grant_id=grant_id))
