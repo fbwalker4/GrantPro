@@ -502,19 +502,33 @@ def verify_password_reset(token):
 
 
 def use_password_reset(token, new_password):
-    """Complete password reset"""
-    email, error = verify_password_reset(token)
-    if error:
-        return False, error
-    
+    """Complete password reset — atomic verify + use to prevent TOCTOU race."""
     conn = get_connection()
     c = conn.cursor()
-    
+
+    # Verify and mark used in a single transaction
+    c.execute('SELECT email, expires_at, used FROM password_resets WHERE token = ?', (token,))
+    row = c.fetchone()
+    if not row:
+        conn.close()
+        return False, "Invalid or expired reset link"
+
+    email = row['email'] if isinstance(row, dict) else row[0]
+    expires_at = row['expires_at'] if isinstance(row, dict) else row[1]
+    used = row['used'] if isinstance(row, dict) else row[2]
+
+    if used:
+        conn.close()
+        return False, "This reset link has already been used"
+    if datetime.now() > datetime.fromisoformat(str(expires_at)):
+        conn.close()
+        return False, "This reset link has expired"
+
     password_hash = hash_password(new_password)
-    c.execute('UPDATE users SET password_hash = ?, updated_at = ? WHERE email = ?', 
+    c.execute('UPDATE users SET password_hash = ?, updated_at = ? WHERE email = ?',
               (password_hash, datetime.now().isoformat(), email))
     c.execute('UPDATE password_resets SET used = 1 WHERE token = ?', (token,))
-    
+
     conn.commit()
     conn.close()
     return True, None

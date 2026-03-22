@@ -143,8 +143,9 @@ def check_rate_limit(ip, endpoint, max_requests=10, window=60):
                 (f"rl-{secrets.token_hex(8)}", '', '', key, datetime.now().isoformat()))
             conn.commit()
             conn.close()
-        except Exception:
-            pass  # Fail open — don't block requests if DB is unavailable
+        except Exception as e:
+            logger.warning(f'Rate limiter DB check failed (fail-closed): {e}')
+            return False  # Fail closed — deny if we can't verify rate limit
 
     return True
 
@@ -207,10 +208,17 @@ def csrf_required_allow_guest(f):
             # Only enforce CSRF for logged-in users
             token = request.form.get('csrf_token') or request.headers.get('X-CSRF-Token') or request.headers.get('X-CSRFToken')
             expected = session.get('csrf_token')
-            if token != expected:
+            if not token or not expected or not hmac.compare_digest(str(token), str(expected)):
                 return jsonify({'error': 'CSRF token validation failed'}), 403
         return f(*args, **kwargs)
     return decorated_function
+
+def _safe_referrer(fallback='dashboard'):
+    """Return request.referrer only if it's same-origin, else fallback."""
+    ref = request.referrer
+    if ref and ref.startswith(request.host_url):
+        return ref
+    return url_for(fallback) if '/' not in fallback else fallback
 
 # ============ SECURITY HEADERS ============
 
@@ -226,6 +234,9 @@ def add_security_headers(response):
     response.headers['X-Frame-Options'] = 'DENY'
     # Prevent MIME-type sniffing
     response.headers['X-Content-Type-Options'] = 'nosniff'
+    # HSTS — enforce HTTPS in production
+    if os.environ.get('VERCEL'):
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     # XSS protection (legacy browsers)
     response.headers['X-XSS-Protection'] = '1; mode=block'
     # Content Security Policy - strict default
@@ -605,6 +616,8 @@ def login():
         user = user_models.get_user_by_email(email)
         
         if user and user_models.verify_password(password, user['password_hash']):
+            # Regenerate session to prevent session fixation
+            session.clear()
             session['user_id'] = user['id']
             session['user_name'] = user['first_name'] or user['email']
             user_models.update_last_login(user['id'])
@@ -711,7 +724,7 @@ def switch_org():
         flash('Switched organization', 'success')
     else:
         flash('Could not switch organization', 'error')
-    return redirect(request.referrer or url_for('dashboard'))
+    return redirect(_safe_referrer('dashboard'))
 
 
 @app.route('/enterprise-dashboard')
@@ -1472,7 +1485,7 @@ def check_eligibility():
     """Check eligibility for a specific grant"""
     # Check CSRF token for API
     token = request.headers.get('X-CSRF-Token')
-    if token != session.get('csrf_token'):
+    if not token or not hmac.compare_digest(str(token), str(session.get('csrf_token', ''))):
         return jsonify({'eligible': False, 'reason': 'CSRF validation failed'}), 403
     
     data = request.json
@@ -1712,7 +1725,7 @@ def _api_save_grant_impl():
         success = user_models.save_grant(session['user_id'], grant_id, notes)
         if request.form:
             flash('Grant saved!', 'success')
-            return redirect(request.referrer or url_for('grants'))
+            return redirect(_safe_referrer('grants'))
         return jsonify({'success': success, 'logged_in': True})
     else:
         # Guest user - save to leads with saved grants
@@ -1758,7 +1771,7 @@ def api_unsave_grant():
     """Remove a grant from favorites"""
     # Check CSRF token for API
     token = request.headers.get('X-CSRF-Token')
-    if token != session.get('csrf_token'):
+    if not token or not hmac.compare_digest(str(token), str(session.get('csrf_token', ''))):
         return jsonify({'success': False, 'error': 'CSRF validation failed'}), 403
     
     data = request.json
@@ -1789,7 +1802,7 @@ def api_request_template():
     
     if not email:
         flash('Email is required to request a template', 'error')
-        return redirect(request.referrer or '/grants')
+        return redirect(_safe_referrer('/grants'))
     
     # In production, this would send an email to the admin
     # For now, we'll log it and show a success message
@@ -1827,7 +1840,7 @@ def api_request_template():
         json.dump(requests, f, indent=2)
     
     flash('Template request received! We\'ll notify you when the template is ready.', 'success')
-    return redirect(request.referrer or '/grants')
+    return redirect(_safe_referrer('/grants'))
 
 
 # ============ ADMIN ROUTES (Internal) ============
@@ -2283,22 +2296,30 @@ def new_grant(client_id):
     available_grants = grant_researcher.get_all_grants()
     
     if request.method == 'POST':
+        # Enforce grant creation limit
+        can_create, limit_msg, _ = user_models.check_grant_limit(session['user_id'])
+        if not can_create:
+            conn.close()
+            flash(limit_msg, 'error')
+            return redirect(url_for('upgrade'))
+
         grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
         now = datetime.now().isoformat()
-        
+
         grant_name = request.form.get('grant_name')
         agency = request.form.get('agency')
         amount = request.form.get('amount')
         deadline = request.form.get('deadline')
-        
+
         conn.execute('''
             INSERT INTO grants (id, client_id, grant_name, agency, amount, deadline, status, assigned_at)
             VALUES (?, ?, ?, ?, ?, ?, 'assigned', ?)
         ''', (grant_id, client_id, grant_name, agency, amount, deadline, now))
-        
+
         conn.commit()
+        user_models.increment_grant_count(session['user_id'])
         conn.close()
-        
+
         flash(f'Grant assigned: {grant_name}', 'success')
         return redirect(url_for('grant_detail', grant_id=grant_id))
     
@@ -2408,7 +2429,13 @@ def start_application(grant_id):
         if not client_id:
             flash('Please select a client', 'error')
             return redirect(url_for('start_application', grant_id=grant_id))
-        
+
+        # Enforce grant creation limit
+        can_create, limit_msg, _ = user_models.check_grant_limit(session['user_id'])
+        if not can_create:
+            flash(limit_msg, 'error')
+            return redirect(url_for('upgrade'))
+
         # Create the grant for this client
         new_grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
         
@@ -2459,11 +2486,12 @@ def start_application(grant_id):
         ''', (f"app-{new_grant_id}", user_id, new_grant_id, datetime.now().isoformat(), datetime.now().isoformat()))
         
         conn.commit()
+        user_models.increment_grant_count(session['user_id'])
         conn.close()
-        
+
         flash(f'Grant started for {research_grant.get("title", "grant")}', 'success')
         return redirect(url_for('grant_detail', grant_id=new_grant_id))
-    
+
     return render_template('select_client_for_grant.html', grant=research_grant, clients=clients)
 
 
@@ -4111,7 +4139,7 @@ def download_grant(grant_id, fmt):
             io.BytesIO(full_content.encode('utf-8')),
             mimetype='text/plain',
             as_attachment=True,
-            download_name=f"{grant['grant_name'].replace(' ', '_')}.txt"
+            download_name=f"{secure_filename(grant['grant_name']) or 'grant'}.txt"
         )
     
     elif fmt == 'docx':
@@ -4150,7 +4178,7 @@ def download_grant(grant_id, fmt):
                 buffer,
                 mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                 as_attachment=True,
-                download_name=f"{grant['grant_name'].replace(' ', '_')}.docx"
+                download_name=f"{secure_filename(grant['grant_name']) or 'grant'}.docx"
             )
         except ImportError:
             # Fallback to txt if python-docx not installed
@@ -4377,7 +4405,7 @@ def download_grant(grant_id, fmt):
                 buffer,
                 mimetype='application/pdf',
                 as_attachment=True,
-                download_name=f"{grant['grant_name'].replace(' ', '_')}.pdf"
+                download_name=f"{secure_filename(grant['grant_name']) or 'grant'}.pdf"
             )
         except ImportError:
             flash('reportlab not installed, downloading as txt', 'warning')
@@ -4394,7 +4422,7 @@ def copy_section():
     """API endpoint for copy button - returns section content as JSON"""
     # Check CSRF token for API
     token = request.headers.get('X-CSRF-Token')
-    if token != session.get('csrf_token'):
+    if not token or not hmac.compare_digest(str(token), str(session.get('csrf_token', ''))):
         return jsonify({'success': False, 'error': 'CSRF validation failed'}), 403
     
     data = request.json
@@ -4523,26 +4551,34 @@ def use_grant_template(grant_id):
     client_id = request.args.get('client_id')
     
     if not client_id:
-        # Show client selection
+        # Show client selection — only show THIS user's clients
         conn = get_db()
-        clients = conn.execute('SELECT * FROM clients ORDER BY organization_name').fetchall()
+        clients = conn.execute('SELECT * FROM clients WHERE user_id = ? ORDER BY organization_name',
+                               (session['user_id'],)).fetchall()
         conn.close()
         return render_template('select_client.html', grant=selected_grant, clients=clients)
-    
-    # Create the grant in our database
+
+    # Validate client ownership before creating grant
     conn = get_db()
+    client_check = conn.execute('SELECT id FROM clients WHERE id = ? AND user_id = ?',
+                                (client_id, session['user_id'])).fetchone()
+    if not client_check:
+        conn.close()
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    # Determine template before using it in INSERT
+    template_name = selected_grant.get('template', 'generic')
+
     db_grant_id = f"grant-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
     now = datetime.now().isoformat()
-    
+
     conn.execute('''
         INSERT INTO grants (id, client_id, grant_name, agency, amount, deadline, status, assigned_at, opportunity_number, cfda, template)
         VALUES (?, ?, ?, ?, ?, ?, 'assigned', ?, ?, ?, ?)
-    ''', (db_grant_id, client_id, selected_grant['title'], selected_grant['agency'], 
+    ''', (db_grant_id, client_id, selected_grant['title'], selected_grant['agency'],
           selected_grant['amount_max'], selected_grant['deadline'], now,
           selected_grant.get('opportunity_number', ''), selected_grant.get('cfda', ''), template_name))
-    
-    # Generate template sections and save as drafts
-    template_name = selected_grant.get('template', 'generic')
     template_sections = grant_researcher.get_template_sections(template_name)
     
     if template_sections:
@@ -5076,6 +5112,7 @@ def testimonial_form(token):
 
 
 @app.route('/testimonial/<token>', methods=['POST'])
+@csrf_required_allow_guest
 def testimonial_submit(token):
     """Save a submitted testimonial."""
     conn = get_db()
