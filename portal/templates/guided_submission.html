@@ -530,16 +530,40 @@
             </div>
             
             <div class="instructions">
-                <h4>📌 How This Works</h4>
+                <h4>📌 Side-by-Side Submission Guide</h4>
+                <div style="background: rgba(37,99,235,0.1); border: 1px solid rgba(37,99,235,0.2); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                    <strong>Setup:</strong> Drag this window to the LEFT half of your screen. Open the grant portal in a NEW window and drag it to the RIGHT half. Now you can copy from here and paste into the portal side by side.
+                    <br><small style="opacity:0.7;">Tip: On Windows, press Win+Left Arrow. On Mac, hold the green button and choose "Tile Left."</small>
+                </div>
                 <ol>
-                    <li>Open {{ submission_portal.name|default('the grant portal') }} in another browser tab</li>
-                    <li>Click "Copy" on each section below and paste into the corresponding field in the portal</li>
-                    <li>Or download the DOCX/PDF and upload it if the portal accepts file uploads</li>
-                    <li>Follow the guidance provided for each section</li>
+                    <li><strong>Open the portal</strong> — Click the button below to open {{ submission_portal.name|default('the grant portal') }} in a new window</li>
+                    <li><strong>Navigate to the application</strong> — Log into the portal and find or create your application workspace</li>
+                    <li><strong>Copy each section</strong> — Click "Copy" next to each section below, then paste it into the corresponding field in the portal</li>
+                    <li><strong>Upload files where needed</strong> — Some portals require PDF/DOCX uploads instead of paste. Use the download buttons above.</li>
+                    <li><strong>Track your progress</strong> — Sections turn green in the sidebar as you copy them. Your progress is saved automatically.</li>
                 </ol>
+
+                {% if submission_portal.name == 'JustGrants' %}
+                <div style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); border-radius: 6px; padding: 0.75rem; margin-top: 0.75rem; font-size: 0.85rem;">
+                    <strong>JustGrants Tips:</strong> The Project Abstract is a TEXT BOX — paste directly. The Proposal Narrative is a PDF UPLOAD — use the DOCX or PDF download. Budget Detail is a WEB FORM — enter numbers from your Budget Builder.
+                </div>
+                {% elif submission_portal.name == 'Research.gov' %}
+                <div style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); border-radius: 6px; padding: 0.75rem; margin-top: 0.75rem; font-size: 0.85rem;">
+                    <strong>Research.gov Tips:</strong> Project Summary has 3 required boxes (Overview, Intellectual Merit, Broader Impacts). Project Description is a PDF upload (15 pages max, enforced automatically). Budget is a web form. Biosketches MUST use SciENcv format.
+                </div>
+                {% elif submission_portal.name == 'Grants.gov' %}
+                <div style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); border-radius: 6px; padding: 0.75rem; margin-top: 0.75rem; font-size: 0.85rem;">
+                    <strong>Grants.gov Tips:</strong> Create a Workspace first. Fill out the SF-424 form (it pre-populates from SAM.gov). Attach your narrative as a PDF. File names must be under 50 characters with no special characters.
+                </div>
+                {% elif submission_portal.name == 'eRA Commons' %}
+                <div style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); border-radius: 6px; padding: 0.75rem; margin-top: 0.75rem; font-size: 0.85rem;">
+                    <strong>eRA Commons Tips:</strong> Use ASSIST for forms. Specific Aims and Research Strategy are SEPARATE PDF uploads. Choose R&R Budget (over $250K/yr) or Modular Budget (under $250K/yr). Your Signing Official must submit — the PI cannot.
+                </div>
+                {% endif %}
+
                 <div style="margin-top: 0.75rem;">
                     <a href="{{ submission_portal.url|default('https://www.grants.gov') }}" target="_blank" rel="noopener noreferrer" class="open-portal-btn">
-                        🌐 Open {{ submission_portal.name|default('Grants.gov') }}
+                        🌐 Open {{ submission_portal.name|default('Grants.gov') }} in New Window
                     </a>
                 </div>
             </div>
