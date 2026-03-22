@@ -66,7 +66,7 @@ Switching orgs is instant — no logout/login. All data queries scope to the act
 
 ### Current State
 
-Production-ready. Supabase Postgres database with 25+ tables, Flask app with 90+ routes, 21 agency templates with regulatory intelligence, structured budget builder, chained AI generation, consistency review, submission checklist with 100% gate, document uploads, MOU generation, paper submission (SF-424), post-submission tracking, award detection, testimonial pipeline, organization vault, enterprise org switcher, and 1,773 live grants from Grants.gov.
+Production-ready. Supabase Postgres database with 25+ tables, 6,800+ line Flask app with 90+ routes, 58 HTML templates, 21 agency templates with regulatory intelligence, structured budget builder, chained AI generation with APA standards, 16-point consistency review, submission checklist with 100% gate, document uploads, MOU generation, organization vault, paper submission (SF-424 forms), post-submission tracking, enterprise org switcher with per-client profiles/vaults, award detection, testimonial pipeline, and 1,773 live grants synced from Grants.gov.
 
 ---
 
