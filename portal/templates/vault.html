@@ -1,0 +1,394 @@
+{% extends "layout.html" %}
+{% block title %}Organization Vault - Grant Pro{% endblock %}
+
+{% block extra %}
+<style>
+    .vault-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 1.25rem;
+    }
+    .vault-slot {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.25rem;
+        transition: all 0.2s;
+        position: relative;
+    }
+    .vault-slot:hover {
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 1px var(--accent-primary);
+    }
+    .vault-slot-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    .vault-status-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+    .vault-status-icon.uploaded {
+        background: rgba(5, 150, 105, 0.15);
+        color: #10b981;
+    }
+    .vault-status-icon.missing {
+        background: rgba(220, 38, 38, 0.15);
+        color: #dc2626;
+    }
+    .vault-status-icon.expired {
+        background: rgba(217, 119, 6, 0.15);
+        color: #d97706;
+    }
+    .vault-slot-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin: 0 0 0.25rem 0;
+    }
+    .vault-slot-desc {
+        color: var(--text-secondary);
+        font-size: 0.82rem;
+        line-height: 1.4;
+    }
+    .vault-slot-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--border-color);
+    }
+    .vault-slot-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+    }
+    .vault-slot-actions .btn {
+        font-size: 0.8rem;
+        padding: 0.45rem 0.85rem;
+    }
+    .vault-section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin: 2rem 0 1rem 0;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.8rem;
+    }
+    .vault-section-title:first-of-type {
+        margin-top: 0;
+    }
+    .vault-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.72rem;
+        font-weight: 500;
+    }
+    .vault-badge.uploaded {
+        background: rgba(5, 150, 105, 0.15);
+        color: #10b981;
+    }
+    .vault-badge.missing {
+        background: rgba(220, 38, 38, 0.15);
+        color: #dc2626;
+    }
+    .vault-badge.expired {
+        background: rgba(217, 119, 6, 0.15);
+        color: #d97706;
+    }
+
+    /* Upload Modal */
+    .modal-backdrop {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.7);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-backdrop.active {
+        display: flex;
+    }
+    .modal-content {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: var(--shadow-lg);
+    }
+    .modal-title {
+        font-size: 1.15rem;
+        font-weight: 600;
+        margin: 0 0 1.25rem 0;
+    }
+    .modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+    .file-input-wrap {
+        border: 2px dashed var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.2s;
+        margin-bottom: 1rem;
+    }
+    .file-input-wrap:hover {
+        border-color: var(--accent-primary);
+    }
+    .file-input-wrap input[type="file"] {
+        display: none;
+    }
+    .file-input-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+    .file-input-label strong {
+        color: var(--accent-primary);
+        cursor: pointer;
+    }
+    .privacy-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-top: 2rem;
+        padding: 1rem;
+        background: var(--bg-tertiary);
+        border-radius: var(--radius-md);
+        font-size: 0.82rem;
+        color: var(--text-muted);
+    }
+    .privacy-note-icon {
+        flex-shrink: 0;
+        font-size: 1rem;
+    }
+    .vault-stats {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .vault-stat {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+    .vault-stat strong {
+        color: var(--text-primary);
+    }
+
+    @media (max-width: 768px) {
+        .vault-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Organization Vault</h1>
+        <p class="page-subtitle">Upload your permanent organizational documents once. They'll be automatically included in every grant application that requires them.</p>
+    </div>
+</div>
+
+<div class="vault-stats">
+    <div class="vault-stat">
+        <strong>{{ uploaded_count }}</strong> of {{ total_count }} uploaded
+    </div>
+    <div class="vault-stat">
+        <strong>{{ required_uploaded }}</strong> of {{ required_count }} required docs ready
+    </div>
+</div>
+
+<!-- Required Documents -->
+<div class="vault-section-title">Required Documents (upload once, used on every grant)</div>
+<div class="vault-grid">
+    {% for slot in required_slots %}
+    <div class="vault-slot">
+        <div class="vault-slot-header">
+            {% if slot.doc %}
+                {% if slot.expired %}
+                <div class="vault-status-icon expired">!</div>
+                {% else %}
+                <div class="vault-status-icon uploaded">&#10003;</div>
+                {% endif %}
+            {% else %}
+            <div class="vault-status-icon missing">&#10007;</div>
+            {% endif %}
+            <div>
+                <h3 class="vault-slot-title">{{ slot.name }}</h3>
+                <p class="vault-slot-desc">{{ slot.description }}</p>
+            </div>
+        </div>
+
+        {% if slot.doc %}
+        <div class="vault-slot-meta">
+            {% if slot.expired %}
+            <span class="vault-badge expired">Expired</span>
+            {% else %}
+            <span class="vault-badge uploaded">Uploaded</span>
+            {% endif %}
+            <span>{{ slot.doc.uploaded_at[:10] if slot.doc.uploaded_at else '' }}</span>
+            <span>{{ slot.file_size_display }}</span>
+        </div>
+        <div class="vault-slot-actions">
+            <button class="btn btn-secondary" onclick="openUploadModal('{{ slot.doc_type }}', '{{ slot.name }}', true)">Replace</button>
+            <form method="POST" action="/vault/delete/{{ slot.doc.id }}" style="display:inline;" onsubmit="return confirm('Remove this document?')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-ghost" style="color: var(--accent-danger);">Delete</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="vault-slot-actions">
+            <button class="btn btn-primary" onclick="openUploadModal('{{ slot.doc_type }}', '{{ slot.name }}', false)">Upload</button>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Optional Documents -->
+<div class="vault-section-title">Optional Documents</div>
+<div class="vault-grid">
+    {% for slot in optional_slots %}
+    <div class="vault-slot">
+        <div class="vault-slot-header">
+            {% if slot.doc %}
+                {% if slot.expired %}
+                <div class="vault-status-icon expired">!</div>
+                {% else %}
+                <div class="vault-status-icon uploaded">&#10003;</div>
+                {% endif %}
+            {% else %}
+            <div class="vault-status-icon missing" style="background: var(--bg-tertiary); color: var(--text-muted);">-</div>
+            {% endif %}
+            <div>
+                <h3 class="vault-slot-title">{{ slot.name }}</h3>
+                <p class="vault-slot-desc">{{ slot.description }}</p>
+            </div>
+        </div>
+
+        {% if slot.doc %}
+        <div class="vault-slot-meta">
+            {% if slot.expired %}
+            <span class="vault-badge expired">Expired</span>
+            {% else %}
+            <span class="vault-badge uploaded">Uploaded</span>
+            {% endif %}
+            <span>{{ slot.doc.uploaded_at[:10] if slot.doc.uploaded_at else '' }}</span>
+            <span>{{ slot.file_size_display }}</span>
+        </div>
+        <div class="vault-slot-actions">
+            <button class="btn btn-secondary" onclick="openUploadModal('{{ slot.doc_type }}', '{{ slot.name }}', true)">Replace</button>
+            <form method="POST" action="/vault/delete/{{ slot.doc.id }}" style="display:inline;" onsubmit="return confirm('Remove this document?')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-ghost" style="color: var(--accent-danger);">Delete</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="vault-slot-actions">
+            <button class="btn btn-secondary" onclick="openUploadModal('{{ slot.doc_type }}', '{{ slot.name }}', false)">Upload</button>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+<div class="privacy-note">
+    <span class="privacy-note-icon">&#128274;</span>
+    <span>Your documents are stored securely and only used for your grant applications. They are never shared with third parties.</span>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal-backdrop" id="uploadModal">
+    <div class="modal-content" style="position:relative;">
+        <button class="modal-close" onclick="closeUploadModal()">&times;</button>
+        <h3 class="modal-title" id="modalTitle">Upload Document</h3>
+        <form method="POST" action="/vault/upload" enctype="multipart/form-data" id="uploadForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="doc_type" id="modalDocType">
+            <input type="hidden" name="doc_name" id="modalDocName">
+
+            <div class="file-input-wrap" onclick="document.getElementById('fileInput').click()">
+                <input type="file" name="file" id="fileInput" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onchange="updateFileName(this)">
+                <p class="file-input-label" id="fileLabel"><strong>Click to choose a file</strong> or drag and drop<br>PDF, DOC, DOCX, PNG, JPG (max 10MB)</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="description">Notes (optional)</label>
+                <input type="text" name="description" class="form-input" id="description" placeholder="e.g., Updated March 2026">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="expires_at">Expiration Date (optional)</label>
+                <input type="date" name="expires_at" class="form-input" id="expires_at">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%;">Upload Document</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openUploadModal(docType, docName, isReplace) {
+    document.getElementById('modalDocType').value = docType;
+    document.getElementById('modalDocName').value = docName;
+    document.getElementById('modalTitle').textContent = (isReplace ? 'Replace: ' : 'Upload: ') + docName;
+    document.getElementById('fileInput').value = '';
+    document.getElementById('fileLabel').innerHTML = '<strong>Click to choose a file</strong> or drag and drop<br>PDF, DOC, DOCX, PNG, JPG (max 10MB)';
+    document.getElementById('description').value = '';
+    document.getElementById('expires_at').value = '';
+    document.getElementById('uploadModal').classList.add('active');
+}
+
+function closeUploadModal() {
+    document.getElementById('uploadModal').classList.remove('active');
+}
+
+function updateFileName(input) {
+    if (input.files.length > 0) {
+        var name = input.files[0].name;
+        var size = (input.files[0].size / 1024 / 1024).toFixed(1);
+        document.getElementById('fileLabel').innerHTML = '<strong>' + name + '</strong> (' + size + ' MB)';
+    }
+}
+
+// Close modal on backdrop click
+document.getElementById('uploadModal').addEventListener('click', function(e) {
+    if (e.target === this) closeUploadModal();
+});
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeUploadModal();
+});
+</script>
+{% endblock %}

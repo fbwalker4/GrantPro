@@ -223,6 +223,24 @@ def init_db():
             notes TEXT
         )''')
 
+        # Organization vault - permanent document store
+        c.execute('''CREATE TABLE IF NOT EXISTS org_vault (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            doc_type TEXT NOT NULL,
+            doc_name TEXT NOT NULL,
+            description TEXT,
+            file_data BYTEA,
+            file_size INTEGER DEFAULT 0,
+            uploaded_at TEXT,
+            expires_at TEXT,
+            is_current BOOLEAN DEFAULT TRUE
+        )''')
+        try:
+            c.execute('CREATE INDEX IF NOT EXISTS idx_org_vault_user ON org_vault(user_id)')
+        except Exception:
+            pass
+
         # Grant budget table - structured budget builder data
         c.execute('''CREATE TABLE IF NOT EXISTS grant_budget (
             id TEXT PRIMARY KEY,

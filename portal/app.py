@@ -5136,6 +5136,30 @@ def _build_checklist_data(grant_id, user_id, template_name):
     docs = conn.execute('SELECT * FROM grant_documents WHERE grant_id = ?', (grant_id,)).fetchall()
     uploaded_types = {d['doc_type']: d for d in docs}
 
+    # Fetch organization vault documents and map to grant doc types
+    vault_docs_raw = conn.execute(
+        'SELECT * FROM org_vault WHERE user_id = ? AND is_current = TRUE',
+        (user_id,)
+    ).fetchall()
+    vault_by_grant_type = {}
+    _vault_map = {
+        '501c3_letter': '501c3_determination',
+        'ein_letter': 'ein_letter',
+        'board_resolution': 'board_resolution',
+        'sf424b_assurances': 'sf_424b',
+        'sf_lll': 'sf_lll',
+        'audit_report': 'audit_report',
+        'org_chart': 'org_chart',
+    }
+    for vd in vault_docs_raw:
+        grant_doc_type = _vault_map.get(vd['doc_type'])
+        if grant_doc_type:
+            # Check expiration
+            now_str = datetime.now().isoformat()
+            if vd.get('expires_at') and vd['expires_at'] < now_str:
+                continue  # Skip expired vault docs
+            vault_by_grant_type[grant_doc_type] = dict(vd)
+
     # Fetch budget data to check if budget actually exists
     budget_row = conn.execute('SELECT * FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
     budget_dict = dict(budget_row) if budget_row else {}
@@ -5313,6 +5337,24 @@ def _build_checklist_data(grant_id, user_id, template_name):
                         'form_number': form_number,
                         'status_note': 'Signed document uploaded' if requires_signed else 'Document uploaded',
                     })
+            elif vault_by_grant_type.get(doc_type):
+                # Not uploaded to grant_documents, but found in Organization Vault
+                _vdoc = vault_by_grant_type[doc_type]
+                checklist_documents.append({
+                    'type': doc_type,
+                    'name': doc.get('name', doc_type),
+                    'description': doc.get('description', ''),
+                    'required': doc.get('required', False),
+                    'can_generate': True,
+                    'requires_signed_upload': requires_signed,
+                    'uploaded': True,
+                    'from_vault': True,
+                    'draft_only': False,
+                    'doc_id': _vdoc['id'],
+                    'data_ready': True,
+                    'form_number': form_number,
+                    'status_note': 'Complete (from Organization Vault)',
+                })
             else:
                 checklist_documents.append({
                     'type': doc_type,
@@ -5329,19 +5371,46 @@ def _build_checklist_data(grant_id, user_id, template_name):
                     'status_note': status_note,
                 })
         else:
-            # User must upload -- check if document exists in grant_documents
+            # User must upload -- check grant_documents first, then organization vault
             upload_instructions = doc.get('upload_instructions', 'Upload the required document (PDF)')
-            checklist_documents.append({
-                'type': doc_type,
-                'name': doc.get('name', doc_type),
-                'description': doc.get('description', ''),
-                'required': doc.get('required', False),
-                'can_generate': False,
-                'uploaded': uploaded is not None,
-                'doc_id': uploaded['id'] if uploaded else None,
-                'form_number': form_number,
-                'status_note': 'Document uploaded' if uploaded else upload_instructions,
-            })
+            vault_doc = vault_by_grant_type.get(doc_type)
+            if uploaded:
+                checklist_documents.append({
+                    'type': doc_type,
+                    'name': doc.get('name', doc_type),
+                    'description': doc.get('description', ''),
+                    'required': doc.get('required', False),
+                    'can_generate': False,
+                    'uploaded': True,
+                    'doc_id': uploaded['id'],
+                    'form_number': form_number,
+                    'status_note': 'Document uploaded',
+                })
+            elif vault_doc:
+                checklist_documents.append({
+                    'type': doc_type,
+                    'name': doc.get('name', doc_type),
+                    'description': doc.get('description', ''),
+                    'required': doc.get('required', False),
+                    'can_generate': False,
+                    'uploaded': True,
+                    'from_vault': True,
+                    'doc_id': vault_doc['id'],
+                    'form_number': form_number,
+                    'status_note': 'Complete (from Organization Vault)',
+                })
+            else:
+                checklist_documents.append({
+                    'type': doc_type,
+                    'name': doc.get('name', doc_type),
+                    'description': doc.get('description', ''),
+                    'required': doc.get('required', False),
+                    'can_generate': False,
+                    'uploaded': False,
+                    'doc_id': None,
+                    'form_number': form_number,
+                    'status_note': upload_instructions,
+                })
 
     # --- 4. Self-Certifications ---
     standard_certs = [
@@ -6057,6 +6126,181 @@ def robots_txt():
         os.path.join(app.static_folder, 'robots.txt'),
         mimetype='text/plain'
     )
+
+
+# ============ ORGANIZATION VAULT ============
+
+# Vault document slot definitions
+VAULT_REQUIRED_SLOTS = [
+    {'doc_type': '501c3_letter', 'name': '501(c)(3) IRS Determination Letter', 'description': 'Proof of tax-exempt status. Upload your IRS determination letter.'},
+    {'doc_type': 'ein_letter', 'name': 'EIN Confirmation Letter', 'description': 'Your EIN verification from the IRS (Letter CP 575 or 147C).'},
+    {'doc_type': 'board_resolution', 'name': 'Board Resolution', 'description': 'Annual board resolution authorizing grant applications. Renew yearly.'},
+    {'doc_type': 'sf424b_assurances', 'name': 'Signed SF-424B Assurances', 'description': 'Federal assurances signed by your authorized representative. Renew yearly.'},
+    {'doc_type': 'sf_lll', 'name': 'SF-LLL Lobbying Disclosure', 'description': "Disclosure of lobbying activities (usually 'N/A' for most nonprofits)."},
+    {'doc_type': 'audit_report', 'name': 'Most Recent Audit / Financial Statements', 'description': 'Your most recent independent audit or financial review.'},
+    {'doc_type': 'org_chart', 'name': 'Organizational Chart', 'description': 'Current org chart showing staff structure.'},
+]
+
+VAULT_OPTIONAL_SLOTS = [
+    {'doc_type': 'insurance_cert', 'name': 'Insurance Certificate', 'description': 'General liability and/or professional liability.'},
+    {'doc_type': 'nicra', 'name': 'Indirect Cost Rate Agreement (NICRA)', 'description': 'If you have a federally negotiated rate.'},
+    {'doc_type': 'key_personnel_resumes', 'name': 'Key Personnel Resumes', 'description': 'Resumes/CVs for your primary grant staff.'},
+]
+
+# Mapping: vault doc_type -> grant_documents doc_type
+VAULT_TO_GRANT_DOC_MAP = {
+    '501c3_letter': '501c3_determination',
+    'ein_letter': 'ein_letter',
+    'board_resolution': 'board_resolution',
+    'sf424b_assurances': 'sf_424b',
+    'sf_lll': 'sf_lll',
+    'audit_report': 'audit_report',
+    'org_chart': 'org_chart',
+}
+
+
+def _format_file_size(size_bytes):
+    """Format file size in human-readable form."""
+    if not size_bytes:
+        return ''
+    if size_bytes < 1024:
+        return f'{size_bytes} B'
+    elif size_bytes < 1024 * 1024:
+        return f'{size_bytes / 1024:.1f} KB'
+    else:
+        return f'{size_bytes / (1024 * 1024):.1f} MB'
+
+
+def _get_vault_docs(user_id):
+    """Fetch all current vault docs for a user, keyed by doc_type."""
+    conn = get_db()
+    rows = conn.execute(
+        'SELECT * FROM org_vault WHERE user_id = ? AND is_current = TRUE',
+        (user_id,)
+    ).fetchall()
+    conn.close()
+    return {row['doc_type']: dict(row) for row in rows}
+
+
+@app.route('/vault')
+@login_required
+def vault():
+    """Organization Vault - permanent document store."""
+    user_id = session['user_id']
+    vault_docs = _get_vault_docs(user_id)
+    now = datetime.now().isoformat()
+
+    def build_slots(slot_defs):
+        slots = []
+        for s in slot_defs:
+            doc = vault_docs.get(s['doc_type'])
+            expired = False
+            if doc and doc.get('expires_at') and doc['expires_at'] < now:
+                expired = True
+            slots.append({
+                'doc_type': s['doc_type'],
+                'name': s['name'],
+                'description': s['description'],
+                'doc': doc,
+                'expired': expired,
+                'file_size_display': _format_file_size(doc['file_size']) if doc else '',
+            })
+        return slots
+
+    required_slots = build_slots(VAULT_REQUIRED_SLOTS)
+    optional_slots = build_slots(VAULT_OPTIONAL_SLOTS)
+
+    uploaded_count = sum(1 for s in required_slots + optional_slots if s['doc'])
+    total_count = len(required_slots) + len(optional_slots)
+    required_uploaded = sum(1 for s in required_slots if s['doc'] and not s['expired'])
+    required_count = len(required_slots)
+
+    return render_template('vault.html',
+                           required_slots=required_slots,
+                           optional_slots=optional_slots,
+                           uploaded_count=uploaded_count,
+                           total_count=total_count,
+                           required_uploaded=required_uploaded,
+                           required_count=required_count)
+
+
+@app.route('/vault/upload', methods=['POST'])
+@login_required
+@csrf_required
+def vault_upload():
+    """Upload a document to the organization vault."""
+    user_id = session['user_id']
+    doc_type = request.form.get('doc_type', '').strip()
+    doc_name = request.form.get('doc_name', '').strip()
+    description = request.form.get('description', '').strip()
+    expires_at = request.form.get('expires_at', '').strip() or None
+    file = request.files.get('file')
+
+    # Validate doc_type
+    valid_types = [s['doc_type'] for s in VAULT_REQUIRED_SLOTS + VAULT_OPTIONAL_SLOTS]
+    if doc_type not in valid_types:
+        flash('Invalid document type.', 'error')
+        return redirect(url_for('vault'))
+
+    if not file or file.filename == '':
+        flash('Please select a file to upload.', 'error')
+        return redirect(url_for('vault'))
+
+    # Validate file size (10 MB max)
+    file_data = file.read()
+    if len(file_data) > 10 * 1024 * 1024:
+        flash('File too large. Maximum size is 10 MB.', 'error')
+        return redirect(url_for('vault'))
+
+    filename = secure_filename(file.filename)
+    if not doc_name:
+        doc_name = filename
+
+    conn = get_db()
+    now = datetime.now().isoformat()
+
+    # Mark any existing doc of this type as not current
+    conn.execute(
+        'UPDATE org_vault SET is_current = FALSE WHERE user_id = ? AND doc_type = ? AND is_current = TRUE',
+        (user_id, doc_type)
+    )
+
+    # Insert new vault doc
+    doc_id = f"vault-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
+    conn.execute(
+        '''INSERT INTO org_vault (id, user_id, doc_type, doc_name, description, file_data, file_size, uploaded_at, expires_at, is_current)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE)''',
+        (doc_id, user_id, doc_type, doc_name, description,
+         file_data, len(file_data), now, expires_at)
+    )
+    conn.commit()
+    conn.close()
+
+    flash(f'"{doc_name}" uploaded to your vault.', 'success')
+    return redirect(url_for('vault'))
+
+
+@app.route('/vault/delete/<doc_id>', methods=['POST'])
+@login_required
+@csrf_required
+def vault_delete(doc_id):
+    """Remove a document from the organization vault."""
+    user_id = session['user_id']
+    conn = get_db()
+
+    # Verify ownership
+    row = conn.execute('SELECT * FROM org_vault WHERE id = ? AND user_id = ?', (doc_id, user_id)).fetchone()
+    if not row:
+        conn.close()
+        flash('Document not found.', 'error')
+        return redirect(url_for('vault'))
+
+    conn.execute('DELETE FROM org_vault WHERE id = ? AND user_id = ?', (doc_id, user_id))
+    conn.commit()
+    conn.close()
+
+    flash('Document removed from vault.', 'success')
+    return redirect(url_for('vault'))
 
 
 # ============ MAIN ============
