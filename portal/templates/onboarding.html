@@ -475,7 +475,7 @@
                 </p>
             </div>
             
-            <form method="POST" action="/onboarding" role="form" aria-label="Organization profile">
+            <form method="POST" action="/onboarding" role="form" aria-label="Organization profile" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <p style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--text-secondary);">
@@ -511,6 +511,20 @@
                                 <option value="other" {% if org_profile.organization_type == 'other' %}selected{% endif %}>Other</option>
                             </select>
                             <p class="form-hint">Required — used in every grant application.</p>
+                            <div id="vault-501c3-upload" style="margin-top: 0.5rem; padding: 0.75rem; background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.1); border-radius: 6px; display: none;">
+                                <label style="font-size: 0.8rem; font-weight: 500;">Upload 501(c)(3) Determination Letter <span style="color: var(--text-muted);">(optional now, required for grants)</span></label>
+                                <input type="file" name="vault_501c3_letter" accept=".pdf,.jpg,.png" style="margin-top: 0.3rem; font-size: 0.8rem;">
+                                <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">IRS determination letter confirming your 501(c)(3) tax-exempt status.</p>
+                            </div>
+                            <script>
+                                document.getElementById('organization_type').addEventListener('change', function() {
+                                    document.getElementById('vault-501c3-upload').style.display = this.value === 'nonprofit' ? 'block' : 'none';
+                                });
+                                // Show on page load if nonprofit is already selected
+                                if (document.getElementById('organization_type').value === 'nonprofit') {
+                                    document.getElementById('vault-501c3-upload').style.display = 'block';
+                                }
+                            </script>
                         </div>
                     </div>
                 </div>
@@ -533,6 +547,11 @@
                                 Required on every federal grant form (SF-424). Enter once, auto-filled on all applications.
                                 <a href="https://www.irs.gov/ein" target="_blank">Get one free from the IRS →</a>
                             </p>
+                            <div style="margin-top: 0.5rem; padding: 0.75rem; background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.1); border-radius: 6px;">
+                                <label style="font-size: 0.8rem; font-weight: 500;">Upload EIN Confirmation Letter <span style="color: var(--text-muted);">(optional now, required for grants)</span></label>
+                                <input type="file" name="vault_ein_letter" accept=".pdf,.jpg,.png" style="margin-top: 0.3rem; font-size: 0.8rem;">
+                                <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">IRS Letter CP 575 or 147C. PDF or image.</p>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -935,6 +954,12 @@
                             </select>
                             <p class="form-hint">The main portal for finding and applying to federal grants. Free to register at <a href="https://grants.gov" target="_blank">grants.gov</a>.</p>
                         </div>
+                    </div>
+
+                    <div style="margin-top: 0.5rem; padding: 0.75rem; background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.1); border-radius: 6px;">
+                        <label style="font-size: 0.8rem; font-weight: 500;">Upload Organizational Chart <span style="color: var(--text-muted);">(optional now, helpful for grants)</span></label>
+                        <input type="file" name="vault_org_chart" accept=".pdf,.jpg,.png" style="margin-top: 0.3rem; font-size: 0.8rem;">
+                        <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">Shows your organization's structure. Many federal grants require this as a supporting document.</p>
                     </div>
 
                     <hr style="border-color: var(--border-color); margin: 1.5rem 0;">

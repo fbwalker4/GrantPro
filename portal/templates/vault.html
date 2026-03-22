@@ -214,8 +214,8 @@
 {% block content %}
 <div class="page-header">
     <div>
-        <h1 class="page-title">Organization Vault</h1>
-        <p class="page-subtitle">Upload your permanent organizational documents once. They'll be automatically included in every grant application that requires them.</p>
+        <h1 class="page-title">{% if client_name %}{{ client_name }} - Document Vault{% else %}Organization Vault{% endif %}</h1>
+        <p class="page-subtitle">{% if client_name %}Manage documents for {{ client_name }}. These will be used in grants assigned to this client.{% else %}Upload your permanent organizational documents once. They'll be automatically included in every grant application that requires them.{% endif %}</p>
     </div>
 </div>
 
@@ -263,6 +263,7 @@
             <button class="btn btn-secondary" onclick="openUploadModal('{{ slot.doc_type }}', '{{ slot.name }}', true)">Replace</button>
             <form method="POST" action="/vault/delete/{{ slot.doc.id }}" style="display:inline;" onsubmit="return confirm('Remove this document?')">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="client_id" value="{{ client_id or '' }}">
                 <button type="submit" class="btn btn-ghost" style="color: var(--accent-danger);">Delete</button>
             </form>
         </div>
@@ -310,6 +311,7 @@
             <button class="btn btn-secondary" onclick="openUploadModal('{{ slot.doc_type }}', '{{ slot.name }}', true)">Replace</button>
             <form method="POST" action="/vault/delete/{{ slot.doc.id }}" style="display:inline;" onsubmit="return confirm('Remove this document?')">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="client_id" value="{{ client_id or '' }}">
                 <button type="submit" class="btn btn-ghost" style="color: var(--accent-danger);">Delete</button>
             </form>
         </div>
@@ -334,6 +336,7 @@
         <h3 class="modal-title" id="modalTitle">Upload Document</h3>
         <form method="POST" action="/vault/upload" enctype="multipart/form-data" id="uploadForm">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="client_id" value="{{ client_id or '' }}">
             <input type="hidden" name="doc_type" id="modalDocType">
             <input type="hidden" name="doc_name" id="modalDocName">
 

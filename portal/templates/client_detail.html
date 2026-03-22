@@ -6,6 +6,8 @@
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
     <h1>{{ client.organization_name }}</h1>
     <div style="display: flex; gap: 0.5rem;">
+        <a href="/client/{{ client.id }}/edit" class="btn btn-secondary">Edit Profile</a>
+        <a href="/vault?client_id={{ client.id }}" class="btn btn-secondary">Manage Documents</a>
         <a href="/client/{{ client.id }}/intake" class="btn btn-secondary">Intake Form</a>
         <a href="/client/{{ client.id }}/grant/new" class="btn btn-primary">+ Assign Grant</a>
     </div>
@@ -16,11 +18,30 @@
         <h2>Contact Info</h2>
         <p><strong>Contact:</strong> {{ client.contact_name }}</p>
         <p><strong>Email:</strong> {{ client.contact_email }}</p>
+        {% if client.phone %}<p><strong>Phone:</strong> {{ client.phone }}</p>{% endif %}
+        {% if client.website %}<p><strong>Website:</strong> <a href="{{ client.website }}" target="_blank">{{ client.website }}</a></p>{% endif %}
         <p><strong>Status:</strong> <span class="status-badge status-{{ client.status }}" role="status">{{ client.status }}</span></p>
         <p><strong>Stage:</strong> {{ client.current_stage }}</p>
         <p><strong>Created:</strong> {{ client.created_at[:10] }}</p>
     </div>
-    
+
+    <div class="card">
+        <h2>Organization Profile</h2>
+        {% if client.org_type %}<p><strong>Type:</strong> {{ client.org_type }}</p>{% endif %}
+        {% if client.ein %}<p><strong>EIN:</strong> {{ client.ein }}</p>{% endif %}
+        {% if client.uei %}<p><strong>UEI:</strong> {{ client.uei }}</p>{% endif %}
+        {% if client.address_line1 %}
+        <p><strong>Address:</strong> {{ client.address_line1 }}{% if client.city %}, {{ client.city }}{% endif %}{% if client.state %}, {{ client.state }}{% endif %} {{ client.zip_code or '' }}</p>
+        {% endif %}
+        {% if client.annual_budget %}<p><strong>Annual Budget:</strong> {{ client.annual_budget }}</p>{% endif %}
+        {% if client.mission %}<p><strong>Mission:</strong> {{ client.mission[:200] }}{% if client.mission|length > 200 %}...{% endif %}</p>{% endif %}
+        {% if not client.ein and not client.uei and not client.org_type %}
+        <p style="color: var(--text-muted);">No profile data yet. <a href="/client/{{ client.id }}/edit">Add profile details</a></p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="grid-2">
     <div class="card">
         <h2>Grants</h2>
         {% if grants %}
@@ -48,31 +69,31 @@
         <p>No grants assigned yet.</p>
         {% endif %}
     </div>
-</div>
 
-{% if invoices %}
-<div class="card">
-    <h2>Invoices</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Invoice ID</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for invoice in invoices %}
-            <tr>
-                <td>{{ invoice.id }}</td>
-                <td>{{ invoice.invoice_type }}</td>
-                <td>${{ "{:,.2f}".format(invoice.amount) }}</td>
-                <td><span class="status-badge status-{{ invoice.status }}">{{ invoice.status }}</span></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% if invoices %}
+    <div class="card">
+        <h2>Invoices</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Invoice ID</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr>
+                    <td>{{ invoice.id }}</td>
+                    <td>{{ invoice.invoice_type }}</td>
+                    <td>${{ "{:,.2f}".format(invoice.amount) }}</td>
+                    <td><span class="status-badge status-{{ invoice.status }}">{{ invoice.status }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
 </div>
-{% endif %}
 {% endblock %}

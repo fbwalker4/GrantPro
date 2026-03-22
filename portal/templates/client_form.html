@@ -9,6 +9,8 @@
     <form method="POST" role="form" aria-label="{% if client %}Edit client{% else %}New client{% endif %}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
+        <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Contact Information</h2>
+
         <label for="organization_name">Organization Name</label>
         <input type="text" id="organization_name" name="organization_name" required aria-required="true"
                value="{{ client.organization_name if client else '' }}">
@@ -20,8 +22,90 @@
         <label for="contact_email">Contact Email</label>
         <input type="email" id="contact_email" name="contact_email" required aria-required="true"
                value="{{ client.contact_email if client else '' }}">
-        
-        <div style="display: flex; gap: 1rem;">
+
+        <label for="phone">Phone</label>
+        <input type="tel" id="phone" name="phone"
+               value="{{ client.phone if client else '' }}"
+               placeholder="(555) 123-4567">
+
+        <label for="website">Website</label>
+        <input type="url" id="website" name="website"
+               value="{{ client.website if client else '' }}"
+               placeholder="https://example.org">
+
+        <h2 style="font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 1rem;">Organization Profile</h2>
+
+        <label for="org_type">Organization Type</label>
+        <select id="org_type" name="org_type" style="width: 100%; padding: 0.5rem; margin-bottom: 0.75rem;">
+            <option value="">Select...</option>
+            <option value="nonprofit" {% if client and client.org_type == 'nonprofit' %}selected{% endif %}>Nonprofit / 501(c)(3)</option>
+            <option value="small_business" {% if client and client.org_type == 'small_business' %}selected{% endif %}>Small Business</option>
+            <option value="government" {% if client and client.org_type == 'government' %}selected{% endif %}>Government / Public Entity</option>
+            <option value="university" {% if client and client.org_type == 'university' %}selected{% endif %}>University / Educational Institution</option>
+            <option value="tribal" {% if client and client.org_type == 'tribal' %}selected{% endif %}>Tribal Organization</option>
+            <option value="other" {% if client and client.org_type == 'other' %}selected{% endif %}>Other</option>
+        </select>
+
+        <label for="mission">Mission Statement</label>
+        <textarea id="mission" name="mission" rows="3"
+                  placeholder="Describe the client organization's mission...">{{ client.mission if client else '' }}</textarea>
+
+        <label for="annual_budget">Annual Budget</label>
+        <select id="annual_budget" name="annual_budget" style="width: 100%; padding: 0.5rem; margin-bottom: 0.75rem;">
+            <option value="">Select...</option>
+            <option value="under_50k" {% if client and client.annual_budget == 'under_50k' %}selected{% endif %}>Under $50,000</option>
+            <option value="50k_250k" {% if client and client.annual_budget == '50k_250k' %}selected{% endif %}>$50,000 - $250,000</option>
+            <option value="250k_1m" {% if client and client.annual_budget == '250k_1m' %}selected{% endif %}>$250,000 - $1 million</option>
+            <option value="1m_5m" {% if client and client.annual_budget == '1m_5m' %}selected{% endif %}>$1 million - $5 million</option>
+            <option value="5m_10m" {% if client and client.annual_budget == '5m_10m' %}selected{% endif %}>$5 million - $10 million</option>
+            <option value="over_10m" {% if client and client.annual_budget == 'over_10m' %}selected{% endif %}>Over $10 million</option>
+        </select>
+
+        <h2 style="font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 1rem;">Federal Identifiers</h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+                <label for="ein">EIN</label>
+                <input type="text" id="ein" name="ein"
+                       value="{{ client.ein if client else '' }}"
+                       placeholder="XX-XXXXXXX">
+            </div>
+            <div>
+                <label for="uei">UEI</label>
+                <input type="text" id="uei" name="uei"
+                       value="{{ client.uei if client else '' }}"
+                       placeholder="XXXXXXXXXXXX">
+            </div>
+        </div>
+
+        <h2 style="font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 1rem;">Address</h2>
+
+        <label for="address_line1">Street Address</label>
+        <input type="text" id="address_line1" name="address_line1"
+               value="{{ client.address_line1 if client else '' }}"
+               placeholder="123 Main Street">
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem;">
+            <div>
+                <label for="city">City</label>
+                <input type="text" id="city" name="city"
+                       value="{{ client.city if client else '' }}">
+            </div>
+            <div>
+                <label for="state">State</label>
+                <input type="text" id="state" name="state"
+                       value="{{ client.state if client else '' }}"
+                       placeholder="XX" maxlength="2">
+            </div>
+            <div>
+                <label for="zip_code">ZIP Code</label>
+                <input type="text" id="zip_code" name="zip_code"
+                       value="{{ client.zip_code if client else '' }}"
+                       placeholder="12345">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
             <button type="submit" class="btn btn-primary">Save Client</button>
             <a href="/" class="btn btn-secondary">Cancel</a>
         </div>

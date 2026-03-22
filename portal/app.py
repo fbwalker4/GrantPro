@@ -369,6 +369,55 @@ def user_owns_grant(grant_id):
     return grant['user_id'] == user['id']
 
 
+def _resolve_sf424_org(grant, user, user_org_details):
+    """Build SF-424 org dict, preferring client profile data for client grants.
+
+    Args:
+        grant: grant row (dict-like) joined with clients table
+        user: current user dict
+        user_org_details: dict from user_models.get_organization_details (consultant's own data)
+    Returns:
+        dict with keys: legal_name, ein, uei, address, city, state, zip,
+                        contact_name, contact_title, contact_phone, contact_email
+    """
+    # Check if the client row has its own profile data
+    client_has_profile = (
+        grant.get('client_ein') or grant.get('client_uei') or
+        grant.get('client_address') or grant.get('client_mission')
+    )
+    od = (user_org_details or {}).get('organization_details') or {}
+
+    if client_has_profile:
+        return {
+            'legal_name': grant.get('organization_name', ''),
+            'ein': grant.get('client_ein', ''),
+            'uei': grant.get('client_uei', ''),
+            'address': grant.get('client_address', ''),
+            'city': grant.get('client_city', ''),
+            'state': grant.get('client_state', ''),
+            'zip': grant.get('client_zip', ''),
+            'contact_name': grant.get('contact_name', ''),
+            'contact_title': '',
+            'contact_phone': grant.get('client_phone', ''),
+            'contact_email': grant.get('contact_email', ''),
+        }
+    else:
+        org_name = user.get('organization_name', '') if user else grant.get('organization_name', '')
+        return {
+            'legal_name': org_name,
+            'ein': od.get('ein', ''),
+            'uei': od.get('uei', ''),
+            'address': od.get('address_line1', ''),
+            'city': od.get('city', ''),
+            'state': od.get('state', ''),
+            'zip': od.get('zip_code', ''),
+            'contact_name': grant.get('contact_name', ''),
+            'contact_title': od.get('title', ''),
+            'contact_phone': od.get('phone', ''),
+            'contact_email': grant.get('contact_email', ''),
+        }
+
+
 @app.before_request
 def before_request():
     """Make user available to all templates"""
@@ -1035,6 +1084,37 @@ def onboarding():
         }
         user_models.save_grant_readiness(user['id'], readiness_data)
 
+        # Save any vault file uploads (EIN letter, 501c3 letter, org chart)
+        vault_uploads = {
+            'vault_ein_letter': ('ein_letter', 'EIN Confirmation Letter'),
+            'vault_501c3_letter': ('501c3_letter', '501(c)(3) Determination Letter'),
+            'vault_org_chart': ('org_chart', 'Organizational Chart'),
+        }
+        for field_name, (doc_type, doc_display_name) in vault_uploads.items():
+            uploaded_file = request.files.get(field_name)
+            if uploaded_file and uploaded_file.filename:
+                file_data = uploaded_file.read()
+                if len(file_data) <= 10 * 1024 * 1024:  # 10MB limit
+                    filename = secure_filename(uploaded_file.filename)
+                    conn = get_db()
+                    now_ts = datetime.now().isoformat()
+                    # Mark existing docs of this type as not current
+                    conn.execute(
+                        'UPDATE org_vault SET is_current = FALSE WHERE user_id = ? AND doc_type = ? AND is_current = TRUE',
+                        (user['id'], doc_type)
+                    )
+                    doc_id = f"vault-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
+                    conn.execute(
+                        '''INSERT INTO org_vault (id, user_id, doc_type, doc_name, description, file_data, file_size, uploaded_at, expires_at, is_current)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, TRUE)''',
+                        (doc_id, user['id'], doc_type, filename, f'{doc_display_name} uploaded during onboarding',
+                         file_data, len(file_data), now_ts)
+                    )
+                    conn.commit()
+                    conn.close()
+                else:
+                    flash(f'{doc_display_name} too large (max 10 MB). You can upload it later from the Vault.', 'error')
+
         flash('Organization profile saved! This information will be auto-filled in future grant applications.', 'success')
         return redirect(url_for('dashboard'))
     
@@ -1645,6 +1725,44 @@ def migrate_user_profiles_reminder_days():
 migrate_user_profiles_reminder_days()
 
 
+def migrate_client_profiles():
+    """Add profile columns to clients table and client_id to org_vault."""
+    conn = get_db()
+    try:
+        client_cols = {
+            'ein': 'TEXT', 'uei': 'TEXT', 'address_line1': 'TEXT',
+            'city': 'TEXT', 'state': 'TEXT', 'zip_code': 'TEXT',
+            'phone': 'TEXT', 'website': 'TEXT', 'org_type': 'TEXT',
+            'mission': 'TEXT', 'annual_budget': 'TEXT',
+        }
+        # Get existing columns
+        existing = set()
+        try:
+            result = conn.execute("PRAGMA table_info(clients)").fetchall()
+            existing = {row[1] for row in result}
+        except Exception:
+            pass  # Postgres — PRAGMA is skipped, use try/except on ALTER
+        for col, col_type in client_cols.items():
+            if col not in existing:
+                try:
+                    conn.execute(f'ALTER TABLE clients ADD COLUMN {col} {col_type}')
+                    conn.commit()
+                except Exception:
+                    pass  # Column may already exist on Postgres
+        # Add client_id to org_vault
+        try:
+            conn.execute("ALTER TABLE org_vault ADD COLUMN client_id TEXT DEFAULT ''")
+            conn.commit()
+        except Exception:
+            pass  # Column may already exist
+    except Exception as e:
+        print(f"Migration note (client_profiles): {e}")
+    finally:
+        conn.close()
+
+migrate_client_profiles()
+
+
 @app.route('/admin')
 def admin_index():
     """Admin dashboard"""
@@ -1776,17 +1894,35 @@ def new_client():
         client_id = f"client-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
         now = datetime.now().isoformat()
 
+        # Collect profile fields
+        ein = request.form.get('ein', '').strip()
+        uei = request.form.get('uei', '').strip()
+        address_line1 = request.form.get('address_line1', '').strip()
+        city = request.form.get('city', '').strip()
+        state = request.form.get('state', '').strip()
+        zip_code = request.form.get('zip_code', '').strip()
+        phone = request.form.get('phone', '').strip()
+        website = request.form.get('website', '').strip()
+        org_type = request.form.get('org_type', '').strip()
+        mission = request.form.get('mission', '').strip()
+        annual_budget = request.form.get('annual_budget', '').strip()
+
         conn.execute('''
-            INSERT INTO clients (id, user_id, organization_name, contact_name, contact_email, status, current_stage, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, 'new', 'intake', ?, ?)
-        ''', (client_id, user['id'], org_name, contact_name, contact_email, now, now))
+            INSERT INTO clients (id, user_id, organization_name, contact_name, contact_email,
+                                 ein, uei, address_line1, city, state, zip_code, phone, website,
+                                 org_type, mission, annual_budget,
+                                 status, current_stage, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', 'intake', ?, ?)
+        ''', (client_id, user['id'], org_name, contact_name, contact_email,
+              ein, uei, address_line1, city, state, zip_code, phone, website,
+              org_type, mission, annual_budget, now, now))
 
         conn.commit()
         conn.close()
-        
+
         flash(f'Client created: {org_name}', 'success')
         return redirect(url_for('client_detail', client_id=client_id))
-    
+
     return render_template('client_form.html', client=None)
 
 @app.route('/client/<client_id>')
@@ -1808,6 +1944,55 @@ def client_detail(client_id):
         return "Client not found", 404
     
     return render_template('client_detail.html', client=client, grants=grants, invoices=invoices)
+
+@app.route('/client/<client_id>/edit', methods=['GET', 'POST'])
+@login_required
+@csrf_required
+def client_edit(client_id):
+    """Edit client profile"""
+    if not user_owns_client(client_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    conn = get_db()
+    client = conn.execute('SELECT * FROM clients WHERE id = ?', (client_id,)).fetchone()
+    if not client:
+        conn.close()
+        return "Client not found", 404
+
+    if request.method == 'POST':
+        now = datetime.now().isoformat()
+        conn.execute('''
+            UPDATE clients SET
+                organization_name = ?, contact_name = ?, contact_email = ?,
+                ein = ?, uei = ?, address_line1 = ?, city = ?, state = ?,
+                zip_code = ?, phone = ?, website = ?, org_type = ?,
+                mission = ?, annual_budget = ?, updated_at = ?
+            WHERE id = ?
+        ''', (
+            request.form.get('organization_name', '').strip(),
+            request.form.get('contact_name', '').strip(),
+            request.form.get('contact_email', '').strip(),
+            request.form.get('ein', '').strip(),
+            request.form.get('uei', '').strip(),
+            request.form.get('address_line1', '').strip(),
+            request.form.get('city', '').strip(),
+            request.form.get('state', '').strip(),
+            request.form.get('zip_code', '').strip(),
+            request.form.get('phone', '').strip(),
+            request.form.get('website', '').strip(),
+            request.form.get('org_type', '').strip(),
+            request.form.get('mission', '').strip(),
+            request.form.get('annual_budget', '').strip(),
+            now, client_id
+        ))
+        conn.commit()
+        conn.close()
+        flash('Client profile updated', 'success')
+        return redirect(url_for('client_detail', client_id=client_id))
+
+    conn.close()
+    return render_template('client_form.html', client=client)
 
 @app.route('/client/<client_id>/intake', methods=['GET', 'POST'])
 @login_required
@@ -2230,9 +2415,15 @@ def generate_section_content(grant_id, section_id):
     
     conn = get_db()
     try:
-        # Get grant info
+        # Get grant info (include client profile fields for per-client grants)
         grant = conn.execute('''
-            SELECT g.*, c.organization_name, c.contact_name, c.intake_data
+            SELECT g.*, c.organization_name, c.contact_name, c.intake_data,
+                   c.ein AS client_ein, c.uei AS client_uei,
+                   c.address_line1 AS client_address, c.city AS client_city,
+                   c.state AS client_state, c.zip_code AS client_zip,
+                   c.phone AS client_phone, c.website AS client_website,
+                   c.org_type AS client_org_type, c.mission AS client_mission,
+                   c.annual_budget AS client_annual_budget
             FROM grants g
             JOIN clients c ON g.client_id = c.id
             WHERE g.id = ?
@@ -2341,36 +2532,58 @@ def generate_section_content(grant_id, section_id):
         except Exception:
             pass
 
-        # Load user's organization details from onboarding
+        # Load organization details: prefer CLIENT's profile for client grants, fallback to user's own
         user_org_info = ""
         try:
-            user = get_current_user()
-            if user:
-                org_details = user_models.get_organization_details(user['id'])
-                if org_details:
-                    od = org_details.get('details') or {}
-                    op = org_details.get('profile') or {}
-                    fa = org_details.get('focus_areas') or []
-                    pg = org_details.get('past_grants') or []
-                    if od.get('ein'):
-                        user_org_info += f"- EIN: {od['ein']}\n"
-                    if od.get('uei'):
-                        user_org_info += f"- UEI: {od['uei']}\n"
-                    if od.get('address_line1'):
-                        user_org_info += f"- Address: {od['address_line1']}, {od.get('city','')}, {od.get('state','')} {od.get('zip_code','')}\n"
-                    if op.get('mission_statement'):
-                        user_org_info += f"- Mission: {sanitize_for_prompt(op['mission_statement'])}\n"
-                    if op.get('programs_description'):
-                        user_org_info += f"- Programs: {sanitize_for_prompt(op['programs_description'])}\n"
-                    if op.get('annual_revenue'):
-                        user_org_info += f"- Annual Budget: ${int(op['annual_revenue']):,}\n"
-                    if op.get('employees'):
-                        user_org_info += f"- Staff: {op['employees']} employees\n"
-                    if fa:
-                        user_org_info += f"- Focus Areas: {', '.join(fa)}\n"
-                    if pg:
-                        for p in pg[:3]:
-                            user_org_info += f"- Past Grant: {p.get('grant_name','')} from {p.get('funding_organization','')} (${p.get('amount_received',0):,}, {p.get('status','')})\n"
+            # Check if client has its own profile data (per-client grants use client data)
+            _client_has_profile = grant.get('client_ein') or grant.get('client_uei') or grant.get('client_mission')
+            if _client_has_profile:
+                # Use client's own credentials/profile
+                if grant.get('client_ein'):
+                    user_org_info += f"- EIN: {grant['client_ein']}\n"
+                if grant.get('client_uei'):
+                    user_org_info += f"- UEI: {grant['client_uei']}\n"
+                if grant.get('client_address'):
+                    user_org_info += f"- Address: {grant['client_address']}, {grant.get('client_city','')}, {grant.get('client_state','')} {grant.get('client_zip','')}\n"
+                if grant.get('client_mission'):
+                    user_org_info += f"- Mission: {sanitize_for_prompt(grant['client_mission'])}\n"
+                if grant.get('client_annual_budget'):
+                    user_org_info += f"- Annual Budget: {grant['client_annual_budget']}\n"
+                if grant.get('client_phone'):
+                    user_org_info += f"- Phone: {grant['client_phone']}\n"
+                if grant.get('client_website'):
+                    user_org_info += f"- Website: {grant['client_website']}\n"
+                if grant.get('client_org_type'):
+                    user_org_info += f"- Organization Type: {grant['client_org_type']}\n"
+            else:
+                # Fallback: use consultant's own organization details
+                user = get_current_user()
+                if user:
+                    org_details = user_models.get_organization_details(user['id'])
+                    if org_details:
+                        od = org_details.get('details') or {}
+                        op = org_details.get('profile') or {}
+                        fa = org_details.get('focus_areas') or []
+                        pg = org_details.get('past_grants') or []
+                        if od.get('ein'):
+                            user_org_info += f"- EIN: {od['ein']}\n"
+                        if od.get('uei'):
+                            user_org_info += f"- UEI: {od['uei']}\n"
+                        if od.get('address_line1'):
+                            user_org_info += f"- Address: {od['address_line1']}, {od.get('city','')}, {od.get('state','')} {od.get('zip_code','')}\n"
+                        if op.get('mission_statement'):
+                            user_org_info += f"- Mission: {sanitize_for_prompt(op['mission_statement'])}\n"
+                        if op.get('programs_description'):
+                            user_org_info += f"- Programs: {sanitize_for_prompt(op['programs_description'])}\n"
+                        if op.get('annual_revenue'):
+                            user_org_info += f"- Annual Budget: ${int(op['annual_revenue']):,}\n"
+                        if op.get('employees'):
+                            user_org_info += f"- Staff: {op['employees']} employees\n"
+                        if fa:
+                            user_org_info += f"- Focus Areas: {', '.join(fa)}\n"
+                        if pg:
+                            for p in pg[:3]:
+                                user_org_info += f"- Past Grant: {p.get('grant_name','')} from {p.get('funding_organization','')} (${p.get('amount_received',0):,}, {p.get('status','')})\n"
         except Exception:
             pass
 
@@ -3108,7 +3321,11 @@ def paper_download(grant_id):
 
     conn = get_db()
     grant = conn.execute('''
-        SELECT g.*, c.organization_name, c.contact_name, c.contact_email
+        SELECT g.*, c.organization_name, c.contact_name, c.contact_email,
+               c.ein AS client_ein, c.uei AS client_uei,
+               c.address_line1 AS client_address, c.city AS client_city,
+               c.state AS client_state, c.zip_code AS client_zip,
+               c.phone AS client_phone, c.mission AS client_mission
         FROM grants g JOIN clients c ON g.client_id = c.id WHERE g.id = ?
     ''', (grant_id,)).fetchone()
     drafts = conn.execute('''
@@ -3201,8 +3418,6 @@ def paper_download(grant_id):
         from form_generator import generate_sf424_pages
         from pypdf import PdfReader, PdfWriter
 
-        org_name = user.get('organization_name', '') or grant['organization_name']
-
         # Load budget data for this grant
         _pkg_budget_row = None
         try:
@@ -3215,19 +3430,7 @@ def paper_download(grant_id):
         except Exception:
             pass
 
-        sf424_org = {
-            'legal_name': org_name,
-            'ein': org_details.get('ein', ''),
-            'uei': org_details.get('uei', ''),
-            'address': org_details.get('address_line1', ''),
-            'city': org_details.get('city', ''),
-            'state': org_details.get('state', ''),
-            'zip': org_details.get('zip_code', ''),
-            'contact_name': grant.get('contact_name', ''),
-            'contact_title': org_details.get('title', ''),
-            'contact_phone': org_details.get('phone', ''),
-            'contact_email': grant.get('contact_email', ''),
-        }
+        sf424_org = _resolve_sf424_org(grant, user, org_data)
         sf424_grant = {
             'grant_name': grant['grant_name'],
             'agency': grant['agency'],
@@ -3289,7 +3492,11 @@ def paper_download_form(grant_id, form_name):
 
     conn = get_db()
     grant = conn.execute('''
-        SELECT g.*, c.organization_name, c.contact_name, c.contact_email
+        SELECT g.*, c.organization_name, c.contact_name, c.contact_email,
+               c.ein AS client_ein, c.uei AS client_uei,
+               c.address_line1 AS client_address, c.city AS client_city,
+               c.state AS client_state, c.zip_code AS client_zip,
+               c.phone AS client_phone, c.mission AS client_mission
         FROM grants g JOIN clients c ON g.client_id = c.id WHERE g.id = ?
     ''', (grant_id,)).fetchone()
     conn.close()
@@ -3321,10 +3528,11 @@ def paper_download_form(grant_id, form_name):
                                           textColor=colors.HexColor('#1a365d'))
         story = []
         gen_date = datetime.now().strftime('%B %d, %Y')
-        org_name = user.get('organization_name', '') or grant['organization_name']
+        _resolved_org = _resolve_sf424_org(grant, user, org_data)
+        org_name = _resolved_org['legal_name']
         full_address = ', '.join(filter(None, [
-            org_details.get('address_line1', ''), org_details.get('city', ''),
-            org_details.get('state', ''), org_details.get('zip_code', '')])) or 'N/A'
+            _resolved_org.get('address', ''), _resolved_org.get('city', ''),
+            _resolved_org.get('state', ''), _resolved_org.get('zip', '')])) or 'N/A'
 
         normalized = form_name.upper().replace('-', '').replace('_', '').replace(' ', '')
 
@@ -3343,19 +3551,7 @@ def paper_download_form(grant_id, form_name):
             except Exception:
                 pass
 
-            sf424_org = {
-                'legal_name': org_name,
-                'ein': org_details.get('ein', ''),
-                'uei': org_details.get('uei', ''),
-                'address': org_details.get('address_line1', ''),
-                'city': org_details.get('city', ''),
-                'state': org_details.get('state', ''),
-                'zip': org_details.get('zip_code', ''),
-                'contact_name': grant.get('contact_name', ''),
-                'contact_title': org_details.get('title', ''),
-                'contact_phone': org_details.get('phone', ''),
-                'contact_email': grant.get('contact_email', ''),
-            }
+            sf424_org = _resolved_org
             sf424_grant = {
                 'grant_name': grant['grant_name'],
                 'agency': grant['agency'],
@@ -3611,12 +3807,16 @@ def download_grant(grant_id, fmt):
     conn = get_db()
     
     grant = conn.execute('''
-        SELECT g.*, c.organization_name, c.contact_name
-        FROM grants g 
-        JOIN clients c ON g.client_id = c.id 
+        SELECT g.*, c.organization_name, c.contact_name, c.contact_email,
+               c.ein AS client_ein, c.uei AS client_uei,
+               c.address_line1 AS client_address, c.city AS client_city,
+               c.state AS client_state, c.zip_code AS client_zip,
+               c.phone AS client_phone, c.mission AS client_mission
+        FROM grants g
+        JOIN clients c ON g.client_id = c.id
         WHERE g.id = ?
     ''', (grant_id,)).fetchone()
-    
+
     drafts = conn.execute('''
         SELECT section, content FROM drafts
         WHERE grant_id = ? AND content IS NOT NULL
@@ -3889,19 +4089,7 @@ def download_grant(grant_id, fmt):
                 except Exception:
                     pass
 
-                sf424_org = {
-                    'legal_name': user.get('organization_name', '') if user else grant['organization_name'],
-                    'ein': _org_details.get('ein', ''),
-                    'uei': _org_details.get('uei', ''),
-                    'address': _org_details.get('address_line1', ''),
-                    'city': _org_details.get('city', ''),
-                    'state': _org_details.get('state', ''),
-                    'zip': _org_details.get('zip_code', ''),
-                    'contact_name': grant.get('contact_name', ''),
-                    'contact_title': _org_details.get('title', ''),
-                    'contact_phone': _org_details.get('phone', ''),
-                    'contact_email': grant.get('contact_email', ''),
-                }
+                sf424_org = _resolve_sf424_org(grant, user, _org_data)
                 sf424_grant = {
                     'grant_name': grant['grant_name'],
                     'agency': grant['agency'],
@@ -5137,10 +5325,21 @@ def _build_checklist_data(grant_id, user_id, template_name):
     uploaded_types = {d['doc_type']: d for d in docs}
 
     # Fetch organization vault documents and map to grant doc types
+    # Check user's own vault (client_id is empty or NULL)
     vault_docs_raw = conn.execute(
         'SELECT * FROM org_vault WHERE user_id = ? AND is_current = TRUE',
         (user_id,)
     ).fetchall()
+
+    # Also check if the grant belongs to a client with its own vault docs
+    _grant_client_id = None
+    try:
+        _gc_row = conn.execute('SELECT client_id FROM grants WHERE id = ?', (grant_id,)).fetchone()
+        if _gc_row:
+            _grant_client_id = _gc_row['client_id']
+    except Exception:
+        pass
+
     vault_by_grant_type = {}
     _vault_map = {
         '501c3_letter': '501c3_determination',
@@ -5158,7 +5357,14 @@ def _build_checklist_data(grant_id, user_id, template_name):
             now_str = datetime.now().isoformat()
             if vd.get('expires_at') and vd['expires_at'] < now_str:
                 continue  # Skip expired vault docs
-            vault_by_grant_type[grant_doc_type] = dict(vd)
+            # Prefer client-specific docs for client grants, or user's own docs (client_id empty)
+            vd_client_id = vd.get('client_id', '') or ''
+            if _grant_client_id and vd_client_id == _grant_client_id:
+                # Client-specific doc takes priority
+                vault_by_grant_type[grant_doc_type] = dict(vd)
+            elif not vd_client_id and grant_doc_type not in vault_by_grant_type:
+                # User's own doc as fallback (only if no client-specific doc already found)
+                vault_by_grant_type[grant_doc_type] = dict(vd)
 
     # Fetch budget data to check if budget actually exists
     budget_row = conn.execute('SELECT * FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
@@ -6171,13 +6377,19 @@ def _format_file_size(size_bytes):
         return f'{size_bytes / (1024 * 1024):.1f} MB'
 
 
-def _get_vault_docs(user_id):
-    """Fetch all current vault docs for a user, keyed by doc_type."""
+def _get_vault_docs(user_id, client_id=''):
+    """Fetch all current vault docs for a user (or client), keyed by doc_type."""
     conn = get_db()
-    rows = conn.execute(
-        'SELECT * FROM org_vault WHERE user_id = ? AND is_current = TRUE',
-        (user_id,)
-    ).fetchall()
+    if client_id:
+        rows = conn.execute(
+            'SELECT * FROM org_vault WHERE user_id = ? AND client_id = ? AND is_current = TRUE',
+            (user_id, client_id)
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT * FROM org_vault WHERE user_id = ? AND (client_id = '' OR client_id IS NULL) AND is_current = TRUE",
+            (user_id,)
+        ).fetchall()
     conn.close()
     return {row['doc_type']: dict(row) for row in rows}
 
@@ -6185,9 +6397,22 @@ def _get_vault_docs(user_id):
 @app.route('/vault')
 @login_required
 def vault():
-    """Organization Vault - permanent document store."""
+    """Organization Vault - permanent document store. Supports ?client_id=xxx for per-client vaults."""
     user_id = session['user_id']
-    vault_docs = _get_vault_docs(user_id)
+    client_id = request.args.get('client_id', '').strip()
+    client_name = ''
+
+    # If viewing a client vault, verify ownership
+    if client_id:
+        if not user_owns_client(client_id):
+            flash('Access denied', 'error')
+            return redirect(url_for('dashboard'))
+        conn = get_db()
+        _client_row = conn.execute('SELECT organization_name FROM clients WHERE id = ?', (client_id,)).fetchone()
+        conn.close()
+        client_name = _client_row['organization_name'] if _client_row else 'Unknown Client'
+
+    vault_docs = _get_vault_docs(user_id, client_id=client_id)
     now = datetime.now().isoformat()
 
     def build_slots(slot_defs):
@@ -6221,7 +6446,9 @@ def vault():
                            uploaded_count=uploaded_count,
                            total_count=total_count,
                            required_uploaded=required_uploaded,
-                           required_count=required_count)
+                           required_count=required_count,
+                           client_id=client_id,
+                           client_name=client_name)
 
 
 @app.route('/vault/upload', methods=['POST'])
@@ -6230,27 +6457,35 @@ def vault():
 def vault_upload():
     """Upload a document to the organization vault."""
     user_id = session['user_id']
+    client_id = request.form.get('client_id', '').strip()
     doc_type = request.form.get('doc_type', '').strip()
     doc_name = request.form.get('doc_name', '').strip()
     description = request.form.get('description', '').strip()
     expires_at = request.form.get('expires_at', '').strip() or None
     file = request.files.get('file')
 
+    # If uploading to a client vault, verify ownership
+    if client_id and not user_owns_client(client_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('vault'))
+
+    redirect_url = url_for('vault', client_id=client_id) if client_id else url_for('vault')
+
     # Validate doc_type
     valid_types = [s['doc_type'] for s in VAULT_REQUIRED_SLOTS + VAULT_OPTIONAL_SLOTS]
     if doc_type not in valid_types:
         flash('Invalid document type.', 'error')
-        return redirect(url_for('vault'))
+        return redirect(redirect_url)
 
     if not file or file.filename == '':
         flash('Please select a file to upload.', 'error')
-        return redirect(url_for('vault'))
+        return redirect(redirect_url)
 
     # Validate file size (10 MB max)
     file_data = file.read()
     if len(file_data) > 10 * 1024 * 1024:
         flash('File too large. Maximum size is 10 MB.', 'error')
-        return redirect(url_for('vault'))
+        return redirect(redirect_url)
 
     filename = secure_filename(file.filename)
     if not doc_name:
@@ -6259,25 +6494,31 @@ def vault_upload():
     conn = get_db()
     now = datetime.now().isoformat()
 
-    # Mark any existing doc of this type as not current
-    conn.execute(
-        'UPDATE org_vault SET is_current = FALSE WHERE user_id = ? AND doc_type = ? AND is_current = TRUE',
-        (user_id, doc_type)
-    )
+    # Mark any existing doc of this type as not current (scoped to client_id)
+    if client_id:
+        conn.execute(
+            'UPDATE org_vault SET is_current = FALSE WHERE user_id = ? AND doc_type = ? AND client_id = ? AND is_current = TRUE',
+            (user_id, doc_type, client_id)
+        )
+    else:
+        conn.execute(
+            "UPDATE org_vault SET is_current = FALSE WHERE user_id = ? AND doc_type = ? AND (client_id = '' OR client_id IS NULL) AND is_current = TRUE",
+            (user_id, doc_type)
+        )
 
     # Insert new vault doc
     doc_id = f"vault-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
     conn.execute(
-        '''INSERT INTO org_vault (id, user_id, doc_type, doc_name, description, file_data, file_size, uploaded_at, expires_at, is_current)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE)''',
-        (doc_id, user_id, doc_type, doc_name, description,
+        '''INSERT INTO org_vault (id, user_id, client_id, doc_type, doc_name, description, file_data, file_size, uploaded_at, expires_at, is_current)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE)''',
+        (doc_id, user_id, client_id or '', doc_type, doc_name, description,
          file_data, len(file_data), now, expires_at)
     )
     conn.commit()
     conn.close()
 
-    flash(f'"{doc_name}" uploaded to your vault.', 'success')
-    return redirect(url_for('vault'))
+    flash(f'"{doc_name}" uploaded to vault.', 'success')
+    return redirect(redirect_url)
 
 
 @app.route('/vault/delete/<doc_id>', methods=['POST'])
@@ -6286,6 +6527,7 @@ def vault_upload():
 def vault_delete(doc_id):
     """Remove a document from the organization vault."""
     user_id = session['user_id']
+    client_id = request.form.get('client_id', '').strip()
     conn = get_db()
 
     # Verify ownership
@@ -6293,14 +6535,15 @@ def vault_delete(doc_id):
     if not row:
         conn.close()
         flash('Document not found.', 'error')
-        return redirect(url_for('vault'))
+        return redirect(url_for('vault', client_id=client_id) if client_id else url_for('vault'))
 
     conn.execute('DELETE FROM org_vault WHERE id = ? AND user_id = ?', (doc_id, user_id))
     conn.commit()
     conn.close()
 
+    redirect_url = url_for('vault', client_id=client_id) if client_id else url_for('vault')
     flash('Document removed from vault.', 'success')
-    return redirect(url_for('vault'))
+    return redirect(redirect_url)
 
 
 # ============ MAIN ============
