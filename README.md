@@ -66,7 +66,7 @@ Switching orgs is instant — no logout/login. All data queries scope to the act
 
 ### Current State
 
-Production-ready. Supabase Postgres database with 25+ tables, 6,800+ line Flask app with 90+ routes, 58 HTML templates, 21 agency templates with regulatory intelligence, structured budget builder, chained AI generation with APA standards, 16-point consistency review, submission checklist with 100% gate, document uploads, MOU generation, organization vault, paper submission (SF-424 forms), post-submission tracking, enterprise org switcher with per-client profiles/vaults, award detection, testimonial pipeline, and 1,773 live grants synced from Grants.gov.
+Production-ready. Supabase Postgres database with 28+ tables, 6,800+ line Flask app with 90+ routes, 58 HTML templates, 21 agency templates with regulatory intelligence, structured budget builder, chained AI generation with APA standards, 16-point consistency review, submission checklist with 100% gate, document uploads, MOU generation, organization vault, paper submission (SF-424 forms), post-submission tracking, enterprise org switcher with per-client profiles/vaults, award detection, testimonial pipeline, subscription lifecycle management (dunning, suspension, retention, data export, account deletion), and 1,773 live grants synced from Grants.gov.
 
 ---
 
@@ -563,7 +563,47 @@ Automated pipeline:
 5. Admin reviews at `/admin/testimonials`
 6. Approved testimonials displayed on landing page
 
-### 13. PDF/DOCX/TXT Export with Branding Toggle (LIVE)
+### 13. Subscription Lifecycle Management (IN PROGRESS)
+
+Full subscription lifecycle covering retention, dunning, suspension, data export, and account deletion:
+
+**Dunning (failed payments):**
+- Day 0/3/7 retry cadence (Day 0/3/7/10 for enterprise plans)
+- 3 escalating email notifications per cycle
+- In-app banner for past-due accounts
+- Account suspended after exhausting retries
+
+**Suspension:**
+- Read-only mode: users can log in, view data, export, but no AI generation or new grants
+- 90-day data retention before deletion eligibility
+- 6 emails over 90 days (day 1, 7, 30, 60, 80, 88)
+- Instant reactivation on payment update
+
+**Cancellation + retention:**
+- Exit survey (4 options) with personalized offers (downgrade, pause -- no discounts)
+- Full-page cancellation flow showing data impact summary
+- Cancel at period end (access preserved through paid period)
+- Pause subscription option (1 or 3 months, max once per year)
+
+**Data export:**
+- Always available on paid plans via /account/export-data
+- Individual grants (PDF/DOCX), budgets (CSV), full account (ZIP)
+- Prominently offered during cancellation and suspension
+
+**Account deletion:**
+- 3-step confirmation: are you sure, type email address, final confirm
+- 72-hour soft-delete grace period before full purge
+- Tombstone record for compliance
+
+**Schema additions:**
+- 13 new columns on `users` table (payment_failure_count, suspended_at, etc.)
+- `subscription_events` table (audit trail)
+- `data_exports` table
+- `account_deletions` table (tombstones)
+
+**Cron job:** `jobs/subscription_lifecycle.py` runs daily at 8am for renewal reminders, suspension reminders, deletion warnings, and pending-deletion marking.
+
+### 14. PDF/DOCX/TXT Export with Branding Toggle (LIVE)
 
 `core/pdf_utils.py` provides:
 
@@ -924,6 +964,31 @@ app.run(debug=True, host='0.0.0.0', port=5001)
 ---
 
 ## Changelog
+
+### 2026-03-22 (Phase 1: Subscription Lifecycle Foundation)
+
+- Added 13 new columns to `users` table for subscription lifecycle tracking (payment_failure_count, suspended_at, data_deletion_eligible_at, pause_started_at, cancellation_reason, plan_before_suspension, etc.)
+- Created `subscription_events` table for full audit trail of every lifecycle state change
+- Created `data_exports` table for tracking user data export requests
+- Created `account_deletions` table for compliance tombstone records after account purge
+- Enhanced Stripe webhook handler with `invoice.paid` and `invoice.upcoming` event support
+- Built dunning escalation in `handle_payment_failed`: increments failure counter, sends escalating emails, suspends account after threshold (3 for monthly/annual, 4 for enterprise)
+- Added `handle_payment_success` to reset all dunning state and reactivate suspended accounts
+- Added `handle_invoice_upcoming` for 30-day renewal reminder emails with dedup
+- Enhanced `cancel_subscription` to accept reason and store cancellation_effective_at
+- Added 8 new email templates: renewal_reminder, dunning_1/2/3, account_suspended, suspension_reminder, cancellation_confirmation, final_deletion_warning
+- Added `send_dunning_email` convenience wrapper that routes by attempt number
+- Created `jobs/subscription_lifecycle.py` daily cron job for: renewal reminders, suspension reminders (day 7/30/60/80), final deletion warnings (day 83), pending-deletion marking (day 90)
+- Added `log_subscription_event()` function in user_models for audit trail
+
+### 2026-03-22 (UX Polish: Contextual Help Text)
+
+- Added contextual help text across 9 pages for first-time grant writers
+
+### 2026-03-22 (Security: Red Team Pass 8)
+
+- Fixed DOM XSS in search filter pills (innerHTML -> textContent)
+- Fixed rate limit ordering on generate routes (moved inside CSRF/auth)
 
 ### 2026-03-21 (Waves 12-13: Regulatory Intelligence and Submission Readiness)
 

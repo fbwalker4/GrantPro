@@ -597,6 +597,475 @@ def send_award_congratulations(email: str, grant_name: str, org_name: str, testi
     return result
 
 
+# ============ SUBSCRIPTION LIFECYCLE EMAIL TEMPLATES ============
+
+def get_renewal_reminder_email(first_name: str, plan: str, renewal_date: str, amount: float) -> Dict:
+    """Upcoming renewal reminder"""
+    subject = f"Your GrantPro subscription renews on {renewal_date}"
+    preheader = f"Your {plan} plan will automatically renew"
+
+    plan_label = plan.replace('_', ' ').title()
+
+    body = f"""
+    <h2 style="margin: 0 0 20px; color: #1e3a5f; font-size: 24px; font-weight: 700;">
+        Hi {first_name}, your subscription is renewing soon
+    </h2>
+
+    <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+        Just a heads-up that your <strong>{plan_label}</strong> plan will automatically renew on
+        <strong>{renewal_date}</strong> for <strong>${amount:,.2f}</strong>.
+    </p>
+
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <p style="margin: 5px 0; font-size: 14px; color: #666;">
+            <strong>Plan:</strong> {plan_label}
+        </p>
+        <p style="margin: 5px 0; font-size: 14px; color: #666;">
+            <strong>Amount:</strong> ${amount:,.2f}
+        </p>
+        <p style="margin: 5px 0; font-size: 14px; color: #666;">
+            <strong>Renewal date:</strong> {renewal_date}
+        </p>
+    </div>
+
+    <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+        No action is needed if you'd like to continue. If you want to update your payment method
+        or change your plan, you can do so from your account.
+    </p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+        <tr>
+            <td align="center">
+                <a href="{BASE_URL}/subscription/manage" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: #ffffff; padding: 14px 32px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px;">
+                    Manage Subscription
+                </a>
+            </td>
+        </tr>
+    </table>
+
+    <p style="margin: 20px 0 0; font-size: 16px; color: #333;">
+        Best,<br>
+        <strong>The Grant Writer Pro Team</strong>
+    </p>
+    """
+
+    return {
+        "subject": subject,
+        "html": wrap_in_html(body, subject, preheader)
+    }
+
+
+def get_dunning_email_1(first_name: str) -> Dict:
+    """First dunning email -- calm and helpful"""
+    subject = "Your GrantPro payment didn't go through"
+    preheader = "We had trouble processing your payment"
+
+    body = f"""
+    <h2 style="margin: 0 0 20px; color: #1e3a5f; font-size: 24px; font-weight: 700;">
+        Hi {first_name}, your payment didn't go through
+    </h2>
+
+    <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+        This happens sometimes. Your card may have expired, or your bank may have
+        flagged the transaction. We'll retry automatically, but you can also update
+        your payment method right now to avoid any interruption to your service.
+    </p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+        <tr>
+            <td align="center">
+                <a href="{BASE_URL}/subscription/manage" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: #ffffff; padding: 14px 32px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px;">
+                    Update Payment Method
+                </a>
+            </td>
+        </tr>
+    </table>
+
+    <p style="margin: 20px 0 0; font-size: 14px; color: #666;">
+        If you have any questions, just reply to this email. We're happy to help.
+    </p>
+
+    <p style="margin: 10px 0 0; font-size: 16px; color: #333;">
+        Best,<br>
+        <strong>The Grant Writer Pro Team</strong>
+    </p>
+    """
+
+    return {
+        "subject": subject,
+        "html": wrap_in_html(body, subject, preheader)
+    }
+
+
+def get_dunning_email_2(first_name: str) -> Dict:
+    """Second dunning email -- more direct"""
+    subject = "Action needed: Update your payment method"
+    preheader = "We've retried your payment and it still didn't work"
+
+    body = f"""
+    <h2 style="margin: 0 0 20px; color: #1e3a5f; font-size: 24px; font-weight: 700;">
+        {first_name}, we still can't process your payment
+    </h2>
+
+    <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+        We've retried your payment and it still didn't work. Please update your payment
+        method to keep your GrantPro subscription active and maintain access to your
+        saved grants, applications, and AI writing tools.
+    </p>
+
+    <div style="background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+        <p style="margin: 0; font-size: 14px; color: #92400e;">
+            <strong>Your account is currently past due.</strong> Your access will continue for now,
+            but please update your payment to avoid any service interruption.
+        </p>
+    </div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+        <tr>
+            <td align="center">
+                <a href="{BASE_URL}/subscription/manage" style="display: inline-block; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; padding: 14px 32px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px;">
+                    Update Payment Method Now
+                </a>
+            </td>
+        </tr>
+    </table>
+
+    <p style="margin: 10px 0 0; font-size: 16px; color: #333;">
+        Best,<br>
+        <strong>The Grant Writer Pro Team</strong>
+    </p>
+    """
+
+    return {
+        "subject": subject,
+        "html": wrap_in_html(body, subject, preheader)
+    }
+
+
+def get_dunning_email_3(first_name: str, suspension_date: str) -> Dict:
+    """Third dunning email -- clear consequences"""
+    subject = f"Your GrantPro account will be suspended on {suspension_date}"
+    preheader = "Final notice: please update your payment method"
+
+    body = f"""
+    <h2 style="margin: 0 0 20px; color: #dc2626; font-size: 24px; font-weight: 700;">
+        {first_name}, this is your final payment notice
+    </h2>
+
+    <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+        We've been unable to process your subscription payment after multiple attempts.
+        If we don't receive payment, your account will be suspended on
+        <strong>{suspension_date}</strong>.
+    </p>
+
+    <div style="background: #fee2e2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #dc2626;">
+        <p style="margin: 0 0 10px; font-size: 14px; color: #991b1b;">
+            <strong>What happens if your account is suspended:</strong>
+        </p>
+        <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #991b1b;">
+            <li>You'll lose access to your saved grants and applications</li>
+            <li>AI writing tools will be disabled</li>
+            <li>After 90 days, your data will be permanently deleted</li>
+        </ul>
+    </div>
+
+    <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+        You can fix this right now by updating your payment method:
+    </p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+        <tr>
+            <td align="center">
+                <a href="{BASE_URL}/subscription/manage" style="display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: #ffffff; padding: 14px 32px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px;">
+                    Update Payment Method Now
+                </a>
+            </td>
+        </tr>
+    </table>
+
+    <p style="margin: 10px 0 0; font-size: 16px; color: #333;">
+        Best,<br>
+        <strong>The Grant Writer Pro Team</strong>
+    </p>
+    """
+
+    return {
+        "subject": subject,
+        "html": wrap_in_html(body, subject, preheader)
+    }
+
+
+def get_account_suspended_email(first_name: str, deletion_date: str) -> Dict:
+    """Account suspended notification"""
+    subject = "Your GrantPro account has been suspended"
+    preheader = "Your account access has been suspended due to non-payment"
+
+    body = f"""
+    <h2 style="margin: 0 0 20px; color: #dc2626; font-size: 24px; font-weight: 700;">
+        {first_name}, your account has been suspended
+    </h2>
+
+    <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+        Due to multiple failed payment attempts, your GrantPro subscription has been suspended.
+        You no longer have access to paid features, but your data is safe for now.
+    </p>
+
+    <div style="background: #fee2e2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #dc2626;">
+        <p style="margin: 0; font-size: 14px; color: #991b1b;">
+            <strong>Your data will be permanently deleted on {deletion_date}</strong> unless
+            you reactivate your subscription before then.
+        </p>
+    </div>
+
+    <p style="margin: 0 0 10px; font-size: 16px; color: #333;">
+        You can reactivate at any time by updating your payment method:
+    </p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+        <tr>
+            <td align="center">
+                <a href="{BASE_URL}/subscription/manage" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: #ffffff; padding: 14px 32px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px;">
+                    Reactivate Subscription
+                </a>
+            </td>
+        </tr>
+    </table>
+
+    <p style="margin: 0 0 20px; font-size: 14px; color: #666;">
+        Want to export your data before deletion? You can download it here:
+    </p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 10px 0 30px;">
+        <tr>
+            <td align="center">
+                <a href="{BASE_URL}/account/export-data" style="display: inline-block; background: #f4f4f5; color: #333; padding: 12px 28px; font-size: 14px; font-weight: 600; text-decoration: none; border-radius: 8px; border: 1px solid #d4d4d8;">
+                    Export My Data
+                </a>
+            </td>
+        </tr>
+    </table>
+
+    <p style="margin: 10px 0 0; font-size: 16px; color: #333;">
+        Best,<br>
+        <strong>The Grant Writer Pro Team</strong>
+    </p>
+    """
+
+    return {
+        "subject": subject,
+        "html": wrap_in_html(body, subject, preheader)
+    }
+
+
+def get_suspension_reminder_email(first_name: str, days_remaining: int, deletion_date: str) -> Dict:
+    """Periodic reminder during suspension"""
+    subject = f"Your GrantPro data will be deleted in {days_remaining} days"
+    preheader = f"You have {days_remaining} days to reactivate before data deletion"
+
+    body = f"""
+    <h2 style="margin: 0 0 20px; color: #1e3a5f; font-size: 24px; font-weight: 700;">
+        {first_name}, your data deletion is approaching
+    </h2>
+
+    <div style="background: #dc2626; color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+        <div style="font-size: 32px; font-weight: 700;">{days_remaining}</div>
+        <div style="font-size: 14px; opacity: 0.9;">days until data deletion</div>
+    </div>
+
+    <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+        Your GrantPro account was suspended due to payment issues. All of your data,
+        including saved grants, applications, and organization details, will be
+        <strong>permanently deleted on {deletion_date}</strong>.
+    </p>
+
+    <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+        To keep your data and restore access, reactivate your subscription:
+    </p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+        <tr>
+            <td align="center">
+                <a href="{BASE_URL}/subscription/manage" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: #ffffff; padding: 14px 32px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px;">
+                    Reactivate Subscription
+                </a>
+            </td>
+        </tr>
+    </table>
+
+    <p style="margin: 0 0 20px; font-size: 14px; color: #666;">
+        Or export your data before it's deleted:
+        <a href="{BASE_URL}/account/export-data" style="color: #6366f1; text-decoration: none;">Export My Data</a>
+    </p>
+
+    <p style="margin: 10px 0 0; font-size: 16px; color: #333;">
+        Best,<br>
+        <strong>The Grant Writer Pro Team</strong>
+    </p>
+    """
+
+    return {
+        "subject": subject,
+        "html": wrap_in_html(body, subject, preheader)
+    }
+
+
+def get_cancellation_confirmation_email(first_name: str, end_date: str) -> Dict:
+    """Cancellation confirmation"""
+    subject = "Your GrantPro subscription has been canceled"
+    preheader = "Your subscription will remain active until the end of your billing period"
+
+    body = f"""
+    <h2 style="margin: 0 0 20px; color: #1e3a5f; font-size: 24px; font-weight: 700;">
+        {first_name}, your cancellation is confirmed
+    </h2>
+
+    <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+        We're sorry to see you go. Your GrantPro subscription has been canceled, but you'll
+        continue to have full access until <strong>{end_date}</strong>.
+    </p>
+
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <p style="margin: 0 0 10px; font-size: 14px; color: #666;">
+            <strong>What happens next:</strong>
+        </p>
+        <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #666;">
+            <li style="margin-bottom: 8px;">Your access continues until {end_date}</li>
+            <li style="margin-bottom: 8px;">After that, you'll move to the free plan (search only)</li>
+            <li style="margin-bottom: 8px;">Your saved grants and applications will still be visible but read-only</li>
+            <li>You can resubscribe at any time to regain full access</li>
+        </ul>
+    </div>
+
+    <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+        Changed your mind? You can reactivate anytime before {end_date}:
+    </p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+        <tr>
+            <td align="center">
+                <a href="{BASE_URL}/subscription/manage" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: #ffffff; padding: 14px 32px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px;">
+                    Reactivate Subscription
+                </a>
+            </td>
+        </tr>
+    </table>
+
+    <p style="margin: 10px 0 0; font-size: 16px; color: #333;">
+        Best,<br>
+        <strong>The Grant Writer Pro Team</strong>
+    </p>
+    """
+
+    return {
+        "subject": subject,
+        "html": wrap_in_html(body, subject, preheader)
+    }
+
+
+def get_final_deletion_warning_email(first_name: str, deletion_date: str) -> Dict:
+    """Last-chance warning before permanent data deletion"""
+    subject = "Last chance: Your GrantPro data will be permanently deleted in 7 days"
+    preheader = "This is your final warning before permanent data deletion"
+
+    body = f"""
+    <h2 style="margin: 0 0 20px; color: #dc2626; font-size: 24px; font-weight: 700;">
+        {first_name}, this is your final warning
+    </h2>
+
+    <div style="background: #dc2626; color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+        <div style="font-size: 18px; font-weight: 700;">PERMANENT DELETION ON {deletion_date.upper()}</div>
+        <div style="font-size: 14px; opacity: 0.9; margin-top: 8px;">7 days remaining</div>
+    </div>
+
+    <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+        Your GrantPro account has been suspended for over 80 days. In 7 days, on
+        <strong>{deletion_date}</strong>, all of your data will be <strong>permanently
+        and irreversibly deleted</strong>, including:
+    </p>
+
+    <ul style="margin: 0 0 20px; padding-left: 20px; color: #333;">
+        <li style="margin-bottom: 8px;">All saved grants and applications</li>
+        <li style="margin-bottom: 8px;">Organization details and grant readiness profile</li>
+        <li style="margin-bottom: 8px;">Draft grant documents</li>
+        <li style="margin-bottom: 8px;">Account history and preferences</li>
+    </ul>
+
+    <p style="margin: 0 0 10px; font-size: 16px; color: #333;">
+        <strong>You have two options:</strong>
+    </p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0;">
+        <tr>
+            <td align="center" style="padding: 5px;">
+                <a href="{BASE_URL}/subscription/manage" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: #ffffff; padding: 14px 32px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px;">
+                    Reactivate Subscription
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td align="center" style="padding: 10px;">
+                <a href="{BASE_URL}/account/export-data" style="display: inline-block; background: #f4f4f5; color: #333; padding: 12px 28px; font-size: 14px; font-weight: 600; text-decoration: none; border-radius: 8px; border: 1px solid #d4d4d8;">
+                    Export My Data Before Deletion
+                </a>
+            </td>
+        </tr>
+    </table>
+
+    <p style="margin: 10px 0 0; font-size: 16px; color: #333;">
+        Best,<br>
+        <strong>The Grant Writer Pro Team</strong>
+    </p>
+    """
+
+    return {
+        "subject": subject,
+        "html": wrap_in_html(body, subject, preheader)
+    }
+
+
+# ============ SUBSCRIPTION LIFECYCLE SEND WRAPPERS ============
+
+def send_renewal_reminder(email: str, first_name: str, plan: str, renewal_date: str, amount: float) -> Dict:
+    """Send renewal reminder email"""
+    content = get_renewal_reminder_email(first_name, plan, renewal_date, amount)
+    return send_email(email, content["subject"], content["html"], "renewal_reminder")
+
+
+def send_dunning_email(email: str, first_name: str, attempt_number: int, suspension_date: str = None) -> Dict:
+    """Send appropriate dunning email based on attempt number"""
+    if attempt_number == 1:
+        content = get_dunning_email_1(first_name)
+    elif attempt_number == 2:
+        content = get_dunning_email_2(first_name)
+    else:
+        content = get_dunning_email_3(first_name, suspension_date or "soon")
+    return send_email(email, content["subject"], content["html"], f"dunning_{attempt_number}")
+
+
+def send_account_suspended_email(email: str, first_name: str, deletion_date: str) -> Dict:
+    """Send account suspended notification"""
+    content = get_account_suspended_email(first_name, deletion_date)
+    return send_email(email, content["subject"], content["html"], "account_suspended")
+
+
+def send_suspension_reminder(email: str, first_name: str, days_remaining: int, deletion_date: str) -> Dict:
+    """Send periodic suspension reminder"""
+    content = get_suspension_reminder_email(first_name, days_remaining, deletion_date)
+    return send_email(email, content["subject"], content["html"], "suspension_reminder")
+
+
+def send_cancellation_confirmation(email: str, first_name: str, end_date: str) -> Dict:
+    """Send cancellation confirmation email"""
+    content = get_cancellation_confirmation_email(first_name, end_date)
+    return send_email(email, content["subject"], content["html"], "cancellation_confirmation")
+
+
+def send_final_deletion_warning(email: str, first_name: str, deletion_date: str) -> Dict:
+    """Send final deletion warning email"""
+    content = get_final_deletion_warning_email(first_name, deletion_date)
+    return send_email(email, content["subject"], content["html"], "final_deletion_warning")
+
+
 # ============ CONVENIENCE FUNCTIONS ============
 
 def send_welcome_email(email: str, first_name: str = "there") -> Dict:

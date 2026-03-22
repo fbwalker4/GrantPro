@@ -20,7 +20,11 @@ USER_COLUMNS = [
     'verified', 'verification_token', 'created_at', 'updated_at',
     'last_login', 'plan', 'grants_this_month', 'max_grants_per_month',
     'subscription_status', 'stripe_customer_id', 'stripe_subscription_id',
-    'subscription_start', 'subscription_end', 'onboarding_completed'
+    'subscription_start', 'subscription_end', 'onboarding_completed',
+    'payment_failure_count', 'first_payment_failure_at', 'suspended_at',
+    'data_deletion_eligible_at', 'cancellation_effective_at', 'last_dunning_email_at',
+    'renewal_reminder_sent', 'pause_started_at', 'pause_ends_at',
+    'pause_count_this_year', 'cancellation_reason', 'deleted_at', 'plan_before_suspension'
 ]
 
 def init_user_db():
@@ -173,6 +177,64 @@ def init_user_db():
             c.execute('''ALTER TABLE users ADD COLUMN onboarding_completed INTEGER DEFAULT 0''')
         except Exception:
             pass  # Column already exists (Postgres or repeated SQLite run)
+
+        # Subscription lifecycle columns
+        for col, default in [
+            ('payment_failure_count', 'INTEGER DEFAULT 0'),
+            ('first_payment_failure_at', 'TEXT'),
+            ('suspended_at', 'TEXT'),
+            ('data_deletion_eligible_at', 'TEXT'),
+            ('cancellation_effective_at', 'TEXT'),
+            ('last_dunning_email_at', 'TEXT'),
+            ('renewal_reminder_sent', 'INTEGER DEFAULT 0'),
+            ('pause_started_at', 'TEXT'),
+            ('pause_ends_at', 'TEXT'),
+            ('pause_count_this_year', 'INTEGER DEFAULT 0'),
+            ('cancellation_reason', 'TEXT'),
+            ('deleted_at', 'TEXT'),
+            ('plan_before_suspension', 'TEXT'),
+        ]:
+            try:
+                c.execute(f'ALTER TABLE users ADD COLUMN {col} {default}')
+            except Exception:
+                pass
+
+        # Subscription events audit trail
+        c.execute('''CREATE TABLE IF NOT EXISTS subscription_events (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            event_type TEXT NOT NULL,
+            stripe_event_id TEXT,
+            metadata TEXT,
+            created_at TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )''')
+
+        # Data exports
+        c.execute('''CREATE TABLE IF NOT EXISTS data_exports (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            status TEXT DEFAULT 'pending',
+            file_path TEXT,
+            file_size INTEGER,
+            requested_at TEXT,
+            completed_at TEXT,
+            expires_at TEXT,
+            download_count INTEGER DEFAULT 0,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )''')
+
+        # Account deletion tombstones
+        c.execute('''CREATE TABLE IF NOT EXISTS account_deletions (
+            id TEXT PRIMARY KEY,
+            user_id TEXT,
+            email TEXT NOT NULL,
+            plan_at_deletion TEXT,
+            deletion_reason TEXT,
+            initiated_by TEXT DEFAULT 'user',
+            tables_purged TEXT,
+            created_at TEXT
+        )''')
     except Exception as e:
         # On Postgres the schema is managed by supabase_migration.sql
         # so failures here (e.g. AUTOINCREMENT syntax) are expected.
@@ -660,6 +722,22 @@ def get_client_limit(plan):
         'enterprise_unlimited': None,  # Unlimited
     }
     return limits.get(plan, 0)
+
+
+def log_subscription_event(user_id, event_type, stripe_event_id=None, metadata=None):
+    """Insert a row into the subscription_events audit trail."""
+    import json as _json
+    conn = get_connection()
+    c = conn.cursor()
+    now = datetime.now()
+    event_id = f"sub_event-{now.strftime('%Y%m%d%H%M%S')}-{secrets.token_hex(8)}"
+    meta_str = _json.dumps(metadata) if metadata else None
+    c.execute('''INSERT INTO subscription_events (id, user_id, event_type, stripe_event_id, metadata, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?)''',
+              (event_id, user_id, event_type, stripe_event_id, meta_str, now.isoformat()))
+    conn.commit()
+    conn.close()
+    return event_id
 
 
 if __name__ == '__main__':

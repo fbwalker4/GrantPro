@@ -402,3 +402,60 @@ CREATE TABLE IF NOT EXISTS grant_shares (
 );
 CREATE INDEX IF NOT EXISTS idx_grant_shares_token ON grant_shares(share_token);
 CREATE INDEX IF NOT EXISTS idx_grant_shares_grant_id ON grant_shares(grant_id);
+
+-- ============================================================
+-- 8. SUBSCRIPTION LIFECYCLE TABLES (2026-03-22)
+-- ============================================================
+
+-- New columns on users table for subscription lifecycle
+ALTER TABLE users ADD COLUMN IF NOT EXISTS payment_failure_count INTEGER DEFAULT 0;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS first_payment_failure_at TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS suspended_at TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS data_deletion_eligible_at TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS cancellation_effective_at TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_dunning_email_at TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS renewal_reminder_sent BOOLEAN DEFAULT FALSE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS pause_started_at TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS pause_ends_at TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS pause_count_this_year INTEGER DEFAULT 0;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS cancellation_reason TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS plan_before_suspension TEXT;
+
+-- Subscription events audit trail
+CREATE TABLE IF NOT EXISTS subscription_events (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    event_type TEXT NOT NULL,
+    stripe_event_id TEXT,
+    metadata TEXT,
+    created_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_sub_events_user ON subscription_events(user_id);
+CREATE INDEX IF NOT EXISTS idx_sub_events_type ON subscription_events(event_type);
+
+-- Data exports
+CREATE TABLE IF NOT EXISTS data_exports (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    status TEXT DEFAULT 'pending',
+    file_path TEXT,
+    file_size INTEGER,
+    requested_at TEXT,
+    completed_at TEXT,
+    expires_at TEXT,
+    download_count INTEGER DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_data_exports_user ON data_exports(user_id);
+
+-- Account deletion tombstones
+CREATE TABLE IF NOT EXISTS account_deletions (
+    id TEXT PRIMARY KEY,
+    user_id TEXT,
+    email TEXT NOT NULL,
+    plan_at_deletion TEXT,
+    deletion_reason TEXT,
+    initiated_by TEXT DEFAULT 'user',
+    tables_purged TEXT,
+    created_at TEXT
+);
