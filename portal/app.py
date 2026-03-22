@@ -2482,7 +2482,17 @@ def generate_section_content(grant_id, section_id):
         except Exception:
             pass
 
+        # FIX 5 & 6: Add budget-specific instructions for MTDC and conciseness
+        budget_section_instructions = ""
+        if section_id in ('budget', 'budget_justification'):
+            budget_section_instructions = """
+    **BUDGET SECTION REQUIREMENTS:**
+    - When describing indirect costs, explicitly state what is EXCLUDED from the Modified Total Direct Cost (MTDC) base per 2 CFR 200. Equipment and participant support costs are excluded. Show the calculation: MTDC = Total Direct ($X) - Equipment ($X) - Participant Support ($X) = $X. Then: $X x rate% = indirect total.
+    - Keep budget justifications CONCISE. Small line items ($500 or less) need only 1-2 sentences. Large line items ($5,000+) deserve 1 paragraph. Do not over-explain obvious expenses.
+    """
+
         prompt += f"""
+    {budget_section_instructions}
     **WRITING STANDARDS:**
     - Follow APA 7th Edition formatting unless the agency specifies otherwise
     - Use APA citation style for any references (Author, Year)
@@ -2897,6 +2907,48 @@ def budget_builder(grant_id):
 
         # Update the grant record amount with grand_total
         conn.execute('UPDATE grants SET amount = ? WHERE id = ?', (grand_total, grant_id))
+
+        # --- FIX 1: Check match requirements from template compliance ---
+        match_warning = None
+        try:
+            template_name = grant['template'] if 'template' in grant.keys() and grant['template'] else 'generic'
+            tmpl_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates', 'agency_templates.json')
+            with open(tmpl_path) as _tf:
+                _all_tmpls = json.load(_tf)
+            _tmpl_data = _all_tmpls.get('agencies', {}).get(template_name, {})
+            _matching = _tmpl_data.get('compliance', {}).get('matching', {})
+            if _matching.get('required') and _matching.get('ratio') == '1:1':
+                federal_request = grand_total
+                if match_total < federal_request:
+                    shortfall = federal_request - match_total
+                    match_warning = (
+                        f"This grant requires a 1:1 match. Your match (${match_total:,.2f}) "
+                        f"is less than your federal request (${federal_request:,.2f}). "
+                        f"You need at least ${shortfall:,.2f} more in matching funds."
+                    )
+                    flash(match_warning, 'warning')
+                    # Store warning in checklist so consistency check catches it
+                    user = get_current_user()
+                    _uid = user['id'] if user else 'unknown'
+                    _existing_warn = conn.execute(
+                        "SELECT id FROM grant_checklist WHERE grant_id = ? AND item_type = 'match_warning' AND item_name = 'match_compliance'",
+                        (grant_id,)).fetchone()
+                    if _existing_warn:
+                        conn.execute(
+                            "UPDATE grant_checklist SET notes = ?, updated_at = ? WHERE grant_id = ? AND item_type = 'match_warning' AND item_name = 'match_compliance'",
+                            (match_warning, now, grant_id))
+                    else:
+                        conn.execute(
+                            "INSERT INTO grant_checklist (id, grant_id, user_id, item_type, item_name, checked, notes, created_at, updated_at) VALUES (?, ?, ?, 'match_warning', 'match_compliance', 0, ?, ?, ?)",
+                            (f"chk-match-{datetime.now().strftime('%Y%m%d-%H%M%S')}", grant_id, _uid, match_warning, now, now))
+                else:
+                    # Match is sufficient — clear any old warning
+                    conn.execute(
+                        "DELETE FROM grant_checklist WHERE grant_id = ? AND item_type = 'match_warning' AND item_name = 'match_compliance'",
+                        (grant_id,))
+        except Exception as e:
+            logger.warning(f'Match compliance check failed: {e}')
+
         conn.commit()
         conn.close()
 
@@ -4887,6 +4939,158 @@ def validate_budget_consistency(grant_id):
                 ),
                 'severity': 'info'
             })
+    except Exception:
+        pass
+
+    # =================================================================
+    # FIX 4: Additional comprehensive consistency checks
+    # =================================================================
+
+    # Check 11: MATCH COMPLIANCE
+    try:
+        tmpl_path_mc = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates', 'agency_templates.json')
+        with open(tmpl_path_mc) as _tf_mc:
+            _tmpls_mc = json.load(_tf_mc)
+        _tmpl_mc = _tmpls_mc.get('agencies', {}).get(template_name or 'generic', {})
+        _matching_mc = _tmpl_mc.get('compliance', {}).get('matching', {})
+
+        if _matching_mc.get('required'):
+            conn_mc = get_db()
+            budget_mc = conn_mc.execute('SELECT grand_total, match_total FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
+            conn_mc.close()
+            if budget_mc:
+                _gt = float(budget_mc['grand_total'] or 0)
+                _mt = float(budget_mc['match_total'] or 0)
+                if _matching_mc.get('ratio') == '1:1' and _gt > 0 and _mt < _gt:
+                    shortfall = _gt - _mt
+                    issues.append({
+                        'title': 'Match Compliance — Insufficient Match',
+                        'message': f'This grant requires a 1:1 match. Your match (${_mt:,.2f}) is less than your federal request (${_gt:,.2f}). You need ${shortfall:,.2f} more in matching funds.',
+                        'severity': 'error'
+                    })
+    except Exception:
+        pass
+
+    # Check 12: INDIRECT COST EXPLANATION
+    try:
+        conn_ic = get_db()
+        budget_ic = conn_ic.execute('SELECT indirect_total, equipment_total, participant_support_total FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
+        conn_ic.close()
+        if budget_ic and float(budget_ic['indirect_total'] or 0) > 0:
+            _all_budget_text = (budget_content + ' ' + budget_just_content).lower()
+            if 'mtdc' not in _all_budget_text and 'modified total direct' not in _all_budget_text:
+                issues.append({
+                    'title': 'Indirect Cost Explanation Missing',
+                    'message': 'Budget includes indirect costs but does not explain MTDC exclusions (equipment, participant support) per 2 CFR 200. Add MTDC calculation to the budget justification.',
+                    'severity': 'warning'
+                })
+    except Exception:
+        pass
+
+    # Check 13: SF-424 COMPLETENESS
+    try:
+        _sf_missing = []
+        if not (grant.get('agency') or ''):
+            _sf_missing.append('agency')
+        if not (grant.get('grant_name') or ''):
+            _sf_missing.append('grant_name')
+        if not (float(grant.get('amount', 0) or 0) > 0):
+            _sf_missing.append('amount')
+        if not (grant.get('deadline') or ''):
+            _sf_missing.append('deadline')
+
+        # Check org details
+        conn_sf = get_db()
+        user_sf = get_current_user()
+        if user_sf:
+            try:
+                org_sf = user_models.get_organization_details(user_sf['id'])
+                if org_sf:
+                    od_sf = org_sf.get('details') or {}
+                    if not od_sf.get('ein'):
+                        _sf_missing.append('EIN')
+                    if not od_sf.get('uei'):
+                        _sf_missing.append('UEI')
+                    if not od_sf.get('address_line1'):
+                        _sf_missing.append('address')
+                else:
+                    _sf_missing.extend(['EIN', 'UEI', 'address'])
+            except Exception:
+                pass
+        conn_sf.close()
+
+        if _sf_missing:
+            issues.append({
+                'title': 'SF-424 Incomplete',
+                'message': f'SF-424 is missing required fields: {", ".join(_sf_missing)}. Complete these before generating the form.',
+                'severity': 'error'
+            })
+    except Exception:
+        pass
+
+    # Check 14: WORK SAMPLES (for NEA/arts templates)
+    try:
+        _arts_templates = ('nea', 'nea_challenge', 'artist_individual')
+        if template_name in _arts_templates:
+            conn_ws = get_db()
+            ws_doc = conn_ws.execute(
+                "SELECT * FROM grant_documents WHERE grant_id = ? AND doc_type = 'work_samples'",
+                (grant_id,)).fetchone()
+            conn_ws.close()
+            if not ws_doc:
+                issues.append({
+                    'title': 'Work Samples Required',
+                    'message': 'This arts grant requires uploaded work samples (images, video, audio). AI-generated text cannot substitute for actual artistic work samples.',
+                    'severity': 'error'
+                })
+            elif ws_doc and ws_doc.get('generated'):
+                issues.append({
+                    'title': 'Work Samples Must Be Uploaded',
+                    'message': 'Work samples appear to be AI-generated. You must upload actual examples of artistic work, not generated text.',
+                    'severity': 'error'
+                })
+    except Exception:
+        pass
+
+    # Check 15: LETTERS AUTHENTICITY
+    try:
+        conn_la = get_db()
+        _letter_types = ('letters_of_support', 'letters_of_collaboration', 'letters_of_commitment',
+                         'mou_chdo', 'mou_partners')
+        for _lt in _letter_types:
+            gen_doc = conn_la.execute(
+                "SELECT * FROM grant_documents WHERE grant_id = ? AND doc_type = ? AND generated = 1",
+                (grant_id, _lt)).fetchone()
+            if gen_doc:
+                issues.append({
+                    'title': 'AI-Generated Letters Detected',
+                    'message': f'The {_lt.replace("_", " ")} document appears to be AI-generated. Replace with actual signed letters from real people before submission.',
+                    'severity': 'warning'
+                })
+        conn_la.close()
+    except Exception:
+        pass
+
+    # Check 16: STAFFING ADEQUACY
+    try:
+        _grant_name_lower = (grant.get('grant_name') or '').lower()
+        _event_keywords = ('workshop', 'concert', 'event', 'conference', 'festival', 'symposium', 'seminar')
+        _involves_events = any(kw in _grant_name_lower for kw in _event_keywords)
+        if _involves_events:
+            conn_sa = get_db()
+            budget_sa = conn_sa.execute('SELECT personnel FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
+            conn_sa.close()
+            if budget_sa and budget_sa.get('personnel'):
+                try:
+                    _pers = json.loads(budget_sa['personnel']) if isinstance(budget_sa['personnel'], str) else budget_sa['personnel']
+                    if len(_pers) < 3:
+                        issues.append({
+                            'title': 'Staffing Adequacy',
+                            'message': f'Project involves events but only {len(_pers)} personnel listed. Consider whether your staffing level is adequate for the project scope.',
+                            'severity': 'warning'
+                        })
+                except (json.JSONDecodeError, TypeError):
+                    pass
     except Exception:
         pass
 

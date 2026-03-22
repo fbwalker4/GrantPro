@@ -190,6 +190,49 @@ def generate_sf424_pages(grant_data, org_data, budget_data):
     amount = float(g.get('amount', 0) or 0)
     deadline = g.get('deadline', '') or ''
 
+    # FIX 3: Populate ALL available fields from grant data
+    cfda_number = g.get('cfda_number', '') or g.get('cfda', '') or ''
+    cfda_title = g.get('cfda_title', '') or ''
+    funding_opp_number = g.get('funding_opp_number', '') or g.get('opportunity_number', '') or ''
+    funding_opp_title = g.get('funding_opp_title', '') or project_title
+    areas_affected = g.get('areas_affected', '') or ''
+    if not areas_affected and city and state:
+        areas_affected = f"{city}, {state}"
+
+    # Congressional district: look up from state/zip
+    congress_dist = o.get('congressional_district', '') or ''
+    if not congress_dist and state and zipcode:
+        # Mississippi zip-based district lookup
+        _ms_zip_districts = {
+            '386': 'MS-002', '387': 'MS-002', '388': 'MS-002',  # Delta / Clarksdale area
+            '389': 'MS-003', '390': 'MS-003', '391': 'MS-003',  # Jackson area
+            '392': 'MS-004', '393': 'MS-004', '394': 'MS-004',  # Hattiesburg / Gulf Coast
+            '395': 'MS-001', '396': 'MS-001', '397': 'MS-001',  # Tupelo / Northeast
+        }
+        zip_prefix = zipcode[:3] if len(zipcode) >= 3 else ''
+        congress_dist = _ms_zip_districts.get(zip_prefix, f"{state}-" if state else '')
+    elif not congress_dist and state:
+        congress_dist = f"{state}-"
+
+    # Project start/end dates from budget duration or grant data
+    start_date = g.get('start_date', '') or ''
+    end_date = g.get('end_date', '') or ''
+    if not start_date and not end_date:
+        duration_months = int(b.get('project_duration_months', 0) or 0)
+        if duration_months > 0:
+            from datetime import timedelta
+            proj_start = datetime.now()
+            # If deadline exists, start after deadline
+            if deadline:
+                try:
+                    dl = datetime.strptime(deadline, '%Y-%m-%d')
+                    proj_start = dl + timedelta(days=60)  # Typical 60-day post-deadline start
+                except (ValueError, TypeError):
+                    pass
+            proj_end = proj_start + timedelta(days=duration_months * 30)
+            start_date = proj_start.strftime('%m/%d/%Y')
+            end_date = proj_end.strftime('%m/%d/%Y')
+
     fed_amount = float(b.get('grand_total', 0) or 0) or amount
     match_total = float(b.get('match_total', 0) or 0)
     total_amount = fed_amount + match_total
@@ -331,17 +374,17 @@ def generate_sf424_pages(grant_data, org_data, budget_data):
     y -= 30
     _draw_field_box(c, MARGIN, y, full_w * 0.3, 28,
                     "11. Catalog of Federal Domestic Assistance Number:",
-                    g.get('cfda_number', ''))
+                    cfda_number)
     _draw_field_box(c, MARGIN + full_w * 0.3, y, full_w * 0.7, 28,
-                    "CFDA Title:", g.get('cfda_title', ''))
+                    "CFDA Title:", cfda_title)
 
     # Field 12 - Funding Opportunity
     y -= 30
     _draw_field_box(c, MARGIN, y, full_w * 0.4, 28,
                     "* 12. Funding Opportunity Number:",
-                    g.get('funding_opp_number', ''), required=True)
+                    funding_opp_number, required=True)
     _draw_field_box(c, MARGIN + full_w * 0.4, y, full_w * 0.6, 28,
-                    "* Title:", g.get('funding_opp_title', ''), required=True)
+                    "* Title:", funding_opp_title, required=True)
 
     # Field 13
     y -= 22
@@ -352,7 +395,7 @@ def generate_sf424_pages(grant_data, org_data, budget_data):
     y -= 36
     _draw_field_box(c, MARGIN, y, full_w, 34,
                     "14. Areas Affected by Project:",
-                    g.get('areas_affected', ''), value_size=8)
+                    areas_affected, value_size=8)
 
     # Field 15 - Project Title
     y -= 50
@@ -376,8 +419,6 @@ def generate_sf424_pages(grant_data, org_data, budget_data):
     c.setFillColor(black)
     c.setFont("Helvetica-Bold", 7)
     c.drawString(MARGIN + 3, y + 32, "16. Congressional Districts Of:")
-    congress_dist = o.get('congressional_district', '') or \
-                    (f"{state}-" if state else '')
     _draw_field_box(c, MARGIN, y, full_w * 0.5, 26,
                     "* a. Applicant:", congress_dist, required=True)
     _draw_field_box(c, MARGIN + full_w * 0.5, y, full_w * 0.5, 26,
@@ -390,8 +431,6 @@ def generate_sf424_pages(grant_data, org_data, budget_data):
     c.setFillColor(black)
     c.setFont("Helvetica-Bold", 7)
     c.drawString(MARGIN + 3, y + 32, "17. Proposed Project:")
-    start_date = g.get('start_date', '') or ''
-    end_date = g.get('end_date', '') or ''
     _draw_field_box(c, MARGIN, y, full_w * 0.5, 26,
                     "* a. Start Date:", start_date, required=True)
     _draw_field_box(c, MARGIN + full_w * 0.5, y, full_w * 0.5, 26,

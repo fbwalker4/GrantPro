@@ -177,8 +177,8 @@
           "name": "Letters of Collaboration",
           "description": "Letters from partner organizations confirming their role. Must use NSF-approved format with brief, factual statements only.",
           "required": false,
-          "can_generate": true,
-          "generate_prompt": "Draft a letter of collaboration in NSF-approved format from a partner organization",
+          "can_generate": false,
+          "upload_instructions": "Upload signed letters of support from partner organizations. Each letter should be on the organization's letterhead, signed by an authorized representative, and specific to this project.",
           "form_number": "N/A"
         },
         {
@@ -710,8 +710,8 @@
           "name": "Letters of Support",
           "description": "Letters from collaborators, consultants, and resource providers",
           "required": false,
-          "can_generate": true,
-          "generate_prompt": "Draft a letter of support for an NIH research grant application"
+          "can_generate": false,
+          "upload_instructions": "Upload signed letters of support from partner organizations. Each letter should be on the organization's letterhead, signed by an authorized representative, and specific to this project."
         },
         {
           "type": "consortium_agreement",
@@ -1874,8 +1874,8 @@
           "name": "Letters of Support",
           "description": "Letters from collaborators, partners, or stakeholders confirming their commitment to the project.",
           "required": false,
-          "can_generate": true,
-          "generate_prompt": "Draft a letter of support for a federal grant application",
+          "can_generate": false,
+          "upload_instructions": "Upload signed letters of support from partner organizations. Each letter should be on the organization's letterhead, signed by an authorized representative, and specific to this project.",
           "form_number": "N/A"
         },
         {
@@ -3577,8 +3577,8 @@
           "name": "MOU with CHDO or Service Provider",
           "description": "Memorandum of Understanding with Community Housing Development Organization or service provider partner.",
           "required": false,
-          "can_generate": true,
-          "generate_prompt": "Draft a Memorandum of Understanding between a grantee and a Community Housing Development Organization (CHDO) or service provider for a HUD grant",
+          "can_generate": false,
+          "upload_instructions": "Upload a signed MOU between your organization and the CHDO or service provider. The MOU must be on official letterhead, signed by authorized representatives from both parties, and specific to this project.",
           "form_number": "N/A"
         },
         {
@@ -4999,8 +4999,8 @@
           "name": "Letters of Support",
           "description": "Letters from law enforcement, community organizations, or government officials confirming partnership and support.",
           "required": false,
-          "can_generate": true,
-          "generate_prompt": "Draft a letter of support from a law enforcement agency for a DOJ grant",
+          "can_generate": false,
+          "upload_instructions": "Upload signed letters of support from partner organizations. Each letter should be on the organization's letterhead, signed by an authorized representative, and specific to this project.",
           "form_number": "N/A"
         },
         {
@@ -5008,8 +5008,8 @@
           "name": "MOU with Partner Agencies",
           "description": "Memoranda of understanding with law enforcement, courts, or service providers detailing roles, services, and duration.",
           "required": false,
-          "can_generate": true,
-          "generate_prompt": "Draft a memorandum of understanding between a grantee and law enforcement for a DOJ grant",
+          "can_generate": false,
+          "upload_instructions": "Upload signed MOUs with all partner agencies. Each MOU must be on official letterhead, signed by authorized representatives from both parties, and detail the roles, services, and duration of the partnership.",
           "form_number": "N/A"
         }
       ],
