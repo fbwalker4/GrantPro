@@ -231,7 +231,7 @@ def add_security_headers(response):
     # Content Security Policy - strict default
     response.headers['Content-Security-Policy'] = (
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline'; "
+        "script-src 'self' 'unsafe-inline' https://cdn.userway.org; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
         "font-src 'self' https://fonts.gstatic.com; "
         "img-src 'self' data: https:; "
@@ -313,9 +313,12 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         user = get_current_user()
-        if not user or user.get('role') != 'admin':
+        if not user:
+            flash('Please log in to access this page', 'error')
+            return redirect(url_for('login'))
+        if user.get('role') != 'admin':
             flash('Admin access required', 'error')
-            return redirect(url_for('index'))
+            return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -1398,9 +1401,14 @@ def grants():
 @require_rate_limit('api_save_grant', max_requests=10, window=60)
 def api_save_grant():
     """Save a grant to favorites - works for logged in users and guest users with email"""
-    # CSRF enforced for logged-in users via csrf_required_allow_guest
-    # Guests (no user_id in session) skip CSRF since they have no persistent session
+    try:
+        return _api_save_grant_impl()
+    except Exception as e:
+        logger.warning(f'api_save_grant error: {e}')
+        return jsonify({'success': False, 'error': 'server_error', 'message': 'An error occurred. Please try again.'}), 500
 
+def _api_save_grant_impl():
+    """Internal implementation of save-grant API."""
     data = request.json or {}
     grant_id = data.get('grant_id') or request.form.get('grant_id')
     notes = data.get('notes', '') or request.form.get('notes', '')
