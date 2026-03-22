@@ -1032,12 +1032,15 @@ def onboarding():
         flash('Organization profile saved! This information will be auto-filled in future grant applications.', 'success')
         return redirect(url_for('dashboard'))
     
-    # Prepare data for template
-    org_details = org_data.get('organization_details') or {}
-    org_profile = org_data.get('organization_profile') or {}
-    focus_areas = org_data.get('focus_areas') or []
-    past_grants = org_data.get('past_grants') or []
-    grant_readiness = user_models.get_grant_readiness(user['id'])
+    # Prepare data for template (defensive — org_data may have None values)
+    org_details = (org_data or {}).get('organization_details') or {}
+    org_profile = (org_data or {}).get('organization_profile') or {}
+    focus_areas = (org_data or {}).get('focus_areas') or []
+    past_grants = (org_data or {}).get('past_grants') or []
+    try:
+        grant_readiness = user_models.get_grant_readiness(user['id'])
+    except Exception:
+        grant_readiness = {}
 
     return render_template('onboarding.html',
                          user=user,
