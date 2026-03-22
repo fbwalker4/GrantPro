@@ -965,6 +965,18 @@ app.run(debug=True, host='0.0.0.0', port=5001)
 
 ## Changelog
 
+### 2026-03-22 (Phase 3: Pause Subscription)
+
+- Added pause_subscription() and reactivate_subscription() to stripe_payment.py
+- Stripe integration via pause_collection API with auto-resume
+- Max 1 pause per 12-month period, 1 or 3 month durations
+- Added /account/pause (POST) and /account/reactivate (GET/POST) routes
+- Paused accounts are read-only (blocked by paid_required decorator)
+- Pause confirmation email sent on activation
+- Account settings shows pause status, end date, and reactivate button
+- Cancellation retention flow now has working pause buttons for "not using" and "other" reasons
+- Layout banner shows amber "paused" status with reactivate link
+
 ### 2026-03-22 (Phase 2: Cancellation + Retention Flow)
 
 - Added /account/settings page as hub for subscription management, data summary, cancel, and danger zone

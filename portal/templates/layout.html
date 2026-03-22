@@ -820,6 +820,10 @@
                 <div style="background: var(--accent-warning); color: #000; padding: 12px 24px; text-align: center; font-weight: 500; font-size: 0.9rem; border-radius: var(--radius-md); margin-bottom: 1rem;">
                     Your payment method needs updating. <a href="{{ url_for('subscription_manage') }}" style="color: #000; font-weight: 700; text-decoration: underline;">Update Payment Method</a>
                 </div>
+                {% elif _user_status == 'paused' %}
+                <div style="background: var(--accent-warning); color: #000; padding: 12px 24px; text-align: center; font-weight: 500; font-size: 0.9rem; border-radius: var(--radius-md); margin-bottom: 1rem;">
+                    Your subscription is paused until {{ pause_ends_at }}. <a href="{{ url_for('account_reactivate') }}" style="color: #000; font-weight: 700; text-decoration: underline;">Reactivate Now</a>
+                </div>
                 {% elif _user_status == 'suspended' %}
                 <div style="background: var(--accent-danger); color: #fff; padding: 12px 24px; text-align: center; font-weight: 500; font-size: 0.9rem; border-radius: var(--radius-md); margin-bottom: 1rem;">
                     Your account is suspended. Your data will be preserved until {{ suspension_deletion_date }}.

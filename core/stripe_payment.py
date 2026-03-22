@@ -554,6 +554,121 @@ def get_subscription_status(user_id):
 
 
 # ============================================================
+# Pause subscription (user-initiated)
+# ============================================================
+
+def pause_subscription(user_id, months=1):
+    """Pause a user's subscription for 1 or 3 months.
+
+    Rules:
+    - Max one pause per 12-month period
+    - Pause duration: 1 or 3 months
+    - Stripe subscription paused via pause_collection
+    - User data preserved, account goes read-only
+    - Auto-reactivates when pause ends
+    """
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute('SELECT stripe_subscription_id, pause_count_this_year, plan FROM users WHERE id = ?', (user_id,))
+    row = c.fetchone()
+    conn.close()
+
+    if not row or not row[0]:
+        return False, "No active subscription"
+
+    subscription_id = row[0]
+    pause_count = row[1] or 0
+    plan = row[2]
+
+    if pause_count >= 1:
+        return False, "You have already used your pause this year. Pausing is limited to once per 12 months."
+
+    if months not in (1, 3):
+        return False, "Pause duration must be 1 or 3 months."
+
+    now = datetime.now()
+    pause_end = now + timedelta(days=months * 30)
+
+    if STRIPE_API_KEY:
+        try:
+            # Pause billing collection in Stripe
+            stripe.Subscription.modify(
+                subscription_id,
+                pause_collection={
+                    'behavior': 'void',
+                    'resumes_at': int(pause_end.timestamp())
+                }
+            )
+        except Exception as e:
+            return False, f"Stripe error: {str(e)}"
+
+    # Update local state
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute('''UPDATE users SET
+                  subscription_status = 'paused',
+                  pause_started_at = ?,
+                  pause_ends_at = ?,
+                  pause_count_this_year = ?,
+                  updated_at = ?
+                  WHERE id = ?''',
+              (now.isoformat(), pause_end.isoformat(), pause_count + 1, now.isoformat(), user_id))
+    conn.commit()
+    conn.close()
+
+    # Log event
+    from user_models import log_subscription_event
+    log_subscription_event(user_id, 'subscription_paused', metadata={'months': months, 'resumes_at': pause_end.isoformat()})
+
+    return True, f"Subscription paused until {pause_end.strftime('%B %d, %Y')}"
+
+
+# ============================================================
+# Reactivate paused subscription
+# ============================================================
+
+def reactivate_subscription(user_id):
+    """Reactivate a paused subscription early."""
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute('SELECT stripe_subscription_id, subscription_status FROM users WHERE id = ?', (user_id,))
+    row = c.fetchone()
+    conn.close()
+
+    if not row or not row[0]:
+        return False, "No subscription found"
+
+    subscription_id = row[0]
+    status = row[1]
+
+    if status != 'paused':
+        return False, "Subscription is not currently paused"
+
+    if STRIPE_API_KEY:
+        try:
+            stripe.Subscription.modify(subscription_id, pause_collection='')
+        except Exception as e:
+            return False, f"Stripe error: {str(e)}"
+
+    conn = get_connection()
+    c = conn.cursor()
+    now = datetime.now().isoformat()
+    c.execute('''UPDATE users SET
+                  subscription_status = 'active',
+                  pause_started_at = NULL,
+                  pause_ends_at = NULL,
+                  updated_at = ?
+                  WHERE id = ?''', (now, user_id))
+    conn.commit()
+    conn.close()
+
+    from user_models import log_subscription_event
+    log_subscription_event(user_id, 'subscription_reactivated', metadata={'from_status': 'paused'})
+
+    return True, "Subscription reactivated"
+
+
+# ============================================================
 # Cancel subscription (user-initiated)
 # ============================================================
 

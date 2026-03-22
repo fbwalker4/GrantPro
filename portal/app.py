@@ -10,7 +10,7 @@ import logging
 import os
 import re
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from flask import Flask, render_template, request, redirect, url_for, send_file, jsonify, flash, session, g
@@ -315,9 +315,13 @@ def paid_required(f):
         if not user or user.get('plan') not in ('monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_unlimited'):
             flash('This feature requires a paid plan. Upgrade to get started.', 'info')
             return redirect(url_for('upgrade'))
-        # Block suspended users
-        if user.get('subscription_status') == 'suspended':
-            flash('Your account is suspended due to a payment issue. Please update your payment method to continue.', 'warning')
+        # Block suspended or paused users
+        if user.get('subscription_status') in ('suspended', 'paused'):
+            status_label = user.get('subscription_status')
+            if status_label == 'suspended':
+                flash('Your account is suspended due to a payment issue. Please update your payment method to continue.', 'warning')
+            else:
+                flash('Your account is currently paused. Please reactivate to continue.', 'warning')
             return redirect(url_for('account_settings'))
         return f(*args, **kwargs)
     return decorated_function
@@ -540,9 +544,21 @@ def inject_subscription_status():
                     pass
         return 'N/A'
 
+    def get_pause_ends_at():
+        if 'user_id' in session:
+            user = user_models.get_user_by_id(session['user_id'])
+            if user and user.get('pause_ends_at'):
+                try:
+                    dt = datetime.fromisoformat(user['pause_ends_at'])
+                    return dt.strftime('%B %d, %Y')
+                except (ValueError, TypeError):
+                    pass
+        return 'N/A'
+
     return dict(
         get_user_subscription_status=get_user_subscription_status,
-        suspension_deletion_date=get_suspension_deletion_date()
+        suspension_deletion_date=get_suspension_deletion_date(),
+        pause_ends_at=get_pause_ends_at()
     )
 
 
@@ -1320,6 +1336,79 @@ def account_downgrade():
             return redirect(portal_url)
 
     flash('Please contact support to change your plan.', 'info')
+    return redirect(url_for('account_settings'))
+
+
+@app.route('/account/pause', methods=['POST'])
+@login_required
+@csrf_required
+def account_pause():
+    """Pause subscription for 1 or 3 months"""
+    user = get_current_user()
+    months = int(request.form.get('months', 1))
+
+    if months not in (1, 3):
+        flash('Invalid pause duration.', 'error')
+        return redirect(url_for('account_settings'))
+
+    success, message = stripe_payment.pause_subscription(user['id'], months)
+
+    if success:
+        flash(f'Your subscription has been paused. {message}', 'success')
+        # Send notification email
+        try:
+            from email_system import send_email, wrap_in_html
+            pause_end = (datetime.now() + timedelta(days=months * 30)).strftime('%B %d, %Y')
+            body = f'''
+            <h2 style="margin: 0 0 20px; color: #d97706; font-size: 24px; font-weight: 700;">
+                Subscription Paused
+            </h2>
+            <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+                Hi {user.get('first_name', 'there')}, your GrantPro subscription has been paused and will automatically resume on <strong>{pause_end}</strong>.
+            </p>
+            <p style="margin: 0 0 20px; font-size: 16px; color: #333;">
+                During the pause, your data is fully preserved and you can still log in and view everything. AI features and new grant creation will be available again when your subscription resumes.
+            </p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+                <tr><td align="center">
+                    <a href="{os.environ.get('APP_URL', 'http://localhost:5001')}/account/reactivate" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; padding: 14px 32px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px;">
+                        Reactivate Early
+                    </a>
+                </td></tr>
+            </table>
+            '''
+            html = wrap_in_html(body, "Subscription Paused", "Your GrantPro subscription is paused")
+            send_email(user['email'], "Your GrantPro subscription has been paused", html, "subscription_paused")
+        except Exception:
+            pass
+    else:
+        flash(message, 'error')
+
+    return redirect(url_for('account_settings'))
+
+
+@app.route('/account/reactivate', methods=['GET', 'POST'])
+@login_required
+def account_reactivate():
+    """Reactivate a paused subscription"""
+    user = get_current_user()
+
+    if user.get('subscription_status') == 'paused':
+        success, message = stripe_payment.reactivate_subscription(user['id'])
+        if success:
+            flash('Your subscription is active again. Welcome back!', 'success')
+        else:
+            flash(message, 'error')
+    elif user.get('subscription_status') == 'suspended':
+        # Redirect to Stripe portal to update payment
+        if user.get('stripe_customer_id'):
+            portal_url, error = stripe_payment.create_portal_session(user['stripe_customer_id'])
+            if portal_url:
+                return redirect(portal_url)
+        flash('Please update your payment method to reactivate.', 'info')
+    else:
+        flash('Your subscription is already active.', 'info')
+
     return redirect(url_for('account_settings'))
 
 

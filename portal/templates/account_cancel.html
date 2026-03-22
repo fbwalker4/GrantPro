@@ -240,7 +240,23 @@
     <div class="retention-card">
         <h3>Pause Your Subscription</h3>
         <p>Your data stays safe and your account stays set up. When grant season picks back up, just unpause and you are right where you left off.</p>
-        <p style="font-size: 0.85rem; color: var(--text-muted);">Pause options coming soon. In the meantime, your subscription will remain active.</p>
+        {% if (user.get('pause_count_this_year') or 0) < 1 %}
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem;">
+            <form method="POST" action="{{ url_for('account_pause') }}" style="margin: 0;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="months" value="1">
+                <button type="submit" class="btn btn-primary">Pause for 1 Month</button>
+            </form>
+            <form method="POST" action="{{ url_for('account_pause') }}" style="margin: 0;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="months" value="3">
+                <button type="submit" class="btn btn-secondary">Pause for 3 Months</button>
+            </form>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem;">You can pause once per 12-month period.</p>
+        {% else %}
+        <p style="font-size: 0.85rem; color: var(--text-muted);">You have already used your pause this year.</p>
+        {% endif %}
     </div>
 
     {% elif reason == 'switching' %}
@@ -266,7 +282,23 @@
     <div class="retention-card">
         <h3>Consider Pausing Instead</h3>
         <p>Keep your data and setup intact while you take a break. Resume anytime without starting over.</p>
-        <p style="font-size: 0.85rem; color: var(--text-muted);">Pause options coming soon.</p>
+        {% if (user.get('pause_count_this_year') or 0) < 1 %}
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem;">
+            <form method="POST" action="{{ url_for('account_pause') }}" style="margin: 0;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="months" value="1">
+                <button type="submit" class="btn btn-primary">Pause for 1 Month</button>
+            </form>
+            <form method="POST" action="{{ url_for('account_pause') }}" style="margin: 0;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="months" value="3">
+                <button type="submit" class="btn btn-secondary">Pause for 3 Months</button>
+            </form>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem;">You can pause once per 12-month period.</p>
+        {% else %}
+        <p style="font-size: 0.85rem; color: var(--text-muted);">You have already used your pause this year.</p>
+        {% endif %}
     </div>
     {% endif %}
 
