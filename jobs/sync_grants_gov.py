@@ -67,8 +67,8 @@ AGENCY_TEMPLATE_MAP = {
     "SBA": "small_business_grant",
 }
 
-API_URL = "https://api.grants.gov/v1/api/search"
-PAGE_SIZE = 25  # Grants.gov default page size
+API_URL = "https://apply07.grants.gov/grantsws/rest/opportunities/search"
+PAGE_SIZE = 100  # Max per request
 
 
 def _parse_amount(val):
