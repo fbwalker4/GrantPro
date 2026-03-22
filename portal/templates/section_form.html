@@ -7,17 +7,17 @@
 <p><a href="/grant/{{ grant.id }}" aria-label="Back to grant detail page">← Back to Grant</a></p>
 
 {% if section_guidance %}
-<div class="card" style="background: #fff3cd; border-color: #ffc107; margin-bottom: 1rem;">
-    <h3 style="color: #856404; margin-top: 0;">📋 Agency Guidance</h3>
-    <p style="color: #856404;">{{ section_guidance.guidance }}</p>
+<div class="card" style="background: #e8f4fd; border-color: #bee5eb; margin-bottom: 1rem;">
+    <h3 style="color: #0c5460; margin-top: 0;">📋 Agency Guidance</h3>
+    <p style="color: #0c5460;">{{ section_guidance.guidance }}</p>
     {% if section_guidance.max_pages %}
-    <p style="color: #856404;"><strong>Max Pages:</strong> {{ section_guidance.max_pages }}</p>
+    <p style="color: #0c5460;"><strong>Max Pages:</strong> {{ section_guidance.max_pages }}</p>
     {% endif %}
     {% if section_guidance.max_chars %}
-    <p style="color: #856404;"><strong>Max Characters:</strong> {{ section_guidance.max_chars }}</p>
+    <p style="color: #0c5460;"><strong>Max Characters:</strong> {{ section_guidance.max_chars }}</p>
     {% endif %}
     {% if section_guidance.required %}
-    <p style="color: #856404;"><strong>Required:</strong> Yes</p>
+    <p style="color: #0c5460;"><strong>Required:</strong> Yes</p>
     {% endif %}
 </div>
 {% endif %}

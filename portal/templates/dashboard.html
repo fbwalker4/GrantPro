@@ -131,7 +131,9 @@
     </div>
     <div class="actions-row">
         <a href="/wizard" class="btn btn-primary">🔍 Grant Wizard</a>
+        {% if user.plan in ['enterprise_5', 'enterprise_10', 'enterprise_unlimited'] %}
         <a href="/client/new" class="btn btn-secondary">➕ New Client</a>
+        {% endif %}
         <a href="/grants" class="btn btn-secondary">📋 Browse Grants</a>
         <a href="/eligibility" class="btn btn-secondary">✓ Eligibility Check</a>
     </div>

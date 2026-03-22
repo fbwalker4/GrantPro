@@ -620,6 +620,7 @@
                             <option value="Science">Science</option>
                             <option value="Community">Community</option>
                             <option value="Defense">Defense</option>
+                            <option value="Arts & Culture">Arts & Culture</option>
                         </select>
                         <select id="amountFilter" onchange="sortAndFilter()" aria-label="Filter by amount range">
                             <option value="">Any Amount</option>
@@ -693,7 +694,11 @@
                 <div class="grant-meta">
                     <div class="grant-meta-item">
                         <div class="grant-meta-label">Funding</div>
+                        {% if (grant.amount_min is none or grant.amount_min == 0) and (grant.amount_max is none or grant.amount_max == 0) %}
+                        <div class="grant-meta-value amount" style="color: #6b7280; font-style: italic;">See NOFO for details</div>
+                        {% else %}
                         <div class="grant-meta-value amount">${{ "{:,.0f}".format(grant.amount_min) }} - ${{ "{:,.0f}".format(grant.amount_max) }}</div>
+                        {% endif %}
                     </div>
                     <div class="grant-meta-item">
                         <div class="grant-meta-label">Category</div>
@@ -798,7 +803,13 @@
 
             var matchesSearch = !search || title.indexOf(search) !== -1 || desc.indexOf(search) !== -1;
             var matchesAgency = !agency || cardAgency.indexOf(agency) !== -1;
-            var matchesCategory = !category || cardCategory.indexOf(category) !== -1;
+            var matchesCategory = true;
+            if (category === 'Arts & Culture') {
+                var catLower = (cardCategory + ' ' + cardAgency).toLowerCase();
+                matchesCategory = catLower.indexOf('arts') !== -1 || catLower.indexOf('culture') !== -1 || catLower.indexOf('nea') !== -1 || catLower.indexOf('humanities') !== -1 || catLower.indexOf('neh') !== -1 || catLower.indexOf('museum') !== -1;
+            } else if (category) {
+                matchesCategory = cardCategory.indexOf(category) !== -1;
+            }
             var matchesAmount = !amount || cardAmount >= amount;
 
             // Deadline range filter
