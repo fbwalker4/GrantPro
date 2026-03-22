@@ -6,6 +6,7 @@ Handles recurring subscriptions (monthly/annual) and webhooks
 
 import os
 import json
+import secrets
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -196,6 +197,14 @@ def handle_webhook(payload, sig_header):
     if c.fetchone():
         conn.close()
         return {"status": "duplicate", "event": event['type']}, None
+
+    # Record the event ID immediately to prevent concurrent duplicates
+    now = datetime.now()
+    idempotency_id = f"stripe-{now.strftime('%Y%m%d%H%M%S')}-{secrets.token_hex(4)}"
+    c.execute('''INSERT INTO subscription_events (id, user_id, event_type, stripe_event_id, metadata, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?)''',
+              (idempotency_id, 'webhook', event['type'], event['id'], None, now.isoformat()))
+    conn.commit()
     conn.close()
 
     # Handle the event
