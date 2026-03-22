@@ -703,7 +703,23 @@
                 <div class="sidebar-logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 40 40" role="img" aria-label="Grant Pro logo"><defs><linearGradient id="gp-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2563eb"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs><rect width="40" height="40" rx="8" fill="url(#gp-grad)"/><text x="20" y="26" text-anchor="middle" fill="white" font-family="Inter,Helvetica,Arial,sans-serif" font-weight="700" font-size="16">GP</text></svg></div>
                 <span class="sidebar-logo-text">Grant Pro</span>
             </div>
-            
+
+            {% if show_org_switcher %}
+            <div style="padding: 0.5rem 1rem; margin-bottom: 1rem; background: var(--bg-tertiary); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem;">Working as</div>
+                <form method="POST" action="/switch-org" id="orgSwitchForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <select name="org_id" onchange="this.form.submit()" style="width: 100%; padding: 0.4rem 0.5rem; background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.85rem; cursor: pointer;">
+                        {% for org in user_orgs %}
+                        <option value="{{ org.id }}" {% if org.id == active_org_id %}selected{% endif %}>
+                            {{ org.organization_name }}{% if org.is_primary %} (You){% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+            {% endif %}
+
             <nav class="nav-section" aria-label="Main">
                 <div class="nav-section-title">Main</div>
                 <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">

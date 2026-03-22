@@ -331,6 +331,56 @@ def get_user_clients(user_id):
     return [c['id'] for c in clients]
 
 
+def get_active_org_id():
+    """Get the active organization (client) ID.
+    Returns the client_id the user is currently 'working as'.
+    Falls back to user's primary (self) org."""
+    org_id = session.get('active_org_id')
+    if org_id:
+        return org_id
+    # Fall back to user's primary client
+    user = get_current_user()
+    if user and user.get('active_client_id'):
+        return user['active_client_id']
+    # Last resort: find or create self-client
+    if user:
+        conn = get_db()
+        row = conn.execute("SELECT id FROM clients WHERE user_id = ? AND is_primary = TRUE",
+            (user['id'],)).fetchone()
+        conn.close()
+        if row:
+            session['active_org_id'] = row['id']
+            return row['id']
+    return None
+
+def get_user_orgs():
+    """Get all organizations the current user can work as.
+    Returns list of dicts with id, organization_name, is_primary."""
+    user = get_current_user()
+    if not user:
+        return []
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT id, organization_name, is_primary FROM clients WHERE user_id = ? ORDER BY is_primary DESC, organization_name",
+        (user['id'],)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def set_active_org(client_id):
+    """Switch the active organization. Validates ownership."""
+    user = get_current_user()
+    if not user:
+        return False
+    conn = get_db()
+    row = conn.execute("SELECT id FROM clients WHERE id = ? AND user_id = ?",
+        (client_id, user['id'])).fetchone()
+    conn.close()
+    if row:
+        session['active_org_id'] = client_id
+        return True
+    return False
+
+
 def user_owns_client(client_id):
     """Check if current user owns the client"""
     user = get_current_user()
@@ -429,6 +479,23 @@ def inject_user():
     """Make user available in all templates"""
     return dict(user=getattr(g, 'user', None))
 
+
+@app.context_processor
+def inject_org_context():
+    user = getattr(g, 'user', None) or get_current_user()
+    orgs = get_user_orgs() if user else []
+    active_org_id = get_active_org_id() if user else None
+    active_org_name = ''
+    for o in orgs:
+        if o['id'] == active_org_id:
+            active_org_name = o['organization_name']
+            break
+    return dict(
+        user_orgs=orgs,
+        active_org_id=active_org_id,
+        active_org_name=active_org_name,
+        show_org_switcher=len(orgs) > 1
+    )
 
 @app.context_processor
 def inject_grants_count():
@@ -608,6 +675,18 @@ def signup():
             flash(error, 'error')
         else:
             logger.info(f'New user registered: {email} (plan: free)')
+            # Create primary (self) organization
+            self_client_id = f"org-self-{user_id}"
+            conn = get_db()
+            conn.execute("""INSERT INTO clients (id, user_id, organization_name, contact_name, contact_email,
+                status, current_stage, is_primary, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, 'active', 'complete', TRUE, ?, ?)
+                ON CONFLICT (id) DO NOTHING""",
+                (self_client_id, user_id, organization_name or f"{first_name} {last_name}".strip(),
+                 f"{first_name} {last_name}".strip(), email, datetime.now().isoformat(), datetime.now().isoformat()))
+            conn.execute("UPDATE users SET active_client_id = ? WHERE id = ?", (self_client_id, user_id))
+            conn.commit()
+            conn.close()
             # If they requested a paid plan, redirect to payment checkout
             if requested_plan in ['monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_unlimited']:
                 session['user_id'] = user_id
@@ -621,6 +700,18 @@ def signup():
                 return redirect(url_for('onboarding'))
     
     return render_template('signup.html', plan=plan)
+
+
+@app.route('/switch-org', methods=['POST'])
+@login_required
+@csrf_required
+def switch_org():
+    client_id = request.form.get('org_id') or (request.json or {}).get('org_id')
+    if client_id and set_active_org(client_id):
+        flash('Switched organization', 'success')
+    else:
+        flash('Could not switch organization', 'error')
+    return redirect(request.referrer or url_for('dashboard'))
 
 
 @app.route('/upgrade', methods=['GET', 'POST'])
@@ -1637,7 +1728,7 @@ def get_db():
 
 # Add user_id column to clients table if it doesn't exist (run once)
 def migrate_clients_table():
-    """Add user_id to clients table if missing"""
+    """Add user_id and is_primary to clients table if missing"""
     conn = get_db()
     try:
         result = conn.execute("PRAGMA table_info(clients)").fetchall()
@@ -1646,6 +1737,25 @@ def migrate_clients_table():
             conn.execute('ALTER TABLE clients ADD COLUMN user_id TEXT')
             conn.commit()
             print("Added user_id column to clients table")
+        if 'is_primary' not in columns:
+            conn.execute('ALTER TABLE clients ADD COLUMN is_primary BOOLEAN DEFAULT FALSE')
+            conn.commit()
+            print("Added is_primary column to clients table")
+    except Exception as e:
+        print(f"Migration note: {e}")
+    finally:
+        conn.close()
+
+def migrate_users_active_client():
+    """Add active_client_id to users table if missing"""
+    conn = get_db()
+    try:
+        result = conn.execute("PRAGMA table_info(users)").fetchall()
+        columns = [row[1] for row in result]
+        if 'active_client_id' not in columns:
+            conn.execute('ALTER TABLE users ADD COLUMN active_client_id TEXT')
+            conn.commit()
+            print("Added active_client_id column to users table")
     except Exception as e:
         print(f"Migration note: {e}")
     finally:
@@ -1704,6 +1814,7 @@ def migrate_grants_submission_tracking():
         conn.close()
 
 migrate_clients_table()
+migrate_users_active_client()
 migrate_grants_table()
 migrate_grants_submission_tracking()
 
