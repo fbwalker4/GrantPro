@@ -5396,40 +5396,137 @@ def validate_budget_consistency(grant_id):
         pass
 
     # =================================================================
-    # FIX 4: Additional comprehensive consistency checks
+    # ENHANCED CONSISTENCY CHECKS (with error logging, not silent pass)
     # =================================================================
 
-    # Check 11: MATCH COMPLIANCE
+    # Load template data once for all remaining checks
+    _tmpl_data = {}
     try:
         tmpl_path_mc = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates', 'agency_templates.json')
         with open(tmpl_path_mc) as _tf_mc:
             _tmpls_mc = json.load(_tf_mc)
-        _tmpl_mc = _tmpls_mc.get('agencies', {}).get(template_name or 'generic', {})
-        _matching_mc = _tmpl_mc.get('compliance', {}).get('matching', {})
+        _tmpl_data = _tmpls_mc.get('agencies', {}).get(template_name or 'generic', {})
+    except Exception as e:
+        logger.warning(f'Consistency check: failed to load template data: {e}')
 
-        if _matching_mc.get('required'):
-            conn_mc = get_db()
-            budget_mc = conn_mc.execute('SELECT grand_total, match_total FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
-            conn_mc.close()
-            if budget_mc:
-                _gt = float(budget_mc['grand_total'] or 0)
-                _mt = float(budget_mc['match_total'] or 0)
-                if _matching_mc.get('ratio') == '1:1' and _gt > 0 and _mt < _gt:
-                    shortfall = _gt - _mt
-                    issues.append({
-                        'title': 'Match Compliance — Insufficient Match',
-                        'message': f'This grant requires a 1:1 match. Your match (${_mt:,.2f}) is less than your federal request (${_gt:,.2f}). You need ${shortfall:,.2f} more in matching funds.',
-                        'severity': 'error'
-                    })
-    except Exception:
-        pass
-
-    # Check 12: INDIRECT COST EXPLANATION
+    # Load budget data once for all budget checks
+    _budget_db = None
     try:
-        conn_ic = get_db()
-        budget_ic = conn_ic.execute('SELECT indirect_total, equipment_total, participant_support_total FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
-        conn_ic.close()
-        if budget_ic and float(budget_ic['indirect_total'] or 0) > 0:
+        conn_budget = get_db()
+        _budget_db = conn_budget.execute('SELECT * FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
+        conn_budget.close()
+    except Exception as e:
+        logger.warning(f'Consistency check: failed to load budget data: {e}')
+
+    # ---- CHECK 11: BUDGET ARITHMETIC VERIFICATION ----
+    # Cross-check that budget builder category totals actually sum to total_direct
+    try:
+        if _budget_db:
+            bd = dict(_budget_db)
+            # Personnel total is computed from JSON array, not a column
+            _personnel = 0
+            _pers_json = bd.get('personnel')
+            if _pers_json:
+                try:
+                    _pers_list = json.loads(_pers_json) if isinstance(_pers_json, str) else _pers_json
+                    _personnel = sum(float(p.get('total') or 0) for p in _pers_list)
+                except (json.JSONDecodeError, TypeError):
+                    pass
+            _fringe = float(bd.get('fringe_total') or 0)
+            _travel = float(bd.get('travel_total') or 0)
+            _equipment = float(bd.get('equipment_total') or 0)
+            _supplies = float(bd.get('supplies_total') or 0)
+            _contractual = float(bd.get('contractual_total') or 0)
+            _other = float(bd.get('other_total') or 0)
+            _participant = float(bd.get('participant_support_total') or 0)
+            _construction = float(bd.get('construction_total') or 0)
+            _computed_direct = _personnel + _fringe + _travel + _equipment + _supplies + _contractual + _construction + _other + _participant
+            _stored_direct = float(bd.get('total_direct') or 0)
+            _stored_grand = float(bd.get('grand_total') or 0)
+            _stored_indirect = float(bd.get('indirect_total') or 0)
+            _stored_mtdc = float(bd.get('mtdc_base') or 0)
+
+            # Verify category sum = total_direct
+            if abs(_computed_direct - _stored_direct) > 1.00:
+                issues.append({
+                    'title': 'Budget Category Sum Mismatch',
+                    'message': f'Budget categories sum to ${_computed_direct:,.2f} but total direct costs shows ${_stored_direct:,.2f}. Difference: ${abs(_computed_direct - _stored_direct):,.2f}.',
+                    'severity': 'error'
+                })
+
+            # Verify grand_total = total_direct + indirect_total
+            _expected_grand = _stored_direct + _stored_indirect
+            if abs(_expected_grand - _stored_grand) > 1.00:
+                issues.append({
+                    'title': 'Budget Grand Total Mismatch',
+                    'message': f'Direct (${_stored_direct:,.2f}) + Indirect (${_stored_indirect:,.2f}) = ${_expected_grand:,.2f}, but grand total shows ${_stored_grand:,.2f}.',
+                    'severity': 'error'
+                })
+
+            # Verify MTDC base = total_direct - equipment - participant_support
+            _expected_mtdc = _stored_direct - _equipment - _participant
+            if _stored_mtdc > 0 and abs(_expected_mtdc - _stored_mtdc) > 1.00:
+                issues.append({
+                    'title': 'MTDC Base Calculation Error',
+                    'message': f'MTDC base should be ${_expected_mtdc:,.2f} (direct costs minus equipment and participant support) but shows ${_stored_mtdc:,.2f}.',
+                    'severity': 'error'
+                })
+
+            # Check if contractual > $25K — warn about MTDC subcontract exclusion
+            if _contractual > 25000 and _stored_indirect > 0:
+                issues.append({
+                    'title': 'Subcontract MTDC Exclusion',
+                    'message': f'Contractual costs total ${_contractual:,.0f}. Per 2 CFR 200.1, only the first $25,000 of each subcontract is included in MTDC. Verify your MTDC base accounts for this exclusion if any single subcontract exceeds $25,000.',
+                    'severity': 'warning'
+                })
+
+            # Cross-check budget grand_total vs grant amount field
+            _grant_amt = float(grant.get('amount') or 0)
+            if _grant_amt > 0 and _stored_grand > 0 and abs(_grant_amt - _stored_grand) > 1.00:
+                issues.append({
+                    'title': 'Grant Amount vs Budget Mismatch',
+                    'message': f'Grant amount field shows ${_grant_amt:,.2f} but budget grand total is ${_stored_grand:,.2f}. These must match.',
+                    'severity': 'error'
+                })
+    except Exception as e:
+        logger.warning(f'Consistency check 11 (budget arithmetic) failed: {e}')
+
+    # ---- CHECK 12: MATCH COMPLIANCE ----
+    try:
+        _matching_mc = _tmpl_data.get('compliance', {}).get('matching', {})
+        if _matching_mc.get('required') and _budget_db:
+            _gt = float(_budget_db['grand_total'] or 0)
+            _mt = float(_budget_db['match_total'] or 0)
+            _ratio_str = _matching_mc.get('ratio', '')
+            # Parse ratio — support '1:1', '1:3', percentage, etc.
+            if _ratio_str == '1:1' and _gt > 0 and _mt < _gt:
+                shortfall = _gt - _mt
+                issues.append({
+                    'title': 'Match Compliance — Insufficient Match',
+                    'message': f'This grant requires a 1:1 match. Your match (${_mt:,.2f}) is less than your federal request (${_gt:,.2f}). You need ${shortfall:,.2f} more in matching funds.',
+                    'severity': 'error'
+                })
+            elif ':' in _ratio_str and _ratio_str != '1:1':
+                # Parse N:M ratio (e.g., '1:3' means 1 match per 3 federal)
+                try:
+                    parts = _ratio_str.split(':')
+                    match_part = float(parts[0])
+                    federal_part = float(parts[1])
+                    required_match = _gt * (match_part / federal_part)
+                    if _mt < required_match * 0.99:
+                        issues.append({
+                            'title': 'Match Compliance — Insufficient Match',
+                            'message': f'This grant requires a {_ratio_str} match. Required match: ${required_match:,.2f}, your match: ${_mt:,.2f}.',
+                            'severity': 'error'
+                        })
+                except (ValueError, ZeroDivisionError):
+                    pass
+    except Exception as e:
+        logger.warning(f'Consistency check 12 (match compliance) failed: {e}')
+
+    # ---- CHECK 13: INDIRECT COST EXPLANATION + NICRA CHECK ----
+    try:
+        if _budget_db and float(_budget_db.get('indirect_total') or 0) > 0:
             _all_budget_text = (budget_content + ' ' + budget_just_content).lower()
             if 'mtdc' not in _all_budget_text and 'modified total direct' not in _all_budget_text:
                 issues.append({
@@ -5437,10 +5534,33 @@ def validate_budget_consistency(grant_id):
                     'message': 'Budget includes indirect costs but does not explain MTDC exclusions (equipment, participant support) per 2 CFR 200. Add MTDC calculation to the budget justification.',
                     'severity': 'warning'
                 })
-    except Exception:
-        pass
 
-    # Check 13: SF-424 COMPLETENESS
+            # Check indirect rate — if > de minimis (typically 10-15%), require NICRA upload
+            _indirect = float(_budget_db.get('indirect_total') or 0)
+            _mtdc = float(_budget_db.get('mtdc_base') or 0)
+            if _mtdc > 0:
+                _effective_rate = (_indirect / _mtdc) * 100
+                _de_minimis = float(_tmpl_data.get('indirect_cost_rules', {}).get('de_minimis_rate', 15))
+                if _effective_rate > _de_minimis + 0.5:
+                    # Check if NICRA document uploaded
+                    try:
+                        conn_nicra = get_db()
+                        nicra_doc = conn_nicra.execute(
+                            "SELECT id FROM grant_documents WHERE grant_id = ? AND doc_type = 'indirect_cost_agreement'",
+                            (grant_id,)).fetchone()
+                        conn_nicra.close()
+                        if not nicra_doc:
+                            issues.append({
+                                'title': 'Negotiated Indirect Cost Rate Agreement Missing',
+                                'message': f'Your effective indirect rate is {_effective_rate:.1f}% which exceeds the {_de_minimis:.0f}% de minimis rate. Upload your NICRA (Negotiated Indirect Cost Rate Agreement) to justify this rate.',
+                                'severity': 'error'
+                            })
+                    except Exception as e:
+                        logger.warning(f'NICRA upload check failed: {e}')
+    except Exception as e:
+        logger.warning(f'Consistency check 13 (indirect cost) failed: {e}')
+
+    # ---- CHECK 14: SF-424 COMPLETENESS ----
     try:
         _sf_missing = []
         if not (grant.get('agency') or ''):
@@ -5453,7 +5573,6 @@ def validate_budget_consistency(grant_id):
             _sf_missing.append('deadline')
 
         # Check org details
-        conn_sf = get_db()
         user_sf = get_current_user()
         if user_sf:
             try:
@@ -5470,7 +5589,6 @@ def validate_budget_consistency(grant_id):
                     _sf_missing.extend(['EIN', 'UEI', 'address'])
             except Exception:
                 pass
-        conn_sf.close()
 
         if _sf_missing:
             issues.append({
@@ -5478,10 +5596,10 @@ def validate_budget_consistency(grant_id):
                 'message': f'SF-424 is missing required fields: {", ".join(_sf_missing)}. Complete these before generating the form.',
                 'severity': 'error'
             })
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f'Consistency check 14 (SF-424) failed: {e}')
 
-    # Check 14: WORK SAMPLES (for NEA/arts templates)
+    # ---- CHECK 15: WORK SAMPLES (for NEA/arts templates) ----
     try:
         _arts_templates = ('nea', 'nea_challenge', 'artist_individual')
         if template_name in _arts_templates:
@@ -5502,10 +5620,10 @@ def validate_budget_consistency(grant_id):
                     'message': 'Work samples appear to be AI-generated. You must upload actual examples of artistic work, not generated text.',
                     'severity': 'error'
                 })
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f'Consistency check 15 (work samples) failed: {e}')
 
-    # Check 15: LETTERS AUTHENTICITY
+    # ---- CHECK 16: LETTERS AUTHENTICITY ----
     try:
         conn_la = get_db()
         _letter_types = ('letters_of_support', 'letters_of_collaboration', 'letters_of_commitment',
@@ -5521,31 +5639,68 @@ def validate_budget_consistency(grant_id):
                     'severity': 'warning'
                 })
         conn_la.close()
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f'Consistency check 16 (letters) failed: {e}')
 
-    # Check 16: STAFFING ADEQUACY
+    # ---- CHECK 17: STAFFING ADEQUACY (all grants, not just events) ----
     try:
-        _grant_name_lower = (grant.get('grant_name') or '').lower()
-        _event_keywords = ('workshop', 'concert', 'event', 'conference', 'festival', 'symposium', 'seminar')
-        _involves_events = any(kw in _grant_name_lower for kw in _event_keywords)
-        if _involves_events:
-            conn_sa = get_db()
-            budget_sa = conn_sa.execute('SELECT personnel FROM grant_budget WHERE grant_id = ?', (grant_id,)).fetchone()
-            conn_sa.close()
-            if budget_sa and budget_sa.get('personnel'):
-                try:
-                    _pers = json.loads(budget_sa['personnel']) if isinstance(budget_sa['personnel'], str) else budget_sa['personnel']
-                    if len(_pers) < 3:
+        if _budget_db and _budget_db.get('personnel'):
+            _pers_raw = _budget_db['personnel']
+            _pers = json.loads(_pers_raw) if isinstance(_pers_raw, str) else _pers_raw
+            if isinstance(_pers, list) and len(_pers) > 0:
+                # Cross-check: each budgeted person should appear in biographical section
+                bio_content = (sections.get('biographical_sketches', '') or
+                               sections.get('biographical', '') or
+                               sections.get('key_personnel', '') or '').lower()
+                if bio_content:
+                    _missing_bios = []
+                    for p in _pers:
+                        name = (p.get('name') or p.get('title') or '').strip()
+                        if name and len(name) > 2:
+                            # Check if the person's last name appears in bio section
+                            name_parts = name.lower().split()
+                            last_name = name_parts[-1] if name_parts else ''
+                            if last_name and len(last_name) > 2 and last_name not in bio_content:
+                                _missing_bios.append(name)
+                    if _missing_bios:
                         issues.append({
-                            'title': 'Staffing Adequacy',
-                            'message': f'Project involves events but only {len(_pers)} personnel listed. Consider whether your staffing level is adequate for the project scope.',
+                            'title': 'Personnel Missing From Biographical Section',
+                            'message': f'Budget lists {len(_missing_bios)} personnel not found in biographical sketches: {", ".join(_missing_bios[:5])}. Add bios for all budgeted staff.',
                             'severity': 'warning'
                         })
-                except (json.JSONDecodeError, TypeError):
-                    pass
-    except Exception:
-        pass
+                elif len(_pers) > 0:
+                    issues.append({
+                        'title': 'Biographical Sketches Missing',
+                        'message': f'Budget lists {len(_pers)} personnel but no biographical sketches section has been written.',
+                        'severity': 'warning'
+                    })
+    except Exception as e:
+        logger.warning(f'Consistency check 17 (staffing) failed: {e}')
+
+    # ---- CHECK 18: REQUIRED DOCUMENTS NOT UPLOADED ----
+    # Count required docs from template that are neither uploaded nor in vault
+    try:
+        req_docs = _tmpl_data.get('required_documents', [])
+        if req_docs:
+            conn_docs = get_db()
+            uploaded_docs = conn_docs.execute(
+                'SELECT doc_type FROM grant_documents WHERE grant_id = ?',
+                (grant_id,)).fetchall()
+            conn_docs.close()
+            uploaded_types_set = {d['doc_type'] for d in uploaded_docs}
+            _missing_required = []
+            for doc in req_docs:
+                if doc.get('required') and doc['type'] not in uploaded_types_set:
+                    if not doc.get('can_generate'):
+                        _missing_required.append(doc.get('name', doc['type']))
+            if _missing_required:
+                issues.append({
+                    'title': 'Required Documents Not Uploaded',
+                    'message': f'{len(_missing_required)} required document(s) must be uploaded: {", ".join(_missing_required[:5])}{"..." if len(_missing_required) > 5 else ""}.',
+                    'severity': 'error'
+                })
+    except Exception as e:
+        logger.warning(f'Consistency check 18 (required docs) failed: {e}')
 
     return issues
 
@@ -5899,18 +6054,16 @@ def _build_checklist_data(grant_id, user_id, template_name):
         if f['status'] in ('ready', 'complete'):
             completed_count += 1
 
-    # Sections
+    # Sections — only count required sections toward readiness percentage
     for s in checklist_sections:
         total_count += 1
         if s['required']:
             total_required += 1
             if s['status'] == 'complete':
                 completed_count += 1
-        else:
-            if s['status'] == 'complete':
-                completed_count += 1
+        # Optional sections do NOT count toward completed_count / total_required
 
-    # Documents -- check actual upload/readiness status
+    # Documents -- only count required documents toward readiness percentage
     for d in checklist_documents:
         total_count += 1
         if d['required']:
@@ -5920,9 +6073,7 @@ def _build_checklist_data(grant_id, user_id, template_name):
             elif d.get('can_generate') and d.get('data_ready'):
                 # Generatable and data exists -- count as ready (not complete until generated)
                 pass  # Not counted as complete -- must actually generate/upload
-        else:
-            if d['uploaded'] and not d.get('draft_only'):
-                completed_count += 1
+        # Optional documents do NOT count toward completed_count / total_required
 
     # Certifications
     for c in checklist_certifications:
