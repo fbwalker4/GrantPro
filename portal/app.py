@@ -5497,8 +5497,9 @@ def validate_budget_consistency(grant_id):
         if _matching_mc.get('required') and _budget_db:
             _gt = float(_budget_db['grand_total'] or 0)
             _mt = float(_budget_db['match_total'] or 0)
-            _ratio_str = _matching_mc.get('ratio', '')
-            # Parse ratio — support '1:1', '1:3', percentage, etc.
+            _ratio_str = str(_matching_mc.get('ratio', '') or '')
+            _match_desc = _matching_mc.get('description', '')
+
             if _ratio_str == '1:1' and _gt > 0 and _mt < _gt:
                 shortfall = _gt - _mt
                 issues.append({
@@ -5506,8 +5507,26 @@ def validate_budget_consistency(grant_id):
                     'message': f'This grant requires a 1:1 match. Your match (${_mt:,.2f}) is less than your federal request (${_gt:,.2f}). You need ${shortfall:,.2f} more in matching funds.',
                     'severity': 'error'
                 })
+            elif '/' in _ratio_str:
+                # Parse federal/local format: "80/20" means 80% federal, 20% local match
+                try:
+                    parts = _ratio_str.split('/')
+                    federal_pct = float(parts[0])
+                    local_pct = float(parts[1])
+                    if local_pct > 0 and _gt > 0:
+                        # Total project = federal / (federal_pct/100)
+                        total_project = _gt / (federal_pct / 100.0)
+                        required_match = total_project * (local_pct / 100.0)
+                        if _mt < required_match * 0.99:
+                            issues.append({
+                                'title': 'Match Compliance — Insufficient Match',
+                                'message': f'This grant requires a {_ratio_str} (federal/local) split. For ${_gt:,.0f} federal, you need at least ${required_match:,.0f} in matching funds. Your match: ${_mt:,.0f}.',
+                                'severity': 'error'
+                            })
+                except (ValueError, ZeroDivisionError):
+                    pass
             elif ':' in _ratio_str and _ratio_str != '1:1':
-                # Parse N:M ratio (e.g., '1:3' means 1 match per 3 federal)
+                # Parse N:M ratio
                 try:
                     parts = _ratio_str.split(':')
                     match_part = float(parts[0])
@@ -5521,6 +5540,14 @@ def validate_budget_consistency(grant_id):
                         })
                 except (ValueError, ZeroDivisionError):
                     pass
+            elif _ratio_str.lower() == 'varies' and _gt > 0:
+                # Can't compute exact requirement but warn if no match entered
+                if _mt <= 0:
+                    issues.append({
+                        'title': 'Match Compliance — Match May Be Required',
+                        'message': f'This agency requires matching funds (ratio varies by program). You have $0 match entered. Check your specific program\'s NOFO for the exact match requirement. {_match_desc}',
+                        'severity': 'warning'
+                    })
     except Exception as e:
         logger.warning(f'Consistency check 12 (match compliance) failed: {e}')
 
@@ -5557,6 +5584,16 @@ def validate_budget_consistency(grant_id):
                             })
                     except Exception as e:
                         logger.warning(f'NICRA upload check failed: {e}')
+            # Check against agency max_rate cap (e.g., USDA statutory 30% cap)
+            _max_rate = _tmpl_data.get('indirect_cost_rules', {}).get('max_rate')
+            if _max_rate is not None and _mtdc > 0:
+                _max_rate_f = float(_max_rate)
+                if _effective_rate > _max_rate_f + 0.5:
+                    issues.append({
+                        'title': 'Indirect Cost Rate Exceeds Agency Cap',
+                        'message': f'Your effective indirect rate is {_effective_rate:.1f}% but this agency caps indirect costs at {_max_rate_f:.0f}%. Reduce your indirect costs to comply.',
+                        'severity': 'error'
+                    })
     except Exception as e:
         logger.warning(f'Consistency check 13 (indirect cost) failed: {e}')
 
