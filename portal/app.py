@@ -4,6 +4,7 @@ Grant Writing System - Web Portal
 Local Flask app for managing clients, grants, and guided submission
 """
 
+import hmac
 import json
 import logging
 import os
@@ -702,11 +703,13 @@ def signup():
             conn.close()
             # If they requested a paid plan, redirect to payment checkout
             if requested_plan in ['monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_unlimited']:
+                session.clear()
                 session['user_id'] = user_id
                 session['selected_plan'] = requested_plan
                 return redirect(url_for('payment_checkout'))
             else:
                 # Auto-login and send to onboarding
+                session.clear()
                 session['user_id'] = user_id
                 session['user_name'] = first_name or email
                 flash('Welcome to Grant Pro! Let\'s set up your organization profile.', 'success')
@@ -2430,6 +2433,11 @@ def start_application(grant_id):
             flash('Please select a client', 'error')
             return redirect(url_for('start_application', grant_id=grant_id))
 
+        # Validate client ownership — prevent IDOR
+        if not user_owns_client(client_id):
+            flash('Access denied', 'error')
+            return redirect(url_for('dashboard'))
+
         # Enforce grant creation limit
         can_create, limit_msg, _ = user_models.check_grant_limit(session['user_id'])
         if not can_create:
@@ -2743,9 +2751,9 @@ def generate_section_content(grant_id, section_id):
                 logger.warning(f'Failed to parse intake data for grant {grant.get("id")}: {e}')
     
         # Build prompt for AI - include ALL grant-specific info
-        agency = grant['agency'] if 'agency' in grant.keys() and grant['agency'] else 'Unknown'
-        grant_name = grant['grant_name'] if 'grant_name' in grant.keys() and grant['grant_name'] else 'Untitled Grant'
-        org_name = grant['organization_name'] if 'organization_name' in grant.keys() and grant['organization_name'] else ''
+        agency = sanitize_for_prompt(grant['agency'] if 'agency' in grant.keys() and grant['agency'] else 'Unknown')
+        grant_name = sanitize_for_prompt(grant['grant_name'] if 'grant_name' in grant.keys() and grant['grant_name'] else 'Untitled Grant')
+        org_name = sanitize_for_prompt(grant['organization_name'] if 'organization_name' in grant.keys() and grant['organization_name'] else '')
     
         # Get full grant info from research database
         amount_val = grant.get('amount', 0)
@@ -3747,7 +3755,7 @@ def paper_download(grant_id):
         writer.write(merged_buf)
         merged_buf.seek(0)
 
-        safe_name = grant['grant_name'].replace(' ', '_').replace('/', '-')
+        safe_name = secure_filename(grant['grant_name']) or 'grant'
         return send_file(merged_buf, mimetype='application/pdf', as_attachment=True,
                          download_name=f"{safe_name}_Paper_Package.pdf")
 
@@ -3842,7 +3850,7 @@ def paper_download_form(grant_id, form_name):
                 }
 
             form_buf = generate_sf424_pages(sf424_grant, sf424_org, sf424_budget)
-            safe_fname = grant['grant_name'].replace(' ', '_').replace('/', '-')
+            safe_fname = secure_filename(grant['grant_name']) or 'grant'
             return send_file(form_buf, mimetype='application/pdf', as_attachment=True,
                              download_name=f"{safe_fname}_SF424.pdf")
 
@@ -3900,7 +3908,7 @@ def paper_download_form(grant_id, form_name):
         _footer = get_footer_callback()
         doc.build(story, onFirstPage=_footer, onLaterPages=_footer)
         buffer.seek(0)
-        safe_name = form_name.replace(' ', '_').replace('/', '-')
+        safe_name = secure_filename(form_name) or 'form'
         return send_file(buffer, mimetype='application/pdf', as_attachment=True,
                          download_name=f"{safe_name}.pdf")
 
@@ -4567,6 +4575,13 @@ def use_grant_template(grant_id):
         flash('Access denied', 'error')
         return redirect(url_for('dashboard'))
 
+    # Enforce grant creation limit
+    can_create, limit_msg, _ = user_models.check_grant_limit(session['user_id'])
+    if not can_create:
+        conn.close()
+        flash(limit_msg, 'error')
+        return redirect(url_for('upgrade'))
+
     # Determine template before using it in INSERT
     template_name = selected_grant.get('template', 'generic')
 
@@ -4603,8 +4618,9 @@ def use_grant_template(grant_id):
             ''', (draft_id, client_id, db_grant_id, section['id'], content, now, now))
     
     conn.commit()
+    user_models.increment_grant_count(session['user_id'])
     conn.close()
-    
+
     flash(f'Grant created with template: {selected_grant["title"]}', 'success')
     return redirect(url_for('grant_detail', grant_id=db_grant_id))
 
