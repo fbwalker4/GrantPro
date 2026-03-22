@@ -849,12 +849,12 @@ def payment_success():
         import stripe
         stripe.api_key = os.getenv('STRIPE_API_KEY')
         try:
-            session = stripe.checkout.Session.retrieve(session_id)
-            if session.payment_status == 'paid':
-                user_id = session.get('metadata', {}).get('user_id')
+            stripe_session = stripe.checkout.Session.retrieve(session_id)
+            if stripe_session.payment_status == 'paid':
+                user_id = stripe_session.get('metadata', {}).get('user_id')
                 if user_id:
                     user = user_models.get_user_by_id(user_id)
-                    plan = session.get('metadata', {}).get('plan', 'monthly')
+                    plan = stripe_session.get('metadata', {}).get('plan', 'monthly')
                     flash(f'Payment successful! You are now on the {plan.title()} plan.', 'success')
                     return render_template('payment_success.html', user=user, plan=plan)
         except Exception as e:
@@ -1798,6 +1798,7 @@ def api_is_saved_grant(grant_id):
 
 @app.route('/api/request-template', methods=['POST'])
 @csrf_required
+@require_rate_limit('template_request', max_requests=3, window=60)
 def api_request_template():
     """Handle template requests from users"""
     grant_id = request.form.get('grant_id', '')
@@ -3689,8 +3690,9 @@ def paper_download(grant_id):
             story.append(Paragraph(section_title, section_head))
             story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor('#e2e8f0')))
             story.append(Spacer(1, 0.1*inch))
-            content_html = draft['content'].replace('\n', '<br/>')
-            story.append(Paragraph(content_html, styles['Normal']))
+            from pdf_utils import clean_markdown
+            content_cleaned = clean_markdown(draft['content']).replace('\n', '<br/>')
+            story.append(Paragraph(content_cleaned, styles['Normal']))
             story.append(Spacer(1, 0.3*inch))
 
         from pdf_utils import get_footer_callback
@@ -6242,6 +6244,7 @@ def grant_checklist(grant_id):
 @login_required
 @paid_required
 @csrf_required
+@require_rate_limit('consistency_check', max_requests=3, window=60)
 def run_consistency_check(grant_id):
     """Run final consistency validation — rule-based checks + AI-powered review."""
     if not user_owns_grant(grant_id):
