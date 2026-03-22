@@ -2097,7 +2097,7 @@ def new_client():
     if client_limit is not None:  # None = unlimited
         conn = get_db()
         existing_count = conn.execute(
-            'SELECT COUNT(*) FROM clients WHERE user_id = ?', (user['id'],)
+            'SELECT COUNT(*) FROM clients WHERE user_id = ? AND is_primary != TRUE', (user['id'],)
         ).fetchone()[0]
         conn.close()
         if existing_count >= client_limit:
@@ -2116,7 +2116,7 @@ def new_client():
         # Atomic check-and-insert to prevent TOCTOU race condition
         if client_limit is not None:
             recheck_count = conn.execute(
-                'SELECT COUNT(*) FROM clients WHERE user_id = ?', (user['id'],)
+                'SELECT COUNT(*) FROM clients WHERE user_id = ? AND is_primary != TRUE', (user['id'],)
             ).fetchone()[0]
             if recheck_count >= client_limit:
                 conn.close()

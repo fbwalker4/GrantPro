@@ -633,7 +633,9 @@ def get_user_plan(user_id):
 
 
 def get_client_limit(plan):
-    """Return the maximum number of client agencies allowed for a plan.
+    """Return the maximum number of client organizations allowed for a plan.
+    The primary (self) org does NOT count against the limit.
+    Enterprise 5 = 5 client orgs + their own = 6 total in switcher.
     Returns: 0 for free, 1 for monthly/annual, 5/10/None for enterprise tiers.
     None means unlimited."""
     limits = {
