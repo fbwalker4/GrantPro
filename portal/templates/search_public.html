@@ -223,13 +223,119 @@
 
         .results-count strong { color: var(--text-primary); }
 
+        /* Sort bar */
+        .sort-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0 0.5rem;
+        }
+
+        .sort-bar label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .sort-bar select {
+            padding: 0.4rem 2rem 0.4rem 0.7rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238993a4' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.6rem center;
+        }
+
+        /* Filter pills & clear all */
+        .filter-pills-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.25rem 0 0.5rem;
+        }
+
+        .filter-pills-bar:empty { display: none; }
+
+        .filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.65rem;
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--accent-primary);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .filter-pill button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--accent-primary);
+            font-size: 0.85rem;
+            line-height: 1;
+            padding: 0;
+            font-weight: 700;
+        }
+
+        .filter-pill button:hover { color: var(--accent-hover); }
+
+        .btn-clear-all {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.3rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-clear-all:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+
+        /* Mobile filter toggle */
+        .filter-toggle-btn {
+            display: none;
+            margin: 0 auto 0.75rem;
+            padding: 0.55rem 1.25rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .filter-toggle-btn svg {
+            width: 14px;
+            height: 14px;
+            vertical-align: -2px;
+            margin-right: 0.35rem;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
         /* Results */
         .results {
             max-width: 1200px;
             margin: 0 auto;
             padding: 1rem 2rem 3rem;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 1.25rem;
         }
 
@@ -284,6 +390,11 @@
             color: var(--accent-success);
         }
 
+        .badge-status {
+            background: rgba(217, 119, 6, 0.1);
+            color: var(--accent-warning);
+        }
+
         .grant-desc {
             color: var(--text-secondary);
             font-size: 0.875rem;
@@ -293,9 +404,9 @@
         }
 
         .grant-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.25rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 0.75rem;
             margin-bottom: 1rem;
         }
 
@@ -317,6 +428,8 @@
 
         .grant-meta-value.amount { color: var(--accent-success); }
         .grant-meta-value.deadline { color: var(--accent-warning); }
+        .grant-meta-value.deadline-urgent { color: #dc2626; }
+        .grant-meta-value.deadline-soon { color: #ea580c; }
 
         .grant-card-actions {
             display: flex;
@@ -339,6 +452,22 @@
         }
 
         .btn-signup:hover { box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+
+        .btn-grants-gov {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.5rem 0.85rem;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            font-weight: 500;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .btn-grants-gov:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
 
         /* No results */
         .no-results {
@@ -395,6 +524,9 @@
             .results { grid-template-columns: 1fr; padding: 1rem; }
             .search-hero { padding: 1.5rem 1rem 1.25rem; }
             .search-hero h1 { font-size: 1.5rem; }
+            .filter-toggle-btn { display: inline-flex; align-items: center; }
+            .filters-panel { display: none; }
+            .filters-panel.open { display: block; }
             .filters { gap: 0.5rem; }
             .filters select { font-size: 0.8rem; padding: 0.5rem 1.75rem 0.5rem 0.65rem; }
             .search-container { padding: 0 1rem; }
@@ -442,61 +574,97 @@
             <div class="search-container">
                 <div class="search-bar">
                     <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="text" id="searchInput" placeholder="Search by keyword, agency, or topic..." onkeyup="filterGrants()" aria-label="Search grants">
+                    <input type="text" id="searchInput" placeholder="Search by keyword, agency, or topic..." aria-label="Search grants">
                 </div>
-                <div class="filters">
-                    <select id="agencyFilter" onchange="filterGrants()" aria-label="Filter by agency">
-                        <option value="">All Agencies</option>
-                        <option value="NSF">NSF</option>
-                        <option value="DOE">DOE</option>
-                        <option value="NIH">NIH</option>
-                        <option value="USDA">USDA</option>
-                        <option value="HUD">HUD</option>
-                        <option value="EPA">EPA</option>
-                        <option value="DOT">DOT</option>
-                        <option value="NIST">NIST</option>
-                        <option value="ED">ED (Education)</option>
-                        <option value="HHS">HHS</option>
-                        <option value="SAMHSA">SAMHSA</option>
-                        <option value="DOJ">DOJ</option>
-                        <option value="DOL">DOL</option>
-                        <option value="NASA">NASA</option>
-                        <option value="DOD">DOD</option>
-                        <option value="FEMA">FEMA</option>
-                        <option value="NEA">NEA</option>
-                        <option value="SBA">SBA</option>
-                        <option value="DOC">DOC</option>
-                        <option value="DOI">DOI</option>
-                        <option value="VA">VA</option>
-                    </select>
-                    <select id="categoryFilter" onchange="filterGrants()" aria-label="Filter by category">
-                        <option value="">All Categories</option>
-                        <option value="Technology">Technology</option>
-                        <option value="Healthcare">Healthcare</option>
-                        <option value="Education">Education</option>
-                        <option value="Environment">Environment</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Manufacturing">Manufacturing</option>
-                        <option value="Agriculture">Agriculture</option>
-                        <option value="Housing">Housing</option>
-                        <option value="Transportation">Transportation</option>
-                        <option value="Science">Science</option>
-                        <option value="Community">Community</option>
-                        <option value="Defense">Defense</option>
-                    </select>
-                    <select id="amountFilter" onchange="filterGrants()" aria-label="Filter by amount range">
-                        <option value="">Any Amount</option>
-                        <option value="50000">$50K+</option>
-                        <option value="100000">$100K+</option>
-                        <option value="250000">$250K+</option>
-                        <option value="500000">$500K+</option>
-                        <option value="1000000">$1M+</option>
-                        <option value="5000000">$5M+</option>
-                    </select>
+                <button class="filter-toggle-btn" id="filterToggle" aria-expanded="false" aria-controls="filtersPanel">
+                    <svg viewBox="0 0 24 24" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2" fill="currentColor"/><circle cx="16" cy="12" r="2" fill="currentColor"/><circle cx="10" cy="18" r="2" fill="currentColor"/></svg>
+                    Filters
+                </button>
+                <div class="filters-panel" id="filtersPanel">
+                    <div class="filters">
+                        <select id="agencyFilter" onchange="sortAndFilter()" aria-label="Filter by agency">
+                            <option value="">All Agencies</option>
+                            <option value="NSF">NSF</option>
+                            <option value="DOE">DOE</option>
+                            <option value="NIH">NIH</option>
+                            <option value="USDA">USDA</option>
+                            <option value="HUD">HUD</option>
+                            <option value="EPA">EPA</option>
+                            <option value="DOT">DOT</option>
+                            <option value="NIST">NIST</option>
+                            <option value="ED">ED (Education)</option>
+                            <option value="HHS">HHS</option>
+                            <option value="SAMHSA">SAMHSA</option>
+                            <option value="DOJ">DOJ</option>
+                            <option value="DOL">DOL</option>
+                            <option value="NASA">NASA</option>
+                            <option value="DOD">DOD</option>
+                            <option value="FEMA">FEMA</option>
+                            <option value="NEA">NEA</option>
+                            <option value="SBA">SBA</option>
+                            <option value="DOC">DOC</option>
+                            <option value="DOI">DOI</option>
+                            <option value="VA">VA</option>
+                        </select>
+                        <select id="categoryFilter" onchange="sortAndFilter()" aria-label="Filter by category">
+                            <option value="">All Categories</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Education">Education</option>
+                            <option value="Environment">Environment</option>
+                            <option value="Energy">Energy</option>
+                            <option value="Manufacturing">Manufacturing</option>
+                            <option value="Agriculture">Agriculture</option>
+                            <option value="Housing">Housing</option>
+                            <option value="Transportation">Transportation</option>
+                            <option value="Science">Science</option>
+                            <option value="Community">Community</option>
+                            <option value="Defense">Defense</option>
+                        </select>
+                        <select id="amountFilter" onchange="sortAndFilter()" aria-label="Filter by amount range">
+                            <option value="">Any Amount</option>
+                            <option value="50000">$50K+</option>
+                            <option value="100000">$100K+</option>
+                            <option value="250000">$250K+</option>
+                            <option value="500000">$500K+</option>
+                            <option value="1000000">$1M+</option>
+                            <option value="5000000">$5M+</option>
+                        </select>
+                        <select id="deadlineFilter" onchange="sortAndFilter()" aria-label="Filter by deadline range">
+                            <option value="">Any Deadline</option>
+                            <option value="30">Next 30 days</option>
+                            <option value="60">Next 60 days</option>
+                            <option value="90">Next 90 days</option>
+                            <option value="open">Open (no deadline)</option>
+                        </select>
+                        <select id="postedFilter" onchange="sortAndFilter()" aria-label="Filter by posted date">
+                            <option value="">Any Posted Date</option>
+                            <option value="7">Last 7 days</option>
+                            <option value="30">Last 30 days</option>
+                            <option value="90">Last 90 days</option>
+                        </select>
+                        <select id="statusFilter" onchange="sortAndFilter()" aria-label="Filter by status">
+                            <option value="">All</option>
+                            <option value="posted">Posted (accepting applications)</option>
+                            <option value="forecasted">Forecasted (upcoming)</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="results-count" id="resultsCount">
                     Showing <strong>{{ grants|length }}</strong> grants
                 </div>
+                <div class="sort-bar">
+                    <label for="sortSelect">Sort by:</label>
+                    <select id="sortSelect" onchange="sortAndFilter()" aria-label="Sort grants">
+                        <option value="deadline-asc">Deadline (soonest)</option>
+                        <option value="deadline-desc">Deadline (latest)</option>
+                        <option value="amount-desc">Amount (highest)</option>
+                        <option value="amount-asc">Amount (lowest)</option>
+                        <option value="posted-desc">Posted (newest)</option>
+                        <option value="posted-asc">Posted (oldest)</option>
+                    </select>
+                </div>
+                <div class="filter-pills-bar" id="filterPills"></div>
             </div>
         </section>
 
@@ -508,10 +676,18 @@
                  data-agency-code="{{ grant.agency_code|default(grant.agency) }}"
                  data-category="{{ grant.category }}"
                  data-amount="{{ grant.amount_max }}"
-                 data-description="{{ grant.description[:200]|lower }}">
+                 data-description="{{ grant.description[:200]|lower }}"
+                 data-deadline="{{ grant.close_date or '9999-12-31' }}"
+                 data-posted="{{ grant.open_date or '0000-01-01' }}"
+                 data-status="{{ grant.status|default('active') }}">
                 <div class="grant-card-top">
                     <h3>{{ grant.title }}</h3>
-                    <span class="badge badge-agency">{{ grant.agency_code|default(grant.agency) }}</span>
+                    <div>
+                        <span class="badge badge-agency">{{ grant.agency_code|default(grant.agency) }}</span>
+                        {% if grant.status|default('active') == 'forecasted' %}
+                        <span class="badge badge-status">Forecasted</span>
+                        {% endif %}
+                    </div>
                 </div>
                 <p class="grant-desc">{{ grant.description[:180] }}{% if grant.description|length > 180 %}...{% endif %}</p>
                 <div class="grant-meta">
@@ -523,15 +699,24 @@
                         <div class="grant-meta-label">Category</div>
                         <div class="grant-meta-value"><span class="badge badge-category">{{ grant.category }}</span></div>
                     </div>
-                    {% if grant.deadline %}
+                    {% if grant.open_date %}
+                    <div class="grant-meta-item">
+                        <div class="grant-meta-label">Posted</div>
+                        <div class="grant-meta-value">{{ grant.open_date[:10] }}</div>
+                    </div>
+                    {% endif %}
+                    {% if grant.deadline or grant.close_date %}
                     <div class="grant-meta-item">
                         <div class="grant-meta-label">Deadline</div>
-                        <div class="grant-meta-value deadline">{{ grant.deadline[:10] }}</div>
+                        <div class="grant-meta-value deadline js-deadline-value">{{ (grant.close_date or grant.deadline)[:10] }}</div>
                     </div>
                     {% endif %}
                 </div>
                 <div class="grant-card-actions">
                     <a href="/signup?plan=monthly" class="btn-signup">Sign Up to Apply</a>
+                    {% if grant.url %}
+                    <a href="{{ grant.url }}" target="_blank" rel="noopener noreferrer" class="btn-grants-gov">View on Grants.gov</a>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -558,6 +743,8 @@
     </footer>
 
     <script>
+    var TOTAL_GRANTS = {{ grants|length }};
+
     // Mobile nav toggle
     document.getElementById('hamburger').addEventListener('click', function() {
         var nav = document.getElementById('mobileNav');
@@ -565,12 +752,34 @@
         this.setAttribute('aria-expanded', nav.classList.contains('open'));
     });
 
-    // Client-side filtering
+    // Mobile filter toggle
+    document.getElementById('filterToggle').addEventListener('click', function() {
+        var panel = document.getElementById('filtersPanel');
+        var isOpen = panel.classList.toggle('open');
+        this.setAttribute('aria-expanded', isOpen);
+    });
+
+    // Debounced keyword search (200ms)
+    var searchDebounceTimer = null;
+    document.getElementById('searchInput').addEventListener('input', function() {
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(function() {
+            sortAndFilter();
+        }, 200);
+    });
+
+    // Client-side filtering - returns count of visible cards
     function filterGrants() {
         var search = document.getElementById('searchInput').value.toLowerCase();
         var agency = document.getElementById('agencyFilter').value;
         var category = document.getElementById('categoryFilter').value;
         var amount = parseInt(document.getElementById('amountFilter').value) || 0;
+        var deadlineRange = document.getElementById('deadlineFilter').value;
+        var postedRange = document.getElementById('postedFilter').value;
+        var statusVal = document.getElementById('statusFilter').value;
+
+        var now = new Date();
+        now.setHours(0, 0, 0, 0);
 
         var cards = document.querySelectorAll('.grant-card');
         var visible = 0;
@@ -581,13 +790,44 @@
             var cardAgency = card.dataset.agencyCode || '';
             var cardCategory = card.dataset.category || '';
             var cardAmount = parseInt(card.dataset.amount) || 0;
+            var cardDeadline = card.dataset.deadline || '9999-12-31';
+            var cardPosted = card.dataset.posted || '0000-01-01';
+            var cardStatus = (card.dataset.status || '').toLowerCase();
 
             var matchesSearch = !search || title.indexOf(search) !== -1 || desc.indexOf(search) !== -1;
             var matchesAgency = !agency || cardAgency.indexOf(agency) !== -1;
             var matchesCategory = !category || cardCategory.indexOf(category) !== -1;
             var matchesAmount = !amount || cardAmount >= amount;
 
-            if (matchesSearch && matchesAgency && matchesCategory && matchesAmount) {
+            // Deadline range filter
+            var matchesDeadline = true;
+            if (deadlineRange === 'open') {
+                matchesDeadline = cardDeadline === '9999-12-31';
+            } else if (deadlineRange) {
+                var days = parseInt(deadlineRange);
+                var dl = new Date(cardDeadline);
+                var future = new Date(now);
+                future.setDate(future.getDate() + days);
+                matchesDeadline = dl >= now && dl <= future;
+            }
+
+            // Posted date filter
+            var matchesPosted = true;
+            if (postedRange) {
+                var pDays = parseInt(postedRange);
+                var postedDate = new Date(cardPosted);
+                var cutoff = new Date(now);
+                cutoff.setDate(cutoff.getDate() - pDays);
+                matchesPosted = postedDate >= cutoff;
+            }
+
+            // Status filter
+            var matchesStatus = true;
+            if (statusVal) {
+                matchesStatus = cardStatus === statusVal;
+            }
+
+            if (matchesSearch && matchesAgency && matchesCategory && matchesAmount && matchesDeadline && matchesPosted && matchesStatus) {
                 card.style.display = 'flex';
                 visible++;
             } else {
@@ -596,10 +836,181 @@
         });
 
         document.getElementById('noResults').style.display = visible === 0 ? 'block' : 'none';
-        document.getElementById('resultsCount').innerHTML = 'Showing <strong>' + visible + '</strong> of {{ grants|length }} grants';
+
+        // Improved results count
+        var anyFilterActive = search || agency || category || amount || deadlineRange || postedRange || statusVal;
+        var countHTML = 'Showing <strong>' + visible + '</strong>';
+        if (anyFilterActive) {
+            countHTML += ' of ' + TOTAL_GRANTS + ' grants (filtered)';
+        } else {
+            countHTML += ' grants';
+        }
+        document.getElementById('resultsCount').innerHTML = countHTML;
+
+        return visible;
     }
 
-    // Apply URL query params on load
+    // Main sort + filter function
+    function sortAndFilter() {
+        // 1. Apply filters
+        filterGrants();
+
+        // 2. Get sort value
+        var sortVal = document.getElementById('sortSelect').value;
+        var list = document.getElementById('grantsList');
+        var cards = Array.from(list.querySelectorAll('.grant-card'));
+
+        // 3. Sort visible cards
+        cards.sort(function(a, b) {
+            switch (sortVal) {
+                case 'deadline-asc':
+                    return (a.dataset.deadline || '9999-12-31').localeCompare(b.dataset.deadline || '9999-12-31');
+                case 'deadline-desc':
+                    return (b.dataset.deadline || '0000-01-01').localeCompare(a.dataset.deadline || '0000-01-01');
+                case 'amount-desc':
+                    return (parseInt(b.dataset.amount) || 0) - (parseInt(a.dataset.amount) || 0);
+                case 'amount-asc':
+                    return (parseInt(a.dataset.amount) || 0) - (parseInt(b.dataset.amount) || 0);
+                case 'posted-desc':
+                    return (b.dataset.posted || '0000-01-01').localeCompare(a.dataset.posted || '0000-01-01');
+                case 'posted-asc':
+                    return (a.dataset.posted || '0000-01-01').localeCompare(b.dataset.posted || '0000-01-01');
+                default:
+                    return 0;
+            }
+        });
+
+        // 4. Use documentFragment for single DOM reflow
+        var noResults = document.getElementById('noResults');
+        var fragment = document.createDocumentFragment();
+        cards.forEach(function(card) {
+            fragment.appendChild(card);
+        });
+        fragment.appendChild(noResults);
+        list.appendChild(fragment);
+
+        // 5. Update pills and URL
+        updateFilterPills();
+        syncURLParams();
+    }
+
+    // Update filter pills
+    function updateFilterPills() {
+        var container = document.getElementById('filterPills');
+        container.innerHTML = '';
+
+        var filters = [
+            { id: 'searchInput', param: 'q', label: 'Search' },
+            { id: 'agencyFilter', param: 'agency', label: 'Agency' },
+            { id: 'categoryFilter', param: 'category', label: 'Category' },
+            { id: 'amountFilter', param: 'amount', label: 'Amount' },
+            { id: 'deadlineFilter', param: 'deadline', label: 'Deadline' },
+            { id: 'postedFilter', param: 'posted', label: 'Posted' },
+            { id: 'statusFilter', param: 'status', label: 'Status' }
+        ];
+
+        var hasActive = false;
+        filters.forEach(function(f) {
+            var el = document.getElementById(f.id);
+            var val = el.value;
+            if (!val) return;
+            hasActive = true;
+
+            var displayVal = val;
+            if (el.tagName === 'SELECT' && el.selectedIndex > 0) {
+                displayVal = el.options[el.selectedIndex].text;
+            } else if (el.tagName === 'INPUT') {
+                displayVal = '"' + val + '"';
+            }
+
+            var pill = document.createElement('span');
+            pill.className = 'filter-pill';
+            pill.innerHTML = f.label + ': ' + displayVal + ' <button aria-label="Remove ' + f.label + ' filter">&times;</button>';
+            pill.querySelector('button').addEventListener('click', function() {
+                if (el.tagName === 'INPUT') {
+                    el.value = '';
+                } else {
+                    el.selectedIndex = 0;
+                }
+                sortAndFilter();
+            });
+            container.appendChild(pill);
+        });
+
+        if (hasActive) {
+            var clearBtn = document.createElement('button');
+            clearBtn.className = 'btn-clear-all';
+            clearBtn.textContent = 'Clear All';
+            clearBtn.addEventListener('click', function() {
+                clearAllFilters();
+            });
+            container.appendChild(clearBtn);
+        }
+    }
+
+    // Clear all filters
+    function clearAllFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('agencyFilter').selectedIndex = 0;
+        document.getElementById('categoryFilter').selectedIndex = 0;
+        document.getElementById('amountFilter').selectedIndex = 0;
+        document.getElementById('deadlineFilter').selectedIndex = 0;
+        document.getElementById('postedFilter').selectedIndex = 0;
+        document.getElementById('statusFilter').selectedIndex = 0;
+        document.getElementById('sortSelect').value = 'deadline-asc';
+        sortAndFilter();
+    }
+
+    // Sync all filters + sort to URL params
+    function syncURLParams() {
+        var params = new URLSearchParams();
+        var q = document.getElementById('searchInput').value;
+        var agency = document.getElementById('agencyFilter').value;
+        var category = document.getElementById('categoryFilter').value;
+        var amount = document.getElementById('amountFilter').value;
+        var deadline = document.getElementById('deadlineFilter').value;
+        var posted = document.getElementById('postedFilter').value;
+        var status = document.getElementById('statusFilter').value;
+        var sort = document.getElementById('sortSelect').value;
+
+        if (q) params.set('q', q);
+        if (agency) params.set('agency', agency);
+        if (category) params.set('category', category);
+        if (amount) params.set('amount', amount);
+        if (deadline) params.set('deadline', deadline);
+        if (posted) params.set('posted', posted);
+        if (status) params.set('status', status);
+        if (sort && sort !== 'deadline-asc') params.set('sort', sort);
+
+        var newURL = window.location.pathname;
+        var paramStr = params.toString();
+        if (paramStr) newURL += '?' + paramStr;
+        history.replaceState(null, '', newURL);
+    }
+
+    // Apply deadline urgency colors on load
+    function applyDeadlineColors() {
+        var now = new Date();
+        now.setHours(0, 0, 0, 0);
+        document.querySelectorAll('.grant-card').forEach(function(card) {
+            var dl = card.dataset.deadline;
+            if (!dl || dl === '9999-12-31') return;
+            var deadlineDate = new Date(dl);
+            var diff = Math.ceil((deadlineDate - now) / (1000 * 60 * 60 * 24));
+            var valEl = card.querySelector('.js-deadline-value');
+            if (!valEl) return;
+            valEl.classList.remove('deadline', 'deadline-urgent', 'deadline-soon');
+            if (diff < 14) {
+                valEl.classList.add('deadline-urgent');
+            } else if (diff < 30) {
+                valEl.classList.add('deadline-soon');
+            } else {
+                valEl.classList.add('deadline');
+            }
+        });
+    }
+
+    // Apply URL query params on load, then sort/filter
     (function() {
         var params = new URLSearchParams(window.location.search);
         if (params.get('q')) {
@@ -611,9 +1022,24 @@
         if (params.get('category')) {
             document.getElementById('categoryFilter').value = params.get('category');
         }
-        if (params.get('q') || params.get('agency') || params.get('category')) {
-            filterGrants();
+        if (params.get('amount')) {
+            document.getElementById('amountFilter').value = params.get('amount');
         }
+        if (params.get('deadline')) {
+            document.getElementById('deadlineFilter').value = params.get('deadline');
+        }
+        if (params.get('posted')) {
+            document.getElementById('postedFilter').value = params.get('posted');
+        }
+        if (params.get('status')) {
+            document.getElementById('statusFilter').value = params.get('status');
+        }
+        if (params.get('sort')) {
+            document.getElementById('sortSelect').value = params.get('sort');
+        }
+
+        applyDeadlineColors();
+        sortAndFilter();
     })();
     </script>
 </body>
