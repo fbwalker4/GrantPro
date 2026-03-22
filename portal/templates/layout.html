@@ -777,6 +777,9 @@
                     <span class="nav-link-icon">📊</span>
                     Research
                 </a>
+                <a href="/guide" class="nav-link {% if request.path == '/guide' %}active{% endif %}">
+                    <span>❓</span> Help &amp; Guide
+                </a>
             </nav>
             
             <div class="sidebar-footer">
@@ -811,6 +814,13 @@
             {% endwith %}
             
             {% block content %}{% endblock %}
+
+            <div style="text-align: center; padding: 1.5rem 0; margin-top: 2rem; border-top: 1px solid var(--border-color);">
+                <p style="font-size: 0.8rem; color: var(--text-muted);">
+                    Questions? <a href="/guide" style="color: var(--accent-primary);">Read the Guide</a> |
+                    <a href="/contact" style="color: var(--accent-primary);">Contact Support</a>
+                </p>
+            </div>
         </main>
     </div>
     <script>

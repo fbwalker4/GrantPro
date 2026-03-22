@@ -34,7 +34,7 @@
 <div class="card" style="margin-bottom: 1.5rem;">
     <h2 style="margin-bottom: 1rem;">Standard Forms</h2>
     <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">
-        These forms are auto-generated from your grant data.
+        These are required government forms (like the SF-424 cover sheet and budget summary) that we generate automatically from your organization profile and budget. You don't need to fill them out manually.
     </p>
     {% for item in checklist_forms %}
     <div class="checklist-item" style="border-left: 4px solid #10b981;">
@@ -130,7 +130,7 @@
 <div class="card" style="margin-bottom: 1.5rem;">
     <h2 style="margin-bottom: 1rem;">Self-Certifications</h2>
     <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">
-        Confirm you have completed these items outside the system.
+        These are things you need to verify outside of Grant Pro. Check each item off as you complete it. None of these are done through our system -- they're reminders of what the agency requires before submission.
     </p>
     {% for item in checklist_certifications %}
     <div class="checklist-item" style="border-left: 4px solid {% if item.completed %}#10b981{% else %}#dc3545{% endif %};">

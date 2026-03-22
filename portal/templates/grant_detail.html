@@ -11,7 +11,11 @@
         <p style="color: #4361ee; font-size: 0.9rem;">📋 Template: {{ template_name|upper }}</p>
         {% endif %}
     </div>
-    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <div style="background: rgba(37, 99, 235, 0.06); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);">
+            <strong>Workflow:</strong> 1) Write each section below (use AI Generate for a first draft) → 2) Build your budget → 3) Run the Submission Checklist to make sure nothing is missing → 4) Use Guided Submission to submit to the agency portal.
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
         <a href="/grant/{{ grant.id }}/budget-builder" class="btn btn-primary" style="background:#059669;border-color:#059669;">💰 Budget Builder</a>
         <a href="/grant/{{ grant.id }}/checklist" class="btn btn-primary" style="background:#7c3aed;border-color:#7c3aed;">&#9745; Submission Checklist</a>
         <a href="/grant/{{ grant.id }}/guided" class="btn btn-success">🎯 Guided Submission</a>
@@ -28,6 +32,7 @@
             <a href="/grant/{{ grant.id }}/download/txt" class="btn btn-secondary">📄 TXT</a>
             <a href="/grant/{{ grant.id }}/download/docx" class="btn btn-secondary">📝 DOCX</a>
             <a href="/grant/{{ grant.id }}/download/pdf" class="btn btn-secondary">📑 PDF</a>
+        </div>
         </div>
     </div>
 </div>

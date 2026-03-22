@@ -183,8 +183,14 @@
         <div class="empty-state">
             <div class="empty-icon">📭</div>
             <div class="empty-title">No saved grants yet</div>
-            <div class="empty-text">Use our grant wizard to find grants that match your organization</div>
-            <a href="/wizard" class="btn btn-primary">🔍 Find Grants</a>
+            <div class="empty-text">Use our Grant Finder Wizard to answer a few questions about your organization, and we'll match you with relevant funding opportunities. You can also browse grants by agency or category.</div>
+            <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+                <a href="/wizard" class="btn btn-primary">Find Grants with the Wizard</a>
+                <a href="/search" class="btn btn-secondary">Browse All Grants</a>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">
+                Need help? Read our <a href="/guide" style="color: var(--accent-primary);">Grant Writing 101 Guide</a> to understand the process from start to finish.
+            </p>
         </div>
     {% endif %}
 </div>

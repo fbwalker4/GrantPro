@@ -535,7 +535,7 @@
                         <span class="card-icon">🏛️</span>
                         Federal Identifiers
                     </h2>
-                    <p class="form-hint" style="margin-bottom: 1rem;">Skip for now — you can add this later from your profile.</p>
+                    <p class="form-hint" style="margin-bottom: 1rem;">These are government-issued ID numbers for your organization. You need them to submit any federal grant. If you don't have them yet, that's okay -- you can skip for now and come back later. We'll remind you before you submit.</p>
 
                     <div class="form-row">
                         <div class="form-group">
@@ -544,7 +544,7 @@
                                    placeholder="XX-XXXXXXX"
                                    value="{{ org_details.ein or '' }}">
                             <p class="form-hint">
-                                Required on every federal grant form (SF-424). Enter once, auto-filled on all applications.
+                                Your EIN is your organization's tax ID number (like a Social Security number, but for your org). It's required on the SF-424, which is the standard cover sheet for every federal grant application. Enter it once here, and it auto-fills every grant.
                                 <a href="https://www.irs.gov/ein" target="_blank">Get one free from the IRS →</a>
                             </p>
                             <div style="margin-top: 0.5rem; padding: 0.75rem; background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.1); border-radius: 6px;">
@@ -560,8 +560,8 @@
                                    placeholder="XXXXXXXXXX"
                                    value="{{ org_details.uei or '' }}">
                             <p class="form-hint">
-                                Mandatory for all federal grants since April 2022. Without this, you cannot submit.
-                                <a href="https://www.sam.gov" target="_blank">Register at SAM.gov &rarr;</a> (replaces DUNS)
+                                Your UEI is a 12-character ID assigned when you register at SAM.gov. Since April 2022, you cannot submit a federal grant without one. Registration is free but can take 2-4 weeks, so start early.
+                                <a href="https://www.sam.gov" target="_blank">Register at SAM.gov &rarr;</a>
                             </p>
                             <p class="form-hint" style="margin-top: 0.25rem;">
                                 <a href="/guide/sam-registration" style="color: var(--accent-primary); font-weight: 600;">Need help registering? Follow our SAM.gov Registration Guide &rarr;</a>

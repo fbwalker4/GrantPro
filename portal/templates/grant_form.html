@@ -4,20 +4,25 @@
 
 {% block content %}
 <h1>Assign Grant to {{ client.organization_name }}</h1>
+<p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">Create a new grant application. Fill in the basic details below, or select a grant from the research database to auto-fill these fields.</p>
 
 <div class="card">
     <form method="POST" role="form" aria-label="Assign grant to client">
         <label for="grant_name">Grant Name</label>
         <input type="text" id="grant_name" name="grant_name" required aria-required="true" placeholder="e.g., NSF Smart & Connected Communities">
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; margin-bottom: 0.75rem;">The official name of the grant opportunity, exactly as listed on Grants.gov or the agency website.</p>
 
         <label for="agency">Funding Agency</label>
         <input type="text" id="agency" name="agency" required aria-required="true" placeholder="e.g., National Science Foundation">
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; margin-bottom: 0.75rem;">The federal agency offering this funding (e.g., National Science Foundation, USDA).</p>
 
         <label for="amount">Requested Amount ($)</label>
         <input type="number" id="amount" name="amount" required aria-required="true" placeholder="500000">
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; margin-bottom: 0.75rem;">How much you plan to request. Check the grant announcement for min and max award amounts.</p>
 
         <label for="deadline">Deadline</label>
         <input type="date" id="deadline" name="deadline" required aria-required="true">
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; margin-bottom: 0.75rem;">The application due date. Most federal deadlines are firm -- late applications are not accepted.</p>
         
         <div style="display: flex; gap: 1rem;">
             <button type="submit" class="btn btn-primary">Assign Grant</button>

@@ -11,6 +11,10 @@
     <a href="/grant/{{ grant.id }}" class="btn btn-secondary">Back to Grant</a>
 </div>
 
+<div style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+    <strong>How federal budgets work:</strong> Every federal grant uses a standard format with categories like Personnel, Travel, Equipment, and Supplies. List every dollar you plan to spend and why. Don't worry about getting it perfect on the first try -- you can edit anytime before submission.
+</div>
+
 <!-- Grand Total Banner -->
 <div id="grand-total-banner" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
     <div>
@@ -67,7 +71,7 @@
             <h2>A. Personnel</h2>
             <span id="personnel-subtotal" class="bb-subtotal">$0.00</span>
         </div>
-        <p class="bb-helper">List all staff charging time to this grant. % Effort = portion of their time dedicated to this project.</p>
+        <p class="bb-helper">List every person who will work on this grant. "% Effort" means the percentage of their work time dedicated to this project. For example, if your Executive Director will spend one day a week on this project, that's 20% effort.</p>
         <div id="personnel-rows">
             <!-- JS populated -->
         </div>
@@ -219,6 +223,7 @@
             <h2>Match / Cost Share</h2>
             <span id="match-subtotal" class="bb-subtotal">$0.00</span>
         </div>
+        <p class="bb-helper">Some grants require you to contribute a portion of the project cost from your own funds. This is called "cost share" or "match." Cash match is money you spend directly. In-kind match is the dollar value of donated goods or services (e.g., volunteer time, donated space). Check the grant announcement to see if matching is required.</p>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 500px;">
             <div>
                 <label class="bb-label">Cash Match ($)</label>
