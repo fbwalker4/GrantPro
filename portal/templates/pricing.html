@@ -214,7 +214,7 @@
             
             <div class="faq-item">
                 <h3>What grants are in your database?</h3>
-                <p>We cover federal grants from Grants.gov, plus state programs and private foundations. Currently {{ grants_count|default('thousands of') }}+ active opportunities with new grants added weekly.</p>
+                <p>We cover federal grants from Grants.gov, plus state programs and private foundations. Currently {% if grants_count and grants_count > 500 %}{{ grants_count }}+{% else %}thousands of{% endif %} active opportunities with new grants added weekly.</p>
             </div>
             
             <div class="faq-item">

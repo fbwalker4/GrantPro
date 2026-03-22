@@ -15,7 +15,7 @@
     <strong style="color: #e2e8f0;">Current Plan: {{ user.plan.title() if user.plan else 'Free' }}</strong>
     <p style="color: #94a3b8; margin-top: 0.5rem; font-size: 0.9rem;">
         {% if user.plan == 'free' %}
-        You can save grants and search {{ grants_count|default('hundreds of') }}+ federal grants. Upgrade to submit applications.
+        You can save grants and search {% if grants_count and grants_count > 500 %}{{ grants_count }}+{% else %}hundreds of{% endif %} federal grants. Upgrade to submit applications.
         {% else %}
         You have {{ user.max_grants_per_month }} grant submissions per month.
         {% endif %}
@@ -34,7 +34,7 @@
             <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ Everything in Free</li>
             <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;"><strong>3 grant submissions/month</strong></li>
             <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ AI writing assistant</li>
-            <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ {{ grants_count|default('hundreds of') }}+ agency templates</li>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ {% if grants_count and grants_count > 500 %}{{ grants_count }}+{% else %}hundreds of{% endif %} agency templates</li>
             <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ DOCX/PDF export</li>
             <li style="padding: 0.5rem 0; border-bottom: 1px solid #334155;">✓ Guided submission workflow</li>
             <li style="padding: 0.5rem 0;">✓ Email support</li>

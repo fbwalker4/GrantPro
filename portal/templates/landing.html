@@ -764,63 +764,12 @@
             }
         }
     </style>
-    <!-- Free Accessibility Widget -->
-    <style>
-    #a11y-toolbar {position:fixed;bottom:20px;right:20px;z-index:9999;font-family:Arial,sans-serif}
-    #a11y-toggle {background:#2563eb;color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:24px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.2)}
-    #a11y-panel {display:none;position:absolute;bottom:60px;right:0;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.15);padding:20px;min-width:200px}
-    #a11y-panel h3 {margin:0 0 15px;font-size:16px;color:#1e293b}
-    .a11y-btn {display:block;width:100%;padding:10px 15px;margin-bottom:8px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;font-size:14px;color:#475569;text-align:left;transition:all 0.2s}
-    .a11y-btn:hover {background:#e2e8f0}
-    .a11y-btn.active {background:#dbeafe;border-color:#2563eb;color:#2563eb}
-    body.high-contrast {filter:contrast(150%)}
-    body.grayscale {filter:grayscale(100%)}
-    body.large-cursor {cursor:50px 50px,pointer}
-    body.large-cursor * {cursor:50px 50px,pointer!important}
-    body.dyslexia-font {font-family:OpenDyslexic,Verdana,sans-serif!important}
-    </style>
     <!-- UserWay Accessibility Widget -->
     <script async src="https://cdn.userway.org/widget.js" data-account="LCp2cbQRzw"></script>
 </head>
 <body>
-<div id="a11y-toolbar">
-    <button id="a11y-toggle" aria-label="Accessibility Options" title="Accessibility Options">♿</button>
-    <div id="a11y-panel" role="dialog" aria-label="Accessibility Options">
-        <h3>Accessibility</h3>
-        <button class="a11y-btn" onclick="toggleHighContrast()" id="btn-contrast">High Contrast</button>
-        <button class="a11y-btn" onclick="toggleGrayscale()" id="btn-gray">Grayscale</button>
-        <button class="a11y-btn" onclick="toggleLargeCursor()" id="btn-cursor">Large Cursor</button>
-        <button class="a11y-btn" onclick="increaseFontSize()" id="btn-text">Larger Text</button>
-        <button class="a11y-btn" onclick="resetA11y()" id="btn-reset">Reset All</button>
-    </div>
-</div>
 <script>
 (function(){
-    var panel=document.getElementById('a11y-panel');
-    var toggle=document.getElementById('a11y-toggle');
-    toggle.onclick=function(){panel.style.display=panel.style.display==='block'?'none':'block'};
-    document.onclick=function(e){if(!panel.contains(e.target)&&e.target!==toggle){panel.style.display='none'}};
-    window.toggleHighContrast=function(){
-        document.body.classList.toggle('high-contrast');
-        document.getElementById('btn-contrast').classList.toggle('active');
-    };
-    window.toggleGrayscale=function(){
-        document.body.classList.toggle('grayscale');
-        document.getElementById('btn-gray').classList.toggle('active');
-    };
-    window.toggleLargeCursor=function(){
-        document.body.classList.toggle('large-cursor');
-        document.getElementById('btn-cursor').classList.toggle('active');
-    };
-    window.increaseFontSize=function(){
-        var current=parseFloat(getComputedStyle(document.body).fontSize)||16;
-        if(current<24){document.body.style.fontSize=(current+2)+'px';document.getElementById('btn-text').classList.add('active');}
-    };
-    window.resetA11y=function(){
-        document.body.classList.remove('high-contrast','grayscale','large-cursor');
-        document.body.style.fontSize='';
-        document.querySelectorAll('.a11y-btn').forEach(function(b){b.classList.remove('active')});
-    };
     // Mobile nav toggle
     var hamburger=document.getElementById('hamburger');
     var mobileNav=document.getElementById('mobileNav');
@@ -871,11 +820,11 @@
                 <a href="/signup?tier=free" class="btn btn-secondary">Explore Free</a>
             </div>
             <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
-                Search {{ grants_count|default('thousands of') }}+ federal grants free &bull; AI writing + guided submission from $19.95/mo &bull; Cancel anytime
+                Search {% if grants_count and grants_count > 500 %}{{ grants_count }}+{% else %}thousands of{% endif %} federal grants free &bull; AI writing + guided submission from $19.95/mo &bull; Cancel anytime
             </p>
             <div style="margin-top: 2rem; padding: 1.25rem 2rem; background: rgba(37, 99, 235, 0.06); border: 1px solid rgba(37, 99, 235, 0.15); border-radius: 10px; display: inline-block;">
                 <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
-                    Not sure if your grant is in our system? Search our database of <strong>{{ grants_count|default('thousands of') }}+</strong> federal grants before signing up.
+                    Not sure if your grant is in our system? Search our database of <strong>{% if grants_count and grants_count > 500 %}{{ grants_count }}+{% else %}thousands of{% endif %}</strong> federal grants before signing up.
                 </p>
                 <a href="/search" style="display: inline-flex; align-items: center; gap: 0.4rem; background: var(--gradient-primary); color: white; padding: 0.6rem 1.25rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Search Our Grant Database &rarr;</a>
                 <a href="/static/sample_grant_application.pdf" target="_blank" style="display: inline-flex; align-items: center; gap: 0.4rem; border: 1px solid rgba(37,99,235,0.3); color: var(--text-primary); padding: 0.6rem 1.25rem; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 0.9rem; margin-left: 0.75rem;">View Sample Grant PDF &rarr;</a>
