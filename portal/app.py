@@ -3828,6 +3828,27 @@ def generate_section_content(grant_id, section_id):
             sources_text = "\n".join(f"  - {s['source']} (Use for: {s['use_for']})" for s in verified_sources[:10])
             verified_sources_block = f"\n**VERIFIED DATA SOURCES YOU MAY CITE (these are real, verified publications):**\n{sources_text}\n"
 
+        # Load winning examples from similar awards for AI style guidance
+        winning_examples_block = ""
+        try:
+            from awards_library import get_similar_awards
+            similar = get_similar_awards(
+                project_description=grant_name + " " + agency,
+                agency=agency,
+                state=None,
+                limit=3
+            )
+            if similar:
+                examples = []
+                for aw in similar:
+                    desc = (aw.get('award_description') or '')[:500]
+                    if desc:
+                        examples.append(f"- {aw.get('recipient_name','Unknown')} (${aw.get('award_amount',0):,.0f}): {desc}")
+                if examples:
+                    winning_examples_block = "\n**EXAMPLES FROM SUCCESSFULLY FUNDED PROJECTS (use these as style and strategy guidance -- do NOT copy them):**\n" + "\n".join(examples) + "\n"
+        except Exception:
+            pass
+
         prompt = f"""You are a federal grant compliance writer for {agency}. Your ONLY job is to take the applicant's factual data (provided below as TRUTH DATA) and present it in the format and language required by this agency's grant program. You do NOT invent content. You translate the applicant's real information into grant-compliant narrative.
 
     YOUR ROLE:
@@ -3841,6 +3862,7 @@ def generate_section_content(grant_id, section_id):
     {"**REGULATORY COMPLIANCE REQUIREMENTS:**" + chr(10) + compliance_notes + chr(10) if compliance_notes else ""}
     {nofo_eval_block}
     {verified_sources_block}
+    {winning_examples_block}
     {budget_prompt_block}
     {f"**REQUESTED FUNDING: ${amount_min:,.0f} - ${amount_max:,.0f}. You MUST reference this specific dollar amount in your narrative and break it into approximate cost categories.**" if not budget_prompt_block or 'budget' not in budget_prompt_block.lower() else ""}
     Write in narrative format with clear headings. No markdown tables.
