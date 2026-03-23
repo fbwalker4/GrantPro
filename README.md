@@ -965,6 +965,28 @@ app.run(debug=True, host='0.0.0.0', port=5001)
 
 ## Changelog
 
+### 2026-03-22 (Submission Gate Fix + DOCX Crash Fix)
+
+- mark_submitted readiness gate was passing wrong argument types to _build_checklist_data (Row + Connection instead of user_id + template_name). Exception was silently caught, bypassing the gate entirely. Fixed arguments, added logging.
+- DOCX download crashed with TypeError when grant amount was None. Added null coalescing.
+
+### 2026-03-22 (CSRF Sweep: 14 More Missing Tokens)
+
+9 more forms missing CSRF tokens that broke core workflows:
+- section_form.html: users could not save grant section edits
+- admin_grants.html: admin could not manage grants
+- admin_templates.html: admin could not manage templates
+- admin_emails.html: admin could not send test emails
+- admin_leads.html: admin could not email leads
+- contact.html: contact form submissions failed
+- intake_form.html: client intake saves failed
+- select_client_for_grant.html: multi-client grant start failed
+- reset_password.html: password reset completely broken (wrong URL + missing CSRF)
+- wizard_recommendations.html: fetch POST missing X-CSRFToken header
+- Error handlers: added icon parameter to message.html
+- admin_emails.html: fixed config.RESEND_API_KEY reference
+- Verified: EVERY POST form across all 58 templates now has CSRF protection.
+
 ### 2026-03-22 (Critical Flow Fixes: AI Prompt + Checklist + Submission Gate + CSRF)
 
 - **AI generation was using a minimal prompt instead of the detailed one.** The code built a comprehensive prompt with budget data, compliance rules, cross-section consistency, org details, and APA standards -- then threw it away and used a bare-bones prompt for the actual API call. Fixed: AI now uses the full detailed prompt.
