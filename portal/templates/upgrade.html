@@ -41,6 +41,7 @@
         </ul>
         
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="plan" value="monthly">
             <button type="submit" class="btn btn-primary" style="width: 100%;">Start Monthly</button>
         </form>
@@ -64,6 +65,7 @@
         </ul>
         
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="plan" value="annual">
             <button type="submit" class="btn" style="width: 100%; background: #22c55e; color: white;">Start Annual</button>
         </form>
@@ -85,6 +87,7 @@
         </ul>
 
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="plan" value="enterprise_5">
             <button type="submit" class="btn" style="width: 100%; background: white; color: #1e3a5f;">Start Enterprise 5</button>
         </form>
@@ -113,6 +116,7 @@
         </ul>
 
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="plan" value="enterprise_10">
             <button type="submit" class="btn" style="width: 100%; background: #3b82f6; color: white;">Start Enterprise 10</button>
         </form>
@@ -133,6 +137,7 @@
         </ul>
 
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="plan" value="enterprise_unlimited">
             <button type="submit" class="btn" style="width: 100%; background: #22c55e; color: white;">Start Unlimited</button>
         </form>

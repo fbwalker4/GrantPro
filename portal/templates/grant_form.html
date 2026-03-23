@@ -8,6 +8,7 @@
 
 <div class="card">
     <form method="POST" role="form" aria-label="Assign grant to client">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <label for="grant_name">Grant Name</label>
         <input type="text" id="grant_name" name="grant_name" required aria-required="true" placeholder="e.g., NSF Smart & Connected Communities">
         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; margin-bottom: 0.75rem;">The official name of the grant opportunity, exactly as listed on Grants.gov or the agency website.</p>

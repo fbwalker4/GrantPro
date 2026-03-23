@@ -266,7 +266,8 @@ function generateSection(grantId, sectionId, btn) {
     fetch(`/grant/${grantId}/generate/${sectionId}`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
         }
     })
     .then(response => response.json())
