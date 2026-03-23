@@ -38,12 +38,13 @@
     }
     .danger-zone h2 { color: var(--accent-danger); }
     .text-link {
-        color: var(--text-muted);
+        color: var(--accent-primary);
         text-decoration: none;
         font-size: 0.85rem;
+        font-weight: 500;
         transition: color 0.15s;
     }
-    .text-link:hover { color: var(--text-primary); text-decoration: underline; }
+    .text-link:hover { color: var(--accent-hover); text-decoration: underline; }
     .text-link-danger { color: var(--accent-danger); }
     .text-link-danger:hover { color: #ef4444; }
     .data-stat {
@@ -59,11 +60,46 @@
         min-width: 40px;
     }
     .data-stat-label { color: var(--text-secondary); font-size: 0.9rem; }
+    .settings-btn-row {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+    .pause-note {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 0.75rem;
+        margin-bottom: 0;
+    }
+    @media (max-width: 768px) {
+        .settings-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
+        }
+    }
 </style>
 
 <div class="settings-container">
+    <!-- Back navigation -->
+    <a href="{{ url_for('dashboard') }}" style="color: var(--text-muted); text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 1rem;">
+        <span aria-hidden="true">&larr;</span> Back to Dashboard
+    </a>
+
     <h1>Account Settings</h1>
     <p style="color: var(--text-muted); margin-bottom: 2rem;">Manage your subscription, data, and account preferences.</p>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="card" style="border-color: {% if category == 'error' %}rgba(220, 38, 38, 0.3){% elif category == 'success' %}rgba(5, 150, 105, 0.3){% else %}var(--border-color){% endif %}; margin-bottom: 1.5rem; padding: 1rem 1.25rem;">
+        <p style="margin: 0; font-size: 0.9rem; color: {% if category == 'error' %}#ef4444{% elif category == 'success' %}#10b981{% else %}var(--text-secondary){% endif %};">{{ message }}</p>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
 
     <!-- Subscription Section -->
     <div class="settings-section">
@@ -120,11 +156,11 @@
                 <span class="settings-row-label">Grants Used This Month</span>
                 <span class="settings-row-value">{{ sub_status.grants_used or 0 }} / {{ sub_status.grants_allowed or 0 }}</span>
             </div>
-            <div style="margin-top: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <div class="settings-btn-row">
                 {% if sub_status and sub_status.status == 'paused' %}
                     <form method="POST" action="{{ url_for('account_reactivate') }}" style="display: inline; margin: 0;">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-primary">Reactivate Now</button>
+                        <button type="submit" class="btn btn-primary" onclick="this.disabled=true; this.innerText='Reactivating...'; this.form.submit();">Reactivate Now</button>
                     </form>
                 {% elif sub_status and sub_status.plan != 'free' and sub_status.status not in ('canceling', 'cancelled') %}
                     <a href="{{ url_for('subscription_manage') }}" class="btn btn-secondary">Manage Billing</a>
@@ -143,7 +179,7 @@
         <div class="card">
             <h2>Your Data</h2>
             <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">A summary of what you have stored in Grant Pro.</p>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.5rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem;">
                 <div class="data-stat">
                     <span class="data-stat-count">{{ grant_count }}</span>
                     <span class="data-stat-label">Grant Applications</span>
@@ -162,7 +198,7 @@
                 </div>
             </div>
             <div style="margin-top: 1rem;">
-                <a href="{{ url_for('account_export_data') }}" class="text-link">Export Data</a>
+                <a href="{{ url_for('account_export_data') }}" class="text-link">Export Your Data &rarr;</a>
             </div>
         </div>
     </div>
@@ -175,19 +211,19 @@
             <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
                 Pause your subscription instead of canceling. Your data stays safe and your account stays set up.
             </p>
-            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <div class="settings-btn-row" style="margin-top: 0;">
                 <form method="POST" action="{{ url_for('account_pause') }}" style="margin: 0;">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="months" value="1">
-                    <button type="submit" class="btn btn-secondary">Pause for 1 Month</button>
+                    <button type="submit" class="btn btn-secondary" onclick="this.disabled=true; this.innerText='Pausing...'; this.form.submit();">Pause for 1 Month</button>
                 </form>
                 <form method="POST" action="{{ url_for('account_pause') }}" style="margin: 0;">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="months" value="3">
-                    <button type="submit" class="btn btn-secondary">Pause for 3 Months</button>
+                    <button type="submit" class="btn btn-secondary" onclick="this.disabled=true; this.innerText='Pausing...'; this.form.submit();">Pause for 3 Months</button>
                 </form>
             </div>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem;">You can pause once per 12-month period.</p>
+            <p class="pause-note">You can pause once per 12-month period.</p>
         </div>
     </div>
     {% endif %}
@@ -197,7 +233,7 @@
     <div class="settings-section" style="padding-top: 0.5rem;">
         <p style="font-size: 0.9rem; color: var(--text-muted);">
             Need to make a change?
-            <a href="{{ url_for('account_cancel') }}" class="text-link" style="color: var(--text-secondary);">Cancel subscription</a>
+            <a href="{{ url_for('account_cancel') }}" class="text-link text-link-danger">Cancel subscription</a>
         </p>
     </div>
     {% endif %}
@@ -208,7 +244,7 @@
         <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
             Permanently delete your account and all associated data. This action cannot be undone.
         </p>
-        <a href="{{ url_for('account_delete') }}" class="text-link text-link-danger">Delete Account</a>
+        <a href="{{ url_for('account_delete') }}" class="btn btn-secondary" style="border-color: rgba(220, 38, 38, 0.3); color: var(--accent-danger);">Delete Account</a>
     </div>
 </div>
 {% endblock %}

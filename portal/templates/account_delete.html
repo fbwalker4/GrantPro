@@ -11,6 +11,7 @@
     }
     .delete-step-indicator {
         display: flex;
+        align-items: center;
         gap: 0.5rem;
         margin-bottom: 2rem;
     }
@@ -19,9 +20,15 @@
         height: 8px;
         border-radius: 50%;
         background: var(--bg-tertiary);
+        transition: background 0.2s;
     }
     .delete-step-dot.active { background: var(--accent-danger); }
     .delete-step-dot.completed { background: var(--accent-danger); opacity: 0.5; }
+    .delete-step-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-left: 0.25rem;
+    }
     .delete-warning-card {
         background: rgba(220, 38, 38, 0.06);
         border: 1px solid rgba(220, 38, 38, 0.25);
@@ -72,9 +79,13 @@
         display: flex;
         gap: 0.75rem;
         margin-top: 1.5rem;
+        flex-wrap: wrap;
+        align-items: center;
     }
     .btn-danger {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
         color: #fff;
         padding: 0.7rem 1.5rem;
@@ -83,12 +94,20 @@
         border: none;
         border-radius: var(--radius-md);
         cursor: pointer;
-        transition: opacity 0.15s;
+        transition: opacity 0.15s, transform 0.15s;
         text-decoration: none;
+        min-height: 44px;
     }
-    .btn-danger:hover { opacity: 0.9; }
+    .btn-danger:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-danger:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
     .btn-back {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         background: var(--bg-tertiary);
         color: var(--text-secondary);
         padding: 0.7rem 1.5rem;
@@ -99,22 +118,35 @@
         cursor: pointer;
         text-decoration: none;
         transition: border-color 0.15s;
+        min-height: 44px;
     }
     .btn-back:hover { border-color: var(--text-muted); }
+    .email-confirm-group {
+        margin-bottom: 0.5rem;
+    }
+    .email-confirm-label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
     .email-confirm-input {
         width: 100%;
-        padding: 0.7rem 1rem;
+        padding: 0.75rem 1rem;
         font-size: 0.95rem;
-        background: var(--bg-secondary);
+        background: var(--bg-tertiary);
         border: 1px solid var(--border-color);
         border-radius: var(--radius-md);
         color: var(--text-primary);
-        margin-top: 0.5rem;
     }
     .email-confirm-input:focus {
         outline: none;
         border-color: var(--accent-danger);
         box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15);
+    }
+    .email-confirm-input::placeholder {
+        color: var(--text-muted);
     }
     .grace-period-note {
         display: flex;
@@ -133,17 +165,39 @@
         line-height: 1.45;
         margin: 0;
     }
+    @media (max-width: 768px) {
+        .data-impact {
+            grid-template-columns: 1fr;
+        }
+        .delete-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .delete-actions .btn-danger,
+        .delete-actions .btn-back {
+            text-align: center;
+            justify-content: center;
+        }
+    }
 </style>
 
 <div class="delete-container">
+    <!-- Back link -->
+    <a href="{{ url_for('account_settings') }}" style="color: var(--text-muted); text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 1rem;">
+        <span aria-hidden="true">&larr;</span> Back to Account Settings
+    </a>
+
     <h1>Delete Your Account</h1>
     <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">This action is permanent and cannot be undone.</p>
 
-    <!-- Step indicator -->
-    <div class="delete-step-indicator">
-        <div class="delete-step-dot {% if step == 'warning' %}active{% else %}completed{% endif %}"></div>
-        <div class="delete-step-dot {% if step == 'type_email' %}active{% elif step == 'final' %}completed{% endif %}"></div>
-        <div class="delete-step-dot {% if step == 'final' %}active{% endif %}"></div>
+    <!-- Step indicator with labels -->
+    <div class="delete-step-indicator" role="navigation" aria-label="Deletion progress">
+        <div class="delete-step-dot {% if step == 'warning' %}active{% else %}completed{% endif %}" aria-label="Step 1{% if step == 'warning' %} (current){% endif %}"></div>
+        <span class="delete-step-label">Review</span>
+        <div class="delete-step-dot {% if step == 'type_email' %}active{% elif step == 'final' %}completed{% endif %}" aria-label="Step 2{% if step == 'type_email' %} (current){% endif %}"></div>
+        <span class="delete-step-label">Verify</span>
+        <div class="delete-step-dot {% if step == 'final' %}active{% endif %}" aria-label="Step 3{% if step == 'final' %} (current){% endif %}"></div>
+        <span class="delete-step-label">Confirm</span>
     </div>
 
     {% if step == 'warning' %}
@@ -177,14 +231,14 @@
         </div>
     </div>
 
-    <div style="padding: 1rem; background: var(--bg-tertiary); border-radius: var(--radius-md); margin-bottom: 1rem;">
+    <div class="card" style="padding: 1rem 1.25rem; margin-bottom: 1.5rem;">
         <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
             We recommend <a href="{{ url_for('account_export_data') }}" style="color: var(--accent-primary); font-weight: 600;">downloading your data</a> before proceeding.
         </p>
     </div>
 
     <div class="delete-actions">
-        <a href="{{ url_for('account_settings') }}" class="btn-back">Go Back</a>
+        <a href="{{ url_for('account_settings') }}" class="btn-back">Go Back to Settings</a>
         <form method="POST" action="{{ url_for('account_delete') }}" style="margin: 0;">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="step" value="show_type_email">
@@ -196,24 +250,34 @@
     <!-- ========== STEP 2: TYPE EMAIL ========== -->
     <div class="card" style="padding: 1.5rem;">
         <h2 style="color: var(--text-primary); font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Confirm your identity</h2>
-        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
-            To confirm, type your email address: <strong style="color: var(--text-primary);">{{ user.email }}</strong>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            To continue, please type your email address to verify this is intentional.
         </p>
-        <form method="POST" action="{{ url_for('account_delete') }}">
+        <form method="POST" action="{{ url_for('account_delete') }}" id="email-confirm-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="step" value="confirm_type">
-            <input type="text"
-                   name="confirm_email"
-                   class="email-confirm-input"
-                   placeholder="Type your email address"
-                   autocomplete="off"
-                   autocorrect="off"
-                   autocapitalize="off"
-                   spellcheck="false"
-                   required>
+            <div class="email-confirm-group">
+                <label class="email-confirm-label" for="confirm_email">
+                    Type <strong style="color: var(--text-primary);">{{ user.email }}</strong> to continue
+                </label>
+                <input type="email"
+                       id="confirm_email"
+                       name="confirm_email"
+                       class="email-confirm-input"
+                       placeholder="your-email@example.com"
+                       autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="off"
+                       spellcheck="false"
+                       required
+                       aria-describedby="email-hint">
+                <p id="email-hint" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+                    This must match your account email exactly.
+                </p>
+            </div>
             <div class="delete-actions">
                 <a href="{{ url_for('account_settings') }}" class="btn-back">Go Back</a>
-                <button type="submit" class="btn-danger">Continue</button>
+                <button type="submit" class="btn-danger" id="email-submit-btn">Verify and Continue</button>
             </div>
         </form>
     </div>
@@ -224,12 +288,12 @@
         <h2>Final confirmation</h2>
         <p>
             This will permanently delete all records and account data associated with <strong>{{ user.email }}</strong>.
-            When you press the button below, your account will no longer be accessible.
+            When you press the button below, your account will enter a 72-hour deletion window.
         </p>
     </div>
 
     <div class="grace-period-note">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-primary);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-primary);" aria-hidden="true">
             <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
         </svg>
         <p>
@@ -238,12 +302,12 @@
         </p>
     </div>
 
-    <form method="POST" action="{{ url_for('account_delete') }}" style="margin-top: 1.5rem;">
+    <form method="POST" action="{{ url_for('account_delete') }}" style="margin-top: 1.5rem;" id="final-delete-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="step" value="execute">
         <div class="delete-actions">
-            <a href="{{ url_for('account_settings') }}" class="btn-back">Cancel</a>
-            <button type="submit" class="btn-danger">Permanently Delete My Account</button>
+            <a href="{{ url_for('account_settings') }}" class="btn-back">Cancel and Go Back</a>
+            <button type="submit" class="btn-danger" onclick="this.disabled=true; this.innerText='Deleting Account...'; this.form.submit();">Permanently Delete My Account</button>
         </div>
     </form>
     {% endif %}

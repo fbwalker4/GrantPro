@@ -965,6 +965,20 @@ app.run(debug=True, host='0.0.0.0', port=5001)
 
 ## Changelog
 
+### 2026-03-22 (UX Iteration: Subscription Lifecycle Templates)
+
+40+ UX improvements across 4 templates:
+- **Navigation:** Added back links on all pages (settings, cancel, delete, export)
+- **Accessibility:** Proper form labels, fieldset/legend on radio groups, aria-labels on step indicators, aria-hidden on decorative icons, minimum 44px touch targets
+- **Double-click prevention:** All destructive/submit buttons disable on click with loading text
+- **Mobile responsiveness:** Added @media breakpoints for settings rows, data grids, pricing comparisons, button groups, and export history
+- **Step indicators:** Changed bare dots to labeled steps (Feedback/Review/Confirm)
+- **Copy improvements:** "Go Back" -> "Keep My Subscription", "Continue" -> "Verify and Continue", "Download" -> "Download ZIP", clearer delete confirmation text mentioning 72-hour grace
+- **Visual hierarchy:** Export link now primary-colored, delete button upgraded from text link to styled danger button, radio selection highlighting
+- **Flash messages:** Added flash message display to settings and export pages
+- **Information architecture:** Moved "Your Exports" above "What's Included" for returning users
+- **Rate limit communication:** Added "Maximum 3 per hour" note on export page
+
 ### 2026-03-22 (Security + QA: Red Team / Blue Team Sweep)
 
 20 fixes from user agent walkthrough + red team security audit:
