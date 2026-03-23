@@ -1,0 +1,342 @@
+{% extends "layout.html" %}
+
+{% block title %}Match Funding - {{ grant.grant_name }}{% endblock %}
+
+{% block extra %}
+<style>
+    .match-header {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .match-header-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+    .match-stat {
+        text-align: center;
+    }
+    .match-stat-value {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.75rem;
+        font-weight: 700;
+    }
+    .match-stat-value.green { color: var(--accent-success); }
+    .match-stat-value.blue { color: var(--accent-primary); }
+    .match-stat-value.amber { color: var(--accent-warning); }
+    .match-stat-label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 0.25rem;
+    }
+    .category-section {
+        margin-bottom: 2rem;
+    }
+    .category-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .source-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.25rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.2s;
+    }
+    .source-card:hover {
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 1px var(--accent-primary);
+    }
+    .source-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+    }
+    .source-card-name {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    .source-card-agency {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+    }
+    .source-card-amount {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--accent-success);
+        white-space: nowrap;
+    }
+    .source-card-desc {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.75rem;
+        line-height: 1.5;
+    }
+    .source-card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+    .source-card-meta span {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+    .calculator-panel {
+        position: sticky;
+        top: 2rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+    }
+    .calculator-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    .calc-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.9rem;
+    }
+    .calc-row:last-child { border-bottom: none; }
+    .calc-row-label { color: var(--text-secondary); }
+    .calc-row-value { font-weight: 600; }
+    .calc-row-value.green { color: var(--accent-success); }
+    .calc-row-value.amber { color: var(--accent-warning); }
+    .calc-row-value.red { color: var(--accent-danger); }
+    .progress-bar-container {
+        width: 100%;
+        background: var(--bg-tertiary);
+        border-radius: 6px;
+        height: 12px;
+        margin: 1rem 0;
+        overflow: hidden;
+    }
+    .progress-bar-fill {
+        height: 100%;
+        border-radius: 6px;
+        background: var(--gradient-success);
+        transition: width 0.4s ease;
+    }
+    .match-grid {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 2rem;
+    }
+    @media (max-width: 900px) {
+        .match-grid {
+            grid-template-columns: 1fr;
+        }
+        .calculator-panel {
+            position: static;
+        }
+    }
+    .add-to-strategy-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.4rem 0.75rem;
+        background: rgba(37, 99, 235, 0.15);
+        color: #3b82f6;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .add-to-strategy-btn:hover {
+        background: rgba(37, 99, 235, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Match Funding Finder</h1>
+        <p class="page-subtitle">
+            <a href="/grant/{{ grant.id }}" style="color: var(--accent-primary); text-decoration: none;">{{ grant.grant_name }}</a>
+            &mdash; Find sources to cover your local match requirement
+        </p>
+    </div>
+    <a href="/grant/{{ grant.id }}" class="btn btn-secondary">Back to Grant</a>
+</div>
+
+{# ---- Match Requirement Summary ---- #}
+<div class="match-header">
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+        <span style="font-size: 1.25rem;">&#128176;</span>
+        <strong style="font-size: 1.1rem;">Match Requirement</strong>
+    </div>
+    <div class="match-header-stats">
+        <div class="match-stat">
+            <div class="match-stat-value blue">${{ '{:,.0f}'.format(match_info.federal_share) }}</div>
+            <div class="match-stat-label">Federal Share</div>
+        </div>
+        <div class="match-stat">
+            <div class="match-stat-value amber">${{ '{:,.0f}'.format(match_info.match_amount) }}</div>
+            <div class="match-stat-label">Match Required ({{ match_pct }}%)</div>
+        </div>
+        <div class="match-stat">
+            <div class="match-stat-value green">${{ '{:,.0f}'.format(match_info.total_project_cost) }}</div>
+            <div class="match-stat-label">Total Project Cost</div>
+        </div>
+    </div>
+
+    {# Custom calculator #}
+    <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+        <form method="GET" action="/grant/{{ grant.id }}/match-funding" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
+            <div style="flex: 1; min-width: 140px;">
+                <label class="form-label" for="grant_amount">Grant Amount ($)</label>
+                <input type="number" id="grant_amount" name="grant_amount" class="form-input" value="{{ grant_amount }}" step="1000" min="0">
+            </div>
+            <div style="flex: 1; min-width: 100px;">
+                <label class="form-label" for="match_pct">Match %</label>
+                <input type="number" id="match_pct" name="match_pct" class="form-input" value="{{ match_pct }}" step="1" min="0" max="99">
+            </div>
+            <button type="submit" class="btn btn-primary">Recalculate</button>
+        </form>
+    </div>
+</div>
+
+<div class="match-grid">
+    {# ---- Source List by Category ---- #}
+    <div>
+        {% if not sources_by_category %}
+        <div class="card empty-state">
+            <div class="empty-icon">&#128269;</div>
+            <div class="empty-title">No match sources found</div>
+            <div class="empty-text">We don't have match funding sources for {{ user_state or 'your state' }} yet. Check back soon.</div>
+        </div>
+        {% else %}
+            {% for category, sources in sources_by_category.items() %}
+            <div class="category-section">
+                <div class="category-title">
+                    {% if category == 'State Programs' %}&#127963;{% elif category == 'FHLB' %}&#127974;{% elif category == 'CDFI' %}&#128176;{% elif category == 'Foundation' %}&#127775;{% elif category == 'In-Kind' %}&#129309;{% else %}&#128196;{% endif %}
+                    {{ category }}
+                    <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 400;">({{ sources|length }})</span>
+                </div>
+
+                {% for source in sources %}
+                <div class="source-card">
+                    <div class="source-card-header">
+                        <div>
+                            <div class="source-card-name">{{ source.source_name }}</div>
+                            <div class="source-card-agency">{{ source.administering_agency }}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            {% if source.amount_max > 0 %}
+                            <div class="source-card-amount">
+                                {% if source.amount_min > 0 %}${{ '{:,.0f}'.format(source.amount_min) }} &ndash; {% endif %}${{ '{:,.0f}'.format(source.amount_max) }}
+                            </div>
+                            {% endif %}
+                            <span class="badge badge-{{ badge_colors.get(source.source_type, 'purple') }}">
+                                {{ source_labels.get(source.source_type, source.source_type) }} &middot; {{ source.funding_type or 'grant' }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="source-card-desc">{{ source.description }}</div>
+                    <div class="source-card-meta">
+                        {% if source.eligible_activities %}
+                        <span>&#128203; {{ source.eligible_activities }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="source-card-meta" style="margin-top: 0.5rem;">
+                        {% if source.eligible_applicants %}
+                        <span>&#128101; {{ source.eligible_applicants }}</span>
+                        {% endif %}
+                        {% if source.application_cycle %}
+                        <span>&#128197; {{ source.application_cycle }}</span>
+                        {% endif %}
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                        {% if source.website_url %}
+                        <a href="{{ source.website_url }}" target="_blank" rel="noopener" style="font-size: 0.85rem; color: var(--accent-primary); text-decoration: none;">Visit Website &#8599;</a>
+                        {% else %}
+                        <span></span>
+                        {% endif %}
+                        {% if strategy_id %}
+                        <form method="POST" action="/strategy/{{ strategy_id }}/add-source" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="source_name" value="{{ source.source_name }}">
+                            <input type="hidden" name="source_type" value="{{ source.source_type }}">
+                            <input type="hidden" name="amount" value="{{ source.amount_max }}">
+                            <input type="hidden" name="redirect" value="/grant/{{ grant.id }}/match-funding">
+                            <button type="submit" class="add-to-strategy-btn">+ Add to Strategy</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    {# ---- Calculator Sidebar ---- #}
+    <div>
+        <div class="calculator-panel">
+            <div class="calculator-title">&#128200; Match Funding Calculator</div>
+
+            <div class="calc-row">
+                <span class="calc-row-label">Match Required</span>
+                <span class="calc-row-value amber">${{ '{:,.0f}'.format(match_info.match_amount) }}</span>
+            </div>
+
+            {% if strategy and strategy.sources %}
+            <div style="margin: 0.75rem 0 0.25rem 0; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">From Your Strategy</div>
+            {% for src in strategy.sources %}
+            <div class="calc-row">
+                <span class="calc-row-label" style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ src.source_name }}</span>
+                <span class="calc-row-value green">${{ '{:,.0f}'.format(src.amount or 0) }}</span>
+            </div>
+            {% endfor %}
+            <div class="calc-row" style="border-top: 2px solid var(--border-color); padding-top: 0.75rem; margin-top: 0.5rem;">
+                <span class="calc-row-label"><strong>Total Identified</strong></span>
+                <span class="calc-row-value green">${{ '{:,.0f}'.format(strategy.total_identified or 0) }}</span>
+            </div>
+            <div class="calc-row">
+                <span class="calc-row-label"><strong>Gap Remaining</strong></span>
+                <span class="calc-row-value {% if strategy.gap > 0 %}red{% else %}green{% endif %}">${{ '{:,.0f}'.format(strategy.gap or 0) }}</span>
+            </div>
+
+            {% set pct_filled = ((strategy.total_identified / match_info.match_amount * 100) if match_info.match_amount > 0 else 0)|int %}
+            {% set pct_capped = [pct_filled, 100]|min %}
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" style="width: {{ pct_capped }}%;"></div>
+            </div>
+            <div style="text-align: center; font-size: 0.85rem; color: var(--text-muted);">{{ pct_capped }}% of match covered</div>
+            {% else %}
+            <div style="text-align: center; padding: 1rem 0; color: var(--text-muted); font-size: 0.9rem;">
+                No strategy sources added yet.<br>
+                Click "Add to Strategy" on any source to start tracking.
+            </div>
+            {% endif %}
+
+            {% if strategy_id %}
+            <a href="/strategy/{{ strategy_id }}" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">View Full Strategy</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

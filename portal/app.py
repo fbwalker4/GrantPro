@@ -8059,6 +8059,272 @@ def vault_delete(doc_id):
     return redirect(redirect_url)
 
 
+# ============ MATCH FUNDING FINDER ============
+
+# Initialize match tables and seed data on startup
+try:
+    from match_finder import (
+        init_match_tables, seed_match_sources,
+        get_match_sources_by_category, calculate_match_requirement,
+        SOURCE_TYPE_LABELS, SOURCE_TYPE_BADGE_COLORS,
+        get_user_strategies, get_strategy, create_strategy,
+        add_strategy_source, update_strategy_source, delete_strategy_source,
+        update_strategy, delete_strategy,
+    )
+    init_match_tables()
+    seed_match_sources()
+except Exception as _mf_err:
+    logger.warning(f'Match finder init: {_mf_err}')
+
+
+@app.route('/grant/<grant_id>/match-funding')
+@login_required
+def grant_match_funding(grant_id):
+    """Match Funding Finder for a specific grant."""
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    user = get_current_user()
+    conn = get_db()
+
+    grant = conn.execute('''
+        SELECT g.*, c.organization_name, c.contact_name
+        FROM grants g
+        JOIN clients c ON g.client_id = c.id
+        WHERE g.id = ?
+    ''', (grant_id,)).fetchone()
+    conn.close()
+
+    if not grant:
+        return "Grant not found", 404
+
+    # Determine user's state from org profile
+    from user_models import get_organization_details
+    org_profile = get_organization_details(user['id'])
+    user_state = None
+    if org_profile and org_profile.get('organization_details'):
+        user_state = org_profile['organization_details'].get('state')
+    user_state = user_state or 'MS'  # Default to MS for now
+
+    # Get match parameters from query string or defaults
+    grant_amount = request.args.get('grant_amount', type=float) or (grant.get('amount') if grant.get('amount') else 500000)
+    match_pct = request.args.get('match_pct', type=float) or 25
+
+    match_info_dict = calculate_match_requirement(grant_amount, match_pct)
+
+    # Simple namespace object for template access
+    class MatchInfo:
+        def __init__(self, d):
+            self.match_amount = d['match_amount']
+            self.total_project_cost = d['total_project_cost']
+            self.federal_share = d['federal_share']
+    match_info = MatchInfo(match_info_dict)
+
+    sources_by_category = get_match_sources_by_category(user_state, amount_needed=match_info.match_amount)
+
+    # Find or auto-create a funding strategy for this grant
+    strategy = None
+    strategy_id = None
+    try:
+        user_strategies = get_user_strategies(user['id'])
+        for s in user_strategies:
+            if s.get('grant_id') == grant_id:
+                strategy = get_strategy(s['id'])
+                strategy_id = s['id']
+                break
+        if not strategy_id:
+            # Auto-create a strategy tied to this grant
+            strategy_id = create_strategy(
+                user['id'],
+                grant.get('grant_name', 'Grant Project'),
+                match_info.total_project_cost,
+                grant_id=grant_id
+            )
+            strategy = get_strategy(strategy_id)
+    except Exception as e:
+        logger.error(f'Strategy auto-create error: {e}')
+
+    return render_template('grant_match_funding.html',
+                         grant=grant,
+                         user_state=user_state,
+                         grant_amount=grant_amount,
+                         match_pct=match_pct,
+                         match_info=match_info,
+                         sources_by_category=sources_by_category,
+                         source_labels=SOURCE_TYPE_LABELS,
+                         badge_colors=SOURCE_TYPE_BADGE_COLORS,
+                         strategy=strategy,
+                         strategy_id=strategy_id)
+
+
+# ============ FUNDING STRATEGY DASHBOARD ============
+
+@app.route('/strategy')
+@login_required
+def funding_strategies():
+    """List all user's funding strategies."""
+    user = get_current_user()
+    strategies = get_user_strategies(user['id'])
+
+    # Enrich each strategy with source counts and totals
+    total_project_cost = 0
+    total_identified = 0
+    for s in strategies:
+        full = get_strategy(s['id'])
+        s['source_count'] = len(full.get('sources', []))
+        s['total_identified'] = full.get('total_identified', 0)
+        total_project_cost += s.get('total_project_cost', 0) or 0
+        total_identified += s['total_identified']
+
+    return render_template('funding_strategies.html',
+                         strategies=strategies,
+                         total_project_cost=total_project_cost,
+                         total_identified=total_identified)
+
+
+@app.route('/strategy/new', methods=['POST'])
+@login_required
+@csrf_required
+def strategy_new():
+    """Create a new funding strategy."""
+    user = get_current_user()
+    project_name = request.form.get('project_name', '').strip()
+    total_project_cost = request.form.get('total_project_cost', 0, type=float)
+
+    if not project_name:
+        flash('Project name is required.', 'error')
+        return redirect(url_for('funding_strategies'))
+
+    strategy_id = create_strategy(user['id'], project_name, total_project_cost)
+    flash('Funding strategy created.', 'success')
+    return redirect(f'/strategy/{strategy_id}')
+
+
+@app.route('/strategy/<strategy_id>')
+@login_required
+def strategy_detail(strategy_id):
+    """View a single funding strategy."""
+    user = get_current_user()
+    strategy = get_strategy(strategy_id)
+
+    if not strategy:
+        flash('Strategy not found.', 'error')
+        return redirect(url_for('funding_strategies'))
+
+    if strategy.get('user_id') != user['id'] and user.get('role') != 'admin':
+        flash('Access denied.', 'error')
+        return redirect(url_for('funding_strategies'))
+
+    return render_template('funding_strategy.html', strategy=strategy)
+
+
+@app.route('/strategy/<strategy_id>/add-source', methods=['POST'])
+@login_required
+@csrf_required
+def strategy_add_source(strategy_id):
+    """Add a funding source to a strategy."""
+    user = get_current_user()
+    strategy = get_strategy(strategy_id)
+
+    if not strategy or (strategy.get('user_id') != user['id'] and user.get('role') != 'admin'):
+        flash('Access denied.', 'error')
+        return redirect(url_for('funding_strategies'))
+
+    source_name = request.form.get('source_name', '').strip()
+    source_type = request.form.get('source_type', 'other')
+    amount = request.form.get('amount', 0, type=float)
+    notes = request.form.get('notes', '').strip()
+
+    if not source_name:
+        flash('Source name is required.', 'error')
+    else:
+        add_strategy_source(strategy_id, source_name, source_type, amount, notes=notes)
+        flash(f'Added {source_name} to strategy.', 'success')
+
+    redirect_url = request.form.get('redirect', f'/strategy/{strategy_id}')
+    return redirect(redirect_url)
+
+
+@app.route('/strategy/<strategy_id>/update-source', methods=['POST'])
+@login_required
+@csrf_required
+def strategy_update_source(strategy_id):
+    """Update a strategy source status."""
+    user = get_current_user()
+    strategy = get_strategy(strategy_id)
+
+    if not strategy or (strategy.get('user_id') != user['id'] and user.get('role') != 'admin'):
+        flash('Access denied.', 'error')
+        return redirect(url_for('funding_strategies'))
+
+    source_id = request.form.get('source_id', '')
+    status = request.form.get('status', '')
+
+    if source_id and status:
+        update_strategy_source(source_id, status=status)
+        flash('Source status updated.', 'success')
+
+    return redirect(f'/strategy/{strategy_id}')
+
+
+@app.route('/strategy/<strategy_id>/remove-source', methods=['POST'])
+@login_required
+@csrf_required
+def strategy_remove_source(strategy_id):
+    """Remove a funding source from a strategy."""
+    user = get_current_user()
+    strategy = get_strategy(strategy_id)
+
+    if not strategy or (strategy.get('user_id') != user['id'] and user.get('role') != 'admin'):
+        flash('Access denied.', 'error')
+        return redirect(url_for('funding_strategies'))
+
+    source_id = request.form.get('source_id', '')
+    if source_id:
+        delete_strategy_source(source_id)
+        flash('Source removed.', 'success')
+
+    return redirect(f'/strategy/{strategy_id}')
+
+
+@app.route('/strategy/<strategy_id>/edit', methods=['POST'])
+@login_required
+@csrf_required
+def strategy_edit(strategy_id):
+    """Edit strategy details."""
+    user = get_current_user()
+    strategy = get_strategy(strategy_id)
+
+    if not strategy or (strategy.get('user_id') != user['id'] and user.get('role') != 'admin'):
+        flash('Access denied.', 'error')
+        return redirect(url_for('funding_strategies'))
+
+    project_name = request.form.get('project_name', '').strip()
+    total_project_cost = request.form.get('total_project_cost', type=float)
+
+    update_strategy(strategy_id, project_name=project_name or None, total_project_cost=total_project_cost)
+    flash('Strategy updated.', 'success')
+    return redirect(f'/strategy/{strategy_id}')
+
+
+@app.route('/strategy/<strategy_id>/delete', methods=['POST'])
+@login_required
+@csrf_required
+def strategy_delete(strategy_id):
+    """Delete a funding strategy."""
+    user = get_current_user()
+    strategy = get_strategy(strategy_id)
+
+    if not strategy or (strategy.get('user_id') != user['id'] and user.get('role') != 'admin'):
+        flash('Access denied.', 'error')
+        return redirect(url_for('funding_strategies'))
+
+    delete_strategy(strategy_id)
+    flash('Strategy deleted.', 'success')
+    return redirect(url_for('funding_strategies'))
+
+
 # ============ MAIN ============
 
 if __name__ == '__main__':

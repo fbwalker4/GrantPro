@@ -1,0 +1,147 @@
+{% extends "layout.html" %}
+
+{% block title %}Funding Strategies{% endblock %}
+
+{% block extra %}
+<style>
+    .strategy-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: block;
+        color: inherit;
+    }
+    .strategy-card:hover {
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 1px var(--accent-primary);
+    }
+    .strategy-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+    }
+    .strategy-card-name {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    .strategy-card-cost {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--accent-success);
+    }
+    .mini-bar-container {
+        width: 100%;
+        background: var(--bg-tertiary);
+        border-radius: 6px;
+        height: 8px;
+        margin-top: 0.75rem;
+        overflow: hidden;
+    }
+    .mini-bar-fill {
+        height: 100%;
+        border-radius: 6px;
+        transition: width 0.4s ease;
+    }
+    .mini-bar-secured { background: var(--accent-success); }
+    .mini-bar-pending { background: var(--accent-warning); }
+    .mini-bar-identified { background: var(--accent-primary); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Funding Strategies</h1>
+        <p class="page-subtitle">Plan and track your complete funding approach for each project.</p>
+    </div>
+    <button class="btn btn-primary" onclick="document.getElementById('newStrategyModal').style.display='flex'">+ New Strategy</button>
+</div>
+
+{% if strategies %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon purple">&#128200;</div>
+        <div class="stat-value">{{ strategies|length }}</div>
+        <div class="stat-label">Active Strategies</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">&#128176;</div>
+        <div class="stat-value">${{ '{:,.0f}'.format(total_project_cost) }}</div>
+        <div class="stat-label">Total Project Costs</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon amber">&#127919;</div>
+        <div class="stat-value">${{ '{:,.0f}'.format(total_identified) }}</div>
+        <div class="stat-label">Total Identified Funding</div>
+    </div>
+</div>
+
+{% for strategy in strategies %}
+<a href="/strategy/{{ strategy.id }}" class="strategy-card">
+    <div class="strategy-card-header">
+        <div>
+            <div class="strategy-card-name">{{ strategy.project_name }}</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">
+                {{ strategy.source_count or 0 }} sources identified
+                {% if strategy.updated_at %}&middot; Updated {{ strategy.updated_at[:10] }}{% endif %}
+            </div>
+        </div>
+        <div style="text-align: right;">
+            <div class="strategy-card-cost">${{ '{:,.0f}'.format(strategy.total_project_cost or 0) }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">total project cost</div>
+        </div>
+    </div>
+    {% set identified = strategy.total_identified or 0 %}
+    {% set cost = strategy.total_project_cost or 1 %}
+    {% set pct = ((identified / cost * 100)|int) if cost > 0 else 0 %}
+    {% set pct_capped = [pct, 100]|min %}
+    <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+        <span style="color: var(--accent-success);">${{ '{:,.0f}'.format(identified) }} identified</span>
+        <span style="color: var(--text-muted);">{{ pct_capped }}% funded</span>
+    </div>
+    <div class="mini-bar-container">
+        <div class="mini-bar-fill mini-bar-identified" style="width: {{ pct_capped }}%;"></div>
+    </div>
+</a>
+{% endfor %}
+
+{% else %}
+<div class="card empty-state">
+    <div class="empty-icon">&#128200;</div>
+    <div class="empty-title">No funding strategies yet</div>
+    <div class="empty-text">Create a strategy to plan your complete funding approach for a project.</div>
+    <button class="btn btn-primary" onclick="document.getElementById('newStrategyModal').style.display='flex'">Create Your First Strategy</button>
+</div>
+{% endif %}
+
+{# ---- New Strategy Modal ---- #}
+<div id="newStrategyModal" style="display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.6); align-items: center; justify-content: center;">
+    <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; width: 90%; max-width: 480px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2 style="margin: 0; font-size: 1.25rem;">New Funding Strategy</h2>
+            <button onclick="document.getElementById('newStrategyModal').style.display='none'" style="background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+        <form method="POST" action="/strategy/new">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label class="form-label" for="project_name">Project Name</label>
+                <input type="text" id="project_name" name="project_name" class="form-input" required placeholder="e.g. Downtown Revitalization Phase 2">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="total_project_cost">Total Project Cost ($)</label>
+                <input type="number" id="total_project_cost" name="total_project_cost" class="form-input" required step="1000" min="0" placeholder="500000">
+            </div>
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('newStrategyModal').style.display='none'">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create Strategy</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

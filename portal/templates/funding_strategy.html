@@ -1,0 +1,345 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ strategy.project_name }} - Funding Strategy{% endblock %}
+
+{% block extra %}
+<style>
+    .stacked-bar-container {
+        width: 100%;
+        background: var(--bg-tertiary);
+        border-radius: var(--radius-md);
+        height: 48px;
+        overflow: hidden;
+        display: flex;
+        margin: 1.5rem 0;
+    }
+    .stacked-bar-segment {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: white;
+        transition: width 0.4s ease;
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+    .stacked-bar-segment.secured { background: var(--accent-success); }
+    .stacked-bar-segment.applied { background: var(--accent-warning); }
+    .stacked-bar-segment.identified { background: var(--accent-primary); }
+    .stacked-bar-segment.gap { background: rgba(220, 38, 38, 0.3); color: var(--accent-danger); }
+
+    .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        font-size: 0.85rem;
+    }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+    }
+    .legend-dot.secured { background: var(--accent-success); }
+    .legend-dot.applied { background: var(--accent-warning); }
+    .legend-dot.identified { background: var(--accent-primary); }
+    .legend-dot.gap { background: rgba(220, 38, 38, 0.3); }
+
+    .source-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .source-row:last-child { border-bottom: none; }
+    .source-row-info { flex: 1; min-width: 0; }
+    .source-row-name { font-weight: 600; font-size: 0.95rem; }
+    .source-row-type {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+    .source-row-amount {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    .source-row-amount.secured { color: var(--accent-success); }
+    .source-row-amount.applied { color: var(--accent-warning); }
+    .source-row-amount.identified { color: var(--accent-primary); }
+
+    .source-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .gap-analysis {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .gap-analysis-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    .gap-stat {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.95rem;
+    }
+    .gap-stat:last-child { border-bottom: none; }
+    .gap-stat-label { color: var(--text-secondary); }
+    .gap-stat-value { font-weight: 600; }
+    .gap-stat-value.green { color: var(--accent-success); }
+    .gap-stat-value.amber { color: var(--accent-warning); }
+    .gap-stat-value.red { color: var(--accent-danger); }
+
+    .status-select {
+        padding: 0.3rem 0.5rem;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        color: var(--text-primary);
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">{{ strategy.project_name }}</h1>
+        <p class="page-subtitle">Funding strategy
+            {% if strategy.grant_id %}&middot; <a href="/grant/{{ strategy.grant_id }}" style="color: var(--accent-primary); text-decoration: none;">View Grant</a>{% endif %}
+        </p>
+    </div>
+    <div class="actions-row">
+        <button class="btn btn-secondary" onclick="document.getElementById('editStrategyModal').style.display='flex'">Edit Details</button>
+        <a href="/strategy" class="btn btn-secondary">All Strategies</a>
+    </div>
+</div>
+
+{# ---- Stats ---- #}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon purple">&#128176;</div>
+        <div class="stat-value">${{ '{:,.0f}'.format(strategy.total_project_cost or 0) }}</div>
+        <div class="stat-label">Total Project Cost</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">&#9989;</div>
+        <div class="stat-value">${{ '{:,.0f}'.format(strategy.total_secured or 0) }}</div>
+        <div class="stat-label">Secured</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon amber">&#9203;</div>
+        <div class="stat-value">${{ '{:,.0f}'.format(strategy.total_pending or 0) }}</div>
+        <div class="stat-label">Applied / Pending</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon red">&#128680;</div>
+        <div class="stat-value">${{ '{:,.0f}'.format(strategy.gap or 0) }}</div>
+        <div class="stat-label">Funding Gap</div>
+    </div>
+</div>
+
+{# ---- Stacked Bar ---- #}
+{% set cost = strategy.total_project_cost or 1 %}
+{% set secured_sum = strategy.total_secured or 0 %}
+{% set pending_sum = strategy.total_pending or 0 %}
+{% set identified_only = (strategy.total_identified or 0) - secured_sum - pending_sum %}
+{% set identified_only = [identified_only, 0]|max %}
+{% set gap_val = strategy.gap or 0 %}
+
+{% set pct_secured = ((secured_sum / cost * 100)|round(1)) if cost > 0 else 0 %}
+{% set pct_pending = ((pending_sum / cost * 100)|round(1)) if cost > 0 else 0 %}
+{% set pct_identified = ((identified_only / cost * 100)|round(1)) if cost > 0 else 0 %}
+{% set pct_gap = ((gap_val / cost * 100)|round(1)) if cost > 0 else 100 %}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Funding Breakdown</h3>
+    </div>
+    <div class="stacked-bar-container">
+        {% if pct_secured > 0 %}<div class="stacked-bar-segment secured" style="width: {{ pct_secured }}%;">{% if pct_secured > 8 %}${{ '{:,.0f}'.format(secured_sum) }}{% endif %}</div>{% endif %}
+        {% if pct_pending > 0 %}<div class="stacked-bar-segment applied" style="width: {{ pct_pending }}%;">{% if pct_pending > 8 %}${{ '{:,.0f}'.format(pending_sum) }}{% endif %}</div>{% endif %}
+        {% if pct_identified > 0 %}<div class="stacked-bar-segment identified" style="width: {{ pct_identified }}%;">{% if pct_identified > 8 %}${{ '{:,.0f}'.format(identified_only) }}{% endif %}</div>{% endif %}
+        {% if pct_gap > 0 %}<div class="stacked-bar-segment gap" style="width: {{ pct_gap }}%;">{% if pct_gap > 8 %}${{ '{:,.0f}'.format(gap_val) }}{% endif %}</div>{% endif %}
+    </div>
+    <div class="legend">
+        <div class="legend-item"><div class="legend-dot secured"></div> Secured (${{ '{:,.0f}'.format(secured_sum) }})</div>
+        <div class="legend-item"><div class="legend-dot applied"></div> Applied (${{ '{:,.0f}'.format(pending_sum) }})</div>
+        <div class="legend-item"><div class="legend-dot identified"></div> Identified (${{ '{:,.0f}'.format(identified_only) }})</div>
+        <div class="legend-item"><div class="legend-dot gap"></div> Gap (${{ '{:,.0f}'.format(gap_val) }})</div>
+    </div>
+</div>
+
+{# ---- Source List ---- #}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Funding Sources ({{ strategy.sources|length }})</h3>
+        <button class="btn btn-primary" onclick="document.getElementById('addSourceModal').style.display='flex'">+ Add Source</button>
+    </div>
+
+    {% if strategy.sources %}
+        {% for src in strategy.sources %}
+        <div class="source-row">
+            <div class="source-row-info">
+                <div class="source-row-name">{{ src.source_name }}</div>
+                <div class="source-row-type">{{ src.source_type or 'other' }}{% if src.notes %} &middot; {{ src.notes }}{% endif %}</div>
+            </div>
+            <div class="source-row-amount {{ src.status }}">
+                ${{ '{:,.0f}'.format(src.amount or 0) }}
+            </div>
+            <form method="POST" action="/strategy/{{ strategy.id }}/update-source" class="source-actions">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="source_id" value="{{ src.id }}">
+                <select name="status" class="status-select" onchange="this.form.submit()">
+                    <option value="identified" {% if src.status == 'identified' %}selected{% endif %}>Identified</option>
+                    <option value="applied" {% if src.status == 'applied' %}selected{% endif %}>Applied</option>
+                    <option value="secured" {% if src.status == 'secured' %}selected{% endif %}>Secured</option>
+                    <option value="declined" {% if src.status == 'declined' %}selected{% endif %}>Declined</option>
+                </select>
+            </form>
+            <form method="POST" action="/strategy/{{ strategy.id }}/remove-source">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="source_id" value="{{ src.id }}">
+                <button type="submit" class="btn btn-ghost" style="color: var(--accent-danger); padding: 0.4rem;" title="Remove source" onclick="return confirm('Remove this funding source?');">&times;</button>
+            </form>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+        No funding sources added yet. Click "+ Add Source" to start building your strategy.
+    </div>
+    {% endif %}
+</div>
+
+{# ---- Gap Analysis ---- #}
+<div class="gap-analysis">
+    <div class="gap-analysis-title">&#128202; Gap Analysis</div>
+    <div class="gap-stat">
+        <span class="gap-stat-label">Total Project Cost</span>
+        <span class="gap-stat-value">${{ '{:,.0f}'.format(strategy.total_project_cost or 0) }}</span>
+    </div>
+    <div class="gap-stat">
+        <span class="gap-stat-label">Total Identified</span>
+        <span class="gap-stat-value green">${{ '{:,.0f}'.format(strategy.total_identified or 0) }}</span>
+    </div>
+    <div class="gap-stat">
+        <span class="gap-stat-label">Secured</span>
+        <span class="gap-stat-value green">${{ '{:,.0f}'.format(strategy.total_secured or 0) }}</span>
+    </div>
+    <div class="gap-stat">
+        <span class="gap-stat-label">Applied / Pending</span>
+        <span class="gap-stat-value amber">${{ '{:,.0f}'.format(strategy.total_pending or 0) }}</span>
+    </div>
+    <div class="gap-stat" style="border-top: 2px solid var(--border-color); padding-top: 0.75rem; margin-top: 0.5rem;">
+        <span class="gap-stat-label"><strong>Remaining Gap</strong></span>
+        <span class="gap-stat-value {% if strategy.gap > 0 %}red{% else %}green{% endif %}">
+            {% if strategy.gap > 0 %}-{% endif %}${{ '{:,.0f}'.format(strategy.gap or 0) }}
+        </span>
+    </div>
+    {% set coverage_pct = ((strategy.total_identified / (strategy.total_project_cost or 1)) * 100)|int %}
+    <div style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
+        {% if coverage_pct >= 100 %}
+        Your project is fully funded. Well done.
+        {% elif coverage_pct >= 75 %}
+        You're {{ coverage_pct }}% there. A few more sources should close the gap.
+        {% elif coverage_pct >= 50 %}
+        {{ coverage_pct }}% funded. Consider adding more match sources or adjusting scope.
+        {% else %}
+        {{ coverage_pct }}% funded. Significant gap remains -- explore more funding sources.
+        {% endif %}
+    </div>
+</div>
+
+{# ---- Delete strategy ---- #}
+<div style="text-align: right; margin-top: 2rem;">
+    <form method="POST" action="/strategy/{{ strategy.id }}/delete" style="display: inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-ghost" style="color: var(--accent-danger);" onclick="return confirm('Delete this funding strategy and all its sources? This cannot be undone.');">Delete Strategy</button>
+    </form>
+</div>
+
+{# ---- Add Source Modal ---- #}
+<div id="addSourceModal" style="display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.6); align-items: center; justify-content: center;">
+    <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; width: 90%; max-width: 480px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2 style="margin: 0; font-size: 1.25rem;">Add Funding Source</h2>
+            <button onclick="document.getElementById('addSourceModal').style.display='none'" style="background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+        <form method="POST" action="/strategy/{{ strategy.id }}/add-source">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label class="form-label" for="source_name">Source Name</label>
+                <input type="text" id="source_name" name="source_name" class="form-input" required placeholder="e.g. CDBG State Program">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="source_type">Source Type</label>
+                <select id="source_type" name="source_type" class="form-select">
+                    <option value="federal_grant">Federal Grant</option>
+                    <option value="state_grant">State Grant</option>
+                    <option value="foundation">Foundation</option>
+                    <option value="cdfi">CDFI Loan</option>
+                    <option value="fhlb">FHLB</option>
+                    <option value="inkind">In-Kind</option>
+                    <option value="cash_match">Cash Match</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="amount">Amount ($)</label>
+                <input type="number" id="amount" name="amount" class="form-input" required step="100" min="0" placeholder="50000">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="notes">Notes (optional)</label>
+                <input type="text" id="notes" name="notes" class="form-input" placeholder="Application deadline, contact, etc.">
+            </div>
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('addSourceModal').style.display='none'">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Source</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# ---- Edit Strategy Modal ---- #}
+<div id="editStrategyModal" style="display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.6); align-items: center; justify-content: center;">
+    <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; width: 90%; max-width: 480px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2 style="margin: 0; font-size: 1.25rem;">Edit Strategy</h2>
+            <button onclick="document.getElementById('editStrategyModal').style.display='none'" style="background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer;">&times;</button>
+        </div>
+        <form method="POST" action="/strategy/{{ strategy.id }}/edit">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label class="form-label" for="edit_project_name">Project Name</label>
+                <input type="text" id="edit_project_name" name="project_name" class="form-input" value="{{ strategy.project_name }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="edit_total_project_cost">Total Project Cost ($)</label>
+                <input type="number" id="edit_total_project_cost" name="total_project_cost" class="form-input" value="{{ strategy.total_project_cost|int }}" step="1000" min="0">
+            </div>
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('editStrategyModal').style.display='none'">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

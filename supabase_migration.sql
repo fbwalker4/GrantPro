@@ -534,3 +534,56 @@ CREATE INDEX IF NOT EXISTS idx_awards_agency ON successful_awards(agency);
 CREATE INDEX IF NOT EXISTS idx_awards_state ON successful_awards(recipient_state);
 CREATE INDEX IF NOT EXISTS idx_awards_cfda ON successful_awards(cfda_number);
 CREATE INDEX IF NOT EXISTS idx_awards_amount ON successful_awards(award_amount);
+
+-- ============================================================
+-- 11. MATCH FUNDING SOURCES (2026-03-23)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS match_sources (
+    id TEXT PRIMARY KEY,
+    state TEXT NOT NULL,
+    source_name TEXT NOT NULL,
+    source_type TEXT NOT NULL,
+    administering_agency TEXT,
+    funding_type TEXT,
+    amount_min INTEGER DEFAULT 0,
+    amount_max INTEGER DEFAULT 0,
+    eligible_activities TEXT,
+    eligible_applicants TEXT,
+    application_cycle TEXT,
+    website_url TEXT,
+    description TEXT,
+    notes TEXT,
+    last_verified TEXT,
+    created_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_match_sources_state ON match_sources(state);
+CREATE INDEX IF NOT EXISTS idx_match_sources_type ON match_sources(source_type);
+
+-- ============================================================
+-- 12. FUNDING STRATEGIES (2026-03-23)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS funding_strategies (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    grant_id TEXT,
+    project_name TEXT NOT NULL,
+    total_project_cost DOUBLE PRECISION DEFAULT 0,
+    created_at TEXT,
+    updated_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_funding_strategies_user ON funding_strategies(user_id);
+CREATE INDEX IF NOT EXISTS idx_funding_strategies_grant ON funding_strategies(grant_id);
+
+CREATE TABLE IF NOT EXISTS strategy_sources (
+    id TEXT PRIMARY KEY,
+    strategy_id TEXT NOT NULL REFERENCES funding_strategies(id),
+    source_name TEXT NOT NULL,
+    source_type TEXT,
+    amount DOUBLE PRECISION DEFAULT 0,
+    status TEXT DEFAULT 'identified',
+    notes TEXT,
+    created_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_strategy_sources_strategy ON strategy_sources(strategy_id);

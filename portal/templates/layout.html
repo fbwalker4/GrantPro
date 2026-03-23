@@ -777,6 +777,10 @@
             
             <nav class="nav-section" aria-label="Tools">
                 <div class="nav-section-title">Tools</div>
+                <a href="/strategy" class="nav-link {% if request.path.startswith('/strategy') %}active{% endif %}">
+                    <span class="nav-link-icon">&#128200;</span>
+                    Funding Strategy
+                </a>
                 <a href="/eligibility" class="nav-link {% if request.path == '/eligibility' %}active{% endif %}">
                     <span class="nav-link-icon">✓</span>
                     Eligibility
