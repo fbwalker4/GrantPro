@@ -3710,8 +3710,9 @@ def generate_section_content(grant_id, section_id):
     **ABSOLUTE PROHIBITIONS:**
     - NEVER use placeholder brackets like [Insert X], [Date], [Name], [TBD]. Use realistic project-specific values instead.
     - NEVER fabricate citations. ONLY cite sources you are certain are real (U.S. Census Bureau, Bureau of Labor Statistics, CDC, published agency reports, peer-reviewed journals). If you are not certain a citation is real, OMIT IT entirely. Do NOT create fictional references. Do NOT label anything as "illustrative," "fabricated," "realistic example," or "for demonstration." A grant reviewer will verify every reference.
-    - NEVER use filler phrases like "it is important to note," "furthermore," "in conclusion." Be direct.
+    - NEVER use these filler words/phrases: "furthermore," "moreover," "it is important to note," "in conclusion," "holistic approach," "comprehensive framework," "robust," "leveraging," "synergy," "multifaceted," "cutting-edge," "innovative solutions." Use plain, direct language instead.
     - NEVER output generic text. Every sentence must be specific to this organization and this grant.
+    - When describing the budget, ALWAYS break the total into at least 4 cost categories (e.g., personnel, travel, equipment, supplies, contractual, indirect) with approximate dollar amounts that sum to the total.
     - The applicant's EIN and UEI MUST appear at least once in the narrative body where organizational credentials are discussed.
 
     **TASK:**
