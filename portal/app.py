@@ -3695,10 +3695,11 @@ def generate_section_content(grant_id, section_id):
     - If the agency requires applying through a state or intermediary, frame the application accordingly
 
     **ABSOLUTE PROHIBITIONS:**
-    - NEVER use placeholder brackets like [Insert X], [Date], [Name], [TBD]. Fill in realistic values.
-    - NEVER fabricate citations. If you cannot cite a real source, use government data (Census Bureau, BLS, agency reports) or remove the citation entirely. Do NOT label anything as "illustrative" or "invented."
+    - NEVER use placeholder brackets like [Insert X], [Date], [Name], [TBD]. Use realistic project-specific values instead.
+    - NEVER fabricate citations. ONLY cite sources you are certain are real (U.S. Census Bureau, Bureau of Labor Statistics, CDC, published agency reports, peer-reviewed journals). If you are not certain a citation is real, OMIT IT entirely. Do NOT create fictional references. Do NOT label anything as "illustrative," "fabricated," "realistic example," or "for demonstration." A grant reviewer will verify every reference.
     - NEVER use filler phrases like "it is important to note," "furthermore," "in conclusion." Be direct.
     - NEVER output generic text. Every sentence must be specific to this organization and this grant.
+    - The applicant's EIN and UEI MUST appear at least once in the narrative body where organizational credentials are discussed.
 
     **TASK:**
     Write COMPELLING, GRANT-SPECIFIC content for this section that:
