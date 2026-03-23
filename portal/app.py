@@ -3710,7 +3710,6 @@ def generate_section_content(grant_id, section_id):
     **ABSOLUTE PROHIBITIONS:**
     - NEVER use placeholder brackets like [Insert X], [Date], [Name], [TBD]. Use realistic project-specific values instead.
     - NEVER fabricate citations. ONLY cite sources you are certain are real (U.S. Census Bureau, Bureau of Labor Statistics, CDC, published agency reports, peer-reviewed journals). If you are not certain a citation is real, OMIT IT entirely. Do NOT create fictional references. Do NOT label anything as "illustrative," "fabricated," "realistic example," or "for demonstration." A grant reviewer will verify every reference.
-    - NEVER use these filler words/phrases: "furthermore," "moreover," "it is important to note," "in conclusion," "holistic approach," "comprehensive framework," "robust," "leveraging," "synergy," "multifaceted," "cutting-edge," "innovative solutions." Use plain, direct language instead.
     - NEVER output generic text. Every sentence must be specific to this organization and this grant.
     - When describing the budget, ALWAYS break the total into at least 4 cost categories (e.g., personnel, travel, equipment, supplies, contractual, indirect) with approximate dollar amounts that sum to the total.
     - The applicant's EIN and UEI MUST appear at least once in the narrative body where organizational credentials are discussed.
@@ -3799,34 +3798,6 @@ def generate_section_content(grant_id, section_id):
                             continue
                         raise
             
-                # Post-generation cleanup: remove AI-isms the model won't stop using
-                import re
-                ai_text = response.text
-                _ai_replacements = [
-                    (r'\bfurthermore\b', 'Additionally'),
-                    (r'\bFurthermore\b', 'Additionally'),
-                    (r'\bmoreover\b', 'Also'),
-                    (r'\bMoreover\b', 'Also'),
-                    (r'\bholistic approach\b', 'integrated approach'),
-                    (r'\bholistic\b', 'comprehensive'),
-                    (r'\brobust\b', 'strong'),
-                    (r'\bRobust\b', 'Strong'),
-                    (r'\bleveraging\b', 'using'),
-                    (r'\bLeveraging\b', 'Using'),
-                    (r'\bsynergy\b', 'collaboration'),
-                    (r'\bsynergies\b', 'collaborations'),
-                    (r'\bmultifaceted\b', 'varied'),
-                    (r'\bcutting-edge\b', 'advanced'),
-                    (r'\binnovative solutions\b', 'effective methods'),
-                    (r'\bIt is important to note that\b', ''),
-                    (r'\bIt is worth noting that\b', ''),
-                ]
-                for pattern, replacement in _ai_replacements:
-                    ai_text = re.sub(pattern, replacement, ai_text)
-                # Clean up double spaces from removed phrases
-                ai_text = re.sub(r'  +', ' ', ai_text)
-                ai_text = re.sub(r'^\s+', '', ai_text, flags=re.MULTILINE)
-
                 generated_content = f"""# {section_info.get('name', section_id)}
 
     ## Agency Requirements
@@ -3834,7 +3805,7 @@ def generate_section_content(grant_id, section_id):
 
     ---
 
-    {ai_text}
+    {response.text}
 
     ---
 
