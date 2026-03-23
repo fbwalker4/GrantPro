@@ -3799,6 +3799,34 @@ def generate_section_content(grant_id, section_id):
                             continue
                         raise
             
+                # Post-generation cleanup: remove AI-isms the model won't stop using
+                import re
+                ai_text = response.text
+                _ai_replacements = [
+                    (r'\bfurthermore\b', 'Additionally'),
+                    (r'\bFurthermore\b', 'Additionally'),
+                    (r'\bmoreover\b', 'Also'),
+                    (r'\bMoreover\b', 'Also'),
+                    (r'\bholistic approach\b', 'integrated approach'),
+                    (r'\bholistic\b', 'comprehensive'),
+                    (r'\brobust\b', 'strong'),
+                    (r'\bRobust\b', 'Strong'),
+                    (r'\bleveraging\b', 'using'),
+                    (r'\bLeveraging\b', 'Using'),
+                    (r'\bsynergy\b', 'collaboration'),
+                    (r'\bsynergies\b', 'collaborations'),
+                    (r'\bmultifaceted\b', 'varied'),
+                    (r'\bcutting-edge\b', 'advanced'),
+                    (r'\binnovative solutions\b', 'effective methods'),
+                    (r'\bIt is important to note that\b', ''),
+                    (r'\bIt is worth noting that\b', ''),
+                ]
+                for pattern, replacement in _ai_replacements:
+                    ai_text = re.sub(pattern, replacement, ai_text)
+                # Clean up double spaces from removed phrases
+                ai_text = re.sub(r'  +', ' ', ai_text)
+                ai_text = re.sub(r'^\s+', '', ai_text, flags=re.MULTILINE)
+
                 generated_content = f"""# {section_info.get('name', section_id)}
 
     ## Agency Requirements
@@ -3806,7 +3834,7 @@ def generate_section_content(grant_id, section_id):
 
     ---
 
-    {response.text}
+    {ai_text}
 
     ---
 
