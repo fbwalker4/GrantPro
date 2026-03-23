@@ -3285,11 +3285,21 @@ def grant_section(grant_id, section):
                 section_guidance = s
                 break
     
-    return render_template('section_form.html', 
-                         grant=grant, 
-                         section=section, 
+    # Load agency formatting rules for the editor banner
+    formatting_rules = {}
+    try:
+        all_templates = grant_researcher.load_agency_templates()
+        agency_tmpl = all_templates.get('agencies', {}).get(template_name, {})
+        formatting_rules = agency_tmpl.get('formatting_rules', {})
+    except Exception:
+        pass
+
+    return render_template('section_form.html',
+                         grant=grant,
+                         section=section,
                          content=existing['content'] if existing else '',
-                         section_guidance=section_guidance)
+                         section_guidance=section_guidance,
+                         formatting_rules=formatting_rules)
 
 # ============ AI PROMPT SANITIZATION ============
 

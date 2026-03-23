@@ -6,15 +6,34 @@
 <h1>Edit: {{ section.replace('_', ' ').title() }}</h1>
 <p><a href="/grant/{{ grant.id }}" aria-label="Back to grant detail page">&larr; Back to Grant</a></p>
 
+{% if formatting_rules %}
+<div class="card" style="background: #1c1a2e; border: 1px solid #3d3566; margin-bottom: 1rem; padding: 1rem 1.25rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+        <span style="font-size: 1.1rem;">📐</span>
+        <strong style="color: #c4b5fd;">Formatting Requirements</strong>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 1rem 2rem; color: #a8a0d0; font-size: 0.9rem;">
+        <span><strong>Font:</strong> {{ formatting_rules.get('font', 'Times New Roman') }}</span>
+        <span><strong>Size:</strong> {{ formatting_rules.get('font_size_min', 12) }}pt{% if formatting_rules.get('font_size_max') and formatting_rules.font_size_max != formatting_rules.font_size_min %}-{{ formatting_rules.font_size_max }}pt{% endif %}</span>
+        <span><strong>Spacing:</strong> {% if formatting_rules.get('line_spacing', 1.0) >= 2.0 %}Double{% elif formatting_rules.get('line_spacing', 1.0) >= 1.5 %}1.5{% else %}Single{% endif %}</span>
+        <span><strong>Margins:</strong> {{ formatting_rules.get('margins_inches', 1.0) }}" all sides</span>
+        {% if section_guidance and section_guidance.max_pages %}
+        <span style="color: #fbbf24;"><strong>Limit:</strong> {{ section_guidance.max_pages }} page{{ 's' if section_guidance.max_pages != 1 }}</span>
+        {% endif %}
+    </div>
+    <p style="color: #7c73a8; font-size: 0.8rem; margin: 0.5rem 0 0 0;">Your PDF download will be automatically formatted to these specifications. Focus on content -- we handle the formatting.</p>
+</div>
+{% endif %}
+
 {% if section_guidance %}
 <div class="card" style="background: #1a2332; border-color: #2a4a6b; margin-bottom: 1rem;">
     <h3 style="color: #7eb8e0; margin-top: 0;">Agency Guidance</h3>
     <p style="color: #a8c8e0;">{{ section_guidance.guidance }}</p>
     {% if section_guidance.max_pages %}
-    <p style="color: #a8c8e0;"><strong>Max Pages:</strong> {{ section_guidance.max_pages }}</p>
+    <p style="color: #a8c8e0;"><strong>Page Limit:</strong> {{ section_guidance.max_pages }} page{{ 's' if section_guidance.max_pages != 1 }}</p>
     {% endif %}
     {% if section_guidance.max_chars %}
-    <p style="color: #a8c8e0;"><strong>Max Characters:</strong> {{ section_guidance.max_chars }}</p>
+    <p style="color: #a8c8e0;"><strong>Character Limit:</strong> {{ section_guidance.max_chars|int:, }}</p>
     {% endif %}
     {% if section_guidance.required %}
     <p style="color: #a8c8e0;"><strong>Required:</strong> Yes</p>
@@ -33,7 +52,8 @@
         <!-- Hidden textarea that stores the content for form submission -->
         <textarea id="content" name="content" style="display: none;">{{ content }}</textarea>
 
-        <div id="content-counter" style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 1rem 0;"></div>
+        <div id="content-counter" style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 0.5rem 0;"></div>
+        <div id="limit-warning" style="display: none; background: rgba(220,38,38,0.1); border: 1px solid var(--accent-danger); border-radius: var(--radius-sm); padding: 0.5rem 1rem; margin-bottom: 1rem; color: var(--accent-danger); font-size: 0.85rem;"></div>
 
         <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
             <button type="submit" class="btn btn-primary" id="save-btn">Save Section</button>
@@ -258,6 +278,25 @@
         }
 
         counter.innerHTML = parts.join(' &nbsp;|&nbsp; ');
+
+        // Show/hide limit warning
+        var warning = document.getElementById('limit-warning');
+        var warnings = [];
+        if (maxChars > 0 && charCount > maxChars) {
+            warnings.push('You are ' + (charCount - maxChars) + ' characters over the agency limit of ' + maxChars + '. Content exceeding this limit may be rejected by the granting agency.');
+        }
+        if (maxPages > 0) {
+            var estPages = Math.ceil(charCount / charsPerPage) || 0;
+            if (estPages > maxPages) {
+                warnings.push('Your content is approximately ' + estPages + ' pages, exceeding the ' + maxPages + '-page limit. The granting agency may reject applications that exceed page limits.');
+            }
+        }
+        if (warnings.length > 0) {
+            warning.innerHTML = '<strong>Warning:</strong> ' + warnings.join(' ');
+            warning.style.display = 'block';
+        } else {
+            warning.style.display = 'none';
+        }
     }
 
     updateCounter();
