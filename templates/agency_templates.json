@@ -342,6 +342,53 @@
         "Senior personnel must certify non-participation in Malign Foreign Talent Recruitment Programs",
         "Must follow current PAPPG (NSF 24-1) requirements",
         "Results from Prior NSF Support must be included if PI has had prior NSF funding"
+      ],
+      "verified_sources": [
+        {
+          "source": "National Science Board. Science and Engineering Indicators. Alexandria, VA: National Science Foundation.",
+          "type": "agency_report",
+          "use_for": "National R&D spending, STEM workforce trends, international competitiveness"
+        },
+        {
+          "source": "National Science Foundation. NSF Award Abstracts Database. Alexandria, VA: NSF.",
+          "type": "database",
+          "use_for": "Prior funded projects, research landscape, existing NSF investments in the field"
+        },
+        {
+          "source": "National Science Foundation. Survey of Earned Doctorates. Alexandria, VA: NSF NCSES.",
+          "type": "government_data",
+          "use_for": "Doctoral degree trends by field, demographics of STEM graduates"
+        },
+        {
+          "source": "National Science Foundation. Higher Education Research and Development (HERD) Survey. Alexandria, VA: NSF NCSES.",
+          "type": "government_data",
+          "use_for": "University R&D expenditures by field and institution"
+        },
+        {
+          "source": "National Science Foundation. Women, Minorities, and Persons with Disabilities in Science and Engineering. Alexandria, VA: NSF NCSES.",
+          "type": "agency_report",
+          "use_for": "Diversity data in STEM fields, underrepresentation statistics"
+        },
+        {
+          "source": "National Science Foundation. Survey of Graduate Students and Postdoctorates in Science and Engineering. Alexandria, VA: NSF NCSES.",
+          "type": "government_data",
+          "use_for": "Graduate enrollment trends, postdoc counts by field"
+        },
+        {
+          "source": "U.S. Bureau of Labor Statistics. Occupational Outlook Handbook -- STEM Occupations. Washington, DC: BLS.",
+          "type": "government_data",
+          "use_for": "STEM job growth projections, workforce demand data"
+        },
+        {
+          "source": "National Academies of Sciences, Engineering, and Medicine. Publications and Reports. Washington, DC: National Academies Press.",
+          "type": "research",
+          "use_for": "Consensus studies and research priorities in science and engineering"
+        },
+        {
+          "source": "National Science Foundation. Proposal and Award Policies and Procedures Guide (PAPPG). Alexandria, VA: NSF.",
+          "type": "agency_report",
+          "use_for": "Current NSF proposal requirements and compliance rules"
+        }
       ]
     },
     "doe": {
@@ -627,6 +674,58 @@
         "Davis-Bacon applies to construction projects, especially under IIJA/BIL funding",
         "Technology Readiness Level (TRL) must be clearly stated for technology development proposals",
         "DOE uses specific cost principles for for-profit entities under 2 CFR 910"
+      ],
+      "verified_sources": [
+        {
+          "source": "U.S. Energy Information Administration. Annual Energy Outlook. Washington, DC: EIA.",
+          "type": "government_data",
+          "use_for": "Energy consumption projections, fuel mix forecasts, electricity generation data"
+        },
+        {
+          "source": "U.S. Energy Information Administration. State Energy Data System (SEDS). Washington, DC: EIA.",
+          "type": "database",
+          "use_for": "State-level energy consumption, production, prices, and expenditures"
+        },
+        {
+          "source": "Lawrence Berkeley National Laboratory. Tracking the Sun Report Series. Berkeley, CA: LBNL.",
+          "type": "research",
+          "use_for": "Solar PV installation costs, market trends, deployment statistics"
+        },
+        {
+          "source": "Lawrence Berkeley National Laboratory. Land-Based Wind Market Report. Berkeley, CA: LBNL.",
+          "type": "research",
+          "use_for": "Wind energy costs, capacity additions, technology trends"
+        },
+        {
+          "source": "U.S. Department of Energy. Weatherization Assistance Program (WAP) Annual Reports. Washington, DC: DOE.",
+          "type": "agency_report",
+          "use_for": "Weatherization program performance, homes served, energy savings achieved"
+        },
+        {
+          "source": "U.S. Department of Energy. Low-Income Energy Affordability Data (LEAD) Tool. Washington, DC: DOE.",
+          "type": "database",
+          "use_for": "Energy burden by income level, geographic area, housing type"
+        },
+        {
+          "source": "National Renewable Energy Laboratory. Annual Technology Baseline (ATB). Golden, CO: NREL.",
+          "type": "research",
+          "use_for": "Cost and performance projections for electricity generation technologies"
+        },
+        {
+          "source": "U.S. Energy Information Administration. Residential Energy Consumption Survey (RECS). Washington, DC: EIA.",
+          "type": "government_data",
+          "use_for": "Household energy use patterns, fuel types, efficiency characteristics"
+        },
+        {
+          "source": "American Council for an Energy-Efficient Economy. State Energy Efficiency Scorecard. Washington, DC: ACEEE.",
+          "type": "research",
+          "use_for": "State-by-state energy efficiency policy rankings and metrics"
+        },
+        {
+          "source": "U.S. Department of Energy. Energy Jobs Report. Washington, DC: DOE.",
+          "type": "agency_report",
+          "use_for": "Clean energy workforce data, employment by technology sector"
+        }
       ]
     },
     "nih": {
@@ -878,6 +977,58 @@
         "IRB approval required before human subjects research can begin",
         "Must use PHS398 budget forms",
         "Authentication of Key Biological and/or Chemical Resources required"
+      ],
+      "verified_sources": [
+        {
+          "source": "Centers for Disease Control and Prevention. CDC WONDER Online Databases. Atlanta, GA: CDC.",
+          "type": "database",
+          "use_for": "Mortality data, natality, disease surveillance, environmental health data"
+        },
+        {
+          "source": "Centers for Disease Control and Prevention. Behavioral Risk Factor Surveillance System (BRFSS). Atlanta, GA: CDC.",
+          "type": "government_data",
+          "use_for": "Health behaviors, chronic disease prevalence, preventive practices by state"
+        },
+        {
+          "source": "National Institutes of Health. NIH RePORTER (Research Portfolio Online Reporting Tools). Bethesda, MD: NIH.",
+          "type": "database",
+          "use_for": "Funded NIH research projects, publications, patents, clinical studies"
+        },
+        {
+          "source": "U.S. Department of Health and Human Services. Healthy People 2030 Objectives and Data. Washington, DC: ODPHP.",
+          "type": "government_data",
+          "use_for": "National health objectives, baseline data, progress toward health targets"
+        },
+        {
+          "source": "Health Resources and Services Administration. Health Professional Shortage Areas (HPSA) Database. Rockville, MD: HRSA.",
+          "type": "database",
+          "use_for": "Primary care, dental, and mental health shortage area designations"
+        },
+        {
+          "source": "Health Resources and Services Administration. Area Health Resources Files (AHRF). Rockville, MD: HRSA.",
+          "type": "database",
+          "use_for": "County-level health workforce data, hospital beds, health facility counts"
+        },
+        {
+          "source": "Centers for Disease Control and Prevention. PLACES: Local Data for Better Health. Atlanta, GA: CDC.",
+          "type": "database",
+          "use_for": "Census tract-level chronic disease prevalence, health outcomes, prevention data"
+        },
+        {
+          "source": "U.S. Census Bureau. Small Area Health Insurance Estimates (SAHIE). Washington, DC: U.S. Census Bureau.",
+          "type": "government_data",
+          "use_for": "Health insurance coverage rates by county, age, income, and race/ethnicity"
+        },
+        {
+          "source": "Mississippi State Department of Health. Mississippi Vital Statistics Annual Report. Jackson, MS: MSDH.",
+          "type": "government_data",
+          "use_for": "Mississippi birth, death, and disease data, leading causes of death"
+        },
+        {
+          "source": "National Institutes of Health. NIH-Funded Research Disease Categories (RCDC). Bethesda, MD: NIH.",
+          "type": "agency_report",
+          "use_for": "NIH funding levels by disease area, research priority investments"
+        }
       ]
     },
     "usda": {
@@ -1120,6 +1271,58 @@
         "Must demonstrate relevance to agriculture, food systems, or rural development",
         "Land-grant institution status (1862, 1890, 1994) affects eligibility for certain programs",
         "Davis-Bacon applies to construction in some Rural Development programs"
+      ],
+      "verified_sources": [
+        {
+          "source": "USDA Economic Research Service. Rural America at a Glance (Annual Edition). Washington, DC: USDA ERS.",
+          "type": "agency_report",
+          "use_for": "Rural population trends, employment, poverty, and economic conditions"
+        },
+        {
+          "source": "USDA Economic Research Service. Food Access Research Atlas. Washington, DC: USDA ERS.",
+          "type": "database",
+          "use_for": "Food desert identification, low-access census tracts, food store proximity data"
+        },
+        {
+          "source": "USDA Rural Development. Rural Housing Service Program Data. Washington, DC: USDA RD.",
+          "type": "agency_report",
+          "use_for": "Rural housing loan and grant program statistics, housing conditions"
+        },
+        {
+          "source": "USDA Economic Research Service. Atlas of Rural and Small-Town America. Washington, DC: USDA ERS.",
+          "type": "database",
+          "use_for": "County-level demographics, employment, income, and education data for rural areas"
+        },
+        {
+          "source": "U.S. Census Bureau. American Community Survey -- Rural/Urban Classification. Washington, DC: U.S. Census Bureau.",
+          "type": "government_data",
+          "use_for": "Rural population data, housing characteristics, commuting patterns"
+        },
+        {
+          "source": "USDA National Institute of Food and Agriculture. NIFA Funded Awards Database. Washington, DC: USDA NIFA.",
+          "type": "database",
+          "use_for": "Previously funded agricultural research and extension projects"
+        },
+        {
+          "source": "USDA Economic Research Service. Food Environment Atlas. Washington, DC: USDA ERS.",
+          "type": "database",
+          "use_for": "County-level food environment indicators: access, prices, assistance programs"
+        },
+        {
+          "source": "USDA National Agricultural Statistics Service. Census of Agriculture. Washington, DC: USDA NASS.",
+          "type": "government_data",
+          "use_for": "Farm counts, land use, production value, farm demographics by county"
+        },
+        {
+          "source": "USDA Food and Nutrition Service. SNAP Data Tables. Washington, DC: USDA FNS.",
+          "type": "government_data",
+          "use_for": "SNAP participation rates, benefit levels, household characteristics"
+        },
+        {
+          "source": "Mississippi State University Extension Service. Mississippi Agricultural Overview. Mississippi State, MS: MSU.",
+          "type": "research",
+          "use_for": "Mississippi-specific agricultural production data, farm economy statistics"
+        }
       ]
     },
     "epa": {
@@ -1339,6 +1542,58 @@
         "Environmental Justice grants must address disproportionate impacts on underserved communities with EJ screening tool data",
         "Title VI compliance is mandatory, especially for EJ programs",
         "Brownfields programs require state environmental authority letter of acknowledgment"
+      ],
+      "verified_sources": [
+        {
+          "source": "U.S. Environmental Protection Agency. Toxics Release Inventory (TRI) Program. Washington, DC: EPA.",
+          "type": "database",
+          "use_for": "Industrial chemical releases by facility, community toxic exposure data"
+        },
+        {
+          "source": "U.S. Environmental Protection Agency. AirNow: Air Quality Index (AQI) Data. Washington, DC: EPA.",
+          "type": "government_data",
+          "use_for": "Real-time and historical air quality data by location"
+        },
+        {
+          "source": "U.S. Environmental Protection Agency. EJScreen: Environmental Justice Screening and Mapping Tool. Washington, DC: EPA.",
+          "type": "database",
+          "use_for": "Environmental justice indices, demographic and environmental burden data by census tract"
+        },
+        {
+          "source": "U.S. Environmental Protection Agency. Superfund National Priorities List (NPL) Sites. Washington, DC: EPA.",
+          "type": "database",
+          "use_for": "Contaminated site locations, cleanup status, community exposure risks"
+        },
+        {
+          "source": "U.S. Environmental Protection Agency. Safe Drinking Water Information System (SDWIS). Washington, DC: EPA.",
+          "type": "database",
+          "use_for": "Public water system compliance data, drinking water violations"
+        },
+        {
+          "source": "U.S. Environmental Protection Agency. National Water Quality Inventory: Report to Congress. Washington, DC: EPA.",
+          "type": "agency_report",
+          "use_for": "Surface water quality assessments, impaired waterways data"
+        },
+        {
+          "source": "U.S. Environmental Protection Agency. Greenhouse Gas Reporting Program (GHGRP). Washington, DC: EPA.",
+          "type": "government_data",
+          "use_for": "Facility-level greenhouse gas emissions data"
+        },
+        {
+          "source": "U.S. Environmental Protection Agency. Envirofacts Database. Washington, DC: EPA.",
+          "type": "database",
+          "use_for": "Integrated environmental compliance and permit data"
+        },
+        {
+          "source": "Mississippi Department of Environmental Quality. Annual Water Quality Reports. Jackson, MS: MDEQ.",
+          "type": "government_data",
+          "use_for": "Mississippi-specific water quality data, 303(d) impaired waters list"
+        },
+        {
+          "source": "U.S. Environmental Protection Agency. Environmental Justice Collaborative Problem-Solving (EJCPS) Program Reports. Washington, DC: EPA.",
+          "type": "agency_report",
+          "use_for": "Environmental justice community engagement models and outcomes"
+        }
       ]
     },
     "dot": {
@@ -3464,6 +3719,58 @@
         "Must include a GEPA Section 427 statement on equitable access for special populations",
         "FERPA compliance must be addressed for any project involving student data",
         "Supplement-not-supplant rules apply to formula programs"
+      ],
+      "verified_sources": [
+        {
+          "source": "National Center for Education Statistics. Digest of Education Statistics. Washington, DC: U.S. Department of Education.",
+          "type": "government_data",
+          "use_for": "Comprehensive K-12 and postsecondary education data, enrollment, graduation rates"
+        },
+        {
+          "source": "National Center for Education Statistics. National Assessment of Educational Progress (NAEP) -- The Nation's Report Card. Washington, DC: NCES.",
+          "type": "government_data",
+          "use_for": "Student achievement scores by state, grade level, and demographics"
+        },
+        {
+          "source": "U.S. Department of Education. IDEA Section 618 Data Products. Washington, DC: OSEP.",
+          "type": "agency_report",
+          "use_for": "Special education child counts, placement data, dispute resolution statistics"
+        },
+        {
+          "source": "U.S. Department of Education. Title I, Part A Allocations. Washington, DC: OESE.",
+          "type": "government_data",
+          "use_for": "Title I funding allocations by LEA, poverty-based formula data"
+        },
+        {
+          "source": "National Center for Education Statistics. Common Core of Data (CCD). Washington, DC: NCES.",
+          "type": "database",
+          "use_for": "Public school demographics, free/reduced lunch rates, enrollment by district"
+        },
+        {
+          "source": "National Center for Education Statistics. Integrated Postsecondary Education Data System (IPEDS). Washington, DC: NCES.",
+          "type": "database",
+          "use_for": "College enrollment, graduation rates, institutional finance data"
+        },
+        {
+          "source": "U.S. Department of Education. What Works Clearinghouse (WWC). Washington, DC: IES.",
+          "type": "database",
+          "use_for": "Evidence ratings for educational interventions and programs"
+        },
+        {
+          "source": "U.S. Department of Education. Civil Rights Data Collection (CRDC). Washington, DC: OCR.",
+          "type": "government_data",
+          "use_for": "Discipline disparities, access to AP courses, teacher equity data"
+        },
+        {
+          "source": "Mississippi Department of Education. Mississippi Statewide Assessment Results. Jackson, MS: MDE.",
+          "type": "government_data",
+          "use_for": "Mississippi student achievement data, school performance ratings"
+        },
+        {
+          "source": "National Center for Education Statistics. School Pulse Panel. Washington, DC: NCES.",
+          "type": "government_data",
+          "use_for": "School operational data, staffing challenges, student mental health needs"
+        }
       ]
     },
     "hud": {
@@ -3758,6 +4065,58 @@
         "Environmental review is delegated to the grantee (not HUD) -- must complete before committing funds",
         "Must demonstrate proactive Affirmatively Furthering Fair Housing (AFFH) obligations",
         "NEPA compliance is the grantee's responsibility, not HUD's"
+      ],
+      "verified_sources": [
+        {
+          "source": "U.S. Census Bureau. American Community Survey (ACS) 5-Year Estimates. Washington, DC: U.S. Census Bureau.",
+          "type": "government_data",
+          "use_for": "Population demographics, poverty rates, housing characteristics, income data"
+        },
+        {
+          "source": "U.S. Department of Housing and Urban Development. Comprehensive Housing Affordability Strategy (CHAS) Data. Washington, DC: HUD Office of Policy Development and Research.",
+          "type": "agency_report",
+          "use_for": "Housing problems by income level, cost burden data, overcrowding statistics"
+        },
+        {
+          "source": "U.S. Department of Housing and Urban Development. Fair Market Rents Documentation System. Washington, DC: HUD.",
+          "type": "government_data",
+          "use_for": "Fair Market Rent levels by metropolitan area and county"
+        },
+        {
+          "source": "U.S. Department of Housing and Urban Development. FY Income Limits Documentation System. Washington, DC: HUD.",
+          "type": "government_data",
+          "use_for": "Area Median Income, Very Low Income, and Extremely Low Income thresholds"
+        },
+        {
+          "source": "U.S. Department of Housing and Urban Development. Annual Homeless Assessment Report (AHAR) to Congress. Washington, DC: HUD.",
+          "type": "agency_report",
+          "use_for": "Point-in-Time homeless counts, sheltered vs unsheltered populations"
+        },
+        {
+          "source": "U.S. Department of Housing and Urban Development. Picture of Subsidized Households. Washington, DC: HUD.",
+          "type": "database",
+          "use_for": "Public housing and voucher program data by locality"
+        },
+        {
+          "source": "U.S. Department of Housing and Urban Development. Consolidated Planning/CHAS Data. Washington, DC: HUD.",
+          "type": "agency_report",
+          "use_for": "Local consolidated plan priorities and housing needs assessments"
+        },
+        {
+          "source": "National Low Income Housing Coalition. Out of Reach Report. Washington, DC: NLIHC.",
+          "type": "research",
+          "use_for": "Housing wage data, affordability gap analysis by state and county"
+        },
+        {
+          "source": "U.S. Census Bureau. Building Permits Survey. Washington, DC: U.S. Census Bureau.",
+          "type": "government_data",
+          "use_for": "New residential construction activity by jurisdiction"
+        },
+        {
+          "source": "U.S. Department of Housing and Urban Development. Housing Market Indicators. Washington, DC: HUD PD&R.",
+          "type": "agency_report",
+          "use_for": "Vacancy rates, homeownership rates, housing market conditions"
+        }
       ]
     },
     "nasa": {
@@ -4306,6 +4665,58 @@
         "Must have adequate accounting system before award -- DCAA audits are thorough",
         "DOD grants are primarily for BASIC RESEARCH -- applied research typically uses contracts or OTs",
         "Cost Accounting Standards apply to large awards"
+      ],
+      "verified_sources": [
+        {
+          "source": "U.S. Department of Defense. Defense Spending by State Report. Washington, DC: DOD Comptroller.",
+          "type": "government_data",
+          "use_for": "Military spending impact by state, contract awards, personnel expenditures"
+        },
+        {
+          "source": "U.S. Department of Defense. Base Realignment and Closure (BRAC) Commission Reports. Washington, DC: DOD.",
+          "type": "agency_report",
+          "use_for": "Military installation closures and realignments, community impact data"
+        },
+        {
+          "source": "U.S. Department of Defense. Military Installations, Ranges, and Training Areas (MIRTA). Washington, DC: DOD.",
+          "type": "database",
+          "use_for": "Military installation locations, infrastructure, community partnerships"
+        },
+        {
+          "source": "Defense Technical Information Center (DTIC). DOD Research Summaries. Fort Belvoir, VA: DTIC.",
+          "type": "database",
+          "use_for": "DOD-funded research projects, technical reports, defense research priorities"
+        },
+        {
+          "source": "U.S. Department of Defense. Annual Demographics Report: Profile of the Military Community. Washington, DC: DOD.",
+          "type": "agency_report",
+          "use_for": "Military personnel demographics, family data, geographic distribution"
+        },
+        {
+          "source": "Office of Economic Adjustment. Defense Community Infrastructure Program Data. Arlington, VA: OEA.",
+          "type": "agency_report",
+          "use_for": "Community infrastructure needs near military installations, program outcomes"
+        },
+        {
+          "source": "U.S. Department of Defense. National Defense Strategy. Washington, DC: DOD.",
+          "type": "agency_report",
+          "use_for": "Strategic defense priorities, technology focus areas, capability gaps"
+        },
+        {
+          "source": "Congressional Research Service. Defense Primer: Research, Development, Test, and Evaluation. Washington, DC: CRS.",
+          "type": "research",
+          "use_for": "DOD R&D budget overview, technology priority areas, SBIR/STTR data"
+        },
+        {
+          "source": "U.S. Department of Defense. Small Business Innovation Research (SBIR/STTR) Award Data. Washington, DC: DOD.",
+          "type": "database",
+          "use_for": "DOD SBIR/STTR awards by topic, phase, and performing organization"
+        },
+        {
+          "source": "Mississippi Military Installations Economic Impact Data. Jackson, MS: Mississippi Development Authority.",
+          "type": "government_data",
+          "use_for": "Mississippi military base economic impact, employment, community data"
+        }
       ]
     },
     "fema": {
@@ -4574,6 +4985,58 @@
         "Must include a Benefit-Cost Analysis demonstrating BCR > 1.0",
         "HMGP is only available after a Presidential disaster declaration -- reference the specific declaration if known",
         "NEPA review is conducted by FEMA, not the applicant -- do not claim the applicant will perform NEPA review"
+      ],
+      "verified_sources": [
+        {
+          "source": "Federal Emergency Management Agency. National Risk Index. Washington, DC: FEMA.",
+          "type": "database",
+          "use_for": "Community-level natural hazard risk scores, expected annual losses, social vulnerability"
+        },
+        {
+          "source": "Federal Emergency Management Agency. Disaster Declarations Summary -- Open FEMA Dataset. Washington, DC: FEMA.",
+          "type": "database",
+          "use_for": "Historical disaster declarations by state and county, disaster types and dates"
+        },
+        {
+          "source": "Federal Emergency Management Agency. National Flood Insurance Program (NFIP) Statistics. Washington, DC: FEMA.",
+          "type": "government_data",
+          "use_for": "Flood insurance policies in force, claims history, repetitive loss properties"
+        },
+        {
+          "source": "Federal Emergency Management Agency. Hazard Mitigation Assistance (HMA) Program Data. Washington, DC: FEMA.",
+          "type": "agency_report",
+          "use_for": "Historical mitigation grant awards, project types, cost-effectiveness data"
+        },
+        {
+          "source": "Mississippi Emergency Management Agency. State Hazard Mitigation Plan. Jackson, MS: MEMA.",
+          "type": "government_data",
+          "use_for": "Mississippi hazard profiles, vulnerability assessments, mitigation strategies"
+        },
+        {
+          "source": "National Oceanic and Atmospheric Administration. Storm Events Database. Silver Spring, MD: NOAA NCEI.",
+          "type": "database",
+          "use_for": "Historical storm data, property damage estimates, fatalities by event type"
+        },
+        {
+          "source": "Federal Emergency Management Agency. Community Resilience Indicator Analysis (CRIA). Washington, DC: FEMA.",
+          "type": "agency_report",
+          "use_for": "Community resilience metrics, social and infrastructure vulnerability indicators"
+        },
+        {
+          "source": "U.S. Army Corps of Engineers. National Inventory of Dams. Washington, DC: USACE.",
+          "type": "database",
+          "use_for": "Dam safety data, flood control infrastructure condition assessments"
+        },
+        {
+          "source": "National Weather Service. Weather Fatalities, Injuries and Damage Statistics. Silver Spring, MD: NWS.",
+          "type": "government_data",
+          "use_for": "Annual weather-related casualties and economic losses"
+        },
+        {
+          "source": "Federal Emergency Management Agency. Flood Insurance Rate Maps (FIRM). Washington, DC: FEMA.",
+          "type": "government_data",
+          "use_for": "Flood zone designations, base flood elevations, special flood hazard areas"
+        }
       ]
     },
     "dol": {
@@ -4853,6 +5316,58 @@
         "YouthBuild programs require Davis-Bacon compliance for construction training",
         "Must identify specific target populations being served (disconnected youth, returning citizens, veterans, etc.)",
         "Quarterly financial (ETA-9130) and performance reports are required"
+      ],
+      "verified_sources": [
+        {
+          "source": "U.S. Bureau of Labor Statistics. Current Employment Statistics (CES). Washington, DC: BLS.",
+          "type": "government_data",
+          "use_for": "Employment levels by industry, job growth trends, payroll data"
+        },
+        {
+          "source": "U.S. Bureau of Labor Statistics. Local Area Unemployment Statistics (LAUS). Washington, DC: BLS.",
+          "type": "government_data",
+          "use_for": "Unemployment rates by state, county, and metropolitan area"
+        },
+        {
+          "source": "U.S. Bureau of Labor Statistics. Occupational Employment and Wage Statistics (OEWS). Washington, DC: BLS.",
+          "type": "government_data",
+          "use_for": "Employment and wage data by occupation and geographic area"
+        },
+        {
+          "source": "U.S. Department of Labor. WIOA Performance Reports. Washington, DC: ETA.",
+          "type": "agency_report",
+          "use_for": "Workforce program outcomes, employment rates, credential attainment, earnings"
+        },
+        {
+          "source": "O*NET OnLine. Occupational Information Network. Washington, DC: U.S. Department of Labor.",
+          "type": "database",
+          "use_for": "Occupation descriptions, skills requirements, job outlook, education levels needed"
+        },
+        {
+          "source": "U.S. Department of Labor. Registered Apprenticeship Partners Information Database System (RAPIDS). Washington, DC: OA.",
+          "type": "database",
+          "use_for": "Apprenticeship program data, completions, active apprentices by state and occupation"
+        },
+        {
+          "source": "U.S. Bureau of Labor Statistics. Quarterly Census of Employment and Wages (QCEW). Washington, DC: BLS.",
+          "type": "government_data",
+          "use_for": "Establishment counts, employment, and wage data by industry and county"
+        },
+        {
+          "source": "U.S. Census Bureau. OnTheMap / LEHD Origin-Destination Employment Statistics. Washington, DC: U.S. Census Bureau.",
+          "type": "database",
+          "use_for": "Commuting patterns, workforce flow data, job locations relative to residences"
+        },
+        {
+          "source": "Mississippi Department of Employment Security. Labor Market Information. Jackson, MS: MDES.",
+          "type": "government_data",
+          "use_for": "Mississippi-specific employment data, industry projections, workforce statistics"
+        },
+        {
+          "source": "U.S. Bureau of Labor Statistics. Employment Projections Program. Washington, DC: BLS.",
+          "type": "government_data",
+          "use_for": "Long-term occupational and industry employment projections, fastest-growing occupations"
+        }
       ]
     },
     "doj": {
@@ -5204,6 +5719,58 @@
         "OVW grants require strict VAWA confidentiality protections -- victim information cannot be shared without informed consent",
         "Faith-based organizations cannot use DOJ funds for inherently religious activities",
         "Must demonstrate data-driven understanding of crime/public safety problem with local statistics"
+      ],
+      "verified_sources": [
+        {
+          "source": "Federal Bureau of Investigation. Uniform Crime Report (UCR) / Crime in the United States. Washington, DC: FBI.",
+          "type": "government_data",
+          "use_for": "Crime rates by jurisdiction, violent and property crime statistics"
+        },
+        {
+          "source": "Bureau of Justice Statistics. National Crime Victimization Survey (NCVS). Washington, DC: DOJ.",
+          "type": "government_data",
+          "use_for": "Victimization rates, unreported crime estimates, victim demographics"
+        },
+        {
+          "source": "Bureau of Justice Statistics. Prisoners in [Year] Report Series. Washington, DC: DOJ.",
+          "type": "agency_report",
+          "use_for": "Incarceration rates, prison population demographics, recidivism data"
+        },
+        {
+          "source": "Bureau of Justice Statistics. Reentry Trends in the United States. Washington, DC: DOJ.",
+          "type": "agency_report",
+          "use_for": "Prisoner reentry data, post-release outcomes, supervision statistics"
+        },
+        {
+          "source": "Office of Justice Programs. OJP Performance Measurement Reports. Washington, DC: DOJ.",
+          "type": "agency_report",
+          "use_for": "DOJ grant program outcomes, evidence-based practice results"
+        },
+        {
+          "source": "Federal Bureau of Investigation. National Incident-Based Reporting System (NIBRS). Washington, DC: FBI.",
+          "type": "database",
+          "use_for": "Detailed incident-level crime data by jurisdiction"
+        },
+        {
+          "source": "Bureau of Justice Statistics. Law Enforcement Management and Administrative Statistics (LEMAS). Washington, DC: DOJ.",
+          "type": "government_data",
+          "use_for": "Police department staffing, policies, equipment, community policing data"
+        },
+        {
+          "source": "Office of Juvenile Justice and Delinquency Prevention. Statistical Briefing Book. Washington, DC: DOJ OJJDP.",
+          "type": "database",
+          "use_for": "Juvenile arrest rates, detention data, youth justice system statistics"
+        },
+        {
+          "source": "CrimeSolutions.ojp.gov Evidence-Based Programs Database. Washington, DC: DOJ.",
+          "type": "database",
+          "use_for": "Evidence ratings for crime prevention programs and practices"
+        },
+        {
+          "source": "Mississippi Bureau of Investigation. Crime in Mississippi Annual Report. Jackson, MS: MBI.",
+          "type": "government_data",
+          "use_for": "Mississippi-specific crime statistics and law enforcement data"
+        }
       ]
     }
   },

@@ -3592,6 +3592,13 @@ def generate_section_content(grant_id, section_id):
             rules_text = "\n".join(f"  {i+1}. {rule}" for i, rule in enumerate(critical_rules))
             critical_rules_block = f"\n**NON-NEGOTIABLE AGENCY REQUIREMENTS (violation of ANY rule = automatic disqualification):**\n{rules_text}\n"
 
+        # Inject verified citation sources
+        verified_sources_block = ""
+        verified_sources = agency_tmpl.get('verified_sources', [])
+        if verified_sources:
+            sources_text = "\n".join(f"  - {s['source']} (Use for: {s['use_for']})" for s in verified_sources[:10])
+            verified_sources_block = f"\n**VERIFIED DATA SOURCES YOU MAY CITE (these are real, verified publications):**\n{sources_text}\n"
+
         prompt = f"""You are a federal grant compliance writer for {agency}. Your ONLY job is to take the applicant's factual data (provided below as TRUTH DATA) and present it in the format and language required by this agency's grant program. You do NOT invent content. You translate the applicant's real information into grant-compliant narrative.
 
     YOUR ROLE:
@@ -3603,6 +3610,7 @@ def generate_section_content(grant_id, section_id):
     {"**MANDATORY AGENCY COMPLIANCE RULES (failure to follow these will result in automatic disqualification):**" + chr(10) + agency_context + chr(10) if agency_context else ""}
     {critical_rules_block}
     {"**REGULATORY COMPLIANCE REQUIREMENTS:**" + chr(10) + compliance_notes + chr(10) if compliance_notes else ""}
+    {verified_sources_block}
     {budget_prompt_block}
     {f"**REQUESTED FUNDING: ${amount_min:,.0f} - ${amount_max:,.0f}. You MUST reference this specific dollar amount in your narrative and break it into approximate cost categories.**" if not budget_prompt_block or 'budget' not in budget_prompt_block.lower() else ""}
     Write in narrative format with clear headings. No markdown tables.
