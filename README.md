@@ -576,7 +576,24 @@ When a user starts a grant application, GrantPro fetches the ACTUAL NOFO documen
 
 Falls back to generic agency templates if Grants.gov fetch fails.
 
-### 14. Subscription Lifecycle Management (IN PROGRESS)
+### 14. Winning Grants Library (LIVE)
+
+Searchable database of successful federal grant awards from USAspending.gov:
+- Awards from 12 federal agencies across 6 states
+- Search by keyword, filter by agency/state/amount
+- Award details: recipient, amount, project description, CFDA info, dates
+- AI uses winning examples as style guidance during section generation
+
+### 15. Smart Grant Matcher (LIVE)
+
+AI-powered project-to-grant matching:
+- User describes project in plain English
+- Gemini analyzes description + org profile against grant catalog
+- Returns ranked matches with scores (50-100), match reasons, and missing requirements
+- Direct links to start applications from match results
+- Dashboard CTA banner for discovery
+
+### 16. Subscription Lifecycle Management (LIVE)
 
 Full subscription lifecycle covering retention, dunning, suspension, data export, and account deletion:
 
