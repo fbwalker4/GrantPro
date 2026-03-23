@@ -207,6 +207,7 @@ def calculate_match_requirement(grant_amount, match_percentage):
     if not grant_amount or not match_percentage:
         return {'match_amount': 0, 'total_project_cost': 0, 'federal_share': 0}
 
+    match_percentage = min(max(match_percentage, 0), 75)
     match_pct = float(match_percentage) / 100.0
     # Match is typically expressed as % of total project cost
     # e.g. 25% match means federal = 75%, local = 25%

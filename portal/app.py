@@ -50,6 +50,7 @@ import user_models
 import stripe_payment
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max upload
 
 # Serve static files (images, PDFs, etc.)
 @app.route("/static/<path:filename>")
@@ -8109,7 +8110,7 @@ def grant_match_funding(grant_id):
 
     # Get match parameters from query string or defaults
     grant_amount = request.args.get('grant_amount', type=float) or (grant.get('amount') if grant.get('amount') else 500000)
-    match_pct = request.args.get('match_pct', type=float) or 25
+    match_pct = min(max(float(request.args.get('match_pct', 25)), 0), 75)
 
     match_info_dict = calculate_match_requirement(grant_amount, match_pct)
 
@@ -8196,6 +8197,10 @@ def strategy_new():
         flash('Project name is required.', 'error')
         return redirect(url_for('funding_strategies'))
 
+    if total_project_cost <= 0:
+        flash('Project cost must be greater than zero.', 'error')
+        return redirect(url_for('funding_strategies'))
+
     strategy_id = create_strategy(user['id'], project_name, total_project_cost)
     flash('Funding strategy created.', 'success')
     return redirect(f'/strategy/{strategy_id}')
@@ -8236,6 +8241,10 @@ def strategy_add_source(strategy_id):
     amount = request.form.get('amount', 0, type=float)
     notes = request.form.get('notes', '').strip()
 
+    if amount < 0:
+        flash('Amount cannot be negative.', 'error')
+        return redirect(url_for('strategy_detail', strategy_id=strategy_id))
+
     if not source_name:
         flash('Source name is required.', 'error')
     else:
@@ -8243,6 +8252,8 @@ def strategy_add_source(strategy_id):
         flash(f'Added {source_name} to strategy.', 'success')
 
     redirect_url = request.form.get('redirect', f'/strategy/{strategy_id}')
+    if not redirect_url.startswith('/') or redirect_url.startswith('//'):
+        redirect_url = f'/strategy/{strategy_id}'
     return redirect(redirect_url)
 
 
@@ -8260,6 +8271,20 @@ def strategy_update_source(strategy_id):
 
     source_id = request.form.get('source_id', '')
     status = request.form.get('status', '')
+
+    ALLOWED_STATUSES = {'identified', 'applied', 'secured', 'declined'}
+    if status and status not in ALLOWED_STATUSES:
+        flash('Invalid status.', 'error')
+        return redirect(url_for('strategy_detail', strategy_id=strategy_id))
+
+    if source_id:
+        # Verify source belongs to this strategy
+        conn = get_db()
+        source_check = conn.execute('SELECT strategy_id FROM strategy_sources WHERE id = ?', (source_id,)).fetchone()
+        conn.close()
+        if not source_check or source_check['strategy_id'] != strategy_id:
+            flash('Source not found in this strategy.', 'error')
+            return redirect(url_for('strategy_detail', strategy_id=strategy_id))
 
     if source_id and status:
         update_strategy_source(source_id, status=status)
@@ -8282,6 +8307,13 @@ def strategy_remove_source(strategy_id):
 
     source_id = request.form.get('source_id', '')
     if source_id:
+        # Verify source belongs to this strategy
+        conn = get_db()
+        source_check = conn.execute('SELECT strategy_id FROM strategy_sources WHERE id = ?', (source_id,)).fetchone()
+        conn.close()
+        if not source_check or source_check['strategy_id'] != strategy_id:
+            flash('Source not found in this strategy.', 'error')
+            return redirect(url_for('strategy_detail', strategy_id=strategy_id))
         delete_strategy_source(source_id)
         flash('Source removed.', 'success')
 
@@ -8302,6 +8334,10 @@ def strategy_edit(strategy_id):
 
     project_name = request.form.get('project_name', '').strip()
     total_project_cost = request.form.get('total_project_cost', type=float)
+
+    if total_project_cost is not None and total_project_cost <= 0:
+        flash('Project cost must be greater than zero.', 'error')
+        return redirect(url_for('strategy_detail', strategy_id=strategy_id))
 
     update_strategy(strategy_id, project_name=project_name or None, total_project_cost=total_project_cost)
     flash('Strategy updated.', 'success')
