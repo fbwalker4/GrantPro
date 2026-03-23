@@ -34,6 +34,7 @@
     <div class="card">
         <h2 class="card-title">🧪 Send Test Email</h2>
         <form action="/admin/emails/send-test" method="POST" role="form" aria-label="Send test email">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="form-group">
                 <label for="emailTestRecipient">Recipient Email</label>
                 <input type="email" id="emailTestRecipient" name="email" required aria-required="true" placeholder="test@example.com">
@@ -45,8 +46,8 @@
         <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
             <h4 style="margin-bottom: 0.5rem;">📡 Resend API Status</h4>
             <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                <strong>API Key:</strong> {% if config.RESEND_API_KEY %}Configured{% else %}Not set (set RESEND_API_KEY env var){% endif %}<br>
-                <strong>From:</strong> {{ config.FROM_EMAIL or 'not configured' }}
+                <strong>API Key:</strong> {% if resend_key_set %}Configured{% else %}Not set (set RESEND_API_KEY env var){% endif %}<br>
+                <strong>From:</strong> {{ from_email }}
             </p>
         </div>
     </div>

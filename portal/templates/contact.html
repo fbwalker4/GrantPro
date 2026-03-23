@@ -55,6 +55,7 @@
             <p class="subtitle">We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
             
             <form method="POST" action="/contact" role="form" aria-label="Contact us">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="inquiry_type" value="{{ inquiry_type }}">
 
                 <div class="form-group">

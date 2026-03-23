@@ -24,6 +24,7 @@
 
 <div class="card">
     <form method="POST" role="form" aria-label="Edit grant section content">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <label for="content">{{ section.replace('_', ' ').title() }} Content</label>
         <textarea id="content" name="content" class="form-textarea" aria-label="Section content editor" style="min-height: 400px;">{{ content }}</textarea>
         <div id="content-counter" style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 1rem 0;"></div>

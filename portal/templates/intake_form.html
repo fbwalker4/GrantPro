@@ -8,6 +8,7 @@
 
 <div class="card">
     <form method="POST" role="form" aria-label="Client intake questionnaire">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <h3>Organization Basics</h3>
         
         <label for="org_legal_name">Legal Organization Name</label>

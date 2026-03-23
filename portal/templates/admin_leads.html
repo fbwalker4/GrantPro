@@ -89,6 +89,7 @@
     <div class="card">
         <h3 class="card-title">📧 Email All Leads</h3>
         <form action="/admin/emails/send-test" method="POST" role="form" aria-label="Send test email">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="form-group">
                 <label for="leadTestEmail">Send test to yourself, then forward</label>
                 <input type="email" id="leadTestEmail" name="email" placeholder="your@email.com" required aria-required="true">

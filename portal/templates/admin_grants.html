@@ -15,6 +15,7 @@
 <div id="grantForm" class="card" style="display: none; margin-bottom: 2rem;">
     <h2 class="card-title" id="formTitle">Add New Grant</h2>
     <form method="POST" id="grantFormData" role="form" aria-label="Add or edit grant">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" id="formAction" value="add">
         <input type="hidden" name="id" id="grantId">
 

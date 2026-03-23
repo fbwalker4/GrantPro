@@ -15,6 +15,7 @@
 <div id="templateForm" class="card" style="display: none; margin-bottom: 2rem;">
     <h2 class="card-title" id="formTitle">Add New Template</h2>
     <form method="POST" role="form" aria-label="Add or edit template">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" id="formAction" value="add">
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
@@ -93,6 +94,7 @@
         <div style="display: flex; gap: 0.5rem;">
             <button class="btn btn-ghost btn-sm" onclick="editTemplate('{{ name }}')">Edit</button>
             <form method="POST" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="action" value="delete">
                 <input type="hidden" name="template_name" value="{{ name }}">
                 <button type="submit" class="btn btn-ghost btn-sm" style="color: var(--accent-warning);" onclick="return confirm('Delete template {{ name }}?')">Delete</button>

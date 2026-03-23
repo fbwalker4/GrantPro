@@ -79,7 +79,7 @@
     function saveGrant(grantId) {
         fetch('/api/save-grant', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}'},
             body: JSON.stringify({grant_id: grantId})
         }).then(res => res.json()).then(data => {
             if (data.success) {

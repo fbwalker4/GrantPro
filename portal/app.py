@@ -5498,7 +5498,9 @@ def admin_emails():
     
     stats = email_system.get_email_stats()
     
-    return render_template('admin_emails.html', stats=stats)
+    return render_template('admin_emails.html', stats=stats,
+        resend_key_set=bool(os.environ.get('RESEND_API_KEY')),
+        from_email=os.environ.get('FROM_EMAIL', 'Not configured'))
 
 
 @app.route('/admin/emails/send-test', methods=['POST'])
@@ -7432,22 +7434,22 @@ def shared_grant_view(token):
 @app.errorhandler(404)
 def not_found(e):
     return render_template('message.html', title='Page Not Found',
-        message='The page you are looking for does not exist.'), 404
+        message='The page you are looking for does not exist.', icon='🔍'), 404
 
 @app.errorhandler(405)
 def method_not_allowed(e):
     return render_template('message.html', title='Method Not Allowed',
-        message='This action is not supported.'), 405
+        message='This action is not supported.', icon='🚫'), 405
 
 @app.errorhandler(429)
 def too_many_requests(e):
     return render_template('message.html', title='Too Many Requests',
-        message='Please slow down and try again in a moment.'), 429
+        message='Please slow down and try again in a moment.', icon='⏳'), 429
 
 @app.errorhandler(500)
 def server_error(e):
     return render_template('message.html', title='Server Error',
-        message='Something went wrong. Please try again later.'), 500
+        message='Something went wrong. Please try again later.', icon='⚠️'), 500
 
 
 # ============ SECURITY.TXT + ROBOTS.TXT ============
