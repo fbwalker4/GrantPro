@@ -2,8 +2,8 @@
 {% block title %}Export Data - Grant Pro{% endblock %}
 {% block content %}
 <style>
-    .export-container { max-width: 800px; }
-    .export-container h1 { font-family: 'Playfair Display', serif; color: var(--text-primary); margin-bottom: 0.5rem; }
+    .export-container { max-width: 800px; margin: 0 auto; }
+    .export-container h1 { font-family: 'Playfair Display', serif; color: var(--text-primary); margin-bottom: 0.5rem; font-size: 1.75rem; }
     .export-container h2 { color: var(--text-primary); margin-bottom: 1rem; font-size: 1.15rem; font-weight: 600; }
     .export-section { margin-bottom: 2rem; }
     .export-item {
@@ -37,20 +37,34 @@
     }
     .export-history-row:last-child { border-bottom: none; }
     .export-history-date { color: var(--text-secondary); font-size: 0.85rem; }
-    .export-history-size { color: var(--text-muted); font-size: 0.8rem; }
+    .export-history-size { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.15rem; }
     .export-history-status {
-        display: inline-block;
-        padding: 0.2rem 0.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.75rem;
         border-radius: 4px;
         font-size: 0.75rem;
-        font-weight: 600;
+        font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
     .status-ready { background: rgba(5, 150, 105, 0.15); color: #10b981; }
     .status-pending { background: rgba(217, 119, 6, 0.15); color: #d97706; }
     .status-expired { background: var(--bg-tertiary); color: var(--text-muted); }
+
+    /* Focus styles */
+    .btn:focus-visible,
+    button:focus-visible,
+    a:focus-visible {
+        outline: 2px solid var(--accent-primary);
+        outline-offset: 2px;
+    }
+
     @media (max-width: 768px) {
+        .export-container h1 {
+            font-size: 1.5rem;
+        }
         .export-item {
             flex-direction: column;
             align-items: flex-start;
@@ -60,6 +74,16 @@
             flex-direction: column;
             align-items: flex-start;
             gap: 0.5rem;
+        }
+        .export-history-actions {
+            width: 100%;
+            justify-content: flex-start !important;
+        }
+        .export-generate-btn {
+            width: 100%;
+            text-align: center;
+            justify-content: center;
+            min-height: 44px;
         }
     }
 </style>
@@ -71,7 +95,7 @@
     </a>
 
     <h1>Export Your Data</h1>
-    <p style="color: var(--text-muted); margin-bottom: 2rem;">Download all your Grant Pro data as a ZIP file. Exports include your profile, grants, budgets, documents, and more.</p>
+    <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem;">Download all your Grant Pro data as a ZIP file. Exports include your profile, grants, budgets, documents, and more.</p>
 
     <!-- Flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -91,7 +115,7 @@
             <h2>Your Exports</h2>
             {% for export in exports %}
             <div class="export-history-row">
-                <div>
+                <div style="min-width: 0;">
                     <div class="export-history-date">
                         {{ export.requested_at[:16] if export.requested_at else 'Unknown date' }}
                     </div>
@@ -107,10 +131,10 @@
                     </div>
                     {% endif %}
                 </div>
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div class="export-history-actions" style="display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0;">
                     {% if export.status == 'ready' %}
                         <span class="export-history-status status-ready">Ready</span>
-                        <a href="{{ url_for('account_export_download', export_id=export.id) }}" class="btn btn-primary" style="padding: 0.4rem 0.85rem; font-size: 0.85rem;">Download ZIP</a>
+                        <a href="{{ url_for('account_export_download', export_id=export.id) }}" class="btn btn-primary" style="padding: 0.4rem 0.85rem; font-size: 0.85rem; min-height: 36px;">Download ZIP</a>
                     {% elif export.status == 'pending' %}
                         <span class="export-history-status status-pending">Processing</span>
                     {% else %}
@@ -119,6 +143,16 @@
                 </div>
             </div>
             {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <!-- Empty state for no previous exports -->
+    <div class="export-section">
+        <div class="card">
+            <h2>Your Exports</h2>
+            <div style="text-align: center; padding: 1.5rem 1rem;">
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">No previous exports. Generate one below to download your data.</p>
+            </div>
         </div>
     </div>
     {% endif %}
@@ -130,7 +164,7 @@
             <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.85rem;">Your export will contain the following data:</p>
 
             <div class="export-item">
-                <div>
+                <div style="min-width: 0;">
                     <div class="export-item-name">User Profile</div>
                     <div class="export-item-desc">Name, email, organization details</div>
                 </div>
@@ -138,7 +172,7 @@
             </div>
 
             <div class="export-item">
-                <div>
+                <div style="min-width: 0;">
                     <div class="export-item-name">Grant Applications ({{ grant_count }})</div>
                     <div class="export-item-desc">Full grant data, draft sections by version</div>
                 </div>
@@ -146,7 +180,7 @@
             </div>
 
             <div class="export-item">
-                <div>
+                <div style="min-width: 0;">
                     <div class="export-item-name">Budgets ({{ budget_count }})</div>
                     <div class="export-item-desc">Budget breakdowns per grant</div>
                 </div>
@@ -154,7 +188,7 @@
             </div>
 
             <div class="export-item">
-                <div>
+                <div style="min-width: 0;">
                     <div class="export-item-name">Saved Grants ({{ saved_count }})</div>
                     <div class="export-item-desc">Bookmarked grants with notes</div>
                 </div>
@@ -162,7 +196,7 @@
             </div>
 
             <div class="export-item">
-                <div>
+                <div style="min-width: 0;">
                     <div class="export-item-name">Organizations ({{ client_count }})</div>
                     <div class="export-item-desc">Client organization profiles</div>
                 </div>
@@ -170,7 +204,7 @@
             </div>
 
             <div class="export-item">
-                <div>
+                <div style="min-width: 0;">
                     <div class="export-item-name">Documents ({{ doc_count }})</div>
                     <div class="export-item-desc">Uploaded files and vault documents</div>
                 </div>
@@ -180,7 +214,7 @@
             <div style="margin-top: 1.5rem;">
                 <form method="POST" action="{{ url_for('account_export_generate') }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn btn-primary" onclick="this.disabled=true; this.innerText='Generating Export...'; this.form.submit();">Generate New Export</button>
+                    <button type="submit" class="btn btn-primary export-generate-btn" style="min-height: 44px;" onclick="this.disabled=true; this.innerText='Generating Export...'; this.form.submit();">Generate New Export</button>
                 </form>
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem;">Exports are available for download for 7 days. Maximum 3 per hour.</p>
             </div>
@@ -190,7 +224,7 @@
     <!-- Data ownership note -->
     <div class="export-section">
         <div class="card" style="background: var(--bg-tertiary);">
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0; line-height: 1.5;">
                 Your data belongs to you. Exports contain everything stored in your Grant Pro account, organized into folders with readable formats (JSON, CSV, and original document files). Password hashes are never included.
             </p>
         </div>

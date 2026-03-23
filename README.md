@@ -965,6 +965,20 @@ app.run(debug=True, host='0.0.0.0', port=5001)
 
 ## Changelog
 
+### 2026-03-22 (UI Polish: Design System + Mobile + Accessibility)
+
+- Cards aligned to dashboard design system (bg-card, border-color, radius-lg, shadow-md)
+- Typography matched to page-title/card-title sizes across all account pages
+- Status badges restyled to match layout.html badge pattern
+- Data stats styled as mini-cards with backgrounds
+- Content centered with max-width on wide monitors
+- Mobile 768px breakpoint: grids collapse, buttons full-width 44px min-height, settings rows stack, step indicators readable
+- iOS zoom prevention: email input at 16px font-size
+- Focus-visible outlines on all interactive elements for keyboard navigation
+- Empty state added for export page when no previous exports exist
+- Step dots with colored glow shadow for visibility
+- Danger zone styled as proper card
+
 ### 2026-03-22 (UX Iteration: Subscription Lifecycle Templates)
 
 40+ UX improvements across 4 templates:

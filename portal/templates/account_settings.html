@@ -2,16 +2,18 @@
 {% block title %}Account Settings - Grant Pro{% endblock %}
 {% block content %}
 <style>
-    .settings-container { max-width: 800px; }
-    .settings-container h1 { font-family: 'Playfair Display', serif; color: var(--text-primary); margin-bottom: 0.5rem; }
-    .settings-container h2 { color: var(--text-primary); margin-bottom: 1rem; font-size: 1.15rem; font-weight: 600; }
+    .settings-container { max-width: 800px; margin: 0 auto; }
+    .settings-container h1 { font-family: 'Playfair Display', serif; color: var(--text-primary); margin-bottom: 0.5rem; font-size: 1.75rem; }
+    .settings-container h2 { color: var(--text-primary); margin-bottom: 1rem; font-size: 1.15rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
     .settings-section { margin-bottom: 2rem; }
     .plan-badge {
-        display: inline-block;
-        padding: 0.3rem 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.75rem;
         border-radius: 4px;
-        font-size: 0.8rem;
-        font-weight: 600;
+        font-size: 0.75rem;
+        font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
@@ -31,6 +33,7 @@
     .settings-row-label { color: var(--text-secondary); font-size: 0.9rem; }
     .settings-row-value { font-weight: 500; font-size: 0.9rem; }
     .danger-zone {
+        background: var(--bg-card);
         border: 1px solid rgba(220, 38, 38, 0.3);
         border-radius: var(--radius-lg);
         padding: 1.5rem;
@@ -45,13 +48,18 @@
         transition: color 0.15s;
     }
     .text-link:hover { color: var(--accent-hover); text-decoration: underline; }
+    .text-link:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; border-radius: 2px; }
     .text-link-danger { color: var(--accent-danger); }
     .text-link-danger:hover { color: #ef4444; }
+    .text-link-danger:focus-visible { outline-color: var(--accent-danger); }
     .data-stat {
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        padding: 0.5rem 0;
+        padding: 0.75rem;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
     }
     .data-stat-count {
         font-family: 'Playfair Display', serif;
@@ -66,17 +74,53 @@
         margin-top: 1rem;
         flex-wrap: wrap;
     }
+    .settings-btn-row .btn {
+        min-height: 44px;
+    }
+    .settings-btn-row button.btn {
+        min-height: 44px;
+    }
     .pause-note {
         font-size: 0.8rem;
         color: var(--text-muted);
         margin-top: 0.75rem;
         margin-bottom: 0;
     }
+
+    /* Focus styles for all interactive elements */
+    .btn:focus-visible,
+    button:focus-visible {
+        outline: 2px solid var(--accent-primary);
+        outline-offset: 2px;
+    }
+
     @media (max-width: 768px) {
+        .settings-container h1 {
+            font-size: 1.5rem;
+        }
         .settings-row {
             flex-direction: column;
             align-items: flex-start;
             gap: 0.25rem;
+        }
+        .settings-btn-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .settings-btn-row .btn,
+        .settings-btn-row button.btn {
+            text-align: center;
+            justify-content: center;
+            width: 100%;
+        }
+        .data-stats-grid {
+            grid-template-columns: 1fr 1fr !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .data-stats-grid {
+            grid-template-columns: 1fr !important;
         }
     }
 </style>
@@ -179,7 +223,7 @@
         <div class="card">
             <h2>Your Data</h2>
             <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">A summary of what you have stored in Grant Pro.</p>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem;">
+            <div class="data-stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem;">
                 <div class="data-stat">
                     <span class="data-stat-count">{{ grant_count }}</span>
                     <span class="data-stat-label">Grant Applications</span>
@@ -197,7 +241,7 @@
                     <span class="data-stat-label">Organizations</span>
                 </div>
             </div>
-            <div style="margin-top: 1rem;">
+            <div style="margin-top: 1.25rem;">
                 <a href="{{ url_for('account_export_data') }}" class="text-link">Export Your Data &rarr;</a>
             </div>
         </div>
@@ -244,7 +288,7 @@
         <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
             Permanently delete your account and all associated data. This action cannot be undone.
         </p>
-        <a href="{{ url_for('account_delete') }}" class="btn btn-secondary" style="border-color: rgba(220, 38, 38, 0.3); color: var(--accent-danger);">Delete Account</a>
+        <a href="{{ url_for('account_delete') }}" class="btn btn-secondary" style="border-color: rgba(220, 38, 38, 0.3); color: var(--accent-danger); min-height: 44px;">Delete Account</a>
     </div>
 </div>
 {% endblock %}

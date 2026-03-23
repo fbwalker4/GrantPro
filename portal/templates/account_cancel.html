@@ -22,19 +22,22 @@
         margin-bottom: 2rem;
     }
     .cancel-step-dot {
-        width: 8px;
-        height: 8px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
         background: var(--bg-tertiary);
         transition: background 0.2s;
+        flex-shrink: 0;
     }
-    .cancel-step-dot.active { background: var(--accent-primary); }
+    .cancel-step-dot.active { background: var(--accent-primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
     .cancel-step-dot.completed { background: var(--accent-success); }
     .cancel-step-label {
         font-size: 0.75rem;
         color: var(--text-muted);
-        margin-left: 0.25rem;
+        margin-left: 0.15rem;
+        margin-right: 0.5rem;
     }
+    .cancel-step-label:last-child { margin-right: 0; }
     .reason-option {
         display: flex;
         align-items: center;
@@ -46,6 +49,7 @@
         margin-bottom: 0.75rem;
         cursor: pointer;
         transition: border-color 0.15s, background 0.15s;
+        min-height: 52px;
     }
     .reason-option:hover {
         border-color: var(--accent-primary);
@@ -55,12 +59,19 @@
         border-color: var(--accent-primary);
         background: rgba(37, 99, 235, 0.08);
     }
+    .reason-option:focus-within {
+        outline: 2px solid var(--accent-primary);
+        outline-offset: 2px;
+    }
     .reason-option input[type="radio"] {
         accent-color: var(--accent-primary);
         width: 18px;
         height: 18px;
         cursor: pointer;
         flex-shrink: 0;
+    }
+    .reason-option input[type="radio"]:focus-visible {
+        outline: none;
     }
     .reason-option label {
         cursor: pointer;
@@ -118,11 +129,16 @@
         background: var(--accent-danger);
         color: white;
         box-shadow: var(--shadow-sm);
+        min-height: 44px;
     }
     .btn-cancel-confirm:hover {
         background: #b91c1c;
         transform: translateY(-1px);
         box-shadow: var(--shadow-md);
+    }
+    .btn-cancel-confirm:focus-visible {
+        outline: 2px solid var(--accent-danger);
+        outline-offset: 2px;
     }
     .btn-cancel-confirm:disabled {
         opacity: 0.6;
@@ -135,6 +151,12 @@
         margin-top: 1.5rem;
         flex-wrap: wrap;
         align-items: center;
+    }
+    .btn-row .btn {
+        min-height: 44px;
+    }
+    .btn-row button.btn {
+        min-height: 44px;
     }
     .pricing-compare {
         display: grid;
@@ -167,7 +189,18 @@
         color: var(--text-muted);
         margin-top: 0.25rem;
     }
+
+    /* Focus styles */
+    .btn:focus-visible,
+    button:focus-visible {
+        outline: 2px solid var(--accent-primary);
+        outline-offset: 2px;
+    }
+
     @media (max-width: 768px) {
+        .cancel-container h1 {
+            font-size: 1.35rem;
+        }
         .pricing-compare {
             grid-template-columns: 1fr;
         }
@@ -176,9 +209,15 @@
             align-items: stretch;
         }
         .btn-row .btn,
-        .btn-row button {
+        .btn-row button,
+        .btn-row button.btn {
             text-align: center;
             justify-content: center;
+            width: 100%;
+            min-height: 44px;
+        }
+        .retention-card .btn {
+            min-height: 44px;
         }
     }
 </style>
@@ -267,7 +306,7 @@
         <form method="POST" action="{{ url_for('account_downgrade') }}" style="margin-top: 0.75rem;">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="target_plan" value="monthly">
-            <button type="submit" class="btn btn-primary" style="width: 100%;" onclick="this.disabled=true; this.innerText='Downgrading...'; this.form.submit();">Downgrade to Standard Monthly</button>
+            <button type="submit" class="btn btn-primary" style="width: 100%; min-height: 44px; justify-content: center;" onclick="this.disabled=true; this.innerText='Downgrading...'; this.form.submit();">Downgrade to Standard Monthly</button>
         </form>
         {% else %}
         <p>Your current plan is already the most affordable option at <strong>$19.95/month</strong>. If budget is tight, you might consider pausing your subscription instead.</p>
@@ -289,12 +328,12 @@
             <form method="POST" action="{{ url_for('account_pause') }}" style="margin: 0;">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="months" value="1">
-                <button type="submit" class="btn btn-primary" onclick="this.disabled=true; this.innerText='Pausing...'; this.form.submit();">Pause for 1 Month</button>
+                <button type="submit" class="btn btn-primary" style="min-height: 44px;" onclick="this.disabled=true; this.innerText='Pausing...'; this.form.submit();">Pause for 1 Month</button>
             </form>
             <form method="POST" action="{{ url_for('account_pause') }}" style="margin: 0;">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="months" value="3">
-                <button type="submit" class="btn btn-secondary" onclick="this.disabled=true; this.innerText='Pausing...'; this.form.submit();">Pause for 3 Months</button>
+                <button type="submit" class="btn btn-secondary" style="min-height: 44px;" onclick="this.disabled=true; this.innerText='Pausing...'; this.form.submit();">Pause for 3 Months</button>
             </form>
         </div>
         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem;">You can pause once per 12-month period.</p>
@@ -313,7 +352,7 @@
     <div class="retention-card">
         <h3>Export Your Data First</h3>
         <p>Before you go, make sure you have everything you need. Our data export feature will bundle all your grants, documents, and saved information into a downloadable ZIP.</p>
-        <a href="{{ url_for('account_export_data') }}" class="btn btn-primary" style="margin-top: 0.5rem;">Download My Data</a>
+        <a href="{{ url_for('account_export_data') }}" class="btn btn-primary" style="margin-top: 0.5rem; min-height: 44px;">Download My Data</a>
     </div>
 
     {% else %}
@@ -331,12 +370,12 @@
             <form method="POST" action="{{ url_for('account_pause') }}" style="margin: 0;">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="months" value="1">
-                <button type="submit" class="btn btn-primary" onclick="this.disabled=true; this.innerText='Pausing...'; this.form.submit();">Pause for 1 Month</button>
+                <button type="submit" class="btn btn-primary" style="min-height: 44px;" onclick="this.disabled=true; this.innerText='Pausing...'; this.form.submit();">Pause for 1 Month</button>
             </form>
             <form method="POST" action="{{ url_for('account_pause') }}" style="margin: 0;">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="months" value="3">
-                <button type="submit" class="btn btn-secondary" onclick="this.disabled=true; this.innerText='Pausing...'; this.form.submit();">Pause for 3 Months</button>
+                <button type="submit" class="btn btn-secondary" style="min-height: 44px;" onclick="this.disabled=true; this.innerText='Pausing...'; this.form.submit();">Pause for 3 Months</button>
             </form>
         </div>
         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem;">You can pause once per 12-month period.</p>
@@ -386,7 +425,7 @@
         <form method="POST" action="{{ url_for('account_cancel') }}" style="margin: 0;">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="step" value="show_confirm">
-            <button type="submit" class="btn btn-secondary" style="border-color: var(--text-muted); color: var(--text-muted);">Continue to Cancel</button>
+            <button type="submit" class="btn btn-secondary" style="border-color: var(--text-muted); color: var(--text-muted); min-height: 44px;">Continue to Cancel</button>
         </form>
     </div>
 
