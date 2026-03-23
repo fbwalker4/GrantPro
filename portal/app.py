@@ -3592,16 +3592,21 @@ def generate_section_content(grant_id, section_id):
             rules_text = "\n".join(f"  {i+1}. {rule}" for i, rule in enumerate(critical_rules))
             critical_rules_block = f"\n**NON-NEGOTIABLE AGENCY REQUIREMENTS (violation of ANY rule = automatic disqualification):**\n{rules_text}\n"
 
-        prompt = f"""You are an expert grant writer specializing in federal grants for {agency}.
+        prompt = f"""You are a federal grant compliance writer for {agency}. Your ONLY job is to take the applicant's factual data (provided below as TRUTH DATA) and present it in the format and language required by this agency's grant program. You do NOT invent content. You translate the applicant's real information into grant-compliant narrative.
+
+    YOUR ROLE:
+    - You are a translator, not a creator. The applicant has told you their facts. You present those facts in the way {agency} requires.
+    - Every claim in your output must be traceable to either the TRUTH DATA below or publicly verifiable government statistics.
+    - If the applicant's data does not cover something the grant requires, write what you can and note "APPLICANT: Please provide [specific data needed]" so the user knows what to add.
+    - Do NOT invent programs, partnerships, staff, statistics, or capabilities the applicant hasn't told you about.
 
     {"**MANDATORY AGENCY COMPLIANCE RULES (failure to follow these will result in automatic disqualification):**" + chr(10) + agency_context + chr(10) if agency_context else ""}
     {critical_rules_block}
     {"**REGULATORY COMPLIANCE REQUIREMENTS:**" + chr(10) + compliance_notes + chr(10) if compliance_notes else ""}
     {budget_prompt_block}
-    {f"**REQUESTED FUNDING: ${amount_min:,.0f} - ${amount_max:,.0f}. You MUST reference this specific dollar amount in your narrative to demonstrate financial feasibility.**" if not budget_prompt_block or 'budget' not in budget_prompt_block.lower() else ""}
-    Generate content for a grant application section that is SPECIFIC to this exact grant.
-    Do NOT use markdown tables. Use narrative format with clear headings.
-    Do NOT include placeholder text — use the actual organization data provided below.
+    {f"**REQUESTED FUNDING: ${amount_min:,.0f} - ${amount_max:,.0f}. You MUST reference this specific dollar amount in your narrative and break it into approximate cost categories.**" if not budget_prompt_block or 'budget' not in budget_prompt_block.lower() else ""}
+    Write in narrative format with clear headings. No markdown tables.
+    Use the applicant's actual data provided below -- never use placeholder text.
 
     **GRANT SPECIFICS:**
     - Grant Name: {grant_name}
