@@ -3376,8 +3376,9 @@ def upload_nofo(grant_id):
         flash(f'NOFO parsed successfully. Extracted {sections_count} required sections.', 'success')
 
     except Exception as e:
-        logger.error(f'NOFO upload processing failed: {e}')
-        flash('Error processing NOFO. Please try again.', 'error')
+        import traceback
+        logger.error(f'NOFO upload processing failed: {e}\n{traceback.format_exc()}')
+        flash(f'Error processing NOFO: {str(e)[:200]}', 'error')
 
     return redirect(url_for('grant_detail', grant_id=grant_id))
 
@@ -3656,6 +3657,7 @@ def generate_section_content(grant_id, section_id):
         # Load agency-specific regulatory context from template
         agency_context = ""
         compliance_notes = ""
+        agency_tmpl = {}
         try:
             with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates', 'agency_templates.json')) as tf:
                 all_templates = json.load(tf)
