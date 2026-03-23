@@ -4,33 +4,39 @@
 
 {% block content %}
 <h1>Edit: {{ section.replace('_', ' ').title() }}</h1>
-<p><a href="/grant/{{ grant.id }}" aria-label="Back to grant detail page">← Back to Grant</a></p>
+<p><a href="/grant/{{ grant.id }}" aria-label="Back to grant detail page">&larr; Back to Grant</a></p>
 
 {% if section_guidance %}
-<div class="card" style="background: #e8f4fd; border-color: #bee5eb; margin-bottom: 1rem;">
-    <h3 style="color: #0c5460; margin-top: 0;">📋 Agency Guidance</h3>
-    <p style="color: #0c5460;">{{ section_guidance.guidance }}</p>
+<div class="card" style="background: #1a2332; border-color: #2a4a6b; margin-bottom: 1rem;">
+    <h3 style="color: #7eb8e0; margin-top: 0;">Agency Guidance</h3>
+    <p style="color: #a8c8e0;">{{ section_guidance.guidance }}</p>
     {% if section_guidance.max_pages %}
-    <p style="color: #0c5460;"><strong>Max Pages:</strong> {{ section_guidance.max_pages }}</p>
+    <p style="color: #a8c8e0;"><strong>Max Pages:</strong> {{ section_guidance.max_pages }}</p>
     {% endif %}
     {% if section_guidance.max_chars %}
-    <p style="color: #0c5460;"><strong>Max Characters:</strong> {{ section_guidance.max_chars }}</p>
+    <p style="color: #a8c8e0;"><strong>Max Characters:</strong> {{ section_guidance.max_chars }}</p>
     {% endif %}
     {% if section_guidance.required %}
-    <p style="color: #0c5460;"><strong>Required:</strong> Yes</p>
+    <p style="color: #a8c8e0;"><strong>Required:</strong> Yes</p>
     {% endif %}
 </div>
 {% endif %}
 
 <div class="card">
-    <form method="POST" role="form" aria-label="Edit grant section content">
+    <form id="section-form" method="POST" role="form" aria-label="Edit grant section content">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <label for="content">{{ section.replace('_', ' ').title() }} Content</label>
-        <textarea id="content" name="content" class="form-textarea" aria-label="Section content editor" style="min-height: 400px;">{{ content }}</textarea>
+        <label for="content" style="margin-bottom: 0.5rem; display: block;">{{ section.replace('_', ' ').title() }} Content</label>
+
+        <!-- Quill Rich Text Editor -->
+        <div id="quill-editor" style="min-height: 400px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-bottom: 0.25rem;"></div>
+
+        <!-- Hidden textarea that stores the content for form submission -->
+        <textarea id="content" name="content" style="display: none;">{{ content }}</textarea>
+
         <div id="content-counter" style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 1rem 0;"></div>
 
-        <div style="display: flex; gap: 1rem;">
-            <button type="submit" class="btn btn-primary">Save Section</button>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button type="submit" class="btn btn-primary" id="save-btn">Save Section</button>
             <a href="/grant/{{ grant.id }}" class="btn btn-secondary">Cancel</a>
         </div>
     </form>
@@ -38,14 +44,106 @@
 
 <div class="card">
     <h3>Quick Tips</h3>
-    <ul style="color: #666;">
+    <ul style="color: var(--text-secondary);">
         <li>Write in clear, concise language appropriate for the grant agency</li>
-        <li>Avoid jargon - reviewers may not be technical experts in your field</li>
+        <li>Use headings to organize your content by the agency's required components</li>
         <li>Include specific metrics and outcomes where possible</li>
         <li>Keep paragraphs under 200 words for readability</li>
+        <li>Use bold for emphasis on key terms and figures</li>
     </ul>
 </div>
 
+<!-- Quill CSS -->
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+<style>
+    /* Dark theme overrides for Quill */
+    .ql-toolbar.ql-snow {
+        background: var(--bg-secondary);
+        border-color: var(--border-color);
+        border-radius: var(--radius-md) var(--radius-md) 0 0;
+    }
+    .ql-container.ql-snow {
+        border-color: var(--border-color);
+        border-radius: 0 0 var(--radius-md) var(--radius-md);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 1rem;
+        color: var(--text-primary);
+        background: var(--bg-tertiary);
+    }
+    .ql-editor {
+        min-height: 400px;
+        line-height: 1.7;
+        color: var(--text-primary);
+    }
+    .ql-editor.ql-blank::before {
+        color: var(--text-muted);
+        font-style: normal;
+    }
+    .ql-snow .ql-stroke {
+        stroke: var(--text-secondary);
+    }
+    .ql-snow .ql-fill {
+        fill: var(--text-secondary);
+    }
+    .ql-snow .ql-picker-label {
+        color: var(--text-secondary);
+    }
+    .ql-snow .ql-picker-options {
+        background: var(--bg-secondary);
+        border-color: var(--border-color);
+    }
+    .ql-snow .ql-picker-item {
+        color: var(--text-primary);
+    }
+    .ql-snow .ql-picker-item:hover {
+        color: var(--accent-primary);
+    }
+    .ql-snow .ql-active .ql-stroke {
+        stroke: var(--accent-primary);
+    }
+    .ql-snow .ql-active .ql-fill {
+        fill: var(--accent-primary);
+    }
+    .ql-snow .ql-active {
+        color: var(--accent-primary);
+    }
+    .ql-snow button:hover .ql-stroke {
+        stroke: var(--accent-primary);
+    }
+    .ql-snow button:hover .ql-fill {
+        fill: var(--accent-primary);
+    }
+    .ql-snow .ql-tooltip {
+        background: var(--bg-secondary);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+        box-shadow: var(--shadow-md);
+    }
+    .ql-snow .ql-tooltip input[type=text] {
+        background: var(--bg-tertiary);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+    .ql-editor h1 { font-size: 1.5rem; font-weight: 700; margin: 1.5rem 0 0.75rem; color: var(--text-primary); }
+    .ql-editor h2 { font-size: 1.25rem; font-weight: 600; margin: 1.25rem 0 0.5rem; color: var(--text-primary); }
+    .ql-editor h3 { font-size: 1.1rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--text-primary); }
+    .ql-editor p { margin-bottom: 0.75rem; }
+    .ql-editor ul, .ql-editor ol { margin-bottom: 0.75rem; padding-left: 1.5rem; }
+    .ql-editor blockquote {
+        border-left: 3px solid var(--accent-primary);
+        padding-left: 1rem;
+        color: var(--text-secondary);
+        margin: 1rem 0;
+    }
+
+    @media (max-width: 768px) {
+        .ql-editor { min-height: 300px; }
+        #save-btn { width: 100%; }
+    }
+</style>
+
+<!-- Quill JS -->
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 <script>
 (function() {
     var textarea = document.getElementById('content');
@@ -54,10 +152,75 @@
     var maxPages = {{ section_guidance.max_pages|default(0)|int }};
     var charsPerPage = 3000;
 
+    // Initialize Quill
+    var quill = new Quill('#quill-editor', {
+        theme: 'snow',
+        placeholder: 'Start writing your section content...',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['blockquote'],
+                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                [{ 'align': [] }],
+                ['link'],
+                ['clean']
+            ]
+        }
+    });
+
+    // Load existing content into Quill
+    var existingContent = textarea.value;
+    if (existingContent) {
+        // Check if content looks like HTML (from a previous Quill save)
+        if (existingContent.trim().startsWith('<') && existingContent.includes('</')) {
+            quill.clipboard.dangerouslyPasteHTML(existingContent);
+        } else {
+            // Plain text or markdown -- convert line breaks to paragraphs
+            var paragraphs = existingContent.split(/\n\n+/);
+            var html = paragraphs.map(function(p) {
+                // Convert markdown-style headers
+                p = p.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+                p = p.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+                p = p.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+                // Convert bold
+                p = p.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                // Convert italic
+                p = p.replace(/\*(.+?)\*/g, '<em>$1</em>');
+                // Convert bullet lists
+                if (p.match(/^[\*\-]\s/m)) {
+                    var items = p.split(/\n/).filter(function(l) { return l.trim(); });
+                    var lis = items.map(function(item) {
+                        return '<li>' + item.replace(/^[\*\-]\s+/, '') + '</li>';
+                    }).join('');
+                    return '<ul>' + lis + '</ul>';
+                }
+                // Wrap plain text in paragraph tags if not already a heading
+                if (!p.match(/^<h[123]/)) {
+                    p = '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+                }
+                return p;
+            }).join('');
+            quill.clipboard.dangerouslyPasteHTML(html);
+        }
+    }
+
+    // Sync Quill content to hidden textarea on every change
+    quill.on('text-change', function() {
+        textarea.value = quill.root.innerHTML;
+        updateCounter();
+    });
+
+    // Also sync before form submit
+    document.getElementById('section-form').addEventListener('submit', function() {
+        textarea.value = quill.root.innerHTML;
+    });
+
     function updateCounter() {
-        var text = textarea.value;
+        var text = quill.getText().trim();
         var charCount = text.length;
-        var wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+        var wordCount = text === '' ? 0 : text.split(/\s+/).length;
         var parts = [];
 
         // Character count
@@ -97,7 +260,6 @@
         counter.innerHTML = parts.join(' &nbsp;|&nbsp; ');
     }
 
-    textarea.addEventListener('input', updateCounter);
     updateCounter();
 })();
 </script>
