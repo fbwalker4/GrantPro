@@ -178,6 +178,18 @@ def init_user_db():
         except Exception:
             pass  # Column already exists (Postgres or repeated SQLite run)
 
+        # Document preference columns on user_profiles
+        for col, default in [
+            ('doc_font', "TEXT DEFAULT 'Times New Roman'"),
+            ('doc_font_size', 'INTEGER DEFAULT 12'),
+            ('doc_line_spacing', 'REAL DEFAULT 1.0'),
+            ('doc_margins', 'REAL DEFAULT 1.0'),
+        ]:
+            try:
+                c.execute(f'ALTER TABLE user_profiles ADD COLUMN {col} {default}')
+            except Exception:
+                pass
+
         # Subscription lifecycle columns
         for col, default in [
             ('payment_failure_count', 'INTEGER DEFAULT 0'),
@@ -394,7 +406,8 @@ def update_user_profile(user_id, profile_data):
         'bio', 'interests', 'eligible_entities', 'funding_amount_min',
         'funding_amount_max', 'preferred_categories', 'notify_deadlines',
         'notify_new_grants', 'reminder_days', 'first_name', 'last_name',
-        'organization_name', 'organization_type'
+        'organization_name', 'organization_type',
+        'doc_font', 'doc_font_size', 'doc_line_spacing', 'doc_margins',
     }
     
     fields = []

@@ -57,6 +57,52 @@
     </div>
 
     <div class="card">
+        <h2>Document Preferences</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">These settings are used when the grant agency doesn't specify formatting requirements. Agency requirements always take precedence.</p>
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label" for="doc_font">Font</label>
+                    <select class="form-select" id="doc_font" name="doc_font">
+                        <option value="Times New Roman" {% if profile.doc_font == 'Times New Roman' or not profile.doc_font %}selected{% endif %}>Times New Roman</option>
+                        <option value="Arial" {% if profile.doc_font == 'Arial' %}selected{% endif %}>Arial</option>
+                        <option value="Georgia" {% if profile.doc_font == 'Georgia' %}selected{% endif %}>Georgia</option>
+                        <option value="Palatino" {% if profile.doc_font == 'Palatino' %}selected{% endif %}>Palatino</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="doc_font_size">Font Size</label>
+                    <select class="form-select" id="doc_font_size" name="doc_font_size">
+                        <option value="10" {% if profile.doc_font_size == 10 %}selected{% endif %}>10 pt</option>
+                        <option value="11" {% if profile.doc_font_size == 11 %}selected{% endif %}>11 pt</option>
+                        <option value="12" {% if profile.doc_font_size == 12 or not profile.doc_font_size %}selected{% endif %}>12 pt</option>
+                        <option value="14" {% if profile.doc_font_size == 14 %}selected{% endif %}>14 pt</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="doc_line_spacing">Line Spacing</label>
+                    <select class="form-select" id="doc_line_spacing" name="doc_line_spacing">
+                        <option value="1.0" {% if profile.doc_line_spacing == 1.0 or not profile.doc_line_spacing %}selected{% endif %}>Single (1.0)</option>
+                        <option value="1.5" {% if profile.doc_line_spacing == 1.5 %}selected{% endif %}>1.5</option>
+                        <option value="2.0" {% if profile.doc_line_spacing == 2.0 %}selected{% endif %}>Double (2.0)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="doc_margins">Margins</label>
+                    <select class="form-select" id="doc_margins" name="doc_margins">
+                        <option value="0.5" {% if profile.doc_margins == 0.5 %}selected{% endif %}>0.5"</option>
+                        <option value="0.75" {% if profile.doc_margins == 0.75 %}selected{% endif %}>0.75"</option>
+                        <option value="1.0" {% if profile.doc_margins == 1.0 or not profile.doc_margins %}selected{% endif %}>1.0"</option>
+                        <option value="1.25" {% if profile.doc_margins == 1.25 %}selected{% endif %}>1.25"</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Document Preferences</button>
+        </form>
+    </div>
+
+    <div class="card">
         <h2>Notification Preferences</h2>
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

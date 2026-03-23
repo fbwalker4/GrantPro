@@ -404,6 +404,15 @@ CREATE INDEX IF NOT EXISTS idx_grant_shares_token ON grant_shares(share_token);
 CREATE INDEX IF NOT EXISTS idx_grant_shares_grant_id ON grant_shares(grant_id);
 
 -- ============================================================
+-- 7b. DOCUMENT PREFERENCES on user_profiles (2026-03-22)
+-- ============================================================
+
+ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS doc_font TEXT DEFAULT 'Times New Roman';
+ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS doc_font_size INTEGER DEFAULT 12;
+ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS doc_line_spacing REAL DEFAULT 1.0;
+ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS doc_margins REAL DEFAULT 1.0;
+
+-- ============================================================
 -- 8. SUBSCRIPTION LIFECYCLE TABLES (2026-03-22)
 -- ============================================================
 

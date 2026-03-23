@@ -1187,6 +1187,21 @@ def profile():
             'notify_new_grants': 1 if request.form.get('notify_new_grants') else 0,
             'reminder_days': reminder_days_str,
         }
+        # Document preference fields (only include if present in form)
+        if request.form.get('doc_font'):
+            profile_data['doc_font'] = request.form.get('doc_font')
+        if request.form.get('doc_font_size'):
+            profile_data['doc_font_size'] = safe_int(request.form.get('doc_font_size')) or 12
+        if request.form.get('doc_line_spacing'):
+            try:
+                profile_data['doc_line_spacing'] = float(request.form.get('doc_line_spacing'))
+            except (ValueError, TypeError):
+                pass
+        if request.form.get('doc_margins'):
+            try:
+                profile_data['doc_margins'] = float(request.form.get('doc_margins'))
+            except (ValueError, TypeError):
+                pass
         user_models.update_user_profile(user['id'], profile_data)
         
         # Update user table fields separately
@@ -4901,14 +4916,41 @@ def download_grant(grant_id, fmt):
             from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
             from reportlab.lib.enums import TA_CENTER, TA_LEFT
 
-            # --- Load agency-specific formatting rules ---
+            # --- Load formatting rules with preference hierarchy ---
+            # Priority: agency rules > user doc prefs > system defaults
             fmt_rules = {}
+            agency_has_rules = False
             try:
                 fmt_template = _tdata.get('agencies', {}).get(template_name, {}).get('formatting_rules', {})
                 if fmt_template:
                     fmt_rules = fmt_template
+                    # Agency has real rules if template is not 'generic'
+                    agency_has_rules = template_name != 'generic'
             except Exception:
                 pass
+
+            # If agency doesn't specify rules, use user document preferences
+            if not agency_has_rules:
+                try:
+                    user = get_current_user()
+                    _profile = user_models.get_user_profile(user['id'])
+                    if _profile:
+                        user_doc_prefs = {}
+                        if _profile.get('doc_font'):
+                            user_doc_prefs['font'] = _profile['doc_font']
+                        if _profile.get('doc_font_size'):
+                            user_doc_prefs['font_size_min'] = _profile['doc_font_size']
+                            user_doc_prefs['font_size_max'] = _profile['doc_font_size']
+                        if _profile.get('doc_line_spacing'):
+                            user_doc_prefs['line_spacing'] = _profile['doc_line_spacing']
+                        if _profile.get('doc_margins'):
+                            user_doc_prefs['margins_inches'] = _profile['doc_margins']
+                        # User prefs fill in where agency rules are absent
+                        merged = dict(user_doc_prefs)
+                        merged.update(fmt_rules)  # agency rules (if any) still win
+                        fmt_rules = merged
+                except Exception:
+                    pass
 
             # Font mapping: agency font names -> reportlab built-in fonts
             _font_map = {
