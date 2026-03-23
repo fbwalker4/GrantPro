@@ -1,0 +1,145 @@
+{% extends "layout.html" %}
+
+{% block title %}Smart Grant Matcher - Grant Pro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Find Your Best Grants</h1>
+        <p class="page-subtitle">Describe your project and we'll match it to the best federal funding opportunities</p>
+    </div>
+</div>
+
+<!-- Project Description Form -->
+<div class="card" style="margin-bottom: 2rem;">
+    <div class="card-header">
+        <h2 class="card-title">Describe Your Project</h2>
+    </div>
+    <form method="POST" action="/grants/match" id="matcherForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div style="margin-bottom: 1rem;">
+            <textarea name="project_description" id="projectDesc" rows="6"
+                placeholder="Example: We want to rehabilitate 20 affordable housing units in Gulfport, Mississippi for low-income families. Our nonprofit has been serving the Gulf Coast community for 15 years and we need funding for construction materials, labor, and project management."
+                style="width: 100%; padding: 0.875rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; font-size: 0.95rem; line-height: 1.6; resize: vertical; background: var(--bg-primary); color: var(--text-primary);"
+                >{{ project_desc }}</textarea>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <button type="submit" class="btn btn-primary" id="matchBtn" style="min-width: 200px;">
+                <span id="matchBtnText">Find Matching Grants</span>
+                <span id="matchBtnLoading" style="display: none;">
+                    <span class="spinner" style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 0.5rem;"></span>
+                    Analyzing grants...
+                </span>
+            </button>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">AI-powered matching typically takes 10-15 seconds</span>
+        </div>
+    </form>
+</div>
+
+<!-- Results -->
+{% if matches is not none %}
+<div style="margin-bottom: 1.5rem;">
+    <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">
+        {% if matches %}
+            {{ matches|length }} Grant{{ 's' if matches|length != 1 else '' }} Matched
+        {% else %}
+            No Matches Found
+        {% endif %}
+    </h2>
+    {% if matches %}
+    <p style="font-size: 0.9rem; color: var(--text-secondary);">Ranked by relevance to your project description</p>
+    {% endif %}
+</div>
+
+{% for match in matches %}
+<div class="card" style="margin-bottom: 1rem; border-left: 4px solid {% if match.score >= 90 %}#059669{% elif match.score >= 70 %}#2563eb{% else %}#d97706{% endif %};">
+    <div style="display: flex; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+        <!-- Score Badge -->
+        <div style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; min-width: 60px;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.25rem; color: #fff;
+                background: {% if match.score >= 90 %}#059669{% elif match.score >= 70 %}#2563eb{% else %}#d97706{% endif %};">
+                {{ match.score }}
+            </div>
+            <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                {% if match.score >= 90 %}Excellent{% elif match.score >= 70 %}Good{% else %}Possible{% endif %}
+            </span>
+        </div>
+
+        <!-- Grant Details -->
+        <div style="flex: 1; min-width: 0;">
+            <h3 style="font-size: 1.05rem; font-weight: 600; margin-bottom: 0.25rem; line-height: 1.4;">{{ match.title }}</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                <span>{{ match.agency }}</span>
+                {% if match.category %}
+                <span style="padding: 0.15rem 0.5rem; background: var(--bg-tertiary); border-radius: 4px; font-size: 0.8rem;">{{ match.category }}</span>
+                {% endif %}
+                {% if match.amount_max %}
+                <span style="font-weight: 600; color: var(--accent-success);">${{ "{:,.0f}".format(match.amount_min) }} - ${{ "{:,.0f}".format(match.amount_max) }}</span>
+                {% endif %}
+                {% if match.close_date %}
+                <span>Deadline: {{ match.close_date }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Match Reasons -->
+            {% if match.match_reasons %}
+            <div style="margin-bottom: 0.5rem;">
+                {% for reason in match.match_reasons %}
+                <div style="display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.3rem; font-size: 0.875rem;">
+                    <span style="color: #059669; flex-shrink: 0; margin-top: 2px;">&#10003;</span>
+                    <span>{{ reason }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Missing Requirements -->
+            {% if match.missing_requirements %}
+            <div style="margin-bottom: 0.5rem;">
+                {% for req in match.missing_requirements %}
+                <div style="display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.3rem; font-size: 0.875rem; color: var(--accent-warning);">
+                    <span style="flex-shrink: 0; margin-top: 2px;">&#9888;</span>
+                    <span>{{ req }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Match Notes -->
+            {% if match.match_notes %}
+            <p style="font-size: 0.85rem; color: var(--text-secondary); font-style: italic; margin-bottom: 0.75rem;">{{ match.match_notes }}</p>
+            {% endif %}
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <a href="/grants#{{ match.grant_id }}" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.4rem 1rem;">View Grant</a>
+                <a href="/wizard?grant_id={{ match.grant_id }}" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.4rem 1rem;">Start Application</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<style>
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
+
+<script>
+document.getElementById('matcherForm').addEventListener('submit', function() {
+    var desc = document.getElementById('projectDesc').value.trim();
+    if (!desc) return;
+
+    var btn = document.getElementById('matchBtn');
+    var btnText = document.getElementById('matchBtnText');
+    var btnLoading = document.getElementById('matchBtnLoading');
+
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+    btnText.style.display = 'none';
+    btnLoading.style.display = 'inline';
+});
+</script>
+{% endblock %}

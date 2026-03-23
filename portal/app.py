@@ -5403,6 +5403,42 @@ def api_award_detail(award_id):
     return jsonify({'award': award})
 
 
+# ============ SMART GRANT MATCHER ============
+
+@app.route('/grants/match', methods=['GET', 'POST'])
+@login_required
+@csrf_required
+def grant_matcher():
+    """Smart Grant Matcher -- describe your project, get matched grants"""
+    user = get_current_user()
+    matches = None
+    project_desc = ''
+
+    if request.method == 'POST':
+        project_desc = request.form.get('project_description', '').strip()
+        if not project_desc:
+            flash('Please describe your project.', 'error')
+        else:
+            try:
+                from grant_matcher import match_grants
+                from user_models import get_organization_details
+
+                org_profile = get_organization_details(user['id'])
+                state = None
+                if org_profile and org_profile.get('organization_details'):
+                    state = org_profile['organization_details'].get('state')
+
+                matches = match_grants(project_desc, org_profile, state)
+
+                if not matches:
+                    flash('No matching grants found. Try a different project description.', 'info')
+            except Exception as e:
+                logger.error(f'Grant matcher error: {e}')
+                flash('Grant matching encountered an error. Please try again.', 'error')
+
+    return render_template('grant_matcher.html', user=user, matches=matches, project_desc=project_desc)
+
+
 # ============ GRANT RESEARCH ROUTES ============
 
 @app.route('/research')
