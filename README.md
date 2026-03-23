@@ -965,6 +965,13 @@ app.run(debug=True, host='0.0.0.0', port=5001)
 
 ## Changelog
 
+### 2026-03-22 (Critical Flow Fixes: AI Prompt + Checklist + Submission Gate + CSRF)
+
+- **AI generation was using a minimal prompt instead of the detailed one.** The code built a comprehensive prompt with budget data, compliance rules, cross-section consistency, org details, and APA standards -- then threw it away and used a bare-bones prompt for the actual API call. Fixed: AI now uses the full detailed prompt.
+- **Checklist standard forms hardcoded green status.** SF-424 forms always showed as "Auto-generated" with green checkmarks even when data was missing. Fixed: shows actual status with amber "Needs Data" badge when incomplete.
+- **Submission gate was UI-only.** mark_submitted had no server-side readiness check. Fixed: returns to checklist with error if readiness < 100%.
+- **3 missing CSRF tokens found in pre-existing templates.** upgrade.html (all 5 plan forms), grant_form.html, and grant_detail.html AI generate fetch. These would have blocked all upgrades, grant assignment, and AI generation.
+
 ### 2026-03-22 (UI Polish: Design System + Mobile + Accessibility)
 
 - Cards aligned to dashboard design system (bg-card, border-color, radius-lg, shadow-md)
