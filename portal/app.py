@@ -3694,6 +3694,12 @@ def generate_section_content(grant_id, section_id):
     - If other sections are provided above, your project title, timeline, and key figures must be identical
     - If the agency requires applying through a state or intermediary, frame the application accordingly
 
+    **ABSOLUTE PROHIBITIONS:**
+    - NEVER use placeholder brackets like [Insert X], [Date], [Name], [TBD]. Fill in realistic values.
+    - NEVER fabricate citations. If you cannot cite a real source, use government data (Census Bureau, BLS, agency reports) or remove the citation entirely. Do NOT label anything as "illustrative" or "invented."
+    - NEVER use filler phrases like "it is important to note," "furthermore," "in conclusion." Be direct.
+    - NEVER output generic text. Every sentence must be specific to this organization and this grant.
+
     **TASK:**
     Write COMPELLING, GRANT-SPECIFIC content for this section that:
     1. Directly addresses {agency}'s exact requirements listed above
@@ -3701,12 +3707,13 @@ def generate_section_content(grant_id, section_id):
     3. Is CONSISTENT with the other sections already written (same project title, same personnel, same numbers)
     4. Uses the EXACT budget data provided above — do not invent different numbers
     5. Includes specific details about the applicant organization (use TRUTH DATA, not placeholders)
-    6. References the specific funding amount: ${amount_min:,.0f} - ${amount_max:,.0f}
+    6. References the specific funding amount ${amount_min:,.0f} - ${amount_max:,.0f} AND breaks it into cost categories (personnel, travel, equipment, etc.) even if approximate
     7. Is ready to submit — follows APA standards and agency-specific formatting rules
     8. Addresses the section's page/character limits appropriately
     9. Do NOT repeat large blocks of text that appear in other sections
-    10. Citations must be real, verifiable publications — do NOT fabricate references
+    10. Every citation must be a real, verifiable government report, academic paper, or agency publication
     11. Check every NON-NEGOTIABLE REQUIREMENT above and ensure your content addresses each one
+    12. All past grants from the TRUTH DATA must be mentioned as evidence of organizational capacity
 
     Write the complete section content now:"""
     
