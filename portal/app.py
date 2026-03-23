@@ -3472,8 +3472,10 @@ def generate_section_content(grant_id, section_id):
             if idr.get('max_rate'):
                 comp_notes.append(f"Indirect cost rate capped at {idr['max_rate']}%.")
             compliance_notes = "\n".join(f"- {n}" for n in comp_notes) if comp_notes else ""
+            # Load critical_rules for strongest-framing injection
+            critical_rules = agency_tmpl.get('critical_rules', [])
         except Exception:
-            pass
+            critical_rules = []
 
         # Load organization details: prefer CLIENT's profile for client grants, fallback to user's own
         user_org_info = ""
@@ -3584,11 +3586,19 @@ def generate_section_content(grant_id, section_id):
         except Exception as e:
             logger.warning(f'Budget data load for AI prompt failed: {e}')
 
+        # Build critical rules block
+        critical_rules_block = ""
+        if critical_rules:
+            rules_text = "\n".join(f"  {i+1}. {rule}" for i, rule in enumerate(critical_rules))
+            critical_rules_block = f"\n**NON-NEGOTIABLE AGENCY REQUIREMENTS (violation of ANY rule = automatic disqualification):**\n{rules_text}\n"
+
         prompt = f"""You are an expert grant writer specializing in federal grants for {agency}.
 
-    {"CRITICAL AGENCY-SPECIFIC GUIDANCE:" + chr(10) + agency_context + chr(10) if agency_context else ""}
-    {"COMPLIANCE REQUIREMENTS FOR THIS AGENCY:" + chr(10) + compliance_notes + chr(10) if compliance_notes else ""}
+    {"**MANDATORY AGENCY COMPLIANCE RULES (failure to follow these will result in automatic disqualification):**" + chr(10) + agency_context + chr(10) if agency_context else ""}
+    {critical_rules_block}
+    {"**REGULATORY COMPLIANCE REQUIREMENTS:**" + chr(10) + compliance_notes + chr(10) if compliance_notes else ""}
     {budget_prompt_block}
+    {f"**REQUESTED FUNDING: ${amount_min:,.0f} - ${amount_max:,.0f}. You MUST reference this specific dollar amount in your narrative to demonstrate financial feasibility.**" if not budget_prompt_block or 'budget' not in budget_prompt_block.lower() else ""}
     Generate content for a grant application section that is SPECIFIC to this exact grant.
     Do NOT use markdown tables. Use narrative format with clear headings.
     Do NOT include placeholder text — use the actual organization data provided below.
@@ -3611,7 +3621,7 @@ def generate_section_content(grant_id, section_id):
     **AGENCY REQUIREMENTS (must follow exactly):**
     {section_info.get('guidance', 'No specific guidance provided.')}
 
-    **APPLICANT ORGANIZATION:**
+    **APPLICANT ORGANIZATION (TRUTH DATA -- use these exact details, do not fabricate or substitute):**
     - Organization: {org_name}
     {user_org_info if user_org_info else ""}"""
 
@@ -3675,18 +3685,28 @@ def generate_section_content(grant_id, section_id):
     - Use active voice where possible
     {formatting_notes}
 
+    **TRUTH DATA CONSISTENCY CHECK (before writing, verify your content will satisfy ALL of these):**
+    - Organization name must appear as "{org_name}" exactly -- no abbreviations or alterations
+    - All dollar amounts must match the budget data above (if provided) or the funding range ${amount_min:,.0f} - ${amount_max:,.0f}
+    - All personnel names, roles, and salaries must match the budget data exactly
+    - Past grant amounts and agencies must match the applicant data above
+    - Location, EIN, UEI must match the applicant data above
+    - If other sections are provided above, your project title, timeline, and key figures must be identical
+    - If the agency requires applying through a state or intermediary, frame the application accordingly
+
     **TASK:**
     Write COMPELLING, GRANT-SPECIFIC content for this section that:
     1. Directly addresses {agency}'s exact requirements listed above
-    2. Follows ALL compliance requirements for this agency
+    2. Follows ALL mandatory compliance rules and critical agency requirements listed above
     3. Is CONSISTENT with the other sections already written (same project title, same personnel, same numbers)
     4. Uses the EXACT budget data provided above — do not invent different numbers
-    5. Includes specific details about the applicant organization (use real data, not placeholders)
-    6. Fits within the funding amount: ${amount_min:,.0f} - ${amount_max:,.0f}
+    5. Includes specific details about the applicant organization (use TRUTH DATA, not placeholders)
+    6. References the specific funding amount: ${amount_min:,.0f} - ${amount_max:,.0f}
     7. Is ready to submit — follows APA standards and agency-specific formatting rules
     8. Addresses the section's page/character limits appropriately
     9. Do NOT repeat large blocks of text that appear in other sections
     10. Citations must be real, verifiable publications — do NOT fabricate references
+    11. Check every NON-NEGOTIABLE REQUIREMENT above and ensure your content addresses each one
 
     Write the complete section content now:"""
     

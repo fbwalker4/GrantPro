@@ -179,7 +179,7 @@
           "required": false,
           "can_generate": true,
           "requires_signed_upload": true,
-          "generate_prompt": "Draft a letter of collaboration from [partner] confirming their role in [project]. Use the NSF-approved format: brief, factual statements only. State the collaborator's name, organization, and specific contribution. Do NOT include endorsements or praise — NSF restricts letters of collaboration to factual commitments. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED.",
+          "generate_prompt": "Draft a letter of collaboration from [partner] confirming their role in [project]. Use the NSF-approved format: brief, factual statements only. State the collaborator's name, organization, and specific contribution. Do NOT include endorsements or praise \u2014 NSF restricts letters of collaboration to factual commitments. Label clearly as DRAFT \u2014 TO BE CUSTOMIZED AND SIGNED.",
           "upload_instructions": "After generating a draft, print it, have the partner review and edit it, then get it signed on their letterhead. Upload the signed version here.",
           "form_number": "N/A"
         },
@@ -334,7 +334,15 @@
           "Palatino Linotype"
         ],
         "notes": "Research.gov auto-checks compliance. Minimum 11pt for body text, 10pt for captions/footnotes."
-      }
+      },
+      "critical_rules": [
+        "Project Summary must contain three labeled sections: Overview, Intellectual Merit, and Broader Impacts",
+        "Must address both Intellectual Merit and Broader Impacts review criteria throughout",
+        "Biosketches must use SciENcv format",
+        "Senior personnel must certify non-participation in Malign Foreign Talent Recruitment Programs",
+        "Must follow current PAPPG (NSF 24-1) requirements",
+        "Results from Prior NSF Support must be included if PI has had prior NSF funding"
+      ]
     },
     "doe": {
       "name": "Department of Energy (DOE)",
@@ -363,7 +371,7 @@
           "name": "Project Narrative",
           "required": true,
           "max_pages": 15,
-          "guidance": "Describe: (1) significance/objectives, (2) approach/methods, (3) innovation, (4) timeline/milestones, (5) deliverables. Address DOE policy priorities if applicable.",
+          "guidance": "Describe: (1) significance/objectives, (2) approach/methods, (3) innovation, (4) timeline/milestones, (5) deliverables. Address DOE policy priorities if applicable. Must state Technology Readiness Level (TRL) for technology development proposals. Must address NEPA compliance requirements.",
           "components": [
             "objectives",
             "approach",
@@ -496,7 +504,7 @@
           "required": false,
           "can_generate": true,
           "requires_signed_upload": true,
-          "generate_prompt": "Draft a letter of commitment from [partner] confirming their role and resource contributions to [project] for a DOE grant application. Include the partner's specific commitments (facilities, equipment, personnel, expertise), the duration of their involvement, and any cost-sharing contributions. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED.",
+          "generate_prompt": "Draft a letter of commitment from [partner] confirming their role and resource contributions to [project] for a DOE grant application. Include the partner's specific commitments (facilities, equipment, personnel, expertise), the duration of their involvement, and any cost-sharing contributions. Label clearly as DRAFT \u2014 TO BE CUSTOMIZED AND SIGNED.",
           "upload_instructions": "After generating a draft, print it, have the partner review and edit it, then get it signed on their letterhead. Upload the signed version here."
         }
       ],
@@ -612,7 +620,14 @@
           "Arial"
         ],
         "notes": "11pt minimum. Times New Roman or Arial."
-      }
+      },
+      "critical_rules": [
+        "NEPA compliance is critical -- must include environmental questionnaire",
+        "Buy America requirements apply to infrastructure projects",
+        "Davis-Bacon applies to construction projects, especially under IIJA/BIL funding",
+        "Technology Readiness Level (TRL) must be clearly stated for technology development proposals",
+        "DOE uses specific cost principles for for-profit entities under 2 CFR 910"
+      ]
     },
     "nih": {
       "name": "National Institutes of Health (NIH)",
@@ -716,7 +731,7 @@
           "required": false,
           "can_generate": true,
           "requires_signed_upload": true,
-          "generate_prompt": "Draft a letter of support from [partner] confirming their role in [project] for an NIH grant application. Include the collaborator's qualifications, their specific contribution to the project, and any resources they will provide. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED.",
+          "generate_prompt": "Draft a letter of support from [partner] confirming their role in [project] for an NIH grant application. Include the collaborator's qualifications, their specific contribution to the project, and any resources they will provide. Label clearly as DRAFT \u2014 TO BE CUSTOMIZED AND SIGNED.",
           "upload_instructions": "After generating a draft, print it, have the partner review and edit it, then get it signed on their letterhead. Upload the signed version here."
         },
         {
@@ -855,7 +870,15 @@
           "Palatino Linotype"
         ],
         "notes": "No less than 11pt for body text. No less than 6pt for figures, legends, and footnotes. 0.5-inch margins minimum."
-      }
+      },
+      "critical_rules": [
+        "Specific Aims page (1 page) is the most critical component -- must be compelling and concise",
+        "Research Strategy must address Significance, Innovation, and Approach",
+        "Biosketches must use SciENcv format (same as NSF)",
+        "IRB approval required before human subjects research can begin",
+        "Must use PHS398 budget forms",
+        "Authentication of Key Biological and/or Chemical Resources required"
+      ]
     },
     "usda": {
       "name": "USDA (Rural Development / SBIR)",
@@ -1091,7 +1114,13 @@
           "Helvetica"
         ],
         "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
-      }
+      },
+      "critical_rules": [
+        "NIFA research grants have a 30% statutory cap on indirect costs",
+        "Must demonstrate relevance to agriculture, food systems, or rural development",
+        "Land-grant institution status (1862, 1890, 1994) affects eligibility for certain programs",
+        "Davis-Bacon applies to construction in some Rural Development programs"
+      ]
     },
     "epa": {
       "name": "EPA (Environmental Protection Agency)",
@@ -1118,7 +1147,7 @@
           "name": "Project Narrative",
           "required": true,
           "max_pages": 10,
-          "guidance": "Include: (1) statement of work, (2) quality assurance if applicable, (3) timeout milestones, (4) environmental outcomes, (5) transfer/promotion plan.",
+          "guidance": "Include: (1) statement of work, (2) quality assurance if applicable, (3) timeout milestones, (4) environmental outcomes, (5) transfer/promotion plan. Must address Quality Assurance Project Plan (QAPP) requirements for any data collection. Must address MBE/WBE utilization targets. For EJ programs, must include EJ screening tool results demonstrating disproportionate impact.",
           "components": [
             "work",
             "qa",
@@ -1303,7 +1332,14 @@
           "Arial"
         ],
         "notes": "Single-spaced. 12pt Times New Roman or Arial."
-      }
+      },
+      "critical_rules": [
+        "Quality Assurance Project Plan (QAPP) is required for any environmental data collection",
+        "Must address MBE/WBE (Minority/Women Business Enterprise) utilization targets",
+        "Environmental Justice grants must address disproportionate impacts on underserved communities with EJ screening tool data",
+        "Title VI compliance is mandatory, especially for EJ programs",
+        "Brownfields programs require state environmental authority letter of acknowledgment"
+      ]
     },
     "dot": {
       "name": "DOT (Department of Transportation)",
@@ -1537,7 +1573,13 @@
           "Helvetica"
         ],
         "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
-      }
+      },
+      "critical_rules": [
+        "Benefit-Cost Analysis (BCA) is mandatory for most competitive programs",
+        "Must address all merit criteria: safety, economic competitiveness, quality of life, environmental sustainability, innovation, state of good repair",
+        "Davis-Bacon applies to all federally funded construction contracts over $2,000",
+        "Buy America requirements apply to infrastructure materials"
+      ]
     },
     "nist": {
       "name": "NIST (National Institute of Standards and Technology)",
@@ -1633,7 +1675,7 @@
           "required": false,
           "can_generate": true,
           "requires_signed_upload": true,
-          "generate_prompt": "Draft a letter of support from [partner] confirming their role in [project] for a NIST grant application. Include the industry partner's commitment, specific technical contributions, and any cost-sharing or in-kind support. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED.",
+          "generate_prompt": "Draft a letter of support from [partner] confirming their role in [project] for a NIST grant application. Include the industry partner's commitment, specific technical contributions, and any cost-sharing or in-kind support. Label clearly as DRAFT \u2014 TO BE CUSTOMIZED AND SIGNED.",
           "upload_instructions": "After generating a draft, print it, have the partner review and edit it, then get it signed on their letterhead. Upload the signed version here."
         }
       ],
@@ -1743,7 +1785,12 @@
           "Helvetica"
         ],
         "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
-      }
+      },
+      "critical_rules": [
+        "Must connect to NIST mission: standards, measurement, or manufacturing",
+        "Bayh-Dole IP provisions are critical -- NIST is the lead agency on march-in rights",
+        "MEP Centers require cost-sharing (typically 2:1 non-federal to federal)"
+      ]
     },
     "generic": {
       "name": "Generic Federal Grant",
@@ -1884,7 +1931,7 @@
           "required": false,
           "can_generate": true,
           "requires_signed_upload": true,
-          "generate_prompt": "Draft a letter of support from [partner] confirming their role in [project] for an HHS grant application. Include the partner's qualifications, their specific commitment, and how the partnership strengthens the project. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED.",
+          "generate_prompt": "Draft a letter of support from [partner] confirming their role in [project] for an HHS grant application. Include the partner's qualifications, their specific commitment, and how the partnership strengthens the project. Label clearly as DRAFT \u2014 TO BE CUSTOMIZED AND SIGNED.",
           "upload_instructions": "After generating a draft, print it, have the partner review and edit it, then get it signed on their letterhead. Upload the signed version here.",
           "form_number": "N/A"
         },
@@ -1990,7 +2037,8 @@
           "Helvetica"
         ],
         "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
-      }
+      },
+      "critical_rules": []
     },
     "nea": {
       "name": "NEA - Grants for Arts Projects",
@@ -2215,7 +2263,8 @@
           "Helvetica"
         ],
         "notes": "12pt, clear legible font, standard margins."
-      }
+      },
+      "critical_rules": []
     },
     "nea_challenge": {
       "name": "NEA - Challenge America",
@@ -2423,7 +2472,8 @@
           "Helvetica"
         ],
         "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
-      }
+      },
+      "critical_rules": []
     },
     "artist_individual": {
       "name": "Artist Individual Grant",
@@ -2588,7 +2638,8 @@
           "Helvetica"
         ],
         "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
-      }
+      },
+      "critical_rules": []
     },
     "micro_grant": {
       "name": "Micro-Grant (Under $5K)",
@@ -2733,7 +2784,8 @@
           "Helvetica"
         ],
         "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
-      }
+      },
+      "critical_rules": []
     },
     "small_business_grant": {
       "name": "Small Business Grant",
@@ -2937,7 +2989,8 @@
           "Helvetica"
         ],
         "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
-      }
+      },
+      "critical_rules": []
     },
     "community_project": {
       "name": "Community Project Grant",
@@ -3066,7 +3119,7 @@
           "required": true,
           "can_generate": true,
           "requires_signed_upload": true,
-          "generate_prompt": "Draft a letter of support from [partner] confirming their backing for [project] as a community project grant. Include the stakeholder's connection to the community, their specific endorsement, and how they will support or benefit from the project. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED.",
+          "generate_prompt": "Draft a letter of support from [partner] confirming their backing for [project] as a community project grant. Include the stakeholder's connection to the community, their specific endorsement, and how they will support or benefit from the project. Label clearly as DRAFT \u2014 TO BE CUSTOMIZED AND SIGNED.",
           "upload_instructions": "After generating a draft, print it, have the partner review and edit it, then get it signed on their letterhead. Upload the signed version here."
         }
       ],
@@ -3131,7 +3184,8 @@
           "Helvetica"
         ],
         "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
-      }
+      },
+      "critical_rules": []
     },
     "education": {
       "name": "Department of Education (ED)",
@@ -3198,14 +3252,14 @@
           "name": "Project Abstract",
           "required": true,
           "max_pages": 1,
-          "guidance": "One-page summary: project title, absolute priority, target population, summary of activities, expected outcomes, name of subgrantees (if known)."
+          "guidance": "One-page summary: project title, absolute priority, target population, summary of activities, expected outcomes, name of subgrantees (if known). Must include GEPA Section 427 statement on equitable access for special populations."
         },
         {
           "id": "project_narrative",
           "name": "Project Narrative",
           "required": true,
           "max_pages": 25,
-          "guidance": "Must address absolute, competitive and invitational priorities. Include: (1) need/population, (2) objectives, (3) methods, (4) management plan, (5) evaluation, (6) supporting documents.",
+          "guidance": "Must address absolute, competitive and invitational priorities. Include: (1) need/population, (2) objectives, (3) methods, (4) management plan, (5) evaluation, (6) supporting documents. Must include a logic model or theory of change that maps: inputs -> activities -> outputs -> short-term outcomes -> long-term outcomes. This is standard for ED evidence-based programs and its absence will be flagged by reviewers.",
           "components": [
             "need",
             "objectives",
@@ -3242,7 +3296,7 @@
           "name": "Evaluation Plan",
           "required": true,
           "max_pages": 3,
-          "guidance": "Describe evaluation design: logic model, research questions, data collection, analysis methods, how outcomes will be measured."
+          "guidance": "Describe evaluation design: logic model, research questions, data collection, analysis methods, how outcomes will be measured. Must include a logic model or theory of change that explicitly maps: inputs -> activities -> outputs -> short-term outcomes -> long-term outcomes. Include both formative and summative evaluation components."
         },
         {
           "id": "response_to_prior_feedback",
@@ -3403,7 +3457,14 @@
           "Times New Roman"
         ],
         "notes": "Double-spaced per EDGAR requirements. 1-inch margins. 12pt font."
-      }
+      },
+      "critical_rules": [
+        "Must include a logic model or theory of change mapping: inputs -> activities -> outputs -> short-term outcomes -> long-term outcomes",
+        "Must address all absolute, competitive, and invitational priorities from the NOFO",
+        "Must include a GEPA Section 427 statement on equitable access for special populations",
+        "FERPA compliance must be addressed for any project involving student data",
+        "Supplement-not-supplant rules apply to formula programs"
+      ]
     },
     "hud": {
       "name": "HUD (Housing and Urban Development)",
@@ -3591,7 +3652,7 @@
           "required": false,
           "can_generate": true,
           "requires_signed_upload": true,
-          "generate_prompt": "Draft a Memorandum of Understanding (MOU) between [applicant organization] and [CHDO or service provider partner] for a HUD housing project. Include the purpose of the partnership, roles and responsibilities of each party, duration of the agreement, scope of services, and any resource commitments. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED BY BOTH PARTIES.",
+          "generate_prompt": "Draft a Memorandum of Understanding (MOU) between [applicant organization] and [CHDO or service provider partner] for a HUD housing project. Include the purpose of the partnership, roles and responsibilities of each party, duration of the agreement, scope of services, and any resource commitments. Label clearly as DRAFT \u2014 TO BE CUSTOMIZED AND SIGNED BY BOTH PARTIES.",
           "upload_instructions": "After generating a draft, print it, have both parties review and edit it, then get it signed by authorized representatives from both organizations on official letterhead. Upload the signed version here.",
           "form_number": "N/A"
         },
@@ -3690,7 +3751,14 @@
           "Times New Roman"
         ],
         "notes": "Single or 1.5 spacing depending on program. Check specific NOFA for spacing requirements."
-      }
+      },
+      "critical_rules": [
+        "Davis-Bacon prevailing wage requirements apply to ALL construction/rehabilitation over $2,000",
+        "Section 3 applies: must provide employment/contracting opportunities to low-income residents",
+        "Environmental review is delegated to the grantee (not HUD) -- must complete before committing funds",
+        "Must demonstrate proactive Affirmatively Furthering Fair Housing (AFFH) obligations",
+        "NEPA compliance is the grantee's responsibility, not HUD's"
+      ]
     },
     "nasa": {
       "name": "NASA (National Aeronautics and Space Administration)",
@@ -3945,7 +4013,14 @@
           "Helvetica"
         ],
         "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
-      }
+      },
+      "critical_rules": [
+        "Export control (ITAR/EAR) must be addressed -- space technology overlaps with USML Category IV",
+        "All foreign nationals on the team must be disclosed and may require Technology Assistance Agreements",
+        "Technology Readiness Level (TRL) must be clearly stated",
+        "New Technology reporting is mandatory for all inventions",
+        "EPSCoR is limited to 28 eligible jurisdictions -- verify eligibility before applying"
+      ]
     },
     "dod": {
       "name": "DOD (Department of Defense)",
@@ -4224,7 +4299,14 @@
           "Helvetica"
         ],
         "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
-      }
+      },
+      "critical_rules": [
+        "ITAR restrictions may restrict foreign national participation -- must address in proposal",
+        "DFARS cybersecurity requirements (NIST SP 800-171) apply to Controlled Unclassified Information (CUI)",
+        "Must have adequate accounting system before award -- DCAA audits are thorough",
+        "DOD grants are primarily for BASIC RESEARCH -- applied research typically uses contracts or OTs",
+        "Cost Accounting Standards apply to large awards"
+      ]
     },
     "fema": {
       "name": "FEMA (Federal Emergency Management Agency)",
@@ -4295,7 +4377,7 @@
           "name": "Project Narrative",
           "required": true,
           "max_pages": 15,
-          "guidance": "Include: (1) statement of problem/need, (2) scope of work, (3) methodology, (4) timeline/milestones, (5) evaluation criteria, (6) sustainability.",
+          "guidance": "Include: (1) statement of problem/need, (2) scope of work, (3) methodology, (4) timeline/milestones, (5) evaluation criteria, (6) sustainability. CRITICAL: FEMA HMGP funding flows through State Emergency Management Agencies. Your narrative must frame the applicant as working through/with their state EMA (e.g., Mississippi Emergency Management Agency), NOT as a direct FEMA applicant. Failure to demonstrate this relationship will result in disqualification. Must reference consistency with the approved state or local Hazard Mitigation Plan. Must include or reference a Benefit-Cost Analysis (BCA) demonstrating BCR > 1.0.",
           "components": [
             "problem",
             "scope",
@@ -4312,7 +4394,7 @@
           "forms_required": [
             "SF424A"
           ],
-          "guidance": "Detailed budget. FEMA grants require cost sharing in many programs - document match clearly. Justify all costs."
+          "guidance": "Detailed budget. FEMA grants require 75/25 federal/non-federal cost sharing -- document match clearly with specific sources. Justify all costs. Must demonstrate the 75/25 cost share split with line-item detail."
         },
         {
           "id": "budget_justification",
@@ -4337,7 +4419,7 @@
           "id": "risk_analysis",
           "name": "Risk Analysis",
           "required": false,
-          "guidance": "For some programs: describe hazard risk being addressed, probability, consequences, how project reduces risk."
+          "guidance": "Describe hazard risk being addressed, probability, consequences, how project reduces risk. Must reference BCA Toolkit analysis with BCR > 1.0. Show consistency with state/local Hazard Mitigation Plan."
         }
       ],
       "required_documents": [
@@ -4484,7 +4566,15 @@
           "Helvetica"
         ],
         "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
-      }
+      },
+      "critical_rules": [
+        "Applicant must apply through their State Emergency Management Agency (SEMA), not directly to FEMA",
+        "Must demonstrate 75/25 federal/non-federal cost share",
+        "Must reference consistency with the state or local Hazard Mitigation Plan",
+        "Must include a Benefit-Cost Analysis demonstrating BCR > 1.0",
+        "HMGP is only available after a Presidential disaster declaration -- reference the specific declaration if known",
+        "NEPA review is conducted by FEMA, not the applicant -- do not claim the applicant will perform NEPA review"
+      ]
     },
     "dol": {
       "name": "Department of Labor (DOL)",
@@ -4756,7 +4846,14 @@
           "Helvetica"
         ],
         "notes": "Default formatting. 12pt Times New Roman, 1-inch margins, single-spaced."
-      }
+      },
+      "critical_rules": [
+        "Must align with WIOA performance indicators and track six specific outcome measures",
+        "Must demonstrate strong employer engagement and demand-driven workforce development",
+        "YouthBuild programs require Davis-Bacon compliance for construction training",
+        "Must identify specific target populations being served (disconnected youth, returning citizens, veterans, etc.)",
+        "Quarterly financial (ETA-9130) and performance reports are required"
+      ]
     },
     "doj": {
       "name": "DOJ (Department of Justice)",
@@ -4831,7 +4928,7 @@
           "name": "Statement of the Problem",
           "required": true,
           "max_pages": 5,
-          "guidance": "Describe the crime/public safety problem: data, trends, root causes, impact on community. Show why intervention needed.",
+          "guidance": "Describe the crime/public safety problem: data, trends, root causes, impact on community. Show why intervention needed. Must include local crime statistics and data trends, not just national data. Reference specific budget amounts when describing the scale of response needed.",
           "components": [
             "problem",
             "data",
@@ -4844,7 +4941,7 @@
           "name": "Project Design",
           "required": true,
           "max_pages": 10,
-          "guidance": "Describe: (1) goals/objectives, (2) activities/services, (3) how addresses problem, (4) innovation, (5) partnerships, (6) timeline.",
+          "guidance": "Describe: (1) goals/objectives, (2) activities/services, (3) how addresses problem, (4) innovation, (5) partnerships, (6) timeline. Must reference specific budget figures and connect proposed activities to their associated costs to demonstrate financial feasibility and planning.",
           "components": [
             "goals",
             "activities",
@@ -4867,7 +4964,7 @@
           "id": "budget_justification",
           "name": "Budget Justification",
           "required": true,
-          "guidance": "Explain each line item. Show costs are reasonable, necessary, allowable. Address match if required."
+          "guidance": "Explain each line item. Show costs are reasonable, necessary, allowable. Address match if required. Connect each cost to specific program activities described in the project design. Reference actual dollar amounts throughout narrative sections."
         },
         {
           "id": "organizational_capacity",
@@ -5015,7 +5112,7 @@
           "required": false,
           "can_generate": true,
           "requires_signed_upload": true,
-          "generate_prompt": "Draft a letter of support from [partner] confirming their partnership and support for [project] as part of a DOJ grant application. Include the partner's role (law enforcement, community organization, or government office), their specific commitment, and how the partnership advances public safety or justice goals. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED.",
+          "generate_prompt": "Draft a letter of support from [partner] confirming their partnership and support for [project] as part of a DOJ grant application. Include the partner's role (law enforcement, community organization, or government office), their specific commitment, and how the partnership advances public safety or justice goals. Label clearly as DRAFT \u2014 TO BE CUSTOMIZED AND SIGNED.",
           "upload_instructions": "After generating a draft, print it, have the partner review and edit it, then get it signed on their letterhead. Upload the signed version here.",
           "form_number": "N/A"
         },
@@ -5026,7 +5123,7 @@
           "required": false,
           "can_generate": true,
           "requires_signed_upload": true,
-          "generate_prompt": "Draft a Memorandum of Understanding (MOU) between [applicant organization] and [partner agency] for a DOJ grant project. Include the purpose of the partnership, roles and responsibilities of each party, specific services to be provided, duration of the agreement, data sharing provisions, and any resource commitments. Label clearly as DRAFT — TO BE CUSTOMIZED AND SIGNED BY BOTH PARTIES.",
+          "generate_prompt": "Draft a Memorandum of Understanding (MOU) between [applicant organization] and [partner agency] for a DOJ grant project. Include the purpose of the partnership, roles and responsibilities of each party, specific services to be provided, duration of the agreement, data sharing provisions, and any resource commitments. Label clearly as DRAFT \u2014 TO BE CUSTOMIZED AND SIGNED BY BOTH PARTIES.",
           "upload_instructions": "After generating a draft, print it, have both parties review and edit it, then get it signed by authorized representatives from both organizations on official letterhead. Upload the signed version here.",
           "form_number": "N/A"
         }
@@ -5100,7 +5197,14 @@
           "Times New Roman"
         ],
         "notes": "Double-spaced. Page limits strictly enforced. Times New Roman preferred."
-      }
+      },
+      "critical_rules": [
+        "Must reference specific budget figures and connect proposed activities to their associated costs",
+        "Must include performance measurement plan with measurable outcomes",
+        "OVW grants require strict VAWA confidentiality protections -- victim information cannot be shared without informed consent",
+        "Faith-based organizations cannot use DOJ funds for inherently religious activities",
+        "Must demonstrate data-driven understanding of crime/public safety problem with local statistics"
+      ]
     }
   },
   "common_requirements": {
