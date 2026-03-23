@@ -563,7 +563,20 @@ Automated pipeline:
 5. Admin reviews at `/admin/testimonials`
 6. Approved testimonials displayed on landing page
 
-### 13. Subscription Lifecycle Management (IN PROGRESS)
+### 13. NOFO Parser -- Real Grant Requirements from Grants.gov (LIVE)
+
+When a user starts a grant application, GrantPro fetches the ACTUAL NOFO document from Grants.gov and extracts grant-specific requirements using AI:
+
+1. **Search:** Grants.gov REST API (public, no auth) by opportunity number
+2. **Fetch:** Download NOFO PDF/DOCX attachment from Grants.gov
+3. **Extract:** PDF text extraction via pdfplumber/pypdf/pdftotext
+4. **Parse:** Gemini 2.5 Flash extracts structured data: required sections, evaluation criteria, eligibility rules, compliance requirements, submission instructions, match requirements, page limits, formatting rules
+5. **Store:** `grant_requirements` table per application
+6. **Override:** NOFO sections replace generic template sections in the grant detail, editor, and AI generation
+
+Falls back to generic agency templates if Grants.gov fetch fails.
+
+### 14. Subscription Lifecycle Management (IN PROGRESS)
 
 Full subscription lifecycle covering retention, dunning, suspension, data export, and account deletion:
 
