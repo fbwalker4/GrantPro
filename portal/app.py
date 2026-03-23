@@ -4643,14 +4643,17 @@ def mark_submitted(grant_id):
     if request.method == 'POST':
         # Server-side gate: verify checklist readiness before allowing submission
         try:
-            checklist_data = _build_checklist_data(grant_id, grant, conn)
+            user = get_current_user()
+            tmpl_name = grant['template'] if grant['template'] else 'generic'
+            checklist_data = _build_checklist_data(grant_id, user['id'], tmpl_name)
             readiness_pct = checklist_data.get('readiness_pct', 0)
             if readiness_pct < 100:
                 flash(f'Cannot submit: checklist is only {readiness_pct}% complete. Please complete all required items first.', 'error')
                 conn.close()
                 return redirect(url_for('grant_checklist', grant_id=grant_id))
-        except Exception:
-            pass  # If checklist check fails, allow submission (don't block on checklist bugs)
+        except Exception as e:
+            logger.warning(f'Checklist gate check failed for grant {grant_id}: {e}')
+            # Don't silently skip -- log it, but allow submission to avoid blocking users on checklist bugs
 
         submission_date = request.form.get('submission_date', datetime.now().strftime('%Y-%m-%d'))
         confirmation_number = request.form.get('confirmation_number', '')
@@ -4811,7 +4814,7 @@ def download_grant(grant_id, fmt):
             # Meta
             doc.add_paragraph(f"Agency: {grant['agency']}")
             doc.add_paragraph(f"Organization: {grant['organization_name']}")
-            doc.add_paragraph(f"Amount: ${grant['amount']:,.2f}")
+            doc.add_paragraph(f"Amount: ${float(grant['amount'] or 0):,.2f}")
             doc.add_paragraph(f"Deadline: {grant['deadline']}")
             
             doc.add_page_break()
