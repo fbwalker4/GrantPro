@@ -3171,6 +3171,23 @@ def start_application(grant_id):
         user_models.increment_grant_count(session['user_id'])
         conn.close()
 
+        # Fetch and parse NOFO requirements if opportunity number exists
+        try:
+            from nofo_parser import fetch_and_parse_nofo
+            opp_num = research_grant.get('opportunity_number')
+            if opp_num:
+                logger.info(f"Fetching NOFO for {opp_num}")
+                fetch_and_parse_nofo(
+                    opportunity_number=opp_num,
+                    grant_id=new_grant_id,
+                    user_id=user_id,
+                    grant_name=research_grant.get('title', ''),
+                    agency=research_grant.get('agency', '')
+                )
+        except Exception as e:
+            logger.warning(f"NOFO fetch failed (non-blocking): {e}")
+            # Non-blocking: if NOFO fetch fails, the user still gets the generic template
+
         flash(f'Grant started for {research_grant.get("title", "grant")}', 'success')
         return redirect(url_for('grant_detail', grant_id=new_grant_id))
 
@@ -3225,7 +3242,25 @@ def grant_detail(grant_id):
             {'id': 'letters_of_support', 'name': 'Letters of Support', 'guidance': 'Include supporting letters from collaborators.'},
             {'id': 'timeline', 'name': 'Timeline', 'guidance': 'Provide a project timeline with milestones.'}
         ]
-    
+
+    # Check for NOFO-specific requirements (override generic template)
+    evaluation_criteria = []
+    nofo_reqs = None
+    compliance_requirements = []
+    try:
+        from nofo_parser import get_grant_requirements
+        nofo_reqs = get_grant_requirements(grant_id)
+        if nofo_reqs and nofo_reqs.get('required_sections'):
+            # Use NOFO sections instead of generic template sections
+            template_sections = nofo_reqs['required_sections']
+            # Also pass evaluation criteria and compliance for display
+            evaluation_criteria = nofo_reqs.get('evaluation_criteria', [])
+            compliance_requirements = nofo_reqs.get('compliance_requirements', [])
+    except Exception:
+        nofo_reqs = None
+        evaluation_criteria = []
+        compliance_requirements = []
+
     existing_sections = {d['section']: d for d in drafts}
 
     budget_total = None
@@ -3238,7 +3273,9 @@ def grant_detail(grant_id):
                          existing_sections=existing_sections,
                          template_sections=template_sections,
                          template_name=template_name,
-                         budget_total=budget_total)
+                         budget_total=budget_total,
+                         evaluation_criteria=evaluation_criteria,
+                         nofo_reqs=nofo_reqs)
 
 @app.route('/grant/<grant_id>/section/<section>', methods=['GET', 'POST'])
 @login_required
@@ -3299,7 +3336,26 @@ def grant_section(grant_id, section):
             if s.get('id') == section:
                 section_guidance = s
                 break
-    
+
+    # Override section guidance with NOFO-specific if available
+    try:
+        from nofo_parser import get_grant_requirements
+        nofo_reqs = get_grant_requirements(grant_id)
+        if nofo_reqs:
+            for ns in nofo_reqs.get('required_sections', []):
+                if ns.get('id') == section or ns.get('name', '').lower().replace(' ', '_') == section:
+                    section_guidance = {
+                        'id': section,
+                        'name': ns.get('name', section),
+                        'guidance': ns.get('guidance', ''),
+                        'max_pages': ns.get('max_pages'),
+                        'max_chars': ns.get('max_chars'),
+                        'required': ns.get('required', True),
+                    }
+                    break
+    except Exception:
+        pass
+
     # Load agency formatting rules for the editor banner
     formatting_rules = {}
     try:
@@ -3411,6 +3467,29 @@ def generate_section_content(grant_id, section_id):
                     section_info = s
                     break
 
+        # Override template section with NOFO-specific requirements if available
+        nofo_reqs_for_gen = None
+        try:
+            from nofo_parser import get_grant_requirements
+            nofo_reqs_for_gen = get_grant_requirements(grant_id)
+            if nofo_reqs_for_gen:
+                nofo_sections = nofo_reqs_for_gen.get('required_sections', [])
+                for ns in nofo_sections:
+                    if ns.get('id') == section_id or ns.get('name', '').lower().replace(' ', '_') == section_id:
+                        # Override section info with NOFO-specific data
+                        section_info = {
+                            'id': section_id,
+                            'name': ns.get('name', section_id),
+                            'guidance': ns.get('guidance', section_info.get('guidance', '') if section_info else ''),
+                            'max_pages': ns.get('max_pages') or (section_info.get('max_pages') if section_info else None),
+                            'max_chars': ns.get('max_chars') or (section_info.get('max_chars') if section_info else None),
+                            'required': ns.get('required', True),
+                            'components': ns.get('components', [])
+                        }
+                        break
+        except Exception as e:
+            logger.warning(f"NOFO requirements load failed in generate: {e}")
+
         if not section_info:
             # Try to find in drafts
             existing = conn.execute('''
@@ -3501,6 +3580,20 @@ def generate_section_content(grant_id, section_id):
             critical_rules = agency_tmpl.get('critical_rules', [])
         except Exception:
             critical_rules = []
+
+        # Inject NOFO-specific evaluation criteria and compliance into the prompt
+        nofo_eval_block = ""
+        try:
+            if nofo_reqs_for_gen:
+                eval_criteria = nofo_reqs_for_gen.get('evaluation_criteria', [])
+                if eval_criteria:
+                    criteria_text = "\n".join(f"- {c['criterion']} ({c.get('weight','?')}): {c.get('description','')}" for c in eval_criteria)
+                    nofo_eval_block = f"\n**NOFO EVALUATION CRITERIA (reviewers will score your application on these):**\n{criteria_text}\n"
+                nofo_compliance = nofo_reqs_for_gen.get('compliance_requirements', [])
+                if nofo_compliance:
+                    compliance_notes += "\nNOFO-SPECIFIC COMPLIANCE:\n" + "\n".join(f"- {r}" for r in nofo_compliance)
+        except Exception as e:
+            logger.warning(f"NOFO eval/compliance injection failed: {e}")
 
         # Load organization details: prefer CLIENT's profile for client grants, fallback to user's own
         user_org_info = ""
@@ -3635,6 +3728,7 @@ def generate_section_content(grant_id, section_id):
     {"**MANDATORY AGENCY COMPLIANCE RULES (failure to follow these will result in automatic disqualification):**" + chr(10) + agency_context + chr(10) if agency_context else ""}
     {critical_rules_block}
     {"**REGULATORY COMPLIANCE REQUIREMENTS:**" + chr(10) + compliance_notes + chr(10) if compliance_notes else ""}
+    {nofo_eval_block}
     {verified_sources_block}
     {budget_prompt_block}
     {f"**REQUESTED FUNDING: ${amount_min:,.0f} - ${amount_max:,.0f}. You MUST reference this specific dollar amount in your narrative and break it into approximate cost categories.**" if not budget_prompt_block or 'budget' not in budget_prompt_block.lower() else ""}

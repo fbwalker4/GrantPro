@@ -210,6 +210,19 @@
     {% endfor %}
 </div>
 
+{% if evaluation_criteria %}
+<div class="card" style="margin-top: 1.5rem; border-left: 3px solid var(--accent-warning);">
+    <h3 style="color: var(--accent-warning);">Evaluation Criteria</h3>
+    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">How reviewers will score your application:</p>
+    {% for c in evaluation_criteria %}
+    <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border-color);">
+        <span><strong>{{ c.criterion }}</strong>{% if c.description %} -- {{ c.description[:100] }}{% endif %}</span>
+        <span style="color: var(--accent-warning); font-weight: 600; white-space: nowrap; margin-left: 1rem;">{{ c.weight }}</span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 <style>
 .section-guidance {
     background: rgba(245, 158, 11, 0.1);

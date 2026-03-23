@@ -468,3 +468,38 @@ CREATE TABLE IF NOT EXISTS account_deletions (
     tables_purged TEXT,
     created_at TEXT
 );
+
+-- ============================================================
+-- 9. GRANT REQUIREMENTS / NOFO PARSER (2026-03-23)
+-- ============================================================
+
+-- Grant-specific requirements extracted from NOFO
+CREATE TABLE IF NOT EXISTS grant_requirements (
+    id TEXT PRIMARY KEY,
+    grant_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    opportunity_number TEXT,
+    nofo_source_url TEXT,
+    nofo_file_path TEXT,
+    extraction_status TEXT DEFAULT 'pending',
+    extracted_at TEXT,
+
+    -- Extracted structured data (JSON)
+    required_sections TEXT,       -- JSON array of {id, name, guidance, max_pages, max_chars, required, components}
+    evaluation_criteria TEXT,     -- JSON array of {criterion, weight, description}
+    eligibility_rules TEXT,       -- JSON array of strings
+    compliance_requirements TEXT, -- JSON array of strings
+    submission_instructions TEXT, -- JSON object {portal, deadline, format, copies, etc}
+    match_requirements TEXT,      -- JSON object {ratio, type, amount}
+    page_limits TEXT,             -- JSON object {total, per_section}
+    formatting_rules TEXT,        -- JSON object {font, size, spacing, margins}
+
+    raw_nofo_text TEXT,          -- Full extracted text (for re-parsing)
+    ai_extraction_prompt TEXT,    -- The prompt used for extraction (for debugging)
+    ai_extraction_response TEXT,  -- The raw AI response (for debugging)
+
+    created_at TEXT,
+    updated_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_grant_requirements_grant ON grant_requirements(grant_id);
+CREATE INDEX IF NOT EXISTS idx_grant_requirements_opp ON grant_requirements(opportunity_number);

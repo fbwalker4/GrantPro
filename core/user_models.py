@@ -247,6 +247,31 @@ def init_user_db():
             tables_purged TEXT,
             created_at TEXT
         )''')
+
+        # Grant requirements extracted from NOFO documents
+        c.execute('''CREATE TABLE IF NOT EXISTS grant_requirements (
+            id TEXT PRIMARY KEY,
+            grant_id TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            opportunity_number TEXT,
+            nofo_source_url TEXT,
+            nofo_file_path TEXT,
+            extraction_status TEXT DEFAULT 'pending',
+            extracted_at TEXT,
+            required_sections TEXT,
+            evaluation_criteria TEXT,
+            eligibility_rules TEXT,
+            compliance_requirements TEXT,
+            submission_instructions TEXT,
+            match_requirements TEXT,
+            page_limits TEXT,
+            formatting_rules TEXT,
+            raw_nofo_text TEXT,
+            ai_extraction_prompt TEXT,
+            ai_extraction_response TEXT,
+            created_at TEXT,
+            updated_at TEXT
+        )''')
     except Exception as e:
         # On Postgres the schema is managed by supabase_migration.sql
         # so failures here (e.g. AUTOINCREMENT syntax) are expected.
