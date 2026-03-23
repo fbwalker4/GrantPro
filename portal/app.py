@@ -3734,46 +3734,20 @@ def generate_section_content(grant_id, section_id):
     - Connect your project to the agency's mission
     """
             else:
-                # Use Google AI to generate content
-                full_prompt = f"""You are an expert grant writer with 20+ years of experience writing successful federal grants. 
-
-    Generate high-quality, professional grant content for the following section.
-
-    **Grant Details:**
-    - Grant Name: {grant_name}
-    - Funding Agency: {agency}
-    - Applicant Organization: {org_name}
-
-    **Section Details:**
-    - Section Name: {section_info.get('name', section_id)}
-    - Requirements: {section_info.get('guidance', 'See agency requirements')}
-    - Character Limit: {section_info.get('max_chars', 'N/A')}
-    - Page Limit: {section_info.get('max_pages', 'N/A')}
-
-    {f"Organization Mission:{sanitize_for_prompt(client_info.get('mission', ''))}" if client_info.get('mission') else ""}
-    {f"Organization Description:{sanitize_for_prompt(client_info.get('description', ''))}" if client_info.get('description') else ""}
-
-    {f"Budget Information:{sanitize_for_prompt(json.dumps(client_info.get('budget_info', {})))}" if client_info.get('budget_info') else ""}
-
-    Please write compelling, specific, and competitive grant content that:
-    1. Directly addresses the agency's requirements
-    2. Uses strong, active voice
-    3. Includes specific details and examples
-    4. Aligns with the agency's priorities and mission
-    5. Is ready to submit (not a placeholder)
-
-    Write the complete section content now:"""
+                # Use Google AI to generate content using the detailed prompt
+                # (includes budget data, compliance rules, cross-section consistency,
+                #  org details, formatting rules, and APA standards)
 
                 # Retry logic for transient errors
                 max_retries = 3
                 retry_delay = 2
-            
+
                 for attempt in range(max_retries):
                     try:
                         client = genai.Client(api_key=api_key)
                         response = client.models.generate_content(
                             model='gemini-2.5-flash',
-                            contents=full_prompt
+                            contents=prompt
                         )
                         break
                     except Exception as api_error:
@@ -4667,6 +4641,17 @@ def mark_submitted(grant_id):
         return "Grant not found", 404
 
     if request.method == 'POST':
+        # Server-side gate: verify checklist readiness before allowing submission
+        try:
+            checklist_data = _build_checklist_data(grant_id, grant, conn)
+            readiness_pct = checklist_data.get('readiness_pct', 0)
+            if readiness_pct < 100:
+                flash(f'Cannot submit: checklist is only {readiness_pct}% complete. Please complete all required items first.', 'error')
+                conn.close()
+                return redirect(url_for('grant_checklist', grant_id=grant_id))
+        except Exception:
+            pass  # If checklist check fails, allow submission (don't block on checklist bugs)
+
         submission_date = request.form.get('submission_date', datetime.now().strftime('%Y-%m-%d'))
         confirmation_number = request.form.get('confirmation_number', '')
         portal_used = request.form.get('portal_used', '')

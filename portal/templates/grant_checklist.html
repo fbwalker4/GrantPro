@@ -37,12 +37,20 @@
         These are required government forms (like the SF-424 cover sheet and budget summary) that we generate automatically from your organization profile and budget. You don't need to fill them out manually.
     </p>
     {% for item in checklist_forms %}
-    <div class="checklist-item" style="border-left: 4px solid #10b981;">
+    <div class="checklist-item" style="border-left: 4px solid {% if item.status == 'ready' or item.status == 'complete' %}#10b981{% elif item.status == 'incomplete' %}#f59e0b{% else %}#10b981{% endif %};">
         <div class="checklist-status">
+            {% if item.status == 'incomplete' %}
+            <span class="check-icon" style="color: #f59e0b;">!</span>
+            {% else %}
             <span class="check-icon check-done">&#10003;</span>
+            {% endif %}
             <span>{{ item.name }}</span>
         </div>
+        {% if item.status == 'incomplete' %}
+        <span class="badge" style="background: rgba(245,158,11,0.15); color: #f59e0b;">Needs Data</span>
+        {% else %}
         <span class="badge badge-green">Auto-generated</span>
+        {% endif %}
     </div>
     {% endfor %}
 </div>
