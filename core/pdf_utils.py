@@ -5,21 +5,85 @@ import re
 
 
 def clean_markdown(text):
-    """Convert markdown formatting to reportlab-compatible XML tags and strip artifacts.
+    """Convert markdown OR HTML content to reportlab-compatible XML tags.
 
-    Converts:
-      **bold** -> <b>bold</b>
-      *italic* -> <i>italic</i>
-      ### / ## / # headings -> stripped (handled separately as Heading styles)
-      --- horizontal rules -> removed
-      | table markers -> removed
-      Remaining markdown artifacts -> stripped
+    Handles two input formats:
+    1. Markdown (legacy content): **bold**, *italic*, # headings
+    2. HTML (from Quill rich text editor): <strong>, <em>, <u>, <h1>-<h3>, <ul>, <ol>, <li>, <blockquote>, <br>
+
+    ReportLab Paragraph elements support a limited subset of HTML:
+    <b>, <i>, <u>, <br/>, <font>, <a>, <sub>, <sup>, <strike>
 
     Returns cleaned text suitable for reportlab Paragraph elements.
     """
     if not text:
         return text
 
+    # Detect if content is HTML (from Quill editor)
+    is_html = bool(re.search(r'<(p|strong|em|h[1-3]|ul|ol|li|br|blockquote|u|s|a)\b', text))
+
+    if is_html:
+        return _clean_html_for_reportlab(text)
+    else:
+        return _clean_markdown_for_reportlab(text)
+
+
+def _clean_html_for_reportlab(text):
+    """Convert Quill HTML output to reportlab-compatible XML.
+
+    Preserves: bold, italic, underline, strikethrough, line breaks, links.
+    Converts: <strong> -> <b>, <em> -> <i>, <s> -> <strike>
+    Strips: <p>, <h1>-<h3> (headings handled separately), <div>, <span>, <ul>, <ol>, <li>, <blockquote>
+    """
+    import html as html_module
+
+    # Convert HTML tags to reportlab equivalents
+    text = re.sub(r'<strong>(.*?)</strong>', r'<b>\1</b>', text, flags=re.DOTALL)
+    text = re.sub(r'<em>(.*?)</em>', r'<i>\1</i>', text, flags=re.DOTALL)
+    text = re.sub(r'<u>(.*?)</u>', r'<u>\1</u>', text, flags=re.DOTALL)
+    text = re.sub(r'<s>(.*?)</s>', r'<strike>\1</strike>', text, flags=re.DOTALL)
+    text = re.sub(r'<a\s+href="([^"]*)"[^>]*>(.*?)</a>', r'<a href="\1">\2</a>', text, flags=re.DOTALL)
+
+    # Convert <br> and <br/> to reportlab <br/>
+    text = re.sub(r'<br\s*/?>', '<br/>', text)
+
+    # Convert </p> to paragraph breaks (double newline)
+    text = re.sub(r'</p>\s*', '\n\n', text)
+    text = re.sub(r'<p[^>]*>', '', text)
+
+    # Convert headings to bold text (actual heading rendering happens in split_sections)
+    text = re.sub(r'<h[1-3][^>]*>(.*?)</h[1-3]>', r'\n\n<b>\1</b>\n\n', text, flags=re.DOTALL)
+
+    # Convert list items to bullet text
+    text = re.sub(r'<li[^>]*>(.*?)</li>', '\n\u2022 \\1', text, flags=re.DOTALL)
+    text = re.sub(r'</?[ou]l[^>]*>', '\n', text)
+
+    # Convert blockquotes to italic
+    text = re.sub(r'<blockquote[^>]*>(.*?)</blockquote>', r'<i>\1</i>', text, flags=re.DOTALL)
+
+    # Strip any remaining HTML tags that reportlab doesn't understand
+    # Keep: <b>, <i>, <u>, <strike>, <br/>, <a>, <font>, <sub>, <sup>
+    allowed_tags = r'<(?:/?(?:b|i|u|strike|br/|a|font|sub|sup)[^>]*)>'
+    # Find all tags, keep allowed ones, strip others
+    def _strip_tag(m):
+        tag = m.group(0)
+        if re.match(allowed_tags, tag):
+            return tag
+        return ''
+    text = re.sub(r'<[^>]+>', _strip_tag, text)
+
+    # Unescape HTML entities that Quill may have added
+    text = text.replace('&nbsp;', ' ')
+    # But keep &amp; &lt; &gt; as-is since reportlab needs them
+
+    # Clean up multiple blank lines
+    text = re.sub(r'\n{3,}', '\n\n', text)
+
+    return text.strip()
+
+
+def _clean_markdown_for_reportlab(text):
+    """Original markdown cleaning for legacy plain-text content."""
     # First, escape XML entities for reportlab (& must be first)
     text = text.replace('&', '&amp;')
     text = text.replace('<', '&lt;')
@@ -53,24 +117,49 @@ def clean_markdown(text):
 
 
 def split_markdown_sections(content):
-    """Split content into heading/body pairs based on markdown headings.
+    """Split content into heading/body pairs based on markdown OR HTML headings.
+
+    Handles both:
+    - Markdown: # Heading, ## Heading, ### Heading
+    - HTML: <h1>Heading</h1>, <h2>Heading</h2>, <h3>Heading</h3>
 
     Returns a list of tuples: (heading_level, heading_text, body_text)
     where heading_level is 1-6 (or 0 for content before any heading).
     """
+    if not content:
+        return [(0, '', '')]
+
+    # Detect HTML headings
+    is_html = bool(re.search(r'<h[1-6][^>]*>', content))
+
     parts = []
     current_heading = None
     current_level = 0
     current_body = []
 
-    for line in (content or '').split('\n'):
-        heading_match = re.match(r'^(#{1,6})\s+(.*)', line)
-        if heading_match:
-            # Save previous section
+    for line in content.split('\n'):
+        heading_match = None
+
+        if is_html:
+            # Match HTML headings: <h1>text</h1>, <h2>text</h2>, etc.
+            heading_match = re.match(r'.*<h([1-6])[^>]*>(.*?)</h[1-6]>', line)
+            if heading_match:
+                level = int(heading_match.group(1))
+                text = re.sub(r'<[^>]+>', '', heading_match.group(2)).strip()
+                if current_body or current_heading:
+                    parts.append((current_level, current_heading or '', '\n'.join(current_body)))
+                current_level = level
+                current_heading = text
+                current_body = []
+                continue
+
+        # Match markdown headings
+        md_match = re.match(r'^(#{1,6})\s+(.*)', line)
+        if md_match:
             if current_body or current_heading:
                 parts.append((current_level, current_heading or '', '\n'.join(current_body)))
-            current_level = len(heading_match.group(1))
-            current_heading = heading_match.group(2).strip()
+            current_level = len(md_match.group(1))
+            current_heading = md_match.group(2).strip()
             current_body = []
         else:
             current_body.append(line)
