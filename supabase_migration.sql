@@ -503,3 +503,34 @@ CREATE TABLE IF NOT EXISTS grant_requirements (
 );
 CREATE INDEX IF NOT EXISTS idx_grant_requirements_grant ON grant_requirements(grant_id);
 CREATE INDEX IF NOT EXISTS idx_grant_requirements_opp ON grant_requirements(opportunity_number);
+
+-- ============================================================
+-- 10. SUCCESSFUL AWARDS LIBRARY (2026-03-23)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS successful_awards (
+    id TEXT PRIMARY KEY,
+    usaspending_award_id TEXT UNIQUE,
+    recipient_name TEXT,
+    recipient_state TEXT,
+    recipient_city TEXT,
+    recipient_uei TEXT,
+    award_amount DOUBLE PRECISION,
+    total_outlays DOUBLE PRECISION,
+    agency TEXT,
+    sub_agency TEXT,
+    cfda_number TEXT,
+    cfda_title TEXT,
+    cfda_objectives TEXT,
+    award_description TEXT,
+    funding_opportunity_number TEXT,
+    start_date TEXT,
+    end_date TEXT,
+    award_type TEXT,
+    keywords TEXT,
+    created_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_awards_agency ON successful_awards(agency);
+CREATE INDEX IF NOT EXISTS idx_awards_state ON successful_awards(recipient_state);
+CREATE INDEX IF NOT EXISTS idx_awards_cfda ON successful_awards(cfda_number);
+CREATE INDEX IF NOT EXISTS idx_awards_amount ON successful_awards(award_amount);

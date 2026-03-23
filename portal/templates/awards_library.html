@@ -1,0 +1,344 @@
+{% extends "layout.html" %}
+
+{% block title %}Winning Grants Library - Grant Pro{% endblock %}
+
+{% block extra %}
+<style>
+    .awards-search-box {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .awards-search-row {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+
+    .awards-search-row .form-group {
+        margin-bottom: 0;
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .awards-search-row .form-group.search-main {
+        flex: 3;
+        min-width: 280px;
+    }
+
+    .award-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.25rem;
+        margin-bottom: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .award-card:hover {
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 1px var(--accent-primary);
+    }
+
+    .award-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+    }
+
+    .award-recipient {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .award-amount {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--accent-success);
+        white-space: nowrap;
+    }
+
+    .award-agency {
+        font-size: 0.85rem;
+        color: var(--accent-primary);
+        margin-bottom: 0.4rem;
+    }
+
+    .award-description {
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .award-description.expanded {
+        -webkit-line-clamp: unset;
+        overflow: visible;
+    }
+
+    .award-meta {
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.6rem;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        flex-wrap: wrap;
+    }
+
+    .award-detail-section {
+        display: none;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .award-detail-section.visible {
+        display: block;
+    }
+
+    .award-detail-section h4 {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin: 0 0 0.4rem 0;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .award-detail-section p {
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin: 0 0 1rem 0;
+    }
+
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .results-count {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .amount-range {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .amount-range .form-input {
+        width: 120px;
+    }
+
+    .amount-range-sep {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
+
+    #loadingIndicator {
+        display: none;
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-muted);
+    }
+
+    #loadingIndicator.visible {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Winning Grants Library</h1>
+        <p class="page-subtitle">Browse {{ '{:,}'.format(stats.total_awards) }} successful federal grant awards worth ${{ '{:,.0f}'.format(stats.total_amount) }}</p>
+    </div>
+</div>
+
+<!-- Stats row -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon green">$</div>
+        <div class="stat-value">{{ '{:,}'.format(stats.total_awards) }}</div>
+        <div class="stat-label">Total Awards</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple">~</div>
+        <div class="stat-value">${{ '{:,.0f}'.format(stats.avg_amount) }}</div>
+        <div class="stat-label">Average Award</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon amber">!</div>
+        <div class="stat-value">${{ '{:,.0f}'.format(stats.max_amount) }}</div>
+        <div class="stat-label">Largest Award</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">%</div>
+        <div class="stat-value">{{ stats.by_agency | length }}</div>
+        <div class="stat-label">Agencies</div>
+    </div>
+</div>
+
+<!-- Search / Filters -->
+<div class="awards-search-box">
+    <form id="awardsSearchForm" onsubmit="searchAwards(event)">
+        <div class="awards-search-row">
+            <div class="form-group search-main">
+                <label class="form-label">Search</label>
+                <input type="text" name="q" id="searchQuery" class="form-input"
+                       placeholder="Describe your project or search by keyword..."
+                       value="{{ request.args.get('q', '') }}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Agency</label>
+                <select name="agency" id="filterAgency" class="form-select">
+                    <option value="">All Agencies</option>
+                    {% for a in stats.by_agency %}
+                    <option value="{{ a.agency }}" {% if request.args.get('agency') == a.agency %}selected{% endif %}>
+                        {{ a.agency }} ({{ a.cnt }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">State</label>
+                <select name="state" id="filterState" class="form-select">
+                    <option value="">All States</option>
+                    {% for s in stats.by_state %}
+                    <option value="{{ s.recipient_state }}" {% if request.args.get('state') == s.recipient_state %}selected{% endif %}>
+                        {{ s.recipient_state }} ({{ s.cnt }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="awards-search-row" style="margin-top: 0.75rem;">
+            <div class="form-group">
+                <label class="form-label">Amount Range</label>
+                <div class="amount-range">
+                    <input type="number" name="min_amount" id="filterMinAmount" class="form-input"
+                           placeholder="Min $" value="{{ request.args.get('min_amount', '') }}">
+                    <span class="amount-range-sep">to</span>
+                    <input type="number" name="max_amount" id="filterMaxAmount" class="form-input"
+                           placeholder="Max $" value="{{ request.args.get('max_amount', '') }}">
+                </div>
+            </div>
+            <div class="form-group" style="flex: 0;">
+                <label class="form-label">&nbsp;</label>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Results -->
+<div class="results-header">
+    <div class="results-count" id="resultsCount">
+        {% if awards %}Showing {{ awards | length }} award{{ 's' if awards | length != 1 else '' }}{% else %}No awards found{% endif %}
+    </div>
+</div>
+
+<div id="loadingIndicator">Searching awards...</div>
+
+<div id="awardsResults">
+    {% for award in awards %}
+    <div class="award-card" onclick="toggleDetail(this)">
+        <div class="award-card-top">
+            <div>
+                <div class="award-recipient">{{ award.recipient_name or 'Unknown Recipient' }}</div>
+                <div class="award-agency">{{ award.agency or 'Unknown Agency' }}{% if award.sub_agency %} / {{ award.sub_agency }}{% endif %}</div>
+            </div>
+            <div class="award-amount">${{ '{:,.0f}'.format(award.award_amount or 0) }}</div>
+        </div>
+        <div class="award-description">{{ award.award_description or award.cfda_title or 'No description available' }}</div>
+        <div class="award-meta">
+            {% if award.recipient_state %}<span>{{ award.recipient_state }}</span>{% endif %}
+            {% if award.cfda_number %}<span>CFDA {{ award.cfda_number }}</span>{% endif %}
+            {% if award.start_date %}<span>{{ award.start_date[:10] }}</span>{% endif %}
+            {% if award.award_type %}<span>{{ award.award_type }}</span>{% endif %}
+        </div>
+        <div class="award-detail-section">
+            {% if award.cfda_title %}
+            <h4>Program</h4>
+            <p>{{ award.cfda_title }}</p>
+            {% endif %}
+            {% if award.cfda_objectives %}
+            <h4>Program Objectives</h4>
+            <p>{{ award.cfda_objectives[:1000] }}{% if award.cfda_objectives and award.cfda_objectives|length > 1000 %}...{% endif %}</p>
+            {% endif %}
+            {% if award.funding_opportunity_number %}
+            <h4>Funding Opportunity</h4>
+            <p>{{ award.funding_opportunity_number }}</p>
+            {% endif %}
+            {% if award.recipient_city %}
+            <h4>Location</h4>
+            <p>{{ award.recipient_city }}{% if award.recipient_state %}, {{ award.recipient_state }}{% endif %}</p>
+            {% endif %}
+            {% if award.start_date and award.end_date %}
+            <h4>Period of Performance</h4>
+            <p>{{ award.start_date[:10] }} to {{ award.end_date[:10] }}</p>
+            {% endif %}
+            {% if award.recipient_uei %}
+            <h4>Recipient UEI</h4>
+            <p>{{ award.recipient_uei }}</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+
+    {% if not awards %}
+    <div class="empty-state">
+        <div class="empty-icon">$</div>
+        <div class="empty-title">No awards found</div>
+        <div class="empty-text">Try adjusting your search or filters. If the library is empty, awards need to be collected first.</div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function toggleDetail(card) {
+    var detail = card.querySelector('.award-detail-section');
+    var desc = card.querySelector('.award-description');
+    if (detail) {
+        detail.classList.toggle('visible');
+    }
+    if (desc) {
+        desc.classList.toggle('expanded');
+    }
+}
+
+function searchAwards(e) {
+    e.preventDefault();
+    var q = document.getElementById('searchQuery').value;
+    var agency = document.getElementById('filterAgency').value;
+    var state = document.getElementById('filterState').value;
+    var minAmt = document.getElementById('filterMinAmount').value;
+    var maxAmt = document.getElementById('filterMaxAmount').value;
+
+    var params = new URLSearchParams();
+    if (q) params.set('q', q);
+    if (agency) params.set('agency', agency);
+    if (state) params.set('state', state);
+    if (minAmt) params.set('min_amount', minAmt);
+    if (maxAmt) params.set('max_amount', maxAmt);
+
+    // Use the page route with query params for server-side search
+    window.location.href = '/awards?' + params.toString();
+}
+</script>
+{% endblock %}

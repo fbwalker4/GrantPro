@@ -261,6 +261,10 @@ def add_security_headers(response):
 # Initialize grant researcher
 grant_researcher = GrantResearcher()
 
+# Awards library
+from awards_library import search_awards as _search_awards, get_awards_stats as _get_awards_stats, get_award_detail as _get_award_detail, init_awards_table
+init_awards_table()
+
 # Database path
 from db_connection import LOCAL_DB_PATH as DB_PATH
 from db_connection import get_connection
@@ -5339,6 +5343,65 @@ def copy_section():
     if draft:
         return jsonify({'success': True, 'content': draft['content']})
     return jsonify({'success': False, 'error': 'Section not found'})
+
+# ============ WINNING GRANTS LIBRARY ============
+
+@app.route('/awards')
+@login_required
+def awards_library():
+    """Winning grants library -- search successful awards"""
+    query = request.args.get('q', '')
+    agency = request.args.get('agency', '')
+    state = request.args.get('state', '')
+    min_amount = request.args.get('min_amount', type=float)
+    max_amount = request.args.get('max_amount', type=float)
+
+    stats = _get_awards_stats()
+
+    awards = _search_awards(
+        query=query if query else None,
+        agency=agency if agency else None,
+        state=state if state else None,
+        min_amount=min_amount,
+        max_amount=max_amount,
+        limit=50,
+    )
+
+    return render_template('awards_library.html', awards=awards, stats=stats)
+
+
+@app.route('/api/awards/search')
+@login_required
+def api_awards_search():
+    """API endpoint for awards search"""
+    query = request.args.get('q', '')
+    agency = request.args.get('agency', '')
+    state = request.args.get('state', '')
+    min_amount = request.args.get('min_amount', type=float)
+    max_amount = request.args.get('max_amount', type=float)
+    limit = request.args.get('limit', 20, type=int)
+
+    awards = _search_awards(
+        query=query if query else None,
+        agency=agency if agency else None,
+        state=state if state else None,
+        min_amount=min_amount,
+        max_amount=max_amount,
+        limit=min(limit, 100),
+    )
+
+    return jsonify({'awards': awards, 'count': len(awards)})
+
+
+@app.route('/api/awards/<award_id>')
+@login_required
+def api_award_detail(award_id):
+    """Get full details of a single award"""
+    award = _get_award_detail(award_id)
+    if not award:
+        return jsonify({'error': 'Award not found'}), 404
+    return jsonify({'award': award})
+
 
 # ============ GRANT RESEARCH ROUTES ============
 
