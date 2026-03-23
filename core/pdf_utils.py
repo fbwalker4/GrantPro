@@ -132,6 +132,11 @@ def split_markdown_sections(content):
     # Detect HTML headings
     is_html = bool(re.search(r'<h[1-6][^>]*>', content))
 
+    if is_html:
+        # For HTML content, split on heading tags to create proper sections
+        # First, insert newlines before heading tags so we can split properly
+        content = re.sub(r'(<h[1-6][^>]*>)', r'\n\1', content)
+
     parts = []
     current_heading = None
     current_level = 0
@@ -141,8 +146,8 @@ def split_markdown_sections(content):
         heading_match = None
 
         if is_html:
-            # Match HTML headings: <h1>text</h1>, <h2>text</h2>, etc.
-            heading_match = re.match(r'.*<h([1-6])[^>]*>(.*?)</h[1-6]>', line)
+            # Match HTML headings at the START of the line (after our split)
+            heading_match = re.match(r'^<h([1-6])[^>]*>(.*?)</h[1-6]>', line.strip())
             if heading_match:
                 level = int(heading_match.group(1))
                 text = re.sub(r'<[^>]+>', '', heading_match.group(2)).strip()
@@ -151,6 +156,10 @@ def split_markdown_sections(content):
                 current_level = level
                 current_heading = text
                 current_body = []
+                # Capture anything after the closing heading tag on the same line
+                after_heading = re.sub(r'^<h[1-6][^>]*>.*?</h[1-6]>', '', line.strip()).strip()
+                if after_heading:
+                    current_body.append(after_heading)
                 continue
 
         # Match markdown headings

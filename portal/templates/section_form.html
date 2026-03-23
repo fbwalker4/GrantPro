@@ -33,7 +33,7 @@
     <p style="color: #a8c8e0;"><strong>Page Limit:</strong> {{ section_guidance.max_pages }} page{{ 's' if section_guidance.max_pages != 1 }}</p>
     {% endif %}
     {% if section_guidance.max_chars %}
-    <p style="color: #a8c8e0;"><strong>Character Limit:</strong> {{ section_guidance.max_chars|int:, }}</p>
+    <p style="color: #a8c8e0;"><strong>Character Limit:</strong> {{ "{:,}".format(section_guidance.max_chars|int) }}</p>
     {% endif %}
     {% if section_guidance.required %}
     <p style="color: #a8c8e0;"><strong>Required:</strong> Yes</p>
