@@ -1143,7 +1143,16 @@ def dashboard():
 
         if grant_detail:
             app_item['grant'] = grant_detail
+        else:
+            # Fallback: use grant record's own data if catalog lookup fails
+            app_item['grant'] = {
+                'title': app_item.get('grant_name', 'Untitled Grant'),
+                'agency': app_item.get('agency', 'Unknown Agency'),
+                'id': grant_id_key,
+            }
         app_item.setdefault('client', {'name': app_item.get('organization_name', 'Direct')})
+        app_item.setdefault('created_at', app_item.get('assigned_at', app_item.get('started_at', '')))
+        app_item.setdefault('status', 'draft')
         enhanced_list.append(app_item)
 
     active_grants_list = enhanced_list
