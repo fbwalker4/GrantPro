@@ -13,6 +13,15 @@
     </div>
 </div>
 
+{% if not nofo_reqs %}
+<div class="card" style="border-left: 3px solid var(--accent-danger); margin-bottom: 1.5rem; padding: 1rem 1.25rem;">
+    <strong style="color: var(--accent-danger);">Verify requirements before submitting</strong>
+    <p style="color: var(--text-secondary); margin: 0.5rem 0; font-size: 0.9rem;">
+        This checklist is based on our general template. Before submitting, compare your application against the actual NOFO/FOA requirements for this grant to ensure compliance.
+    </p>
+</div>
+{% endif %}
+
 {# Readiness meter #}
 <div class="card" style="margin-bottom: 2rem;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">

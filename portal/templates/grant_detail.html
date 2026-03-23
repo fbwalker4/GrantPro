@@ -37,6 +37,43 @@
     </div>
 </div>
 
+{# ---- NOFO Status Banner ---- #}
+{% if nofo_reqs and nofo_reqs.extraction_status == 'complete' %}
+<div class="card" style="border-left: 3px solid var(--accent-success); margin-bottom: 1.5rem; padding: 1rem 1.25rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+        <span style="color: var(--accent-success);">
+            <strong>Requirements extracted from NOFO</strong> ({{ nofo_reqs.opportunity_number }})
+        </span>
+    </div>
+</div>
+{% elif nofo_reqs and nofo_reqs.extraction_status == 'failed' %}
+<div class="card" style="border-left: 3px solid var(--accent-warning); margin-bottom: 1.5rem; padding: 1rem 1.25rem;">
+    <strong style="color: var(--accent-warning);">Could not fetch grant requirements from Grants.gov</strong>
+    <p style="color: var(--text-secondary); margin: 0.5rem 0; font-size: 0.9rem;">
+        Your application is using our general {{ grant.template or 'generic' }} template. This may not match the actual requirements for this specific grant.
+    </p>
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;">
+        <form method="POST" action="{{ url_for('upload_nofo', grant_id=grant.id) }}" enctype="multipart/form-data" style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="file" name="nofo_file" accept=".pdf,.docx,.doc" style="font-size: 0.85rem; color: var(--text-secondary);">
+            <button type="submit" class="btn btn-small btn-primary">Upload NOFO</button>
+        </form>
+    </div>
+</div>
+{% else %}
+<div class="card" style="border-left: 3px solid var(--text-muted); margin-bottom: 1.5rem; padding: 1rem 1.25rem;">
+    <strong style="color: var(--text-secondary);">Using general {{ grant.template or 'generic' }} template</strong>
+    <p style="color: var(--text-muted); margin: 0.5rem 0; font-size: 0.9rem;">
+        Upload the NOFO/FOA document to extract the exact requirements for this grant.
+    </p>
+    <form method="POST" action="{{ url_for('upload_nofo', grant_id=grant.id) }}" enctype="multipart/form-data" style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.5rem;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="file" name="nofo_file" accept=".pdf,.docx,.doc" style="font-size: 0.85rem; color: var(--text-secondary);">
+        <button type="submit" class="btn btn-small btn-primary">Upload NOFO</button>
+    </form>
+</div>
+{% endif %}
+
 <div class="grid-2" style="margin-bottom: 2rem;">
     <div class="card">
         <h2>Grant Details</h2>

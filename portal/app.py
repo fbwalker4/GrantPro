@@ -3186,7 +3186,18 @@ def start_application(grant_id):
                 )
         except Exception as e:
             logger.warning(f"NOFO fetch failed (non-blocking): {e}")
-            # Non-blocking: if NOFO fetch fails, the user still gets the generic template
+            # Record the failure so grant_detail shows the amber warning
+            try:
+                conn_nofo = get_db()
+                nofo_req_id = f"req-{datetime.now().strftime('%Y%m%d%H%M%S')}-{secrets.token_hex(4)}"
+                now_nofo = datetime.now().isoformat()
+                conn_nofo.execute('''INSERT INTO grant_requirements (id, grant_id, user_id, opportunity_number, extraction_status, created_at, updated_at)
+                                   VALUES (?, ?, ?, ?, 'failed', ?, ?)''',
+                                (nofo_req_id, new_grant_id, user_id, opp_num or '', now_nofo, now_nofo))
+                conn_nofo.commit()
+                conn_nofo.close()
+            except Exception:
+                pass
 
         flash(f'Grant started for {research_grant.get("title", "grant")}', 'success')
         return redirect(url_for('grant_detail', grant_id=new_grant_id))
@@ -3276,6 +3287,100 @@ def grant_detail(grant_id):
                          budget_total=budget_total,
                          evaluation_criteria=evaluation_criteria,
                          nofo_reqs=nofo_reqs)
+
+@app.route('/grant/<grant_id>/upload-nofo', methods=['POST'])
+@login_required
+@csrf_required
+def upload_nofo(grant_id):
+    """Handle manual NOFO upload -- parse and extract requirements"""
+    if not user_owns_grant(grant_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+
+    file = request.files.get('nofo_file')
+    if not file or not file.filename:
+        flash('Please select a NOFO file to upload.', 'error')
+        return redirect(url_for('grant_detail', grant_id=grant_id))
+
+    # Validate file type
+    allowed = {'.pdf', '.docx', '.doc'}
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in allowed:
+        flash('Please upload a PDF or DOCX file.', 'error')
+        return redirect(url_for('grant_detail', grant_id=grant_id))
+
+    # Save file
+    nofo_dir = Path.home() / '.hermes' / 'grant-system' / 'data' / 'nofos'
+    nofo_dir.mkdir(parents=True, exist_ok=True)
+    safe_name = f"{grant_id}_{secrets.token_hex(4)}{ext}"
+    file_path = nofo_dir / safe_name
+    file.save(str(file_path))
+
+    # Extract and parse
+    try:
+        from nofo_parser import extract_nofo_text, parse_nofo_with_ai
+
+        # Get grant info for context
+        conn = get_db()
+        grant_row = conn.execute('SELECT * FROM grants WHERE id = ?', (grant_id,)).fetchone()
+        grant = dict(grant_row) if grant_row else {}
+        conn.close()
+
+        nofo_text = extract_nofo_text(file_path)
+        if not nofo_text or len(nofo_text) < 100:
+            flash('Could not extract text from the uploaded file. Please try a different format.', 'error')
+            return redirect(url_for('grant_detail', grant_id=grant_id))
+
+        flash(f'NOFO uploaded ({len(nofo_text):,} characters). Parsing requirements...', 'info')
+
+        parsed = parse_nofo_with_ai(nofo_text, grant.get('grant_name', ''), grant.get('agency', ''))
+
+        if 'error' in parsed:
+            flash(f'Could not parse NOFO: {parsed["error"][:100]}', 'error')
+            return redirect(url_for('grant_detail', grant_id=grant_id))
+
+        # Store in database
+        user = get_current_user()
+        now = datetime.now().isoformat()
+        req_id = f"req-{datetime.now().strftime('%Y%m%d%H%M%S')}-{secrets.token_hex(4)}"
+
+        conn = get_db()
+        # Delete any existing requirements for this grant
+        conn.execute('DELETE FROM grant_requirements WHERE grant_id = ?', (grant_id,))
+
+        conn.execute('''INSERT INTO grant_requirements
+                    (id, grant_id, user_id, opportunity_number, nofo_source_url, nofo_file_path,
+                     extraction_status, extracted_at,
+                     required_sections, evaluation_criteria, eligibility_rules,
+                     compliance_requirements, submission_instructions, match_requirements,
+                     page_limits, formatting_rules, raw_nofo_text,
+                     created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, 'complete', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                 (req_id, grant_id, user['id'],
+                  grant.get('opportunity_number', ''), 'manual_upload', str(file_path),
+                  now,
+                  json.dumps(parsed.get('required_sections', [])),
+                  json.dumps(parsed.get('evaluation_criteria', [])),
+                  json.dumps(parsed.get('eligibility_rules', [])),
+                  json.dumps(parsed.get('compliance_requirements', [])),
+                  json.dumps(parsed.get('submission_instructions', {})),
+                  json.dumps(parsed.get('match_requirements', {})),
+                  json.dumps(parsed.get('page_limits', {})),
+                  json.dumps(parsed.get('formatting_rules', {})),
+                  nofo_text[:500000],
+                  now, now))
+        conn.commit()
+        conn.close()
+
+        sections_count = len(parsed.get('required_sections', []))
+        flash(f'NOFO parsed successfully. Extracted {sections_count} required sections.', 'success')
+
+    except Exception as e:
+        logger.error(f'NOFO upload processing failed: {e}')
+        flash('Error processing NOFO. Please try again.', 'error')
+
+    return redirect(url_for('grant_detail', grant_id=grant_id))
+
 
 @app.route('/grant/<grant_id>/section/<section>', methods=['GET', 'POST'])
 @login_required
@@ -7003,6 +7108,16 @@ def grant_checklist(grant_id):
     data = _build_checklist_data(grant_id, user_id, template_name)
     consistency_issues = validate_budget_consistency(grant_id)
 
+    # Check for NOFO requirements
+    nofo_reqs = None
+    try:
+        from nofo_parser import get_grant_requirements
+        nofo_reqs = get_grant_requirements(grant_id)
+        if nofo_reqs and nofo_reqs.get('extraction_status') != 'complete':
+            nofo_reqs = None
+    except Exception:
+        nofo_reqs = None
+
     # Check if consistency check has been run and passed
     conn2 = get_db()
     check_row = conn2.execute(
@@ -7019,6 +7134,7 @@ def grant_checklist(grant_id):
                            template_name=template_name,
                            consistency_issues=consistency_issues,
                            consistency_passed=consistency_passed,
+                           nofo_reqs=nofo_reqs,
                            **data)
 
 
