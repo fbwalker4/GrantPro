@@ -27,6 +27,13 @@ Thumbs.db
 *.swp
 *.swo
 
+# Downloaded NOFOs and generated exports
+data/nofos/
+output/exports/
+
+# App logs
+tracking/app.log
+
 # Vercel
 .vercel/
 node_modules/

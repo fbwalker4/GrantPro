@@ -66,7 +66,7 @@ Switching orgs is instant — no logout/login. All data queries scope to the act
 
 ### Current State
 
-Production-ready. Supabase Postgres database with 28+ tables, 6,800+ line Flask app with 90+ routes, 58 HTML templates, 21 agency templates with regulatory intelligence, structured budget builder, chained AI generation with APA standards, 16-point consistency review, submission checklist with 100% gate, document uploads, MOU generation, organization vault, paper submission (SF-424 forms), post-submission tracking, enterprise org switcher with per-client profiles/vaults, award detection, testimonial pipeline, subscription lifecycle management (dunning, suspension, retention, data export, account deletion), and 1,773 live grants synced from Grants.gov.
+Production-ready. Supabase Postgres database with 32+ tables, 7,500+ line Flask app with 100+ routes, 65+ HTML templates, 21 agency templates with regulatory intelligence and critical compliance rules, structured budget builder, chained AI generation with truth-data compliance and APA standards, 16-point consistency review, submission checklist with server-side 100% gate, document uploads, MOU generation, organization vault, paper submission (SF-424 forms), post-submission tracking, enterprise org switcher with per-client profiles/vaults, award detection, testimonial pipeline, subscription lifecycle management (dunning, suspension, retention, pause, data export, account deletion), NOFO parser (fetches real grant requirements from Grants.gov), winning grants library (1,850+ awards from USAspending.gov), smart AI grant matcher, match funding finder with state-specific sources, funding strategy dashboard, Quill.js rich text editor with agency formatting rules, user document preferences, and 1,773 live grants synced from Grants.gov.
 
 ---
 
@@ -994,6 +994,46 @@ app.run(debug=True, host='0.0.0.0', port=5001)
 ---
 
 ## Changelog
+
+### 2026-03-23 (Features A-E: Discovery, Matching, and Strategy Platform)
+
+Major feature additions building competitive parity with Grants+ and beyond:
+
+- **Winning Grants Library** (Feature A): Searchable database of 1,850+ successful federal grant awards from USAspending.gov. Search by keyword, filter by agency/state/amount. Awards from 11 agencies across 6 states (MS, AL, LA, TN, FL, GA). Collection script for ongoing updates.
+- **Smart Grant Matcher** (Feature B): AI-powered project-to-grant matching. User describes project in plain English, Gemini matches against catalog + org profile, returns scored results (50-100) with match reasons and missing requirements. Dashboard CTA banner.
+- **AI Learns from Winners** (Feature E): During AI section generation, 2-3 excerpts from successfully funded projects for the same agency are injected as style guidance. Builds on the awards library.
+- **Match Funding Finder** (Feature C): State-specific funding sources for federal grant match requirements. 10 Mississippi sources seeded (MDA CDBG State, MS Home Corp, FHLB Dallas, Hope Enterprise CDFI, MEMA, Phil Hardin Foundation, Riley Foundation, Community Foundation of South MS, MDEQ SRF, in-kind). Running calculator with save-to-strategy.
+- **Funding Strategy Dashboard** (Feature D): Visual stacked bar showing project funding mix. CRUD for funding sources with status tracking (identified/applied/secured). Gap analysis with AI suggestions.
+- Red team sweep: 7 security fixes (open redirect, IDOR on strategy sources, negative amounts, status allowlist, file size limit, match percentage bounds).
+
+### 2026-03-23 (NOFO Parser: Real Grant Requirements from Grants.gov)
+
+- New module core/nofo_parser.py: fetches actual NOFO documents from Grants.gov API (public, no auth), downloads PDF, extracts text, parses with Gemini to extract required sections, evaluation criteria, eligibility rules, compliance requirements, submission instructions, match requirements, page limits, formatting rules.
+- Integrated into start_application (auto-fetch), grant_detail (shows NOFO sections instead of generic template), grant_section (NOFO-specific guidance in editor), generate_section (NOFO requirements in AI prompt).
+- Manual NOFO upload at /grant/<id>/upload-nofo when auto-fetch fails.
+- Three-state status banner: green (extracted), amber (failed + upload form), neutral (no NOFO + upload form).
+- Checklist warning when no NOFO requirements loaded.
+- Tested with real HUD NOFO (PRO Housing FR-6800-N-98): 13 sections, 5 evaluation criteria, 22 compliance rules in 34 seconds.
+
+### 2026-03-23 (AI Prompt Overhaul + Grant Quality)
+
+- Reframed AI role as "compliance translator" not content creator. Every claim traceable to truth data or public stats.
+- Added critical_rules field to all 21 agency templates (FEMA intermediation, cost share, BCAs, etc.)
+- 109 verified citation sources across 11 agencies
+- Truth data consistency check block in every prompt
+- Budget breakdown enforcement (4+ cost categories required)
+- Absolute prohibitions: no placeholder brackets, no fabricated citations, no generic text, EIN/UEI required
+- Grant quality tested: 96.8/100 average across 13 templates with 4 perfect 100s
+- Rich text editor (Quill.js) with agency formatting requirements banner
+- PDF export preserves bold, italic, underline, lists from rich text editor
+- User document preferences (font, size, spacing, margins) with agency override hierarchy
+
+### 2026-03-23 (Full Workflow Verification)
+
+- 23-step end-to-end test: signup → onboarding → search → upgrade → start grant → edit section → AI generate → save → budget → checklist → download PDF/TXT → match funding → awards library → grant matcher → funding strategy → profile → settings → mark submitted. All pass.
+- Fixed: AI generation 500 error (uninitialized agency_tmpl variable)
+- Fixed: Dashboard 500 error (missing fallback for grant/created_at fields)
+- Fixed: Sample grant PDF removed from landing page
 
 ### 2026-03-22 (Submission Gate Fix + DOCX Crash Fix)
 
