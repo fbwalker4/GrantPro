@@ -473,8 +473,10 @@ def save_grant(user_id, grant_id, notes=None):
     now = datetime.now().isoformat()
     
     try:
-        c.execute('INSERT OR REPLACE INTO saved_grants (user_id, grant_id, notes, saved_at) VALUES (?, ?, ?, ?)',
-                  (user_id, grant_id, notes, now))
+        c.execute('INSERT INTO saved_grants (user_id, grant_id, notes, saved_at) '
+                 'VALUES (%s, %s, %s, %s) '
+                 'ON CONFLICT (user_id, grant_id) DO UPDATE SET notes = EXCLUDED.notes, saved_at = EXCLUDED.saved_at',
+               (user_id, grant_id, notes, now))
         conn.commit()
         conn.close()
         return True
@@ -566,7 +568,8 @@ def create_password_reset(email):
     from datetime import timedelta
     expires = now + timedelta(hours=24)
     
-    c.execute('INSERT OR REPLACE INTO password_resets (email, token, created_at, expires_at) VALUES (?, ?, ?, ?)',
+    c.execute('INSERT INTO password_resets (email, token, created_at, expires_at) VALUES (%s, %s, %s, %s) '
+              'ON CONFLICT (email) DO UPDATE SET token = EXCLUDED.token, created_at = EXCLUDED.created_at, expires_at = EXCLUDED.expires_at, used = FALSE',
               (email, token, now.isoformat(), expires.isoformat()))
     conn.commit()
     conn.close()
@@ -1040,9 +1043,15 @@ def save_organization_details(user_id, data):
     past_grants = data.get('past_grants', [])
     
     # Save organization details
-    c.execute('''INSERT OR REPLACE INTO organization_details 
+    c.execute('''INSERT INTO organization_details 
                  (user_id, ein, duns, uei, address_line1, address_line2, city, state, zip_code, country, phone, website, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) '''
+               '''ON CONFLICT (user_id) DO UPDATE SET 
+                 ein = EXCLUDED.ein, duns = EXCLUDED.duns, uei = EXCLUDED.uei,
+                 address_line1 = EXCLUDED.address_line1, address_line2 = EXCLUDED.address_line2,
+                 city = EXCLUDED.city, state = EXCLUDED.state, zip_code = EXCLUDED.zip_code,
+                 country = EXCLUDED.country, phone = EXCLUDED.phone, website = EXCLUDED.website,
+                 created_at = EXCLUDED.created_at, updated_at = EXCLUDED.updated_at''',
                (user_id, 
                 org_details.get('ein'), org_details.get('duns'), org_details.get('uei'),
                 org_details.get('address_line1'), org_details.get('address_line2'),
@@ -1051,10 +1060,14 @@ def save_organization_details(user_id, data):
                 now, now))
     
     # Save organization profile
-    c.execute('''INSERT OR REPLACE INTO organization_profile
+    c.execute('''INSERT INTO organization_profile
                  (user_id, annual_revenue, year_founded, employees, organization_type,
                   mission_statement, programs_description)
-                 VALUES (?, ?, ?, ?, ?, ?, ?)''',
+                 VALUES (%s, %s, %s, %s, %s, %s, %s) '''
+               '''ON CONFLICT (user_id) DO UPDATE SET 
+                 annual_revenue = EXCLUDED.annual_revenue, year_founded = EXCLUDED.year_founded,
+                 employees = EXCLUDED.employees, organization_type = EXCLUDED.organization_type,
+                 mission_statement = EXCLUDED.mission_statement, programs_description = EXCLUDED.programs_description''',
                (user_id,
                 org_profile.get('annual_revenue'), org_profile.get('year_founded'),
                 org_profile.get('employees'), org_profile.get('organization_type'),
@@ -1077,7 +1090,7 @@ def save_organization_details(user_id, data):
                       grant.get('year_received'), grant.get('amount_received'), grant.get('status')))
     
     # Mark onboarding as completed
-    c.execute('UPDATE users SET onboarding_completed = 1, updated_at = ? WHERE id = ?', (now, user_id))
+    c.execute('UPDATE users SET onboarding_completed = TRUE, updated_at = ? WHERE id = ?', (now, user_id))
     
     conn.commit()
     conn.close()
