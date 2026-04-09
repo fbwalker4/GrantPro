@@ -8529,6 +8529,8 @@ def cron_fhlb_sync():
                     k, _, v = line.strip().partition('=')
                     if k == 'DATABASE_URL':
                         db_url = v.strip()
+        if not db_url:
+            db_url = os.environ.get('SUPABASE_POSTGRES_URL', '')
         p = urllib.parse.urlparse(db_url)
         pw = urllib.parse.unquote(p.password) if '%' in p.password else p.password
         return psycopg2.connect(host=p.hostname, port=p.port or 6543, dbname=p.path[1:],
@@ -8639,6 +8641,8 @@ def cron_grant_hygiene():
                     k, _, v = line.strip().partition('=')
                     if k == 'DATABASE_URL':
                         db_url = v.strip()
+        if not db_url:
+            db_url = os.environ.get('SUPABASE_POSTGRES_URL', '')
         p = urllib.parse.urlparse(db_url)
         pw = urllib.parse.unquote(p.password) if '%' in p.password else p.password
         return psycopg2.connect(host=p.hostname, port=p.port or 6543, dbname=p.path[1:],
