@@ -2428,7 +2428,7 @@ def api_save_grant():
 
 def _api_save_grant_impl():
     """Internal implementation of save-grant API."""
-    data = request.json or {}
+    data = request.get_json(silent=True) or {}
     grant_id = data.get('grant_id') or request.form.get('grant_id')
     notes = data.get('notes', '') or request.form.get('notes', '')
     notes = re.sub(r'<[^>]+>', '', notes)  # Strip HTML tags
@@ -2449,7 +2449,6 @@ def _api_save_grant_impl():
             return jsonify({'success': False, 'error': 'email_required', 'message': 'Please provide your email to save grants'})
 
         # Validate email format more strictly
-        import re
         if not re.match(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$', email):
             return jsonify({'success': False, 'error': 'invalid_email', 'message': 'Please provide a valid email address'})
 
@@ -3048,19 +3047,19 @@ def new_grant(client_id):
 @login_required
 def grant_info(grant_id):
     """View grant information (eligibility, deadline, amounts) - no application needed"""
-    all_grants = grant_researcher.get_all_grants()
+    # Look up grant directly from Supabase grants_catalog (get_all_grants only has 131 fallback grants)
+    conn = get_db()
+    grant_row = conn.execute(
+        'SELECT * FROM grants_catalog WHERE id = ? OR id = ? LIMIT 1',
+        (grant_id, f'gg-{grant_id}')
+    ).fetchone()
+    conn.close()
     
-    # Find the grant
-    grant = None
-    for g in all_grants:
-        if g['id'] == grant_id:
-            grant = g
-            break
-    
-    if not grant:
+    if not grant_row:
         flash('Grant not found', 'error')
         return redirect(url_for('grants'))
     
+    grant = dict(grant_row)
     return render_template('grant_info.html', grant=grant)
 
 
@@ -3071,13 +3070,15 @@ def grant_info(grant_id):
 @csrf_required
 def start_application(grant_id):
     """Select a client to assign this grant to"""
-    # Get the grant from research database
-    all_grants = grant_researcher.get_all_grants()
-    research_grant = None
-    for g in all_grants:
-        if g['id'] == grant_id:
-            research_grant = g
-            break
+    # Get the grant directly from Supabase grants_catalog (get_all_grants only has 131 fallback grants)
+    conn_lookup = get_db()
+    research_grant = conn_lookup.execute(
+        'SELECT * FROM grants_catalog WHERE id = ? OR id = ? LIMIT 1',
+        (grant_id, f'gg-{grant_id}')
+    ).fetchone()
+    if research_grant:
+        research_grant = dict(research_grant)
+    conn_lookup.close()
     
     if not research_grant:
         flash('Grant not found', 'error')
@@ -4051,13 +4052,20 @@ def generate_section_content(grant_id, section_id):
 
                 for attempt in range(max_retries):
                     try:
-                        client = genai.Client(api_key=api_key)
-                        response = client.models.generate_content(
-                            model='gemini-2.5-flash',
-                            contents=prompt,
-                            config={"http_options": {"timeout": 30000}}
+                        import requests as _req
+                        resp = _req.post(
+                            f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}',
+                            json={'contents': [{'parts': [{'text': prompt}]}]},
+                            headers={'Content-Type': 'application/json'},
+                            timeout=60
                         )
-                        generated_text = (response.text or '').strip() if response else ''
+                        data = resp.json()
+                        candidates = data.get('candidates', [])
+                        generated_text = ''
+                        if candidates:
+                            parts = candidates[0].get('content', {}).get('parts', [])
+                            if parts:
+                                generated_text = parts[0].get('text', '').strip()
                         min_chars = 1200
                         if section_info.get('max_chars'):
                             try:
@@ -4077,11 +4085,11 @@ def generate_section_content(grant_id, section_id):
                             continue
                         raise
             
-                generated_content = (response.text or '').strip()
+                generated_content = generated_text
             
         except Exception as e:
             # Fall back to placeholder on error -- guidance is shown in the UI, not embedded in content
-            generated_content = f"""[AI generation encountered an error. Please write your {section_info.get('name', section_id)} content here. See the Agency Guidance panel above for requirements.]"""
+            generated_content = f"""[AI generation encountered an error. Write your {section_info.get('name', section_id)} content here. Error: {type(e).__name__}: {e}.]"""
     
         # Check if draft exists
         existing = conn.execute('''
@@ -5688,12 +5696,37 @@ def use_grant_template(grant_id):
 @login_required
 def list_templates():
     """List all available grant templates"""
-    template_data = grant_researcher.get_grant_template('nsf')  # Just to load the file
+    # Load template file - try multiple locations in priority order
+    template_file = None
     
-    # Load template file
-    template_file = Path.home() / ".hermes" / "grant-system" / "templates" / "agency_templates.json"
-    with open(template_file) as f:
-        templates = json.load(f)
+    # Try portal/templates/agency_templates.json (deployed with Flask app)
+    for candidate in [
+        Path(__file__).parent / 'templates' / 'agency_templates.json',
+        Path.cwd() / 'templates' / 'agency_templates.json',
+        Path.home() / '.hermes' / 'grant-system' / 'templates' / 'agency_templates.json',
+    ]:
+        if candidate.exists():
+            template_file = candidate
+            break
+    
+    # Try GrantResearcher's templates_dir as last resort
+    if not template_file:
+        try:
+            from research.grant_researcher import GrantResearcher
+            gr = GrantResearcher()
+            tf = gr.templates_dir / 'agency_templates.json'
+            if tf.exists():
+                template_file = tf
+        except Exception:
+            pass
+    
+    templates = {'agencies': {}}
+    try:
+        if template_file and template_file.exists():
+            with open(template_file) as f:
+                templates = json.load(f)
+    except Exception:
+        pass  # Fall back to empty templates
     
     return render_template('list_templates.html', templates=templates.get('agencies', {}))
 
@@ -7349,13 +7382,15 @@ def run_consistency_check(grant_id):
 
             if api_key:
                 from google import genai
-                client = genai.Client(api_key=api_key)
+                import requests as _req
+                api_url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}'
+                headers_req = {'Content-Type': 'application/json'}
 
                 # Build full application text for AI review
                 full_text = ""
                 for d in drafts:
                     full_text += f"\n\n=== SECTION: {d['section'].replace('_',' ').upper()} ===\n"
-                    full_text += d['content'][:5000]  # First 5K chars per section
+                    full_text += d['content'][:5000]
 
                 budget_context = ""
                 if budget_row:
@@ -7391,14 +7426,19 @@ ISSUE: [description of the inconsistency]
 ...or...
 NO ISSUES FOUND"""
 
-                response = client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=review_prompt,
-                    config={"http_options": {"timeout": 20000}}
-                )
-                ai_result = response.text.strip()
+                try:
+                    resp_consistency = _req.post(api_url, json={'contents': [{'parts': [{'text': review_prompt}]}]}, headers=headers_req, timeout=20)
+                    data_consistency = resp_consistency.json()
+                    ai_result = ''
+                    if data_consistency.get('candidates'):
+                        parts_c = data_consistency['candidates'][0].get('content', {}).get('parts', [])
+                        if parts_c:
+                            ai_result = parts_c[0].get('text', '').strip()
+                except Exception as consistency_error:
+                    logger.warning(f"Consistency check AI error: {consistency_error}")
+                    ai_result = f"AI consistency check failed: {consistency_error}"
 
-                if 'NO ISSUES FOUND' not in ai_result.upper():
+                if ai_result and 'NO ISSUES FOUND' not in ai_result.upper():
                     for line in ai_result.split('\n'):
                         line = line.strip()
                         if line.startswith('ISSUE:'):
@@ -7635,28 +7675,31 @@ Generate a complete, formal {doc_label} that:
                             break
 
         if api_key:
+            import requests as _req
             max_retries = 3
             retry_delay = 2
-            response = None
+            generated_content = None
+            api_url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}'
+            headers = {'Content-Type': 'application/json'}
             for attempt in range(max_retries):
                 try:
-                    client = genai.Client(api_key=api_key)
-                    response = client.models.generate_content(
-                        model='gemini-2.5-flash',
-                        contents=prompt,
-                        config={"http_options": {"timeout": 30000}}
-                    )
+                    resp = _req.post(api_url, json={'contents': [{'parts': [{'text': prompt}]}]}, headers=headers, timeout=20)
+                    data = resp.json()
+                    if data.get('candidates'):
+                        parts = data['candidates'][0].get('content', {}).get('parts', [])
+                        if parts and parts[0].get('text'):
+                            generated_content = parts[0]['text']
+                            break
+                    if attempt < max_retries - 1:
+                        import time as _time; _time.sleep(retry_delay * (attempt + 1)); continue
+                    generated_content = f"[AI generation failed (no content). Please draft this {doc_label} manually.]"
                     break
                 except Exception as api_error:
                     if attempt < max_retries - 1 and ('ssl' in str(api_error).lower() or 'timeout' in str(api_error).lower() or 'connection' in str(api_error).lower()):
-                        import time as _time
-                        _time.sleep(retry_delay * (attempt + 1))
-                        continue
-                    raise
-
-            if response and response.text:
-                generated_content = response.text
-            else:
+                        import time as _time; _time.sleep(retry_delay * (attempt + 1)); continue
+                    generated_content = f"[AI generation failed: {api_error}. Please draft this {doc_label} manually.]"
+                    break
+            if generated_content is None:
                 generated_content = f"[AI generation failed. Please draft this {doc_label} manually.]"
         else:
             generated_content = f"""# {doc_label}
