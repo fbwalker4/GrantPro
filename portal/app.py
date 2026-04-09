@@ -8489,3 +8489,209 @@ if __name__ == '__main__':
     print("\n🚀 Starting server at http://localhost:5001\n")
     
     app.run(debug=False, host='0.0.0.0', port=5001)
+
+# ── FHLB Dallas Grant Sync Cron ───────────────────────────────────────────────
+@app.route('/api/cron/fhlb-sync', methods=['GET'])
+def cron_fhlb_sync():
+    """
+    Weekly cron: scrape FHLB Dallas website and upsert grants to Supabase.
+    Run weekly via Vercel cron: 0 6 * * 1 (Mondays 6am UTC)
+    """
+    import requests, re, psycopg2, urllib.parse
+    from datetime import datetime
+
+    HEADERS = {'User-Agent': 'Mozilla/5.0 (compatible; GrantProBot/1.0)'}
+    PROGRAMS = [
+        {'id': 'fhlb-dallas-ahp-general', 'name': 'AHP General Fund',
+         'agency': 'Federal Home Loan Bank of Dallas',
+         'url': 'https://www.fhlb.com/community-programs/affordable-housing-program-general-fund',
+         'grant_type': 'competitive'},
+        {'id': 'fhlb-dallas-help', 'name': 'HELP Down Payment Assistance',
+         'agency': 'Federal Home Loan Bank of Dallas',
+         'url': 'https://www.fhlb.com/community-programs/homeownership-programs/down-payment-and-closing-cost-assistance-help',
+         'grant_type': 'downpayment'},
+        {'id': 'fhlb-dallas-snap', 'name': 'SNAP Special Needs Assistance',
+         'agency': 'Federal Home Loan Bank of Dallas',
+         'url': 'https://www.fhlb.com/community-programs/homeownership-programs/special-needs-assistance-program-snap',
+         'grant_type': 'special_needs'},
+        {'id': 'fhlb-dallas-dra', 'name': 'DRA Disaster Rebuilding Assistance',
+         'agency': 'Federal Home Loan Bank of Dallas',
+         'url': 'https://www.fhlb.com/community-programs/homeownership-programs/disaster-rebuilding-assistance',
+         'grant_type': 'disaster'},
+    ]
+
+    def get_db():
+        db_url = os.environ.get('DATABASE_URL', '')
+        if not db_url:
+            env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+            if os.path.exists(env_path):
+                for line in open(env_path):
+                    k, _, v = line.strip().partition('=')
+                    if k == 'DATABASE_URL':
+                        db_url = v.strip()
+        p = urllib.parse.urlparse(db_url)
+        pw = urllib.parse.unquote(p.password) if '%' in p.password else p.password
+        return psycopg2.connect(host=p.hostname, port=p.port or 6543, dbname=p.path[1:],
+                                user=p.username, password=pw)
+
+    def scrape(url):
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=15)
+            if r.status_code != 200:
+                return ''
+            html = re.sub(r'<script[^>]*>.*?</script>', '', r.text, flags=re.S)
+            html = re.sub(r'<style[^>]*>.*?</style>', '', html, flags=re.S)
+            return re.sub(r'<[^>]+>', ' ', html)
+        except:
+            return ''
+
+    def window_dates(text):
+        m = re.search(r'([A-Za-z]+\s+\d{1,2},?\s+\d{4})\s+through\s+([A-Za-z]+\s+\d{1,2},?\s+\d{4})', text)
+        if m:
+            try:
+                od = datetime.strptime(m.group(1).replace(',', ''), '%B %d %Y').strftime('%Y-%m-%d')
+                cd = datetime.strptime(m.group(2).replace(',', ''), '%B %d %Y').strftime('%Y-%m-%d')
+                return od, cd
+            except:
+                return '', ''
+        return '', ''
+
+    def upsert(g):
+        conn = get_db()
+        c = conn.cursor()
+        now = datetime.now().isoformat()
+        try:
+            c.execute("""INSERT INTO grants_catalog
+                (id, opportunity_number, title, agency, description, eligibility, amount_min, amount_max,
+                 open_date, close_date, grant_type, source, status, created_at, updated_at, url)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                ON CONFLICT (id) DO UPDATE SET
+                    title=EXCLUDED.title, description=EXCLUDED.description,
+                    close_date=EXCLUDED.close_date, status=EXCLUDED.status, updated_at=EXCLUDED.updated_at""",
+                (g['id'], g.get('opp', ''), g['title'], g['agency'], g.get('desc', ''),
+                 g.get('elig', ''), g.get('min', 10000), g.get('max', 500000),
+                 g.get('open', ''), g['close'], g['grant_type'], 'fhlb-dallas',
+                 g['status'], now, now, g['url']))
+            conn.commit()
+        finally:
+            conn.close()
+
+    year = datetime.now().year
+    results = []
+    for prog in PROGRAMS:
+        for yr in [year, year + 1]:
+            text = scrape(prog['url'])
+            today = datetime.now().strftime('%Y-%m-%d')
+            open_d, close_d = window_dates(text) if text else ('', '')
+            deadline = close_d or f'{yr}-04-30'
+            open_dt = open_d or f'{yr}-01-01'
+            status = 'closed' if deadline < today else ('posted' if open_dt <= today else 'forecasted')
+            amt_min = 1000 if 'down payment' in prog['name'].lower() else 10000
+            amt_max = 25000 if 'down payment' in prog['name'].lower() else 500000
+            desc = text[:2000] if text else f"FHLB Dallas {prog['name']}."
+            elig = 'Housing authorities, nonprofits, developers in FHLB Dallas district (AL, AR, LA, MS, TX). Must be FHLB member.'
+            g = {'id': f"{prog['id']}-{yr}",
+                 'opp': f"FHLBD-{prog['id'].split('-')[-1].upper()}-{yr}",
+                 'title': f"{prog['name']} ({yr})",
+                 'agency': prog['agency'],
+                 'desc': desc[:2000],
+                 'elig': elig,
+                 'min': amt_min,
+                 'max': amt_max,
+                 'open': open_dt,
+                 'close': deadline,
+                 'grant_type': prog['grant_type'],
+                 'status': status,
+                 'url': prog['url']}
+            upsert(g)
+            results.append({'id': g['id'], 'status': status})
+
+    return jsonify({'ok': True, 'synced': results, 'count': len(results)})
+
+
+# ── Grant Hygiene Cron ────────────────────────────────────────────────────────
+@app.route('/api/cron/hygiene', methods=['GET'])
+def cron_grant_hygiene():
+    """
+    Database hygiene: normalize dates, archive expired grants, clean stale entries.
+    Run weekly via Vercel cron.
+    """
+    import re as re_mod
+    from datetime import datetime, timedelta
+
+    def parse_date(s):
+        if not s or str(s).strip() in ('', 'None'):
+            return None
+        s = str(s).strip()
+        if re_mod.match(r'^\d{4}-\d{2}-\d{2}', s):
+            return s[:10]
+        m = re_mod.match(r'^(\d{1,2})/(\d{1,2})/(\d{4})$', s)
+        if m:
+            return f"{m.group(3)}-{int(m.group(1)):02d}-{int(m.group(2)):02d}"
+        return None
+
+    def get_db():
+        db_url = os.environ.get('DATABASE_URL', '')
+        if not db_url:
+            env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+            if os.path.exists(env_path):
+                for line in open(env_path):
+                    k, _, v = line.strip().partition('=')
+                    if k == 'DATABASE_URL':
+                        db_url = v.strip()
+        p = urllib.parse.urlparse(db_url)
+        pw = urllib.parse.unquote(p.password) if '%' in p.password else p.password
+        return psycopg2.connect(host=p.hostname, port=p.port or 6543, dbname=p.path[1:],
+                                user=p.username, password=pw)
+
+    conn = get_db()
+    c = conn.cursor()
+    stats = {}
+    today = datetime.now().strftime('%Y-%m-%d')
+    thirty_days_ago = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+    one_year_ago = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')
+
+    # Normalize close_date formats
+    c.execute("SELECT id, close_date FROM grants_catalog WHERE close_date IS NOT NULL AND close_date != ''")
+    normalized = 0
+    for grant_id, close_date in c.fetchall():
+        new_date = parse_date(close_date)
+        if new_date and new_date != str(close_date):
+            c.execute("UPDATE grants_catalog SET close_date = %s WHERE id = %s", (new_date, grant_id))
+            normalized += 1
+    stats['normalized_dates'] = normalized
+
+    # Merge 'active' into 'posted'
+    c.execute("SELECT COUNT(*) FROM grants_catalog WHERE status = 'active'")
+    active_count = c.fetchone()[0]
+    c.execute("UPDATE grants_catalog SET status = 'posted' WHERE status = 'active'")
+    stats['active_merged'] = active_count
+
+    # Pre-fetch in-use grant IDs
+    c.execute('SELECT DISTINCT grant_id FROM saved_grants WHERE grant_id IS NOT NULL')
+    saved = {r[0] for r in c.fetchall()}
+    c.execute('SELECT DISTINCT grant_id FROM user_applications WHERE grant_id IS NOT NULL')
+    applied = {r[0] for r in c.fetchall()}
+    in_use = saved | applied
+
+    # Archive expired grants not in use
+    c.execute("""SELECT id FROM grants_catalog
+        WHERE close_date IS NOT NULL AND close_date != ''
+        AND close_date ~ E'^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+        AND close_date < %s
+        AND status NOT IN ('archived','closed')""", (thirty_days_ago,))
+    to_archive = [r[0] for r in c.fetchall() if r[0] not in in_use]
+    if to_archive:
+        placeholders = ','.join(['%s'] * len(to_archive))
+        c.execute(f'UPDATE grants_catalog SET status = %s WHERE id IN ({placeholders})', ['archived'] + to_archive)
+    stats['archived'] = len(to_archive)
+
+    # Delete stale grants with no close_date >1yr old
+    c.execute('DELETE FROM grants_catalog WHERE (close_date IS NULL OR close_date = %s OR close_date = %s) AND created_at < %s AND id NOT IN (SELECT DISTINCT grant_id FROM saved_grants) AND id NOT IN (SELECT DISTINCT grant_id FROM user_applications)',
+               ('', 'None', one_year_ago))
+    stats['deleted_stale'] = c.rowcount
+
+    conn.commit()
+    conn.close()
+    return jsonify({'ok': True, 'stats': stats})
+

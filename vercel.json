@@ -11,10 +11,6 @@
     {
       "src": "api/health.py",
       "use": "@vercel/python"
-    },
-    {
-      "src": "api/cron/fhlb_sync.py",
-      "use": "@vercel/python"
     }
   ],
   "routes": [
@@ -23,8 +19,8 @@
       "dest": "api/health.py"
     },
     {
-      "src": "/api/cron/fhlb-sync",
-      "dest": "api/cron/fhlb_sync.py"
+      "src": "/api/cron/.*",
+      "dest": "api/index.py"
     },
     {
       "src": "/(.*)",
@@ -35,6 +31,10 @@
     {
       "path": "/api/cron/fhlb-sync",
       "schedule": "0 6 * * 1"
+    },
+    {
+      "path": "/api/cron/hygiene",
+      "schedule": "0 5 * * 1"
     }
   ]
 }
