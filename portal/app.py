@@ -175,6 +175,31 @@ def generate_csrf_token():
 
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
+
+def _format_date(value):
+    """Normalize a date value to YYYY-MM-DD string. Handles ISO dates,
+    US-style MM/DD/YYYY, and already-formatted strings uniformly."""
+    if not value:
+        return ''
+    s = str(value).strip()
+    # Already ISO (YYYY-MM-DD or YYYY-MM-DDTHH:...)
+    if len(s) >= 10 and s[4] == '-' and s[7] == '-':
+        return s[:10]
+    # MM/DD/YYYY or M/D/YYYY
+    parts = s.split('/')
+    if len(parts) == 3:
+        try:
+            m, d, y = int(parts[0]), int(parts[1]), int(parts[2])
+            if 1900 <= y <= 2100 and 1 <= m <= 12 and 1 <= d <= 31:
+                return f"{y:04d}-{m:02d}-{d:02d}"
+        except (ValueError, IndexError):
+            pass
+    # Fallback: strip time and return first 10 chars
+    return s[:10]
+
+
+app.jinja_env.filters['std_date'] = _format_date
+
 def csrf_required(f):
     """Decorator to require CSRF token on POST requests.
     
