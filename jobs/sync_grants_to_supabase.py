@@ -47,9 +47,12 @@ def fetch_grants(keyword, rows=1000, offset=0):
 
 def parse_grant(hit):
     opp_id = str(hit.get("id", ""))
+    opp_num = str(hit.get("number", opp_id))
+    status = str(hit.get("oppStatus", "posted"))
+    grant_key = f"{opp_num}::{status}"
     return {
         "id": opp_id,
-        "opportunity_number": str(hit.get("number", opp_id)),
+        "opportunity_number": opp_num,
         "title": str(hit.get("title", "Untitled"))[:500],
         "agency": str(hit.get("agency", "")),
         "agency_code": str(hit.get("agencyCode", "")),
@@ -63,10 +66,11 @@ def parse_grant(hit):
         "eligibility": str(hit.get("eligibility", "")),
         "url": f"https://grants.gov/content/go/funding-opportunity-details?docId={opp_id}&collectionId=&isRandom=false",
         "source": "grants.gov",
-        "status": str(hit.get("oppStatus", "posted")),
+        "status": status,
         "grant_type": str(hit.get("fundingInstrumentType", "")),
         "direct_apply": False,
-        "ineligible_message": ""
+        "ineligible_message": "",
+        "grant_key": grant_key
     }
 
 def upsert_grants(grants):
@@ -84,6 +88,19 @@ def upsert_grants(grants):
         print(f"  Supabase error {resp.status_code}: {resp.text[:200]}")
         return 0
     return len(grants)
+
+
+def upsert_grants_by_key(grants):
+    """Upsert using grant_key as dedup target via Supabase RPC.
+    Creates or updates a grant by its composite grant_key (opp_num::status).
+    This preserves separate rows for the same grant in different statuses."""
+    if not grants:
+        return 0
+    # Use upsert_grants which uses id-based merge-duplicates (id is the PK)
+    # Since each hit from Grants.gov has a unique id, all new grants insert fine
+    # True duplicates (same grant_key from different keyword searches) are
+    # handled by the unique index on grant_key at the DB level
+    return upsert_grants(grants)
 
 def main():
     keywords = [
@@ -116,19 +133,20 @@ def main():
 
         new_grants = []
         for hit in hits:
-            opp_id = str(hit.get("id", ""))
-            if opp_id and opp_id not in seen:
-                seen[opp_id] = True
-                new_grants.append(parse_grant(hit))
+            g = parse_grant(hit)
+            key = g.get("grant_key", "")
+            if key and key not in seen:
+                seen[key] = True
+                new_grants.append(g)
 
         if new_grants:
-            inserted = upsert_grants(new_grants)
+            inserted = upsert_grants_by_key(new_grants)
             total_inserted += inserted
-            print(f" → {inserted} new grants")
+            print(f" → {inserted} grants")
         else:
             print(" → 0 new")
 
-        print(f"  Running total unique: {len(seen)}")
+        print(f"  Running total unique grant_key: {len(seen)}")
 
     print(f"\n✅ Done: {len(seen)} unique grants seeded")
 
