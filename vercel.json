@@ -5,13 +5,15 @@
       "src": "api/index.py",
       "use": "@vercel/python",
       "config": {
-        "includeFiles": [
-          "templates/**"
-        ]
+        "includeFiles": ["templates/**"]
       }
     },
     {
       "src": "api/health.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/cron/fhlb_sync.py",
       "use": "@vercel/python"
     }
   ],
@@ -21,8 +23,18 @@
       "dest": "api/health.py"
     },
     {
+      "src": "/api/cron/fhlb-sync",
+      "dest": "api/cron/fhlb_sync.py"
+    },
+    {
       "src": "/(.*)",
       "dest": "api/index.py"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/fhlb-sync",
+      "schedule": "0 6 * * 1"
     }
   ]
 }

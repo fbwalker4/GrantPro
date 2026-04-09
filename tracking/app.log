@@ -1,0 +1,1137 @@
+2026-03-22 06:16:03,056 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-22 06:16:08,185 WARNING grantpro: Consistency check 16 (letters) failed: operator does not exist: boolean = integer
+LINE 1: ...74218' AND doc_type = 'letters_of_support' AND generated = 1
+                                                                    ^
+HINT:  No operator matches the given name and argument types. You might need to add explicit type casts.
+
+2026-03-22 06:29:03,329 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-22 06:29:08,220 WARNING grantpro: Consistency check 14 (SF-424) failed: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+2026-03-22 06:29:11,470 WARNING grantpro: Consistency check 14 (SF-424) failed: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+2026-03-22 06:29:15,017 WARNING grantpro: Consistency check 14 (SF-424) failed: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+2026-03-22 06:29:17,867 WARNING grantpro: Consistency check 14 (SF-424) failed: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+2026-03-22 06:29:20,718 WARNING grantpro: Consistency check 14 (SF-424) failed: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+2026-03-22 06:29:23,130 WARNING grantpro: Consistency check 14 (SF-424) failed: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+2026-03-22 21:22:33,228 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-22 21:22:37,099 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-03-22 21:22:37,099 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-22 21:22:47,592 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:22:47] "GET / HTTP/1.1" 200 -
+2026-03-22 21:22:48,786 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:22:48] "GET /search HTTP/1.1" 200 -
+2026-03-22 21:22:49,201 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:22:49] "GET /login HTTP/1.1" 200 -
+2026-03-22 21:22:49,641 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:22:49] "GET /signup HTTP/1.1" 200 -
+2026-03-22 21:22:50,079 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:22:50] "GET /pricing HTTP/1.1" 200 -
+2026-03-22 21:22:50,521 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:22:50] "GET /forgot-password HTTP/1.1" 200 -
+2026-03-22 21:22:50,943 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:22:50] "GET /terms HTTP/1.1" 200 -
+2026-03-22 21:22:51,385 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:22:51] "GET /privacy HTTP/1.1" 200 -
+2026-03-22 21:22:51,834 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:22:51] "GET /guide HTTP/1.1" 200 -
+2026-03-22 21:22:52,285 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:22:52] "GET /help HTTP/1.1" 200 -
+2026-03-22 21:23:00,304 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:00] "GET /signup HTTP/1.1" 200 -
+2026-03-22 21:23:00,345 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:00] "[32mPOST /signup HTTP/1.1[0m" 302 -
+2026-03-22 21:23:17,882 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:17] "[32mGET /dashboard HTTP/1.1[0m" 302 -
+2026-03-22 21:23:17,888 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:17] "[32mGET /onboarding HTTP/1.1[0m" 302 -
+2026-03-22 21:23:17,893 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:17] "[32mGET /profile HTTP/1.1[0m" 302 -
+2026-03-22 21:23:17,898 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:17] "[32mGET /account/settings HTTP/1.1[0m" 302 -
+2026-03-22 21:23:17,903 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:17] "[32mGET /account/export-data HTTP/1.1[0m" 302 -
+2026-03-22 21:23:17,908 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:17] "[32mGET /account/cancel HTTP/1.1[0m" 302 -
+2026-03-22 21:23:17,914 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:17] "[32mGET /account/delete HTTP/1.1[0m" 302 -
+2026-03-22 21:23:17,919 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:17] "[32mGET /upgrade HTTP/1.1[0m" 302 -
+2026-03-22 21:23:17,925 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:17] "[32mGET /my-grants HTTP/1.1[0m" 302 -
+2026-03-22 21:23:17,930 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:17] "[32mGET /clients HTTP/1.1[0m" 302 -
+2026-03-22 21:23:17,936 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:17] "[32mGET /grants HTTP/1.1[0m" 302 -
+2026-03-22 21:23:17,941 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:17] "[32mGET /vault HTTP/1.1[0m" 302 -
+2026-03-22 21:23:17,946 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:17] "[32mGET /wizard HTTP/1.1[0m" 302 -
+2026-03-22 21:23:17,952 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:17] "[32mGET /templates HTTP/1.1[0m" 302 -
+2026-03-22 21:23:18,362 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:18] "GET /eligibility HTTP/1.1" 200 -
+2026-03-22 21:23:18,803 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:18] "GET /contact HTTP/1.1" 200 -
+2026-03-22 21:23:28,961 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:28] "GET /login HTTP/1.1" 200 -
+2026-03-22 21:23:29,419 WARNING grantpro: Failed login attempt for: rusty@test.com from 127.0.0.1
+2026-03-22 21:23:29,830 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:29] "POST /login HTTP/1.1" 200 -
+2026-03-22 21:23:29,857 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:29] "[32mGET /dashboard HTTP/1.1[0m" 302 -
+2026-03-22 21:23:29,870 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:29] "[32mGET /onboarding HTTP/1.1[0m" 302 -
+2026-03-22 21:23:29,882 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:29] "[32mGET /profile HTTP/1.1[0m" 302 -
+2026-03-22 21:23:29,892 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:29] "[32mGET /account/settings HTTP/1.1[0m" 302 -
+2026-03-22 21:23:29,900 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:29] "[32mGET /account/export-data HTTP/1.1[0m" 302 -
+2026-03-22 21:23:29,908 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:29] "[32mGET /account/delete HTTP/1.1[0m" 302 -
+2026-03-22 21:23:29,914 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:29] "[32mGET /upgrade HTTP/1.1[0m" 302 -
+2026-03-22 21:23:29,920 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:29] "[32mGET /my-grants HTTP/1.1[0m" 302 -
+2026-03-22 21:23:29,926 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:29] "[32mGET /clients HTTP/1.1[0m" 302 -
+2026-03-22 21:23:29,932 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:29] "[32mGET /grants HTTP/1.1[0m" 302 -
+2026-03-22 21:23:29,937 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:29] "[32mGET /vault HTTP/1.1[0m" 302 -
+2026-03-22 21:23:29,942 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:29] "[32mGET /wizard HTTP/1.1[0m" 302 -
+2026-03-22 21:23:29,947 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:29] "[32mGET /templates HTTP/1.1[0m" 302 -
+2026-03-22 21:23:59,295 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:23:59] "GET /login HTTP/1.1" 200 -
+2026-03-22 21:24:00,222 INFO grantpro: User login: qatest@grantpro.test
+2026-03-22 21:24:00,224 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:24:00] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-22 21:24:08,447 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:24:08] "GET /dashboard HTTP/1.1" 200 -
+2026-03-22 21:24:25,338 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:24:25] "GET /dashboard HTTP/1.1" 200 -
+2026-03-22 21:24:29,910 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:24:29] "GET /profile HTTP/1.1" 200 -
+2026-03-22 21:24:34,734 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:24:34] "GET /onboarding HTTP/1.1" 200 -
+2026-03-22 21:24:39,855 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:24:39] "GET /account/settings HTTP/1.1" 200 -
+2026-03-22 21:24:44,687 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:24:44] "GET /account/export-data HTTP/1.1" 200 -
+2026-03-22 21:24:49,436 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:24:49] "GET /account/delete HTTP/1.1" 200 -
+2026-03-22 21:24:54,561 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:24:54] "GET /account/cancel HTTP/1.1" 200 -
+2026-03-22 21:24:55,420 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:24:55] "[32mGET /upgrade HTTP/1.1[0m" 302 -
+2026-03-22 21:24:56,273 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:24:56] "[32mGET /upgrade HTTP/1.1[0m" 302 -
+2026-03-22 21:25:01,806 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:25:01] "GET /my-grants HTTP/1.1" 200 -
+2026-03-22 21:25:06,381 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:25:06] "GET /clients HTTP/1.1" 200 -
+2026-03-22 21:25:13,174 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:25:13] "GET /grants HTTP/1.1" 200 -
+2026-03-22 21:25:17,384 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:25:17] "GET /vault HTTP/1.1" 200 -
+2026-03-22 21:25:21,557 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:25:21] "GET /wizard HTTP/1.1" 200 -
+2026-03-22 21:25:25,358 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:25:25] "GET /templates HTTP/1.1" 200 -
+2026-03-22 21:25:29,503 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:25:29] "GET /eligibility HTTP/1.1" 200 -
+2026-03-22 21:25:33,246 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:25:33] "GET /contact HTTP/1.1" 200 -
+2026-03-22 21:25:37,344 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:25:37] "GET /search HTTP/1.1" 200 -
+2026-03-22 21:25:40,627 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:25:40] "GET /guide HTTP/1.1" 200 -
+2026-03-22 21:25:43,971 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:25:43] "GET /guide/sam-registration HTTP/1.1" 200 -
+2026-03-22 21:25:47,741 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:25:47] "GET /help HTTP/1.1" 200 -
+2026-03-22 21:25:51,102 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:25:51] "GET /pricing HTTP/1.1" 200 -
+2026-03-22 21:26:02,479 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:26:02] "GET /api/search-grants?q=community+development HTTP/1.1" 200 -
+2026-03-22 21:26:06,955 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:26:06] "GET /grant-info/NSF-2025-001 HTTP/1.1" 200 -
+2026-03-22 21:26:14,280 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:26:14] "[32mGET /start-grant/NSF-2025-001 HTTP/1.1[0m" 302 -
+2026-03-22 21:26:19,266 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:26:19] "[32mGET /start-grant/NSF-2025-001 HTTP/1.1[0m" 302 -
+2026-03-22 21:26:40,621 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:26:40] "GET /my-grants HTTP/1.1" 200 -
+2026-03-22 21:26:45,827 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:26:45] "GET /grant/grant-20260322-212618-9edfcf8c HTTP/1.1" 200 -
+2026-03-22 21:26:50,932 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:26:50] "GET /grant/grant-20260322-212618-9edfcf8c/section/project_summary HTTP/1.1" 200 -
+2026-03-22 21:26:52,810 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:26:52] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/section/project_summary HTTP/1.1[0m" 302 -
+2026-03-22 21:26:58,294 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:26:58] "GET /grant/grant-20260322-212618-9edfcf8c/budget-builder HTTP/1.1" 200 -
+2026-03-22 21:27:08,942 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:27:08] "GET /grant/grant-20260322-212618-9edfcf8c/checklist HTTP/1.1" 200 -
+2026-03-22 21:27:11,108 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:27:11] "GET /grant/grant-20260322-212618-9edfcf8c/download/txt HTTP/1.1" 200 -
+2026-03-22 21:27:14,908 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:27:14] "GET /grant/grant-20260322-212618-9edfcf8c/download/pdf HTTP/1.1" 200 -
+2026-03-22 21:27:30,964 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:27:30] "GET /grant/grant-20260322-212618-9edfcf8c HTTP/1.1" 200 -
+2026-03-22 21:27:35,790 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-03-22 21:27:51,745 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 200 OK"
+2026-03-22 21:27:51,908 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 21:27:51] "POST /grant/grant-20260322-212618-9edfcf8c/generate/project_summary HTTP/1.1" 200 -
+2026-03-22 23:44:21,259 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-22 23:44:26,105 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-03-22 23:44:26,105 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-22 23:44:33,112 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:44:33] "GET / HTTP/1.1" 200 -
+2026-03-22 23:44:53,640 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:44:53] "GET /login HTTP/1.1" 200 -
+2026-03-22 23:44:54,587 INFO grantpro: User login: qatest@grantpro.test
+2026-03-22 23:44:54,589 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:44:54] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-22 23:45:00,094 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:45:00] "GET /my-grants HTTP/1.1" 200 -
+2026-03-22 23:45:01,862 ERROR app: Exception on /grant/grant-20260322-212618-9edfcf8c/section/project_summary [GET]
+Traceback (most recent call last):
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 305, in decorated_function
+    return f(*args, **kwargs)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 195, in decorated_function
+    return f(*args, **kwargs)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 3312, in grant_section
+    return render_template('section_form.html',
+                         grant=grant,
+    ...<2 lines>...
+                         section_guidance=section_guidance,
+                         formatting_rules=formatting_rules)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/templating.py", line 150, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/templates/section_form.html", line 36, in template
+    <p style="color: #a8c8e0;"><strong>Character Limit:</strong> {{ section_guidance.max_chars|int:, }}</p>
+    ^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: expected token 'end of print statement', got ':'
+2026-03-22 23:45:05,273 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:45:05] "[35m[1mGET /grant/grant-20260322-212618-9edfcf8c/section/project_summary HTTP/1.1[0m" 500 -
+2026-03-22 23:45:05,710 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:45:05] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/section/project_summary HTTP/1.1[0m" 302 -
+2026-03-22 23:45:09,641 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:45:09] "GET /grant/grant-20260322-212618-9edfcf8c/download/pdf HTTP/1.1" 200 -
+2026-03-22 23:47:06,326 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-22 23:47:10,116 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-03-22 23:47:10,117 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-22 23:47:18,753 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:47:18] "GET / HTTP/1.1" 200 -
+2026-03-22 23:47:31,566 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:47:31] "GET /login HTTP/1.1" 200 -
+2026-03-22 23:47:32,559 INFO grantpro: User login: qatest@grantpro.test
+2026-03-22 23:47:32,561 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:47:32] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-22 23:47:34,304 ERROR app: Exception on /grant/grant-20260322-212618-9edfcf8c/section/project_summary [GET]
+Traceback (most recent call last):
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 305, in decorated_function
+    return f(*args, **kwargs)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 195, in decorated_function
+    return f(*args, **kwargs)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 3312, in grant_section
+    return render_template('section_form.html',
+                         grant=grant,
+    ...<2 lines>...
+                         section_guidance=section_guidance,
+                         formatting_rules=formatting_rules)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/templating.py", line 150, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/templates/section_form.html", line 36, in template
+    <p style="color: #a8c8e0;"><strong>Character Limit:</strong> {{ section_guidance.max_chars|int:, }}</p>
+    ^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: expected token 'end of print statement', got ':'
+2026-03-22 23:47:37,690 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:47:37] "[35m[1mGET /grant/grant-20260322-212618-9edfcf8c/section/project_summary HTTP/1.1[0m" 500 -
+2026-03-22 23:47:38,138 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:47:38] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/section/project_summary HTTP/1.1[0m" 302 -
+2026-03-22 23:47:41,879 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:47:41] "GET /grant/grant-20260322-212618-9edfcf8c/download/pdf HTTP/1.1" 200 -
+2026-03-22 23:51:19,665 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-22 23:51:23,603 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-03-22 23:51:23,603 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-22 23:51:31,596 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:51:31] "GET / HTTP/1.1" 200 -
+2026-03-22 23:51:46,577 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:51:46] "GET /login HTTP/1.1" 200 -
+2026-03-22 23:51:47,516 INFO grantpro: User login: qatest@grantpro.test
+2026-03-22 23:51:47,517 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:51:47] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-22 23:51:49,287 ERROR app: Exception on /grant/grant-20260322-212618-9edfcf8c/section/project_summary [GET]
+Traceback (most recent call last):
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 305, in decorated_function
+    return f(*args, **kwargs)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 195, in decorated_function
+    return f(*args, **kwargs)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 3312, in grant_section
+    return render_template('section_form.html',
+                         grant=grant,
+    ...<2 lines>...
+                         section_guidance=section_guidance,
+                         formatting_rules=formatting_rules)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/templating.py", line 150, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/templates/section_form.html", line 36, in template
+    <p style="color: #a8c8e0;"><strong>Character Limit:</strong> {{ section_guidance.max_chars|int:, }}</p>
+    ^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: expected token 'end of print statement', got ':'
+2026-03-22 23:51:52,681 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:51:52] "[35m[1mGET /grant/grant-20260322-212618-9edfcf8c/section/project_summary HTTP/1.1[0m" 500 -
+2026-03-22 23:51:53,130 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:51:53] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/section/project_summary HTTP/1.1[0m" 302 -
+2026-03-22 23:51:56,716 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:51:56] "GET /grant/grant-20260322-212618-9edfcf8c/download/pdf HTTP/1.1" 200 -
+2026-03-22 23:52:56,291 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-22 23:53:00,110 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-03-22 23:53:00,110 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-22 23:53:03,721 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:53:03] "GET / HTTP/1.1" 200 -
+2026-03-22 23:53:12,084 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:53:12] "GET /login HTTP/1.1" 200 -
+2026-03-22 23:53:13,020 INFO grantpro: User login: qatest@grantpro.test
+2026-03-22 23:53:13,022 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:53:13] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-22 23:53:18,241 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:53:18] "GET /grant/grant-20260322-212618-9edfcf8c/section/project_summary HTTP/1.1" 200 -
+2026-03-22 23:53:35,729 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:53:35] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/section/project_summary HTTP/1.1[0m" 302 -
+2026-03-22 23:53:39,990 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:53:39] "GET /grant/grant-20260322-212618-9edfcf8c/download/pdf HTTP/1.1" 200 -
+2026-03-22 23:53:58,009 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:53:58] "GET /grant/grant-20260322-212618-9edfcf8c/section/project_summary HTTP/1.1" 200 -
+2026-03-22 23:53:58,437 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:53:58] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/section/project_summary HTTP/1.1[0m" 302 -
+2026-03-22 23:54:57,125 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:54:57] "GET /grant/grant-20260322-212618-9edfcf8c/download/pdf HTTP/1.1" 200 -
+2026-03-22 23:56:07,113 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-22 23:56:10,897 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-03-22 23:56:10,897 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-22 23:56:17,789 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:56:17] "GET / HTTP/1.1" 200 -
+2026-03-22 23:56:27,738 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:56:27] "GET /login HTTP/1.1" 200 -
+2026-03-22 23:56:28,696 INFO grantpro: User login: qatest@grantpro.test
+2026-03-22 23:56:28,698 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:56:28] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-22 23:56:32,476 INFO werkzeug: 127.0.0.1 - - [22/Mar/2026 23:56:32] "GET /grant/grant-20260322-212618-9edfcf8c/download/pdf HTTP/1.1" 200 -
+2026-03-23 09:47:34,639 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-23 09:47:38,401 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-03-23 09:47:38,401 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-23 09:47:47,668 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:47:47] "GET / HTTP/1.1" 200 -
+2026-03-23 09:48:01,788 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:48:01] "GET /login HTTP/1.1" 200 -
+2026-03-23 09:48:02,699 INFO grantpro: User login: qatest@grantpro.test
+2026-03-23 09:48:02,700 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:48:02] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-23 09:48:08,192 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:48:08] "GET /grant/grant-20260322-212618-9edfcf8c HTTP/1.1" 200 -
+2026-03-23 09:48:13,626 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:48:13] "GET /grant/grant-20260322-212618-9edfcf8c HTTP/1.1" 200 -
+2026-03-23 09:48:25,417 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:48:25] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:48:42,567 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:48:42] "GET /grant/grant-20260322-212618-9edfcf8c HTTP/1.1" 200 -
+2026-03-23 09:48:48,126 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:48:48] "GET /grant/grant-20260322-212618-9edfcf8c HTTP/1.1" 200 -
+2026-03-23 09:49:33,528 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-23 09:49:37,303 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-03-23 09:49:37,304 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-23 09:49:50,023 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:49:50] "GET / HTTP/1.1" 200 -
+2026-03-23 09:49:59,686 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:49:59] "GET /login HTTP/1.1" 200 -
+2026-03-23 09:50:00,790 INFO grantpro: User login: qatest@grantpro.test
+2026-03-23 09:50:00,791 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:50:00] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-23 09:50:06,233 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:50:06] "GET /grant/grant-20260322-212618-9edfcf8c HTTP/1.1" 200 -
+2026-03-23 09:50:06,653 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:50:06] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:14,219 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-23 09:51:17,999 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-03-23 09:51:18,000 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-23 09:51:19,212 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:19] "GET /login HTTP/1.1" 200 -
+2026-03-23 09:51:20,122 INFO grantpro: User login: qatest@grantpro.test
+2026-03-23 09:51:20,123 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:20] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-23 09:51:25,634 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:25] "GET /grant/grant-20260322-212618-9edfcf8c HTTP/1.1" 200 -
+2026-03-23 09:51:26,061 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:26] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:26,473 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:26] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:26,880 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:26] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:27,322 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:27] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:27,727 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:27] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:28,132 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:28] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:28,553 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:28] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:28,965 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:28] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:29,377 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:29] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:29,804 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:29] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:30,207 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:30] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:30,616 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:30] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:31,023 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:31] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:31,431 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:31] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:31,852 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:31] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:32,266 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:32] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:32,681 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:32] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:33,091 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:33] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:33,504 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:33] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:33,926 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:33] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:34,332 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:34] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:34,752 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:34] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:35,166 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:35] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:35,589 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:35] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:36,000 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:36] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:36,421 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:36] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:36,833 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:36] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:37,259 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:37] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:37,665 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:37] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:38,070 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:38] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:38,481 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:38] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:38,893 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:38] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:39,303 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:39] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:39,710 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:39] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:40,186 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:40] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:40,608 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:40] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:41,018 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:41] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:41,434 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:41] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:41,851 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:41] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:42,265 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:42] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:42,673 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:42] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:43,087 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:43] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:43,500 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:43] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:43,915 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:43] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:44,390 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:44] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:44,808 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:44] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:45,217 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:45] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:45,640 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:45] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:46,055 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:46] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:46,468 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:46] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:51:46,870 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:51:46] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:52:05,022 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:52:05] "GET /grant/grant-20260322-212618-9edfcf8c HTTP/1.1" 200 -
+2026-03-23 09:52:05,471 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:52:05] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:52:53,406 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:52:53] "GET /grant/grant-20260322-212618-9edfcf8c HTTP/1.1" 200 -
+2026-03-23 09:52:55,786 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-03-23 09:53:42,342 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 200 OK"
+2026-03-23 09:53:43,605 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:53:43] "[32mPOST /grant/grant-20260322-212618-9edfcf8c/upload-nofo HTTP/1.1[0m" 302 -
+2026-03-23 09:53:57,610 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:53:57] "GET /grant/grant-20260322-212618-9edfcf8c HTTP/1.1" 200 -
+2026-03-23 09:54:39,796 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 09:54:39] "GET /grant/grant-20260322-212618-9edfcf8c HTTP/1.1" 200 -
+2026-03-23 10:09:22,712 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-23 10:09:26,487 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-03-23 10:09:26,487 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-23 10:09:27,837 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:09:27] "GET / HTTP/1.1" 200 -
+2026-03-23 10:09:42,504 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:09:42] "GET /signup HTTP/1.1" 200 -
+2026-03-23 10:09:42,925 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:09:42] "GET /signup HTTP/1.1" 200 -
+2026-03-23 10:09:43,943 INFO grantpro: New user registered: basictest1774278582@grantpro.test (plan: free)
+2026-03-23 10:09:44,469 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:09:44] "[32mPOST /signup HTTP/1.1[0m" 302 -
+2026-03-23 10:09:48,837 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:09:48] "GET /onboarding HTTP/1.1" 200 -
+2026-03-23 10:09:53,152 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:09:53] "GET /onboarding HTTP/1.1" 200 -
+2026-03-23 10:10:00,509 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:10:00] "GET /dashboard HTTP/1.1" 200 -
+2026-03-23 10:10:07,859 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:10:07] "GET /dashboard HTTP/1.1" 200 -
+2026-03-23 10:10:23,033 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:10:23] "GET /api/search-grants?q=housing HTTP/1.1" 200 -
+2026-03-23 10:10:27,069 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:10:27] "GET /grant-info/NSF-2025-001 HTTP/1.1" 200 -
+2026-03-23 10:10:27,896 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:10:27] "[32mGET /start-grant/NSF-2025-001 HTTP/1.1[0m" 302 -
+2026-03-23 10:10:31,623 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:10:31] "GET /upgrade HTTP/1.1" 200 -
+2026-03-23 10:11:01,110 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:11:01] "[32mGET /start-grant/NSF-2025-001 HTTP/1.1[0m" 302 -
+2026-03-23 10:11:05,677 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:11:05] "GET /my-grants HTTP/1.1" 200 -
+2026-03-23 10:11:10,209 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:11:10] "GET /my-grants HTTP/1.1" 200 -
+2026-03-23 10:11:15,274 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:11:15] "GET /grant/grant-20260323-101100-6af720a2 HTTP/1.1" 200 -
+2026-03-23 10:11:20,346 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:11:20] "GET /grant/grant-20260323-101100-6af720a2 HTTP/1.1" 200 -
+2026-03-23 10:11:43,106 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:11:43] "GET /grant/grant-20260323-101100-6af720a2/section/project_summary HTTP/1.1" 200 -
+2026-03-23 10:11:48,204 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:11:48] "GET /grant/grant-20260323-101100-6af720a2/section/project_summary HTTP/1.1" 200 -
+2026-03-23 10:11:50,022 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:11:50] "[32mPOST /grant/grant-20260323-101100-6af720a2/section/project_summary HTTP/1.1[0m" 302 -
+2026-03-23 10:11:55,027 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:11:55] "GET /grant/grant-20260323-101100-6af720a2 HTTP/1.1" 200 -
+2026-03-23 10:11:59,671 ERROR app: Exception on /grant/grant-20260323-101100-6af720a2/generate/project_description [POST]
+Traceback (most recent call last):
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 305, in decorated_function
+    return f(*args, **kwargs)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 328, in decorated_function
+    return f(*args, **kwargs)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 195, in decorated_function
+    return f(*args, **kwargs)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 163, in decorated_function
+    return f(*args, **kwargs)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 3821, in generate_section_content
+    verified_sources = agency_tmpl.get('verified_sources', [])
+                       ^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'agency_tmpl' where it is not associated with a value
+2026-03-23 10:12:02,661 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:12:02] "[35m[1mPOST /grant/grant-20260323-101100-6af720a2/generate/project_description HTTP/1.1[0m" 500 -
+2026-03-23 10:13:09,008 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-23 10:13:12,756 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-03-23 10:13:12,756 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-23 10:13:18,628 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:13:18] "GET /grant/grant-20260323-101100-6af720a2 HTTP/1.1" 200 -
+2026-03-23 10:13:23,832 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-03-23 10:13:39,458 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 200 OK"
+2026-03-23 10:13:39,615 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:13:39] "POST /grant/grant-20260323-101100-6af720a2/generate/project_description HTTP/1.1" 200 -
+2026-03-23 10:14:02,537 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:14:02] "GET /grant/grant-20260323-101100-6af720a2/budget-builder HTTP/1.1" 200 -
+2026-03-23 10:14:12,936 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:14:12] "GET /grant/grant-20260323-101100-6af720a2/checklist HTTP/1.1" 200 -
+2026-03-23 10:14:15,047 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:14:15] "GET /grant/grant-20260323-101100-6af720a2/download/txt HTTP/1.1" 200 -
+2026-03-23 10:14:18,715 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:14:18] "GET /grant/grant-20260323-101100-6af720a2/download/pdf HTTP/1.1" 200 -
+2026-03-23 10:14:22,800 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:14:22] "GET /profile HTTP/1.1" 200 -
+2026-03-23 10:14:27,507 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:14:27] "GET /account/settings HTTP/1.1" 200 -
+2026-03-23 10:14:31,875 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:14:31] "GET /account/export-data HTTP/1.1" 200 -
+2026-03-23 10:14:36,042 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:14:36] "GET /clients HTTP/1.1" 200 -
+2026-03-23 10:14:39,789 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:14:39] "GET /vault HTTP/1.1" 200 -
+2026-03-23 10:14:43,513 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:14:43] "GET /wizard HTTP/1.1" 200 -
+2026-03-23 10:14:46,832 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 10:14:46] "GET /templates HTTP/1.1" 200 -
+2026-03-23 12:42:29,584 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-23 12:42:34,294 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-03-23 12:42:34,294 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-23 12:42:43,163 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:42:43] "GET / HTTP/1.1" 200 -
+2026-03-23 12:43:01,925 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:43:01] "GET /login HTTP/1.1" 200 -
+2026-03-23 12:43:02,840 INFO grantpro: User login: qatest@grantpro.test
+2026-03-23 12:43:02,840 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:43:02] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-23 12:43:11,114 ERROR app: Exception on /dashboard [GET]
+Traceback (most recent call last):
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 310, in decorated_function
+    return f(*args, **kwargs)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 1159, in dashboard
+    return render_template('dashboard.html',
+                         user=user,
+    ...<5 lines>...
+                         profile_pct=profile_pct,
+                         profile_missing=profile_missing)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/templating.py", line 151, in render_template
+    return _render(app, template, context)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/templating.py", line 132, in _render
+    rv = template.render(context)
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/templates/dashboard.html", line 1, in top-level template code
+    {% extends "layout.html" %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fbwalker4/.hermes/grant-system/portal/templates/layout.html", line 871, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^
+  File "/Users/fbwalker4/.hermes/grant-system/portal/templates/dashboard.html", line 221, in block 'content'
+    <h3 class="grant-card-title">{{ project.grant.title }}</h3>
+    ^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+jinja2.exceptions.UndefinedError: 'dict object' has no attribute 'grant'
+2026-03-23 12:43:14,418 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:43:14] "[35m[1mGET /dashboard HTTP/1.1[0m" 500 -
+2026-03-23 12:43:22,605 ERROR app: Exception on /dashboard [GET]
+Traceback (most recent call last):
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 310, in decorated_function
+    return f(*args, **kwargs)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 1159, in dashboard
+    return render_template('dashboard.html',
+                         user=user,
+    ...<5 lines>...
+                         profile_pct=profile_pct,
+                         profile_missing=profile_missing)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/templating.py", line 151, in render_template
+    return _render(app, template, context)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/templating.py", line 132, in _render
+    rv = template.render(context)
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/templates/dashboard.html", line 1, in top-level template code
+    {% extends "layout.html" %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fbwalker4/.hermes/grant-system/portal/templates/layout.html", line 871, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^
+  File "/Users/fbwalker4/.hermes/grant-system/portal/templates/dashboard.html", line 221, in block 'content'
+    <h3 class="grant-card-title">{{ project.grant.title }}</h3>
+    ^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+jinja2.exceptions.UndefinedError: 'dict object' has no attribute 'grant'
+2026-03-23 12:43:25,897 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:43:25] "[35m[1mGET /dashboard HTTP/1.1[0m" 500 -
+2026-03-23 12:43:31,998 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:43:31] "GET /awards HTTP/1.1" 200 -
+2026-03-23 12:43:33,530 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:43:33] "GET /api/awards/search?q=housing&limit=3 HTTP/1.1" 200 -
+2026-03-23 12:43:37,690 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:43:37] "GET /grants/match HTTP/1.1" 200 -
+2026-03-23 12:45:00,515 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-23 12:45:05,229 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-03-23 12:45:05,229 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-23 12:45:18,314 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:45:18] "GET / HTTP/1.1" 200 -
+2026-03-23 12:45:34,303 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:45:34] "GET /login HTTP/1.1" 200 -
+2026-03-23 12:45:35,198 INFO grantpro: User login: qatest@grantpro.test
+2026-03-23 12:45:35,198 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:45:35] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-23 12:45:43,469 ERROR app: Exception on /dashboard [GET]
+Traceback (most recent call last):
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 310, in decorated_function
+    return f(*args, **kwargs)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 1166, in dashboard
+    return render_template('dashboard.html',
+                         user=user,
+    ...<5 lines>...
+                         profile_pct=profile_pct,
+                         profile_missing=profile_missing)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/templating.py", line 151, in render_template
+    return _render(app, template, context)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/templating.py", line 132, in _render
+    rv = template.render(context)
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/templates/dashboard.html", line 1, in top-level template code
+    {% extends "layout.html" %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fbwalker4/.hermes/grant-system/portal/templates/layout.html", line 871, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^
+  File "/Users/fbwalker4/.hermes/grant-system/portal/templates/dashboard.html", line 233, in block 'content'
+    <span>📅 Started: {{ project.created_at[:10] }}</span>
+    ^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'dict object' has no attribute 'created_at'
+2026-03-23 12:45:46,740 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:45:46] "[35m[1mGET /dashboard HTTP/1.1[0m" 500 -
+2026-03-23 12:45:52,823 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:45:52] "GET /awards HTTP/1.1" 200 -
+2026-03-23 12:45:56,898 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:45:56] "GET /grants/match HTTP/1.1" 200 -
+2026-03-23 12:45:58,157 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:45:58] "[32mGET /grant/grant-20260323-101100-6af720a2 HTTP/1.1[0m" 302 -
+2026-03-23 12:45:59,408 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:45:59] "[32mGET /grant/grant-20260323-101100-6af720a2/section/project_summary HTTP/1.1[0m" 302 -
+2026-03-23 12:46:00,682 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:46:00] "[32mGET /grant/grant-20260323-101100-6af720a2/budget-builder HTTP/1.1[0m" 302 -
+2026-03-23 12:46:02,364 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:46:02] "[32mGET /grant/grant-20260323-101100-6af720a2/checklist HTTP/1.1[0m" 302 -
+2026-03-23 12:46:04,013 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:46:04] "[32mGET /grant/grant-20260323-101100-6af720a2/download/pdf HTTP/1.1[0m" 302 -
+2026-03-23 12:46:05,660 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:46:05] "[32mGET /grant/grant-20260323-101100-6af720a2/download/txt HTTP/1.1[0m" 302 -
+2026-03-23 12:46:06,911 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:46:06] "[32mGET /grant/grant-20260323-101100-6af720a2/match-funding HTTP/1.1[0m" 302 -
+2026-03-23 12:46:11,455 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:46:11] "GET /strategy HTTP/1.1" 200 -
+2026-03-23 12:46:16,051 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:46:16] "GET /profile HTTP/1.1" 200 -
+2026-03-23 12:46:21,153 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:46:21] "GET /account/settings HTTP/1.1" 200 -
+2026-03-23 12:46:25,928 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:46:25] "GET /account/export-data HTTP/1.1" 200 -
+2026-03-23 12:46:30,515 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:46:30] "GET /clients HTTP/1.1" 200 -
+2026-03-23 12:46:34,677 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:46:34] "GET /vault HTTP/1.1" 200 -
+2026-03-23 12:46:38,804 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:46:38] "GET /wizard HTTP/1.1" 200 -
+2026-03-23 12:46:42,532 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:46:42] "GET /templates HTTP/1.1" 200 -
+2026-03-23 12:46:47,880 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:46:47] "GET /my-grants HTTP/1.1" 200 -
+2026-03-23 12:46:51,986 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:46:51] "GET /search HTTP/1.1" 200 -
+2026-03-23 12:47:00,767 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-23 12:47:05,470 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-03-23 12:47:05,470 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-23 12:47:06,024 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:47:06] "GET /login HTTP/1.1" 200 -
+2026-03-23 12:47:06,925 INFO grantpro: User login: qatest@grantpro.test
+2026-03-23 12:47:06,926 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:47:06] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-23 12:47:12,293 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:47:12] "GET /my-grants HTTP/1.1" 200 -
+2026-03-23 12:47:20,419 ERROR app: Exception on /dashboard [GET]
+Traceback (most recent call last):
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 310, in decorated_function
+    return f(*args, **kwargs)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/app.py", line 1166, in dashboard
+    return render_template('dashboard.html',
+                         user=user,
+    ...<5 lines>...
+                         profile_pct=profile_pct,
+                         profile_missing=profile_missing)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/templating.py", line 151, in render_template
+    return _render(app, template, context)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/templating.py", line 132, in _render
+    rv = template.render(context)
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/lib/python3.14/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/fbwalker4/.hermes/grant-system/portal/templates/dashboard.html", line 1, in top-level template code
+    {% extends "layout.html" %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fbwalker4/.hermes/grant-system/portal/templates/layout.html", line 871, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^
+  File "/Users/fbwalker4/.hermes/grant-system/portal/templates/dashboard.html", line 233, in block 'content'
+    <span>📅 Started: {{ project.created_at[:10] }}</span>
+    ^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'dict object' has no attribute 'created_at'
+2026-03-23 12:47:23,671 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:47:23] "[35m[1mGET /dashboard HTTP/1.1[0m" 500 -
+2026-03-23 12:47:29,307 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:47:29] "GET /grant/grant-20260322-212618-9edfcf8c HTTP/1.1" 200 -
+2026-03-23 12:47:34,888 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:47:34] "GET /grant/grant-20260322-212618-9edfcf8c/section/project_summary HTTP/1.1" 200 -
+2026-03-23 12:47:40,295 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:47:40] "GET /grant/grant-20260322-212618-9edfcf8c/budget-builder HTTP/1.1" 200 -
+2026-03-23 12:47:51,143 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:47:51] "GET /grant/grant-20260322-212618-9edfcf8c/checklist HTTP/1.1" 200 -
+2026-03-23 12:47:54,776 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:47:54] "GET /grant/grant-20260322-212618-9edfcf8c/download/pdf HTTP/1.1" 200 -
+2026-03-23 12:48:02,610 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:48:02] "GET /grant/grant-20260322-212618-9edfcf8c/match-funding HTTP/1.1" 200 -
+2026-03-23 12:48:08,859 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:48:08] "GET /awards HTTP/1.1" 200 -
+2026-03-23 12:48:13,064 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:48:13] "GET /grants/match HTTP/1.1" 200 -
+2026-03-23 12:48:18,121 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:48:18] "GET /strategy HTTP/1.1" 200 -
+2026-03-23 12:48:22,763 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:48:22] "GET /profile HTTP/1.1" 200 -
+2026-03-23 12:48:27,913 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:48:27] "GET /account/settings HTTP/1.1" 200 -
+2026-03-23 12:49:02,388 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-23 12:49:07,217 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-03-23 12:49:07,217 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-23 12:49:07,744 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:49:07] "GET /login HTTP/1.1" 200 -
+2026-03-23 12:49:08,633 INFO grantpro: User login: qatest@grantpro.test
+2026-03-23 12:49:08,634 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:49:08] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-03-23 12:49:14,038 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:49:14] "GET /my-grants HTTP/1.1" 200 -
+2026-03-23 12:49:22,223 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:49:22] "GET /dashboard HTTP/1.1" 200 -
+2026-03-23 12:49:28,349 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:49:28] "GET /awards HTTP/1.1" 200 -
+2026-03-23 12:49:32,458 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:49:32] "GET /grants/match HTTP/1.1" 200 -
+2026-03-23 12:49:38,102 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:49:38] "GET /grant/grant-20260322-212618-9edfcf8c HTTP/1.1" 200 -
+2026-03-23 12:49:43,686 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:49:43] "GET /grant/grant-20260322-212618-9edfcf8c/section/project_summary HTTP/1.1" 200 -
+2026-03-23 12:49:49,091 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:49:49] "GET /grant/grant-20260322-212618-9edfcf8c/budget-builder HTTP/1.1" 200 -
+2026-03-23 12:49:59,875 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:49:59] "GET /grant/grant-20260322-212618-9edfcf8c/checklist HTTP/1.1" 200 -
+2026-03-23 12:50:03,497 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:50:03] "GET /grant/grant-20260322-212618-9edfcf8c/download/pdf HTTP/1.1" 200 -
+2026-03-23 12:50:05,624 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:50:05] "GET /grant/grant-20260322-212618-9edfcf8c/download/txt HTTP/1.1" 200 -
+2026-03-23 12:50:12,817 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:50:12] "GET /grant/grant-20260322-212618-9edfcf8c/match-funding HTTP/1.1" 200 -
+2026-03-23 12:50:17,861 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:50:17] "GET /strategy HTTP/1.1" 200 -
+2026-03-23 12:50:22,370 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:50:22] "GET /profile HTTP/1.1" 200 -
+2026-03-23 12:50:27,498 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:50:27] "GET /account/settings HTTP/1.1" 200 -
+2026-03-23 12:50:32,281 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:50:32] "GET /account/export-data HTTP/1.1" 200 -
+2026-03-23 12:50:36,847 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:50:36] "GET /clients HTTP/1.1" 200 -
+2026-03-23 12:50:41,001 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:50:41] "GET /vault HTTP/1.1" 200 -
+2026-03-23 12:50:45,241 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:50:45] "GET /wizard HTTP/1.1" 200 -
+2026-03-23 12:50:49,210 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:50:49] "GET /templates HTTP/1.1" 200 -
+2026-03-23 12:50:54,678 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:50:54] "GET /my-grants HTTP/1.1" 200 -
+2026-03-23 12:50:58,790 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 12:50:58] "GET /search HTTP/1.1" 200 -
+2026-03-23 14:46:20,832 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-03-23 14:46:25,569 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-03-23 14:46:25,569 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-03-23 14:46:38,164 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:46:38] "GET / HTTP/1.1" 200 -
+2026-03-23 14:47:02,485 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:47:02] "GET /signup HTTP/1.1" 200 -
+2026-03-23 14:47:03,497 INFO grantpro: New user registered: fullflow1774295222@test.com (plan: free)
+2026-03-23 14:47:04,023 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:47:04] "[32mPOST /signup HTTP/1.1[0m" 302 -
+2026-03-23 14:47:08,477 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:47:08] "GET /onboarding HTTP/1.1" 200 -
+2026-03-23 14:47:15,988 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:47:15] "GET /dashboard HTTP/1.1" 200 -
+2026-03-23 14:47:16,429 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:47:16] "GET /api/search-grants?q=community HTTP/1.1" 200 -
+2026-03-23 14:47:23,639 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:47:23] "GET /grant-info/NSF-2025-001 HTTP/1.1" 200 -
+2026-03-23 14:47:24,504 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:47:24] "[32mGET /start-grant/NSF-2025-001 HTTP/1.1[0m" 302 -
+2026-03-23 14:47:28,476 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:47:28] "GET /upgrade HTTP/1.1" 200 -
+2026-03-23 14:47:53,497 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:47:53] "[32mGET /start-grant/NSF-2025-001 HTTP/1.1[0m" 302 -
+2026-03-23 14:47:58,069 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:47:58] "GET /my-grants HTTP/1.1" 200 -
+2026-03-23 14:48:03,104 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:48:03] "GET /grant/grant-20260323-144752-9c83de56 HTTP/1.1" 200 -
+2026-03-23 14:48:08,106 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:48:08] "GET /grant/grant-20260323-144752-9c83de56/section/project_summary HTTP/1.1" 200 -
+2026-03-23 14:48:08,551 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:48:08] "[32mPOST /grant/grant-20260323-144752-9c83de56/section/project_summary HTTP/1.1[0m" 302 -
+2026-03-23 14:48:13,558 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:48:13] "GET /grant/grant-20260323-144752-9c83de56 HTTP/1.1" 200 -
+2026-03-23 14:48:14,385 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:48:14] "[32mPOST /grant/grant-20260323-144752-9c83de56/generate/project_description HTTP/1.1[0m" 302 -
+2026-03-23 14:48:31,929 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:48:31] "GET /grant/grant-20260323-144752-9c83de56 HTTP/1.1" 200 -
+2026-03-23 14:48:38,127 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-03-23 14:48:55,646 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 200 OK"
+2026-03-23 14:48:55,801 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:48:55] "POST /grant/grant-20260323-144752-9c83de56/generate/project_description HTTP/1.1" 200 -
+2026-03-23 14:49:24,338 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:49:24] "GET /grant/grant-20260323-144752-9c83de56/budget-builder HTTP/1.1" 200 -
+2026-03-23 14:49:26,668 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:49:26] "[32mPOST /grant/grant-20260323-144752-9c83de56/budget-builder HTTP/1.1[0m" 302 -
+2026-03-23 14:49:37,276 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:49:37] "GET /grant/grant-20260323-144752-9c83de56/checklist HTTP/1.1" 200 -
+2026-03-23 14:49:39,423 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:49:39] "GET /grant/grant-20260323-144752-9c83de56/download/txt HTTP/1.1" 200 -
+2026-03-23 14:49:43,095 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:49:43] "GET /grant/grant-20260323-144752-9c83de56/download/pdf HTTP/1.1" 200 -
+2026-03-23 14:49:50,542 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:49:50] "GET /grant/grant-20260323-144752-9c83de56/match-funding HTTP/1.1" 200 -
+2026-03-23 14:49:56,350 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:49:56] "GET /awards HTTP/1.1" 200 -
+2026-03-23 14:50:00,136 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:50:00] "GET /grants/match HTTP/1.1" 200 -
+2026-03-23 14:50:04,812 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:50:04] "GET /strategy HTTP/1.1" 200 -
+2026-03-23 14:50:09,061 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:50:09] "GET /profile HTTP/1.1" 200 -
+2026-03-23 14:50:13,802 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:50:13] "GET /account/settings HTTP/1.1" 200 -
+2026-03-23 14:50:18,839 INFO werkzeug: 127.0.0.1 - - [23/Mar/2026 14:50:18] "GET /grant/grant-20260323-144752-9c83de56/mark-submitted HTTP/1.1" 200 -
+2026-04-07 20:59:36,087 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-04-07 20:59:41,106 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-04-07 20:59:41,106 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-04-07 21:02:26,469 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:02:26] "GET / HTTP/1.1" 200 -
+2026-04-07 21:05:32,227 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-04-07 21:05:37,172 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-04-07 21:05:37,172 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-04-07 21:05:46,974 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:05:46] "GET / HTTP/1.1" 200 -
+2026-04-07 21:07:32,380 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:07:32] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:07:33,306 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:07:33,307 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:07:33] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:07:39,346 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:07:39] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:07:43,455 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:07:43] "GET /grant-info/HUD-CDBG-2026-001 HTTP/1.1" 200 -
+2026-04-07 21:07:44,399 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:07:44] "[32mPOST /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:08:24,915 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:08:24] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:08:25,836 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:08:25,837 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:08:25] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:08:31,870 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:08:31] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:08:36,035 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:08:36] "GET /grant-info/HUD-CDBG-2026-001 HTTP/1.1" 200 -
+2026-04-07 21:08:36,889 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:08:36] "[32mPOST /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:08:53,944 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:08:53] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:08:54,844 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:08:54,845 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:08:54] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:09:00,871 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:00] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:09:04,941 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:04] "GET /grant-info/HUD-CDBG-2026-001 HTTP/1.1" 200 -
+2026-04-07 21:09:05,822 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:05] "[32mPOST /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:09:07,086 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:07] "[32mGET /grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:09:13,921 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:13] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:09:14,865 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:14] "[32mPOST /grant/HUD-CDBG-2026-001/generate/project_description HTTP/1.1[0m" 302 -
+2026-04-07 21:09:17,976 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:17] "[31m[1mGET /grant/HUD-CDBG-2026-001/generate/project_description HTTP/1.1[0m" 405 -
+2026-04-07 21:09:19,347 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:19] "[32mGET /grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:09:26,085 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:26] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:09:26,928 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:26] "[32mPOST /grant/HUD-CDBG-2026-001/generate/need_statement HTTP/1.1[0m" 302 -
+2026-04-07 21:09:29,892 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:29] "[31m[1mGET /grant/HUD-CDBG-2026-001/generate/need_statement HTTP/1.1[0m" 405 -
+2026-04-07 21:09:31,176 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:31] "[32mGET /grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:09:37,955 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:37] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:09:38,833 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:38] "[32mPOST /grant/HUD-CDBG-2026-001/generate/budget_narrative HTTP/1.1[0m" 302 -
+2026-04-07 21:09:41,818 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:41] "[31m[1mGET /grant/HUD-CDBG-2026-001/generate/budget_narrative HTTP/1.1[0m" 405 -
+2026-04-07 21:09:43,093 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:43] "[32mGET /grant/HUD-CDBG-2026-001/budget-builder HTTP/1.1[0m" 302 -
+2026-04-07 21:09:49,821 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:49] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:09:50,275 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:50] "[32mPOST /grant/HUD-CDBG-2026-001/budget-builder HTTP/1.1[0m" 302 -
+2026-04-07 21:09:51,586 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:51] "[32mGET /grant/HUD-CDBG-2026-001/budget-builder HTTP/1.1[0m" 302 -
+2026-04-07 21:09:58,351 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:09:58] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:10:00,080 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:10:00] "[32mGET /grant/HUD-CDBG-2026-001/checklist HTTP/1.1[0m" 302 -
+2026-04-07 21:10:06,947 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:10:06] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:10:16,241 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:10:16] "[32mPOST /grant/HUD-CDBG-2026-001/run-consistency-check HTTP/1.1[0m" 302 -
+2026-04-07 21:10:19,228 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:10:19] "[31m[1mGET /grant/HUD-CDBG-2026-001/run-consistency-check HTTP/1.1[0m" 405 -
+2026-04-07 21:11:04,578 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:11:04] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:11:05,490 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:11:05,491 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:11:05] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:11:06,777 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:11:06] "[32mGET /grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:11:14,412 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:11:14] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:11:15,261 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:11:15] "[32mPOST /grant/HUD-CDBG-2026-001/generate/project_description HTTP/1.1[0m" 302 -
+2026-04-07 21:11:18,255 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:11:18] "[31m[1mGET /grant/HUD-CDBG-2026-001/generate/project_description HTTP/1.1[0m" 405 -
+2026-04-07 21:11:37,794 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:11:37] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:11:38,789 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:11:38,791 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:11:38] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:11:40,061 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:11:40] "[32mGET /grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:11:47,774 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:11:47] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:11:56,464 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:11:56] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:11:57,449 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:11:57,451 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:11:57] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:12:05,086 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:12:05] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:12:06,353 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:12:06] "[32mGET /grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:12:13,181 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:12:13] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:13:42,151 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:13:42] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:13:43,124 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:13:43,126 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:13:43] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:13:48,916 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:13:48] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:13:52,947 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:13:52] "GET /grant-info/HUD-CDBG-2026-001 HTTP/1.1" 200 -
+2026-04-07 21:13:53,794 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:13:53] "[32mPOST /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:13:55,351 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:13:55] "[32mGET /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:14:00,321 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:00] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:14:01,576 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:01] "[32mGET /grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:14:08,249 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:08] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:14:09,105 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:09] "[32mPOST /grant/HUD-CDBG-2026-001/generate/project_description HTTP/1.1[0m" 302 -
+2026-04-07 21:14:12,094 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:12] "[31m[1mGET /grant/HUD-CDBG-2026-001/generate/project_description HTTP/1.1[0m" 405 -
+2026-04-07 21:14:13,373 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:13] "[32mGET /grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:14:20,094 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:20] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:14:20,962 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:20] "[32mPOST /grant/HUD-CDBG-2026-001/generate/need_statement HTTP/1.1[0m" 302 -
+2026-04-07 21:14:23,905 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:23] "[31m[1mGET /grant/HUD-CDBG-2026-001/generate/need_statement HTTP/1.1[0m" 405 -
+2026-04-07 21:14:25,165 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:25] "[32mGET /grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:14:31,855 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:31] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:14:32,706 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:32] "[32mPOST /grant/HUD-CDBG-2026-001/generate/budget_narrative HTTP/1.1[0m" 302 -
+2026-04-07 21:14:35,765 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:35] "[31m[1mGET /grant/HUD-CDBG-2026-001/generate/budget_narrative HTTP/1.1[0m" 405 -
+2026-04-07 21:14:37,064 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:37] "[32mGET /grant/HUD-CDBG-2026-001/budget-builder HTTP/1.1[0m" 302 -
+2026-04-07 21:14:43,873 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:43] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:14:44,319 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:44] "[32mPOST /grant/HUD-CDBG-2026-001/budget-builder HTTP/1.1[0m" 302 -
+2026-04-07 21:14:45,630 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:45] "[32mGET /grant/HUD-CDBG-2026-001/budget-builder HTTP/1.1[0m" 302 -
+2026-04-07 21:14:52,484 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:52] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:14:54,297 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:14:54] "[32mGET /grant/HUD-CDBG-2026-001/checklist HTTP/1.1[0m" 302 -
+2026-04-07 21:15:01,224 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:15:01] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:15:02,104 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:15:02] "[32mPOST /grant/HUD-CDBG-2026-001/run-consistency-check HTTP/1.1[0m" 302 -
+2026-04-07 21:15:05,112 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:15:05] "[31m[1mGET /grant/HUD-CDBG-2026-001/run-consistency-check HTTP/1.1[0m" 405 -
+2026-04-07 21:16:14,328 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:16:14] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:16:15,315 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:16:15,317 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:16:15] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:16:20,824 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:16:20] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:16:25,502 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:16:25] "GET /grant-info/HUD-CDBG-2026-001 HTTP/1.1" 200 -
+2026-04-07 21:16:26,341 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:16:26] "[32mPOST /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:16:27,895 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:16:27] "[32mGET /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:16:33,618 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:16:33] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:16:34,910 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:16:34] "[32mGET /grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:16:42,505 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:16:42] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:16:43,393 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:16:43] "[32mPOST /grant/HUD-CDBG-2026-001/generate/project_description HTTP/1.1[0m" 302 -
+2026-04-07 21:16:46,921 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:16:46] "[31m[1mGET /grant/HUD-CDBG-2026-001/generate/project_description HTTP/1.1[0m" 405 -
+2026-04-07 21:16:48,212 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:16:48] "[32mGET /grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:16:55,852 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:16:55] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:16:56,792 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:16:56] "[32mPOST /grant/HUD-CDBG-2026-001/generate/need_statement HTTP/1.1[0m" 302 -
+2026-04-07 21:17:00,276 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:17:00] "[31m[1mGET /grant/HUD-CDBG-2026-001/generate/need_statement HTTP/1.1[0m" 405 -
+2026-04-07 21:17:01,614 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:17:01] "[32mGET /grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:17:09,325 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:17:09] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:17:10,209 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:17:10] "[32mPOST /grant/HUD-CDBG-2026-001/generate/budget_narrative HTTP/1.1[0m" 302 -
+2026-04-07 21:17:13,697 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:17:13] "[31m[1mGET /grant/HUD-CDBG-2026-001/generate/budget_narrative HTTP/1.1[0m" 405 -
+2026-04-07 21:17:15,034 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:17:15] "[32mGET /grant/HUD-CDBG-2026-001/budget-builder HTTP/1.1[0m" 302 -
+2026-04-07 21:17:22,623 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:17:22] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:17:23,078 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:17:23] "[32mPOST /grant/HUD-CDBG-2026-001/budget-builder HTTP/1.1[0m" 302 -
+2026-04-07 21:17:24,414 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:17:24] "[32mGET /grant/HUD-CDBG-2026-001/budget-builder HTTP/1.1[0m" 302 -
+2026-04-07 21:17:32,135 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:17:32] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:17:33,845 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:17:33] "[32mGET /grant/HUD-CDBG-2026-001/checklist HTTP/1.1[0m" 302 -
+2026-04-07 21:17:41,619 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:17:41] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:17:42,542 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:17:42] "[32mPOST /grant/HUD-CDBG-2026-001/run-consistency-check HTTP/1.1[0m" 302 -
+2026-04-07 21:17:46,037 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:17:46] "[31m[1mGET /grant/HUD-CDBG-2026-001/run-consistency-check HTTP/1.1[0m" 405 -
+2026-04-07 21:19:17,684 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:19:17] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:19:18,608 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:19:18,609 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:19:18] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:19:22,805 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:19:22] "GET /grant-info/HUD-CDBG-2026-001 HTTP/1.1" 200 -
+2026-04-07 21:19:23,686 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:19:23] "[32mPOST /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:19:41,033 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:19:41] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:19:41,981 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:19:41,982 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:19:41] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:19:49,811 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:19:49] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:19:54,090 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:19:54] "GET /grant-info/HUD-CDBG-2026-001 HTTP/1.1" 200 -
+2026-04-07 21:20:44,616 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:20:44] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:20:45,533 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:20:45,535 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:20:45] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:20:53,139 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:20:53] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:20:57,226 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:20:57] "GET /grant-info/HUD-CDBG-2026-001 HTTP/1.1" 200 -
+2026-04-07 21:22:14,997 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:22:14] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:22:15,931 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:22:15,932 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:22:15] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:22:21,395 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:22:21] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:22:23,404 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:22:23] "[32mGET /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:22:28,863 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:22:28] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:22:30,442 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:22:30] "[32mPOST /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:22:35,873 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:22:35] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:22:53,366 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:22:53] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:22:54,313 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:22:54,315 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:22:54] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:23:01,892 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:23:01] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:23:03,451 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:23:03] "[32mGET /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:23:08,897 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:23:08] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:24:21,505 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:24:21] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:24:22,402 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:24:22,403 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:24:22] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:24:29,889 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:24:29] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:24:31,447 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:24:31] "[32mGET /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:24:36,883 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:24:36] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:25:55,880 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:25:55] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:25:56,795 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:25:56,797 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:25:56] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:26:02,455 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:26:02] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:26:04,427 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:26:04] "[32mGET /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:26:09,932 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:26:09] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:26:11,498 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:26:11] "[32mPOST /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:26:16,991 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:26:16] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:26:33,641 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:26:33] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:26:34,546 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:26:34,548 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:26:34] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:26:42,107 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:26:42] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:26:43,671 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:26:43] "[32mGET /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:26:49,092 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:26:49] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:28:04,392 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:28:04] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:28:05,309 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:28:05,311 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:28:05] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:28:10,716 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:28:10] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:28:12,697 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:28:12] "[32mGET /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:28:18,138 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:28:18] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:28:19,699 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:28:19] "[32mPOST /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:28:25,639 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:28:25] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:28:35,542 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:28:35] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:28:36,537 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:28:36,538 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:28:36] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:28:44,552 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:28:44] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:28:46,220 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:28:46] "[32mGET /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:28:51,983 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:28:51] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:29:24,806 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:29:24] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:29:25,732 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:29:25,733 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:29:25] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:29:33,243 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:29:33] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 21:29:37,346 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:29:37] "GET /grant-info/HUD-CDBG-2026-001 HTTP/1.1" 200 -
+2026-04-07 21:29:38,934 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:29:38] "[32mGET /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:29:44,372 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:29:44] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:30:51,796 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:30:51] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:30:52,718 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:30:52,719 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:30:52] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:30:58,242 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:30:58] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:31:00,272 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:31:00] "[32mGET /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:31:05,826 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:31:05] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:31:07,405 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:31:07] "[32mPOST /start-grant/HUD-CDBG-2026-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:31:12,960 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:31:12] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:35:53,112 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:35:53] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:35:54,068 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:35:54,068 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:35:54] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:35:59,610 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:35:59] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:36:04,812 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:36:04] "[32mGET /start-grant/HUD-2025-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:36:10,161 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:36:10] "GET /grant/grant-20260407-213603-594b21f9 HTTP/1.1" 200 -
+2026-04-07 21:36:14,922 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:36:14] "[32mPOST /start-grant/HUD-2025-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:36:20,603 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:36:20] "GET /grant/grant-20260407-213613-fe71251a HTTP/1.1" 200 -
+2026-04-07 21:36:25,851 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:36:25] "GET /grant/grant-20260407-213613-fe71251a HTTP/1.1" 200 -
+2026-04-07 21:36:32,076 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-04-07 21:36:32,451 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-04-07 21:36:32,615 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:36:32] "POST /grant/grant-20260407-213613-fe71251a/generate/project_description HTTP/1.1" 200 -
+2026-04-07 21:36:38,158 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:36:38] "GET /grant/grant-20260407-213613-fe71251a HTTP/1.1" 200 -
+2026-04-07 21:36:43,172 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-04-07 21:36:43,505 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-04-07 21:36:43,663 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:36:43] "POST /grant/grant-20260407-213613-fe71251a/generate/need_statement HTTP/1.1" 200 -
+2026-04-07 21:36:48,985 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:36:48] "GET /grant/grant-20260407-213613-fe71251a HTTP/1.1" 200 -
+2026-04-07 21:36:51,706 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:36:51] "[33mPOST /grant/grant-20260407-213613-fe71251a/generate/budget_narrative HTTP/1.1[0m" 404 -
+2026-04-07 21:36:56,910 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:36:56] "GET /grant/grant-20260407-213613-fe71251a/budget-builder HTTP/1.1" 200 -
+2026-04-07 21:36:59,326 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:36:59] "[32mPOST /grant/grant-20260407-213613-fe71251a/budget-builder HTTP/1.1[0m" 302 -
+2026-04-07 21:37:04,571 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:37:04] "GET /grant/grant-20260407-213613-fe71251a/budget-builder HTTP/1.1" 200 -
+2026-04-07 21:37:15,487 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:37:15] "GET /grant/grant-20260407-213613-fe71251a/checklist HTTP/1.1" 200 -
+2026-04-07 21:43:31,455 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-04-07 21:43:36,424 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-04-07 21:43:36,424 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-04-07 21:44:34,432 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:44:34] "GET / HTTP/1.1" 200 -
+2026-04-07 21:44:53,364 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:44:53] "GET /login HTTP/1.1" 200 -
+2026-04-07 21:44:54,296 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 21:44:54,298 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:44:54] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 21:44:59,872 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:44:59] "GET /grants HTTP/1.1" 200 -
+2026-04-07 21:45:05,113 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:45:05] "[32mGET /start-grant/HUD-2025-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:45:10,430 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:45:10] "GET /grant/grant-20260407-214504-fa996928 HTTP/1.1" 200 -
+2026-04-07 21:45:15,121 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:45:15] "[32mPOST /start-grant/HUD-2025-001 HTTP/1.1[0m" 302 -
+2026-04-07 21:45:20,353 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:45:20] "GET /grant/grant-20260407-214514-9626febc HTTP/1.1" 200 -
+2026-04-07 21:45:25,670 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:45:25] "GET /grant/grant-20260407-214514-9626febc HTTP/1.1" 200 -
+2026-04-07 21:45:30,958 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-04-07 21:45:31,282 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-04-07 21:45:31,446 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:45:31] "POST /grant/grant-20260407-214514-9626febc/generate/project_description HTTP/1.1" 200 -
+2026-04-07 21:45:36,713 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:45:36] "GET /grant/grant-20260407-214514-9626febc HTTP/1.1" 200 -
+2026-04-07 21:45:41,773 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-04-07 21:45:42,080 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 429 Too Many Requests"
+2026-04-07 21:45:42,235 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:45:42] "POST /grant/grant-20260407-214514-9626febc/generate/need_statement HTTP/1.1" 200 -
+2026-04-07 21:45:47,474 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:45:47] "GET /grant/grant-20260407-214514-9626febc HTTP/1.1" 200 -
+2026-04-07 21:45:50,107 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:45:50] "[33mPOST /grant/grant-20260407-214514-9626febc/generate/budget_narrative HTTP/1.1[0m" 404 -
+2026-04-07 21:45:55,403 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:45:55] "GET /grant/grant-20260407-214514-9626febc/budget-builder HTTP/1.1" 200 -
+2026-04-07 21:45:57,823 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:45:57] "[32mPOST /grant/grant-20260407-214514-9626febc/budget-builder HTTP/1.1[0m" 302 -
+2026-04-07 21:46:03,075 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:46:03] "GET /grant/grant-20260407-214514-9626febc/budget-builder HTTP/1.1" 200 -
+2026-04-07 21:46:14,026 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 21:46:14] "GET /grant/grant-20260407-214514-9626febc/checklist HTTP/1.1" 200 -
+2026-04-07 22:28:42,255 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-04-07 22:28:47,633 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-04-07 22:28:47,633 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-04-07 22:29:04,921 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:29:04] "GET / HTTP/1.1" 200 -
+2026-04-07 22:29:49,809 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:29:49] "GET /login HTTP/1.1" 200 -
+2026-04-07 22:29:50,883 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 22:29:50,884 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:29:50] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 22:29:59,356 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:29:59] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 22:30:04,402 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:30:04] "GET /my-grants HTTP/1.1" 200 -
+2026-04-07 22:30:10,199 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:30:10] "GET /grant/grant-20260407-214514-9626febc HTTP/1.1" 200 -
+2026-04-07 22:30:29,828 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:30:29] "GET /login HTTP/1.1" 200 -
+2026-04-07 22:30:30,741 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 22:30:30,742 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:30:30] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 22:30:38,318 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:30:38] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 22:30:43,593 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:30:43] "GET /grant/grant-20260407-214514-9626febc HTTP/1.1" 200 -
+2026-04-07 22:31:10,617 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:31:10] "GET /login HTTP/1.1" 200 -
+2026-04-07 22:31:11,568 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 22:31:11,569 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:31:11] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 22:31:19,205 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:31:19] "GET /dashboard HTTP/1.1" 200 -
+2026-04-07 22:31:24,481 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:31:24] "GET /grant/grant-20260407-214514-9626febc HTTP/1.1" 200 -
+2026-04-07 22:31:48,372 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:31:48] "GET /login HTTP/1.1" 200 -
+2026-04-07 22:31:49,323 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-07 22:31:49,324 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:31:49] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-07 22:31:57,007 INFO werkzeug: 127.0.0.1 - - [07/Apr/2026 22:31:57] "GET /dashboard HTTP/1.1" 200 -
+2026-04-08 12:48:35,112 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-04-08 12:48:40,080 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.144:5001
+2026-04-08 12:48:40,080 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-04-08 12:48:41,867 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 12:48:41] "GET / HTTP/1.1" 200 -
+2026-04-08 12:48:47,333 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 12:48:47] "GET / HTTP/1.1" 200 -
+2026-04-08 19:53:46,134 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-04-08 19:53:54,261 INFO grantpro: New user registered: test0@example.com (plan: free)
+2026-04-08 20:14:24,343 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-04-08 21:24:19,722 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-04-08 21:24:33,844 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-04-08 21:24:37,616 INFO werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2026-04-08 21:24:37,616 INFO werkzeug: [33mPress CTRL+C to quit[0m
+2026-04-08 21:29:50,487 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:29:50] "GET /login HTTP/1.1" 200 -
+2026-04-08 21:29:51,415 INFO grantpro: User login: qatest_coastalgh@test.com
+2026-04-08 21:29:51,418 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:29:51] "[32mPOST /login HTTP/1.1[0m" 302 -
+2026-04-08 21:29:57,076 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:29:57] "GET /grants HTTP/1.1" 200 -
+2026-04-08 21:30:02,347 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:30:02] "[32mGET /start-grant/HUD-2025-001 HTTP/1.1[0m" 302 -
+2026-04-08 21:30:07,714 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:30:07] "GET /grant/grant-20260408-213001-07ec0140 HTTP/1.1" 200 -
+2026-04-08 21:30:12,444 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:30:12] "[32mPOST /start-grant/HUD-2025-001 HTTP/1.1[0m" 302 -
+2026-04-08 21:30:17,695 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:30:17] "GET /grant/grant-20260408-213011-e1175634 HTTP/1.1" 200 -
+2026-04-08 21:30:23,023 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:30:23] "GET /grant/grant-20260408-213011-e1175634 HTTP/1.1" 200 -
+2026-04-08 21:30:28,677 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-04-08 21:30:57,216 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 200 OK"
+2026-04-08 21:30:57,376 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:30:57] "POST /grant/grant-20260408-213011-e1175634/generate/project_description HTTP/1.1" 200 -
+2026-04-08 21:31:02,791 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:31:02] "GET /grant/grant-20260408-213011-e1175634 HTTP/1.1" 200 -
+2026-04-08 21:31:07,952 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-04-08 21:31:30,812 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 200 OK"
+2026-04-08 21:31:30,981 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:31:30] "POST /grant/grant-20260408-213011-e1175634/generate/need_statement HTTP/1.1" 200 -
+2026-04-08 21:31:36,443 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:31:36] "GET /grant/grant-20260408-213011-e1175634 HTTP/1.1" 200 -
+2026-04-08 21:31:39,110 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:31:39] "[33mPOST /grant/grant-20260408-213011-e1175634/generate/budget_narrative HTTP/1.1[0m" 404 -
+2026-04-08 21:31:44,450 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:31:44] "GET /grant/grant-20260408-213011-e1175634/budget-builder HTTP/1.1" 200 -
+2026-04-08 21:31:46,858 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:31:46] "[32mPOST /grant/grant-20260408-213011-e1175634/budget-builder HTTP/1.1[0m" 302 -
+2026-04-08 21:31:52,108 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:31:52] "GET /grant/grant-20260408-213011-e1175634/budget-builder HTTP/1.1" 200 -
+2026-04-08 21:32:03,243 INFO werkzeug: 127.0.0.1 - - [08/Apr/2026 21:32:03] "GET /grant/grant-20260408-213011-e1175634/checklist HTTP/1.1" 200 -
+2026-04-09 11:51:47,222 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+
+2026-04-09 11:53:09,994 INFO user_models: init_user_db migration note (expected on Postgres): current transaction is aborted, commands ignored until end of transaction block
+

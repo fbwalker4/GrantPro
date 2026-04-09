@@ -686,7 +686,7 @@ def login():
     if request.method == 'POST':
         # Rate limiting check - prevent brute force
         ip = request.remote_addr or 'unknown'
-        if not check_rate_limit(ip, 'login', max_requests=5, window=60):
+        if not check_rate_limit(ip, 'login', max_requests=30, window=60):
             flash('Too many login attempts. Please wait a minute.', 'error')
             return render_template('login.html')
         
