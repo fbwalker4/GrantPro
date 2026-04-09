@@ -2286,34 +2286,52 @@ class GrantResearcher:
             "sections": sections
         }
     
+    def _normalize_catalog_grant(self, grant: dict) -> dict:
+        """Normalize catalog rows so legacy statuses work with current UI filters."""
+        normalized = dict(grant)
+        status = (normalized.get('status') or '').strip().lower()
+        if status == 'active':
+            normalized['status'] = 'posted'
+        elif not status:
+            normalized['status'] = 'posted'
+        if 'deadline' not in normalized:
+            normalized['deadline'] = normalized.get('close_date', '')
+        return normalized
+
     def get_all_grants(self):
-        """Get all known grants -- prefer DB-backed catalog, fall back to hardcoded."""
+        """Get all open/forecasted grants from the catalog DB, fall back to hardcoded data."""
         try:
             from db_connection import get_connection
             conn = get_connection()
             rows = conn.execute(
-                "SELECT * FROM grants_catalog WHERE status = 'active' ORDER BY close_date ASC"
+                """
+                SELECT *
+                FROM grants_catalog
+                WHERE COALESCE(LOWER(status), 'posted') IN ('active', 'posted', 'forecasted')
+                ORDER BY
+                    CASE WHEN COALESCE(LOWER(status), 'posted') = 'forecasted' THEN 1 ELSE 0 END,
+                    close_date ASC NULLS LAST,
+                    title ASC
+                """
             ).fetchall()
             conn.close()
             if rows:
-                grants = []
-                for r in rows:
-                    g = dict(r)
-                    if 'deadline' not in g:
-                        g['deadline'] = g.get('close_date', '')
-                    grants.append(g)
-                return grants
+                return [self._normalize_catalog_grant(dict(r)) for r in rows]
         except Exception:
             pass  # Fall back to hardcoded data
         return self._get_federal_grants()
 
     def get_grants_count(self):
-        """Return count of active grants in the catalog DB."""
+        """Return count of open/forecasted grants in the catalog DB."""
         try:
             from db_connection import get_connection
             conn = get_connection()
             count = conn.execute(
-                "SELECT COUNT(*) FROM grants_catalog WHERE status = 'active'"
+                """
+                SELECT COUNT(*)
+                FROM grants_catalog
+                WHERE COALESCE(LOWER(status), 'posted') IN ('active', 'posted', 'forecasted')
+                """
             ).fetchone()[0]
             conn.close()
             return count
@@ -2415,8 +2433,8 @@ class GrantResearcher:
     
     def filter_grants(self, keyword=None, agency=None, category=None, 
                      min_amount=None, max_amount=None):
-        """Filter grants by criteria"""
-        grants = self._get_federal_grants()
+        """Filter grants by criteria using the live catalog when available."""
+        grants = self.get_all_grants()
         
         results = []
         
@@ -2426,16 +2444,18 @@ class GrantResearcher:
                 if keyword.lower() not in search_text:
                     continue
                     
-            if agency and grant.get('agency_code') != agency:
+            if agency and grant.get('agency_code') != agency and grant.get('agency') != agency:
                 continue
                 
             if category and grant.get('category') != category:
                 continue
                 
-            if min_amount and grant.get('amount_min', 0) < min_amount:
+            amount_min = grant.get('amount_min') or 0
+            amount_max = grant.get('amount_max') or float('inf')
+            if min_amount and amount_min < min_amount:
                 continue
                 
-            if max_amount and grant.get('amount_max', float('inf')) > max_amount:
+            if max_amount and amount_max > max_amount:
                 continue
                 
             results.append(grant)
