@@ -302,21 +302,26 @@
         <form method="POST" action="/grant/{{ grant.id }}/generate-document">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="doc_type" id="genDocType">
-            <div style="margin-bottom: 1rem;">
-                <label style="font-weight: 600;">Partner Organization Name</label>
-                <input type="text" name="partner_name" required placeholder="e.g., Community Housing Corp."
-                       style="width:100%; padding:0.5rem; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-card); color:var(--text-primary); margin-top:0.25rem;">
+            <div id="partnerFields">
+                <div style="margin-bottom: 1rem;">
+                    <label style="font-weight: 600;">Partner Organization Name</label>
+                    <input type="text" name="partner_name" id="partnerNameInput" placeholder="e.g., Community Housing Corp."
+                           style="width:100%; padding:0.5rem; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-card); color:var(--text-primary); margin-top:0.25rem;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="font-weight: 600;">Partner Role in Project</label>
+                    <input type="text" name="partner_role" id="partnerRoleInput" placeholder="e.g., Provide case management services"
+                           style="width:100%; padding:0.5rem; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-card); color:var(--text-primary); margin-top:0.25rem;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="font-weight: 600;">Partnership Details</label>
+                    <textarea name="partnership_details" id="partnershipDetailsInput" rows="4" placeholder="Describe what the agreement covers, key responsibilities, and deliverables..."
+                              style="width:100%; padding:0.5rem; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-card); color:var(--text-primary); margin-top:0.25rem; resize:vertical;"></textarea>
+                </div>
             </div>
-            <div style="margin-bottom: 1rem;">
-                <label style="font-weight: 600;">Partner Role in Project</label>
-                <input type="text" name="partner_role" required placeholder="e.g., Provide case management services"
-                       style="width:100%; padding:0.5rem; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-card); color:var(--text-primary); margin-top:0.25rem;">
-            </div>
-            <div style="margin-bottom: 1rem;">
-                <label style="font-weight: 600;">Partnership Details</label>
-                <textarea name="partnership_details" rows="4" required placeholder="Describe what the agreement covers, key responsibilities, and deliverables..."
-                          style="width:100%; padding:0.5rem; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-card); color:var(--text-primary); margin-top:0.25rem; resize:vertical;"></textarea>
-            </div>
+            <p id="nonPartnerHint" style="display:none; color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">
+                This document can be generated directly from your grant, organization, and budget data. No partner info needed.
+            </p>
             <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
                 <button type="button" class="btn btn-secondary" onclick="hideGenerateModal()">Cancel</button>
                 <button type="submit" class="btn btn-ai" style="padding:0.5rem 1rem;">Generate with AI</button>
@@ -419,6 +424,22 @@ function hideUploadModal() {
 function showGenerateModal(docType, docName) {
     document.getElementById('genDocType').value = docType;
     document.getElementById('generateModalTitle').textContent = 'Generate: ' + docName;
+    const partnerRequiredTypes = new Set([
+        'mou', 'mou_chdo', 'mou_partners', 'letters_of_collaboration',
+        'letters_of_support', 'letters_of_commitment', 'letter_of_support',
+        'cost_share_commitment', 'cost_share_documentation', 'consortium_agreement'
+    ]);
+    const needsPartner = partnerRequiredTypes.has(docType);
+    document.getElementById('partnerFields').style.display = needsPartner ? 'block' : 'none';
+    document.getElementById('nonPartnerHint').style.display = needsPartner ? 'none' : 'block';
+    document.getElementById('partnerNameInput').required = needsPartner;
+    document.getElementById('partnerRoleInput').required = needsPartner;
+    document.getElementById('partnershipDetailsInput').required = needsPartner;
+    if (!needsPartner) {
+        document.getElementById('partnerNameInput').value = '';
+        document.getElementById('partnerRoleInput').value = '';
+        document.getElementById('partnershipDetailsInput').value = '';
+    }
     document.getElementById('generateModal').style.display = 'block';
 }
 

@@ -4029,8 +4029,21 @@ def generate_section_content(grant_id, section_id):
                         client = genai.Client(api_key=api_key)
                         response = client.models.generate_content(
                             model='gemini-2.5-flash',
-                            contents=prompt
+                            contents=prompt,
+                            config={"http_options": {"timeout": 30000}}
                         )
+                        generated_text = (response.text or '').strip() if response else ''
+                        min_chars = 1200
+                        if section_info.get('max_chars'):
+                            try:
+                                min_chars = min(max(int(section_info.get('max_chars')) // 3, 1200), 4000)
+                            except (TypeError, ValueError):
+                                pass
+                        if generated_text and len(generated_text) < min_chars and attempt < max_retries - 1:
+                            prompt += f"\n\nIMPORTANT: Your previous draft was too short. Regenerate this section in substantially more detail. Minimum target length: {min_chars} characters, while still respecting any explicit page or character cap."
+                            import time
+                            time.sleep(retry_delay * (attempt + 1))
+                            continue
                         break
                     except Exception as api_error:
                         if attempt < max_retries - 1 and ('ssl' in str(api_error).lower() or 'timeout' in str(api_error).lower() or 'connection' in str(api_error).lower()):
@@ -4039,7 +4052,7 @@ def generate_section_content(grant_id, section_id):
                             continue
                         raise
             
-                generated_content = response.text
+                generated_content = (response.text or '').strip()
             
         except Exception as e:
             # Fall back to placeholder on error -- guidance is shown in the UI, not embedded in content
@@ -7355,7 +7368,8 @@ NO ISSUES FOUND"""
 
                 response = client.models.generate_content(
                     model="gemini-2.5-flash",
-                    contents=review_prompt
+                    contents=review_prompt,
+                    config={"http_options": {"timeout": 20000}}
                 )
                 ai_result = response.text.strip()
 
@@ -7493,12 +7507,19 @@ def generate_document(grant_id):
         return redirect(url_for('dashboard'))
 
     doc_type = request.form.get('doc_type', 'mou')
-    partner_name = request.form.get('partner_name', '')
-    partner_role = request.form.get('partner_role', '')
-    partnership_details = request.form.get('partnership_details', '')
+    partner_name = request.form.get('partner_name', '').strip()
+    partner_role = request.form.get('partner_role', '').strip()
+    partnership_details = request.form.get('partnership_details', '').strip()
 
-    if not partner_name or not partner_role:
-        flash('Partner name and role are required.', 'error')
+    partner_required_types = {
+        'mou', 'mou_chdo', 'mou_partners', 'letters_of_collaboration',
+        'letters_of_support', 'letters_of_commitment', 'letter_of_support',
+        'cost_share_commitment', 'cost_share_documentation', 'consortium_agreement'
+    }
+    requires_partner = doc_type in partner_required_types
+
+    if requires_partner and (not partner_name or not partner_role):
+        flash('Partner name and role are required for this document type.', 'error')
         return redirect(url_for('grant_checklist', grant_id=grant_id))
 
     conn = get_db()
@@ -7545,20 +7566,31 @@ def generate_document(grant_id):
 - Applicant Organization: {org_name}
 - Grant/Project Name: {grant_name}
 - Funding Agency: {agency}
-- Partner Organization: {partner_name}
+"""
+
+    if requires_partner:
+        prompt += f"""- Partner Organization: {partner_name}
 - Partner Role: {partner_role}
 - Partnership Details: {partnership_details}
+"""
 
+    prompt += f"""
 **Instructions:**
 Generate a complete, formal {doc_label} that:
-1. Includes proper headers, dates, and signature blocks
+1. Includes proper headers, dates, and signature blocks when appropriate
 2. Clearly states the purpose and scope
-3. Defines roles and responsibilities of each party
-4. Includes relevant terms, duration, and conditions
+3. Uses the applicant's actual grant/project context
+4. Includes relevant terms, duration, and conditions when appropriate
 5. Is formatted professionally and ready for review
-6. Uses appropriate legal and grant-writing conventions
+6. Uses appropriate grant-writing conventions
+"""
 
-Write the complete document now:"""
+    if requires_partner:
+        prompt += "7. Defines roles and responsibilities of each party\n"
+    else:
+        prompt += "7. Do not invent partner organizations, collaborators, or third-party commitments unless they were explicitly provided\n"
+
+    prompt += "\nWrite the complete document now:"
 
     generated_content = ""
     try:
@@ -7586,7 +7618,8 @@ Write the complete document now:"""
                     client = genai.Client(api_key=api_key)
                     response = client.models.generate_content(
                         model='gemini-2.5-flash',
-                        contents=prompt
+                        contents=prompt,
+                        config={"http_options": {"timeout": 30000}}
                     )
                     break
                 except Exception as api_error:
@@ -7650,7 +7683,7 @@ Date: ___________________________
     user = get_current_user()
     now = datetime.now().isoformat()
     doc_id = f"gdoc-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(4)}"
-    doc_name = f"{doc_label} - {partner_name}"
+    doc_name = f"{doc_label} - {partner_name}" if partner_name else doc_label
 
     conn = get_db()
     conn.execute('''

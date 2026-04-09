@@ -1059,7 +1059,12 @@ def save_organization_details(user_id, data):
                 org_details.get('country', 'USA'), org_details.get('phone'), org_details.get('website'),
                 now, now))
     
-    # Save organization profile
+    # Save organization profile — coerce numeric fields from string form input to int
+    def to_int(v):
+        try:
+            return int(str(v).strip()) if str(v).strip() else None
+        except (ValueError, TypeError):
+            return None
     c.execute('''INSERT INTO organization_profile
                  (user_id, annual_revenue, year_founded, employees, organization_type,
                   mission_statement, programs_description)
@@ -1069,8 +1074,10 @@ def save_organization_details(user_id, data):
                  employees = EXCLUDED.employees, organization_type = EXCLUDED.organization_type,
                  mission_statement = EXCLUDED.mission_statement, programs_description = EXCLUDED.programs_description''',
                (user_id,
-                org_profile.get('annual_revenue'), org_profile.get('year_founded'),
-                org_profile.get('employees'), org_profile.get('organization_type'),
+                to_int(org_profile.get('annual_revenue')),
+                to_int(org_profile.get('year_founded')),
+                to_int(org_profile.get('employees')),
+                org_profile.get('organization_type'),
                 org_profile.get('mission_statement'), org_profile.get('programs_description')))
     
     # Clear and re-insert focus areas
