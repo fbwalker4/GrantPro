@@ -587,3 +587,19 @@ CREATE TABLE IF NOT EXISTS strategy_sources (
     created_at TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_strategy_sources_strategy ON strategy_sources(strategy_id);
+
+-- Add missing columns to clients table (added directly to Supabase, documented here)
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS ein TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS uei TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS address_line1 TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS address_line2 TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS city TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS state TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS zip_code TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS country TEXT DEFAULT 'US';
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS phone TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS website TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS org_type TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS mission TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS annual_budget DOUBLE PRECISION;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS duns TEXT;
