@@ -81,19 +81,19 @@
     </div>
     {% endif %}
 
-    {% if grant.eligibility_rules and grant.eligibility_rules is mapping %}
-    {% set rules = grant.eligibility_rules %}
+    {% if grant.eligibility_rules and grant.eligibility_rules.get %}
+    {% set rules2 = grant.eligibility_rules %}
     <div class="card" style="border-left: 4px solid #dc2626; background: #fef2f2; margin-bottom: 1rem;">
         <div class="card-header" style="color: #991b1b;">⚠️ Before You Apply — Know the Caps</div>
         <p style="margin: 0.5rem 0; font-size: 0.9rem;">This grant has strict limits. <strong>Your project must fit within these thresholds to qualify:</strong></p>
         <ul style="margin: 0.25rem 0 0.5rem 1.2rem; font-size: 0.88rem;">
-            {% if rules.max_request %}<li>Max <strong>${{ "{:,.0f}".format(rules.max_request) }}</strong> per project</li>{% endif %}
-            {% if rules.max_per_unit %}<li>Max <strong>${{ "{:,.0f}".format(rules.max_per_unit) }}</strong> per unit</li>{% endif %}
-            {% if rules.max_leverage_ratio %}<li>Max leverage ratio <strong>{{ rules.max_leverage_ratio }}:1</strong></li>{% endif %}
-            {% if rules.min_match_percent %}<li><strong>{{ rules.min_match_percent }}% match</strong> required</li>{% endif %}
-            {% if rules.proforma_required_threshold %}<li><strong>Pro forma required</strong> if project exceeds ${{ "{:,.0f}".format(rules.proforma_required_threshold) }}</li>{% endif %}
+            {% if rules2.max_request %}<li>Max <strong>${{ "{:,.0f}".format(rules2.max_request) }}</strong> per project</li>{% endif %}
+            {% if rules2.max_per_unit %}<li>Max <strong>${{ "{:,.0f}".format(rules2.max_per_unit) }}</strong> per unit</li>{% endif %}
+            {% if rules2.max_leverage_ratio %}<li>Max leverage ratio <strong>{{ rules2.max_leverage_ratio }}:1</strong></li>{% endif %}
+            {% if rules2.min_match_percent %}<li><strong>{{ rules2.min_match_percent }}% match</strong> required</li>{% endif %}
+            {% if rules2.proforma_required_threshold %}<li><strong>Pro forma required</strong> if project exceeds ${{ "{:,.0f}".format(rules2.proforma_required_threshold) }}</li>{% endif %}
         </ul>
-        <p style="margin: 0; font-size: 0.85rem; color: #666;">Use the Budget Builder to check your numbers before generating your AI narrative.</p>
+        <a href="/budget-builder/{{ grant.id }}" class="btn btn-sm" style="background: #dc2626; color: #fff; margin-top: 0.25rem;">Build Budget</a>
     </div>
     {% endif %}
 
