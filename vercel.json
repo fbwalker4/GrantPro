@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "portal/app.py",
+      "use": "@vercel/python",
+      "config": {
+        "includeFiles": [
+          "portal/templates/**",
+          "portal/static/**"
+        ]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)$",
+      "dest": "portal/app.py"
+    }
+  ]
+}
