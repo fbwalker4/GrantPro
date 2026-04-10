@@ -984,7 +984,8 @@ def get_organization_details(user_id):
     if row:
         org_details = dict(row) if hasattr(row, 'keys') else dict(zip(['user_id', 'ein', 'duns', 'uei', 'address_line1', 'address_line2',
                                'city', 'state', 'zip_code', 'country', 'phone', 'website',
-                               'organization_type', 'mission_statement', 'created_at', 'updated_at'], row))
+                               'created_at', 'updated_at', 'client_id', 'mission_statement',
+                               'congressional_district', 'organization_type'], row))
     
     # Get organization profile
     c.execute('SELECT * FROM organization_profile WHERE user_id = ?', (user_id,))
