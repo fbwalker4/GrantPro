@@ -327,7 +327,7 @@ def create_user(email, password, first_name=None, last_name=None, organization_n
         'annual': (3, 199),               # Annual: 3 grants, $199/yr
         'enterprise_5': (999, 44.95),     # Enterprise 5: unlimited grants, 5 clients
         'enterprise_10': (999, 74.95),    # Enterprise 10: unlimited grants, 10 clients
-        'enterprise_unlimited': (999, 99.95),  # Enterprise Unlimited: unlimited everything
+        'enterprise_15': (999, 99.95),  # Enterprise Unlimited: unlimited everything
     }
     
     max_grants = plan_limits.get(plan, (0, 0))[0]
@@ -387,7 +387,7 @@ def update_user_plan(user_id, plan, stripe_customer_id=None, stripe_subscription
         'annual': (3, 'active'),                    # Annual: 3 grants/mo, $199/yr
         'enterprise_5': (999, 'active'),            # Enterprise 5: unlimited, 5 clients
         'enterprise_10': (999, 'active'),           # Enterprise 10: unlimited, 10 clients
-        'enterprise_unlimited': (999, 'active'),    # Enterprise Unlimited
+        'enterprise_15': (999, 'active'),    # Enterprise Unlimited
     }
     
     max_grants, sub_status = plan_limits.get(plan, (0, 'inactive'))
@@ -696,7 +696,7 @@ def check_grant_limit(user_id):
         return False, "Upgrade to submit grant applications. Free tier is for research only.", 0
     
     # Enterprise plans = unlimited grants
-    if plan in ('enterprise_5', 'enterprise_10', 'enterprise_unlimited'):
+    if plan in ('enterprise_5', 'enterprise_10', 'enterprise_15'):
         return True, "Unlimited grants", 999
     
     remaining = max_allowed - used
@@ -760,7 +760,7 @@ def get_client_limit(plan):
         'annual': 1,
         'enterprise_5': 5,
         'enterprise_10': 10,
-        'enterprise_unlimited': None,  # Unlimited
+        'enterprise_15': None,  # Unlimited
     }
     return limits.get(plan, 0)
 

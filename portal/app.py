@@ -342,7 +342,7 @@ def paid_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         user = get_current_user()
-        if not user or user.get('plan') not in ('monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_unlimited'):
+        if not user or user.get('plan') not in ('monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_15'):
             flash('This feature requires a paid plan. Upgrade to get started.', 'info')
             return redirect(url_for('upgrade'))
         # Block suspended or paused users
@@ -546,7 +546,7 @@ def inject_org_context():
         user_orgs=orgs,
         active_org_id=active_org_id,
         active_org_name=active_org_name,
-        show_org_switcher=len(orgs) > 1 or (user is not None and user.get('plan', '') in ('enterprise_5', 'enterprise_10', 'enterprise_unlimited'))
+        show_org_switcher=len(orgs) > 1 or (user is not None and user.get('plan', '') in ('enterprise_5', 'enterprise_10', 'enterprise_15'))
     )
 
 @app.context_processor
@@ -736,7 +736,7 @@ def signup():
         'annual': 'annual',
         'enterprise_5': 'enterprise_5',
         'enterprise_10': 'enterprise_10',
-        'enterprise_unlimited': 'enterprise_unlimited',
+        'enterprise_15': 'enterprise_15',
     }
     plan = tier_mapping.get(plan, 'free')
     
@@ -785,7 +785,7 @@ def signup():
             conn.commit()
             conn.close()
             # If they requested a paid plan, redirect to payment checkout
-            if requested_plan in ['monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_unlimited']:
+            if requested_plan in ['monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_15']:
                 session.clear()
                 session['user_id'] = user_id
                 session['selected_plan'] = requested_plan
@@ -818,7 +818,7 @@ def switch_org():
 def enterprise_dashboard():
     """Cross-client dashboard for enterprise users"""
     user = get_current_user()
-    if user.get('plan') not in ('enterprise_5', 'enterprise_10', 'enterprise_unlimited'):
+    if user.get('plan') not in ('enterprise_5', 'enterprise_10', 'enterprise_15'):
         flash('Enterprise plan required for this feature.', 'error')
         return redirect(url_for('dashboard'))
 
@@ -876,7 +876,7 @@ def upgrade():
     user = user_models.get_user_by_id(session['user_id'])
     
     # If already on paid plan, redirect to dashboard
-    if user.get('plan') in ['monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_unlimited']:
+    if user.get('plan') in ['monthly', 'annual', 'enterprise_5', 'enterprise_10', 'enterprise_15']:
         flash('You are already on a paid plan!', 'info')
         return redirect(url_for('dashboard'))
     
@@ -1444,7 +1444,7 @@ def account_downgrade():
 
     # Validate target plan is lower than current
     # Annual is same tier as monthly (just different billing), so allow "downgrade" between them
-    plan_tier = {'free': 0, 'monthly': 1, 'annual': 1, 'enterprise_5': 2, 'enterprise_10': 3, 'enterprise_unlimited': 4}
+    plan_tier = {'free': 0, 'monthly': 1, 'annual': 1, 'enterprise_5': 2, 'enterprise_10': 3, 'enterprise_15': 4}
     current_plan = user.get('plan', 'free')
 
     if target_plan not in plan_tier or plan_tier[target_plan] >= plan_tier.get(current_plan, 0):
@@ -2990,7 +2990,7 @@ def new_client():
         conn.close()
 
         # For enterprise users, switch to the new org and redirect to onboarding
-        if user.get('plan') in ('enterprise_5', 'enterprise_10', 'enterprise_unlimited'):
+        if user.get('plan') in ('enterprise_5', 'enterprise_10', 'enterprise_15'):
             set_active_org(client_id)
             flash(f'Organization created: {org_name}. Complete onboarding for this organization.', 'success')
             return redirect(url_for('onboarding'))

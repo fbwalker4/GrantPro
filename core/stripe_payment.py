@@ -50,8 +50,8 @@ PLAN_PRICING = {
         'grants': 999,
         'client_limit': 10,
     },
-    'enterprise_unlimited': {
-        'stripe_price_id_enterprise_unlimited': os.getenv('STRIPE_ENTERPRISE_UNLIMITED_PRICE_ID', 'price_enterprise_unlimited_placeholder'),
+    'enterprise_15': {
+        'stripe_price_id_enterprise_15': os.getenv('STRIPE_ENTERPRISE_15_PRICE_ID', 'price_enterprise_15_placeholder'),
         'amount': 99.95,
         'interval': 'month',
         'grants': 999,
@@ -60,7 +60,7 @@ PLAN_PRICING = {
 }
 
 # Enterprise plan names for suspension threshold logic
-ENTERPRISE_PLANS = ('enterprise_5', 'enterprise_10', 'enterprise_unlimited')
+ENTERPRISE_PLANS = ('enterprise_5', 'enterprise_10', 'enterprise_15')
 
 
 def get_stripe_customer(user_email, user_name=None):

@@ -293,7 +293,7 @@
             <div class="pricing-compare-item current">
                 <div class="pricing-compare-label">Current Plan</div>
                 <div class="pricing-compare-price">
-                    {% if sub_status.plan == 'annual' %}$199{% elif sub_status.plan == 'enterprise_5' %}$44.95{% elif sub_status.plan == 'enterprise_10' %}$74.95{% elif sub_status.plan == 'enterprise_unlimited' %}$99.95{% endif %}<span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">/{% if sub_status.plan == 'annual' %}yr{% else %}mo{% endif %}</span>
+                    {% if sub_status.plan == 'annual' %}$199{% elif sub_status.plan == 'enterprise_5' %}$69.95{% elif sub_status.plan == 'enterprise_10' %}$119.95{% elif sub_status.plan == 'enterprise_unlimited' %}$149.95{% endif %}<span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">/{% if sub_status.plan == 'annual' %}yr{% else %}mo{% endif %}</span>
                 </div>
                 <div class="pricing-compare-label">{{ sub_status.plan | replace('_', ' ') | title }}</div>
             </div>
