@@ -4550,16 +4550,14 @@ def check_grant_eligibility(grant_id):
     app_conn = get_connection()
     app_c = app_conn.cursor()
     app_c.execute('''
-        SELECT SUM(federal_request + applicant_contribution + state_funding +
-                  local_funding + other_funding) as total_cost,
-               SUM(federal_request) as total_federal
+        SELECT grand_total, requested_amount
         FROM grant_budget WHERE grant_id = ?
     ''', (grant_id,))
     budget_row = app_c.fetchone()
     app_conn.close()
 
-    total_cost = float(budget_row['total_cost'] or 0)
-    federal_request = float(budget_row['total_federal'] or 0)
+    total_cost = float(budget_row['grand_total'] or 0) if budget_row else 0.0
+    federal_request = float(budget_row['requested_amount'] or 0) if budget_row else 0.0
 
     # Get number of units from application data
     units = 0
