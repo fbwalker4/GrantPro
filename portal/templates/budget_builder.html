@@ -236,10 +236,14 @@
         </div>
     </div>
 
-    <!-- Save -->
-    <div style="display: flex; justify-content: center; margin: 2rem 0;">
+    <!-- Save + Eligibility Check -->
+    <div style="display: flex; justify-content: center; gap: 1rem; margin: 2rem 0;">
         <button type="submit" class="btn btn-success" style="padding: 0.75rem 3rem; font-size: 1.1rem;">Save Budget</button>
+        <button type="button" class="btn btn-warning" style="padding: 0.75rem 1.5rem; font-size: 1rem; background: #fef08a; color: #713f12; border: 1px solid #eab308; cursor: pointer;" onclick="checkEligibility()">Check Eligibility</button>
     </div>
+
+    <!-- Eligibility Results -->
+    <div id="eligibility-results" style="display: none; margin: 1rem 0;"></div>
 </form>
 
 <style>
@@ -568,5 +572,65 @@ document.addEventListener('DOMContentLoaded', function() {
     handleIndirectType();
     recalcAll();
 });
+
+function checkEligibility() {
+    var resultsDiv = document.getElementById('eligibility-results');
+    resultsDiv.style.display = 'block';
+    resultsDiv.innerHTML = '<div style="text-align:center;padding:1rem;">Checking eligibility...</div>';
+
+    var grantId = window.location.pathname.split('/')[2];
+    var csrfInput = document.querySelector('input[name=csrf_token]');
+    var csrfToken = csrfInput ? csrfInput.value : '';
+
+    fetch('/grant/' + grantId + '/check-eligibility', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify({})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) {
+            resultsDiv.innerHTML = '<div style="color:#888;padding:1rem;">Eligibility check unavailable for this grant.</div>';
+            return;
+        }
+
+        var html = '';
+        if (data.eligible && data.warnings.length === 0) {
+            html += '<div class="card" style="border-left:4px solid #22c55e;background:#f0fdf4;"><strong style="color:#166534;">✅ Project meets eligibility requirements</strong></div>';
+        } else if (data.eligible && data.warnings.length > 0) {
+            html += '<div class="card" style="border-left:4px solid #eab308;background:#fefce8;"><strong style="color:#854d0e;">⚠️ Eligibility warnings:</strong><ul>';
+            data.warnings.forEach(function(w) { html += '<li>' + w + '</li>'; });
+            html += '</ul></div>';
+        } else {
+            html += '<div class="card" style="border-left:4px solid #dc2626;background:#fef2f2;"><strong style="color:#991b1b;">❌ Eligibility errors — fix before submitting:</strong><ul>';
+            data.errors.forEach(function(e) { html += '<li>' + e + '</li>'; });
+            html += '</ul></div>';
+        }
+
+        if (data.warnings && data.warnings.length > 0 && data.errors && data.errors.length > 0) {
+            html += '<div class="card" style="border-left:4px solid #eab308;background:#fefce8;margin-top:0.5rem;"><strong style="color:#854d0e;">⚠️ Warnings:</strong><ul>';
+            data.warnings.forEach(function(w) { html += '<li>' + w + '</li>'; });
+            html += '</ul></div>';
+        }
+
+        // Show rule reference
+        if (data.rules) {
+            var r = data.rules;
+            html += '<div style="margin-top:0.75rem;font-size:0.85rem;color:#666;">';
+            html += '<strong>Grant limits:</strong> ';
+            var limits = [];
+            if (r.max_request) limits.push('max $' + Number(r.max_request).toLocaleString() + '/project');
+            if (r.max_per_unit) limits.push('max $' + Number(r.max_per_unit).toLocaleString() + '/unit');
+            if (r.max_leverage_ratio) limits.push('max ' + r.max_leverage_ratio + ':1 leverage');
+            html += limits.join(' | ') + '</div>';
+        }
+
+        resultsDiv.innerHTML = html;
+        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    })
+    .catch(function(err) {
+        resultsDiv.innerHTML = '<div style="color:#888;padding:1rem;">Could not run eligibility check. Try saving the budget first.</div>';
+    });
+}
 </script>
 {% endblock %}

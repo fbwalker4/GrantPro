@@ -50,8 +50,8 @@
         {% endif %}
     </div>
 
-    {% if grant.eligibility_rules_json and grant.eligibility_rules_json != 'null' %}
-    {% set rules = grant.eligibility_rules_json | from_json %}
+    {% if grant.eligibility_rules and grant.eligibility_rules is mapping %}
+    {% set rules = grant.eligibility_rules %}
     <div class="card" style="border-left: 4px solid var(--accent-warning); background: #fffbf0;">
         <div class="card-header" style="color: #8b5e00;">⚠️ Eligibility Caps &amp; Thresholds</div>
         <ul style="margin: 0.5rem 0; padding-left: 1.2rem; color: #444;">
@@ -81,11 +81,27 @@
     </div>
     {% endif %}
 
+    {% if grant.eligibility_rules and grant.eligibility_rules is mapping %}
+    {% set rules = grant.eligibility_rules %}
+    <div class="card" style="border-left: 4px solid #dc2626; background: #fef2f2; margin-bottom: 1rem;">
+        <div class="card-header" style="color: #991b1b;">⚠️ Before You Apply — Know the Caps</div>
+        <p style="margin: 0.5rem 0; font-size: 0.9rem;">This grant has strict limits. <strong>Your project must fit within these thresholds to qualify:</strong></p>
+        <ul style="margin: 0.25rem 0 0.5rem 1.2rem; font-size: 0.88rem;">
+            {% if rules.max_request %}<li>Max <strong>${{ "{:,.0f}".format(rules.max_request) }}</strong> per project</li>{% endif %}
+            {% if rules.max_per_unit %}<li>Max <strong>${{ "{:,.0f}".format(rules.max_per_unit) }}</strong> per unit</li>{% endif %}
+            {% if rules.max_leverage_ratio %}<li>Max leverage ratio <strong>{{ rules.max_leverage_ratio }}:1</strong></li>{% endif %}
+            {% if rules.min_match_percent %}<li><strong>{{ rules.min_match_percent }}% match</strong> required</li>{% endif %}
+            {% if rules.proforma_required_threshold %}<li><strong>Pro forma required</strong> if project exceeds ${{ "{:,.0f}".format(rules.proforma_required_threshold) }}</li>{% endif %}
+        </ul>
+        <p style="margin: 0; font-size: 0.85rem; color: #666;">Use the Budget Builder to check your numbers before generating your AI narrative.</p>
+    </div>
+    {% endif %}
+
     <div class="card">
         <div class="card-header">Next Steps</div>
         <div class="actions">
             <a href="/start-grant/{{ grant.id }}" class="btn btn-primary">Start Application</a>
-            <a href="/eligibility" class="btn btn-secondary">Check Eligibility</a>
+            <a href="/grant/{{ grant.id }}/budget-builder" class="btn btn-secondary">Build Budget</a>
         </div>
     </div>
 

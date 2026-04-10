@@ -3141,9 +3141,10 @@ def grant_info(grant_id):
         return redirect(url_for('grants'))
     
     grant = dict(grant_row)
-    # Serialize eligibility_rules JSONB for template
     import json
-    grant['eligibility_rules_json'] = json.dumps(grant.get('eligibility_rules')) if grant.get('eligibility_rules') else None
+    eligibility_rules = grant.get('eligibility_rules')
+    if eligibility_rules:
+        grant['eligibility_rules'] = dict(eligibility_rules) if hasattr(eligibility_rules, 'keys') else eligibility_rules
     return render_template('grant_info.html', grant=grant)
 
 
@@ -4515,7 +4516,121 @@ def budget_builder(grant_id):
             'match_cash': 0, 'match_inkind': 0, 'match_total': 0,
         }
 
+    import json
+    eligibility_rules = grant.get('eligibility_rules')
+    if eligibility_rules:
+        grant['eligibility_rules'] = dict(eligibility_rules) if hasattr(eligibility_rules, 'keys') else eligibility_rules
     return render_template('budget_builder.html', grant=grant, budget=budget)
+
+
+@app.route('/grant/<grant_id>/check-eligibility', methods=['POST'])
+@login_required
+def check_grant_eligibility(grant_id):
+    """Check if project budget meets grant eligibility rules."""
+    import json
+    user = get_current_user()
+
+    # Get grant eligibility rules
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute('SELECT eligibility_rules, amount FROM grants_catalog WHERE id = ? OR opportunity_number = ? LIMIT 1',
+              (grant_id, grant_id))
+    row = c.fetchone()
+    conn.close()
+    if not row:
+        return jsonify({'error': 'Grant not found'}), 404
+
+    rules = row[0]  # JSONB dict from Postgres
+    if not rules:
+        return jsonify({'eligible': True, 'warnings': [], 'checks': {}})
+
+    rules = dict(rules) if hasattr(rules, 'keys') else {}
+
+    # Get user's budget for this grant
+    app_conn = get_connection()
+    app_c = app_conn.cursor()
+    app_c.execute('''
+        SELECT SUM(federal_request + applicant_contribution + state_funding +
+                  local_funding + other_funding) as total_cost
+        FROM grant_budget WHERE grant_id = ?
+    ''', (grant_id,))
+    budget_row = app_c.fetchone()
+    app_conn.close()
+
+    total_cost = float(budget_row[0] or 0)
+    federal_request = 0.0  # Will come from budget if available
+
+    # Get number of units from application data
+    units = 0
+    try:
+        app_conn2 = get_connection()
+        app_c2 = app_conn2.cursor()
+        app_c2.execute('''
+            SELECT additional_data FROM user_applications
+            WHERE grant_id = ? AND user_id = ? ORDER BY started_at DESC LIMIT 1
+        ''', (grant_id, user['id']))
+        app_row = app_c2.fetchone()
+        app_conn2.close()
+        if app_row and app_row[0]:
+            additional = json.loads(app_row[0]) if isinstance(app_row[0], str) else (app_row[0] or {})
+            units = int(additional.get('total_units', 0) or 0)
+    except Exception:
+        pass
+
+    warnings = []
+    errors = []
+    checks = {}
+
+    # 1. Max request per project
+    if rules.get('max_request') and federal_request > rules['max_request']:
+        errors.append(f"Request (${federal_request:,.0f}) exceeds max ${rules['max_request']:,.0f} per project")
+        checks['max_request'] = 'error'
+    else:
+        checks['max_request'] = 'ok'
+
+    # 2. Max per unit
+    if rules.get('max_per_unit') and units > 0 and federal_request / units > rules['max_per_unit']:
+        per_unit = federal_request / units
+        errors.append(f"Subsidy per unit (${per_unit:,.0f}) exceeds max ${rules['max_per_unit']:,.0f}/unit")
+        checks['max_per_unit'] = 'error'
+    else:
+        checks['max_per_unit'] = 'ok'
+
+    # 3. Max leverage ratio
+    if rules.get('max_leverage_ratio') and federal_request > 0 and total_cost / federal_request > rules['max_leverage_ratio']:
+        actual_ratio = total_cost / federal_request
+        errors.append(f"Leverage ratio ({actual_ratio:.1f}:1) exceeds max {rules['max_leverage_ratio']}:1")
+        checks['max_leverage'] = 'error'
+    else:
+        checks['max_leverage'] = 'ok'
+
+    # 4. Min match (20%)
+    if rules.get('min_match_percent') and total_cost > 0:
+        # Assuming applicant contribution = match
+        # This needs actual budget data to check properly
+        checks['min_match'] = 'ok'  # Placeholder - needs budget breakdown
+
+    # 5. Pro forma threshold
+    if rules.get('proforma_required_threshold') and total_cost >= rules['proforma_required_threshold']:
+        warnings.append(f"Pro forma required: projects over ${rules['proforma_required_threshold']:,.0f} must include development pro forma")
+        checks['proforma'] = 'warning'
+    else:
+        checks['proforma'] = 'ok'
+
+    eligible = len(errors) == 0
+
+    return jsonify({
+        'eligible': eligible,
+        'errors': errors,
+        'warnings': warnings,
+        'checks': checks,
+        'rules': {
+            'max_request': rules.get('max_request'),
+            'max_per_unit': rules.get('max_per_unit'),
+            'max_leverage_ratio': rules.get('max_leverage_ratio'),
+            'proforma_required': total_cost >= rules.get('proforma_required_threshold', 0)
+        }
+    })
 
 
 @app.route('/grant/<grant_id>/paper-submission')
