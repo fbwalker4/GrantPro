@@ -1263,45 +1263,52 @@ def profile():
         if user_updates:
             user_models.update_user(user['id'], user_updates)
 
-        # Upsert SF-424 required fields to organization_details
+        # Upsert SF-424 required fields to organization_details using UPDATE-then-INSERT
+        # This is more verbose but avoids ON CONFLICT issues across SQLite and Postgres
+        org_ein = request.form.get('ein', '').strip()
+        org_uei = request.form.get('uei', '').strip()
+        org_addr = request.form.get('address_line1', '').strip()
+        org_city = request.form.get('city', '').strip()
+        org_state = request.form.get('state', '').strip()
+        org_zip = request.form.get('zip_code', '').strip()
+        org_mission = request.form.get('mission_statement', '').strip()
+        org_district = request.form.get('congressional_district', '').strip()
+        org_type_val = request.form.get('organization_type', '').strip()
+
         try:
             conn = get_connection()
             c = conn.cursor()
-            ein = request.form.get('ein', '').strip()
-            uei = request.form.get('uei', '').strip()
-            address_line1 = request.form.get('address_line1', '').strip()
-            city = request.form.get('city', '').strip()
-            state = request.form.get('state', '').strip()
-            zip_code = request.form.get('zip_code', '').strip()
-            mission_stmt = request.form.get('mission_statement', '').strip()
-            cong_district = request.form.get('congressional_district', '').strip()
-            org_type = request.form.get('organization_type', '').strip()
+            # First try UPDATE
             c.execute(
-                "INSERT INTO organization_details "
-                "(user_id,ein,uei,address_line1,city,state,zip_code,mission_statement,congressional_district,organization_type) "
-                "VALUES (?,?,?,?,?,?,?,?,?,?) "
-                "ON CONFLICT (user_id) DO UPDATE SET "
-                "ein=COALESCE(EXCLUDED.ein,organization_details.ein),"
-                "uei=COALESCE(EXCLUDED.uei,organization_details.uei),"
-                "address_line1=COALESCE(EXCLUDED.address_line1,organization_details.address_line1),"
-                "city=COALESCE(EXCLUDED.city,organization_details.city),"
-                "state=COALESCE(EXCLUDED.state,organization_details.state),"
-                "zip_code=COALESCE(EXCLUDED.zip_code,organization_details.zip_code),"
-                "mission_statement=COALESCE(EXCLUDED.mission_statement,organization_details.mission_statement),"
-                "congressional_district=COALESCE(EXCLUDED.congressional_district,organization_details.congressional_district),"
-                "organization_type=COALESCE(EXCLUDED.organization_type,organization_details.organization_type)",
-                (user['id'], ein, uei, address_line1, city, state, zip_code, mission_stmt, cong_district, org_type)
+                "UPDATE organization_details SET "
+                "ein=?, uei=?, address_line1=?, city=?, state=?, zip_code=?, "
+                "mission_statement=?, congressional_district=?, organization_type=? "
+                "WHERE user_id=?",
+                (org_ein, org_uei, org_addr, org_city, org_state, org_zip,
+                 org_mission, org_district, org_type_val, user['id'])
             )
+            if c.rowcount == 0:
+                # Row doesn't exist — INSERT
+                c.execute(
+                    "INSERT INTO organization_details "
+                    "(user_id,ein,uei,address_line1,city,state,zip_code,mission_statement,congressional_district,organization_type) "
+                    "VALUES (?,?,?,?,?,?,?,?,?,?)",
+                    (user['id'], org_ein, org_uei, org_addr, org_city, org_state, org_zip,
+                     org_mission, org_district, org_type_val)
+                )
             conn.commit()
             conn.close()
+            _org_details_saved = True
         except Exception as e:
             logger.error(f'Failed to upsert organization_details for user {user["id"]}: {e}')
             try:
                 conn.close()
             except Exception:
                 pass
+            _org_details_saved = False
 
-        flash('Profile updated!', 'success')
+        flash_msg = 'Profile updated (org details saved).' if _org_details_saved else 'Profile updated but org details save failed.'
+        flash(flash_msg, 'success' if _org_details_saved else 'warning')
         return redirect(url_for('profile'))
     
     return render_template('profile.html', user=user, profile=profile or {})
@@ -8773,3 +8780,49 @@ def cron_grant_hygiene():
     conn.close()
     return jsonify({'ok': True, 'stats': stats})
 
+
+
+@app.route('/debug/db-test', methods=['GET', 'POST'])
+def debug_db_test():
+    """Debug endpoint to test DB write/read"""
+    import json
+    user_id = request.args.get('user_id') or (get_current_user()['id'] if get_current_user() else None)
+    result = {'user_id': user_id, 'db_writes': [], 'db_reads': []}
+    
+    if not user_id:
+        return jsonify({'error': 'No user_id'})
+    
+    test_ein = f"DEBUG-{__import__('time').time()}"
+    
+    try:
+        conn = get_connection()
+        c = conn.cursor()
+        # Try UPDATE first
+        c.execute(
+            "UPDATE organization_details SET ein=? WHERE user_id=?",
+            (test_ein, user_id))
+        if c.rowcount == 0:
+            # Insert if no row existed
+            c.execute(
+                "INSERT INTO organization_details (user_id, ein) VALUES (?, ?)",
+                (user_id, test_ein))
+        conn.commit()
+        result['db_writes'].append(f'WRITE_OK rowcount={c.rowcount}')
+        
+        # Read back
+        c.execute("SELECT ein, uei FROM organization_details WHERE user_id=?", (user_id,))
+        row = c.fetchone()
+        result['db_reads'].append({'row': dict(zip([d[0] for d in c.description], row)) if row else None})
+        
+        # Check connection type
+        result['conn_type'] = type(conn).__name__
+        result['cursor_type'] = type(c).__name__
+        
+        conn.close()
+        result['status'] = 'ok'
+    except Exception as e:
+        result['status'] = 'error'
+        result['error'] = str(e)
+        result['error_type'] = type(e).__name__
+    
+    return jsonify(result)
