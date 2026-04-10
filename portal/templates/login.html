@@ -242,14 +242,18 @@
 
                 <div class="form-group">
                     <label class="form-label" for="password">Password</label>
-                    <input type="password" id="password" name="password" class="form-input" required aria-required="true" placeholder="Enter your password">
+                    <div style="position: relative;">
+                        <input type="password" id="password" name="password" class="form-input" required aria-required="true" placeholder="Enter your password" style="padding-right: 2.5rem;">
+                        <button type="button" onclick="togglePassword('password')" aria-label="Show password" style="position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 0.2rem; font-size: 1rem; line-height: 1;">
+                            <span id="eye-password">&#128065;</span>
+                        </button>
+                    </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
                         <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--text-secondary); cursor: pointer;">
                             <input type="checkbox" name="remember_me" style="accent-color: var(--accent-primary);"> Remember me
                         </label>
                         <a href="/forgot-password" class="forgot-link">Forgot password?</a>
                     </div>
-                </div>
 
                 <button type="submit" class="btn btn-primary">
                     Sign In
@@ -265,5 +269,20 @@
             Don't have an account? <a href="/signup">Sign up</a>
         </div>
     </div>
+
+    <script>
+    function togglePassword(fieldId) {
+        var input = document.getElementById(fieldId);
+        var eye = document.getElementById('eye-' + fieldId);
+        if (!input || !eye) return;
+        if (input.type === 'password') {
+            input.type = 'text';
+            eye.innerHTML = '&#128064;';
+        } else {
+            input.type = 'password';
+            eye.innerHTML = '&#128065;';
+        }
+    }
+    </script>
 </body>
 </html>
