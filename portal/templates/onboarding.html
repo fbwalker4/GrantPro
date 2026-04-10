@@ -1096,12 +1096,12 @@
                 <!-- Actions -->
                 <div class="form-actions">
                     <button type="button" class="skip-link" onclick="
+    // Remove required attributes so partial saves work
     var form = document.getElementById('onboarding_form');
-    // Remove required attr temporarily so partial saves work
     form.querySelectorAll('[required]').forEach(function(el){ el.removeAttribute('required'); });
-    // Submit form (saves whatever is filled) then go to dashboard
-    fetch(form.action, {method:'POST', body: new FormData(form), headers:{'X-CSRF-Token': form.querySelector('[name=csrf_token]').value}})
-      .then(function(){ window.location='/dashboard'; });
+    // Also clear values of truly empty fields that would cause issues
+    // Then submit the form normally (includes CSRF token automatically)
+    form.submit();
     return false;
   ">Skip for now (saves progress)</button>
                     <button type="submit" class="btn btn-primary">Save Organization Profile</button>
