@@ -1692,6 +1692,33 @@ def account_export_generate():
                      (export_id, user_id, str(zip_path), file_size, now.isoformat(), now.isoformat(),
                       (now + timedelta(days=7)).isoformat()))
             conn.commit()
+
+        # Upsert SF-424 required fields to organization_details
+        ein = request.form.get('ein','').strip()
+        uei = request.form.get('uei','').strip()
+        address_line1 = request.form.get('address_line1','').strip()
+        city = request.form.get('city','').strip()
+        state = request.form.get('state','').strip()
+        zip_code = request.form.get('zip_code','').strip()
+        mission_stmt = request.form.get('mission_statement','').strip()
+        cong_district = request.form.get('congressional_district','').strip()
+        org_type = request.form.get('organization_type','').strip()
+        c.execute(
+            "INSERT INTO organization_details "
+            "(user_id,ein,uei,address_line1,city,state,zip_code,mission_statement,congressional_district,organization_type) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?) "
+            "ON CONFLICT (user_id) DO UPDATE SET "
+            "ein=COALESCE(EXCLUDED.ein,organization_details.ein),"
+            "uei=COALESCE(EXCLUDED.uei,organization_details.uei),"
+            "address_line1=COALESCE(EXCLUDED.address_line1,organization_details.address_line1),"
+            "city=COALESCE(EXCLUDED.city,organization_details.city),"
+            "state=COALESCE(EXCLUDED.state,organization_details.state),"
+            "zip_code=COALESCE(EXCLUDED.zip_code,organization_details.zip_code),"
+            "mission_statement=COALESCE(EXCLUDED.mission_statement,organization_details.mission_statement),"
+            "congressional_district=COALESCE(EXCLUDED.congressional_district,organization_details.congressional_district),"
+            "organization_type=COALESCE(EXCLUDED.organization_type,organization_details.organization_type)",
+            (user['id'],ein,uei,address_line1,city,state,zip_code,mission_stmt,cong_district,org_type)
+        )
         except Exception as e:
             logger.error(f'Failed to record data export: {e}')
             conn.commit()
