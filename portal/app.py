@@ -4533,7 +4533,7 @@ def check_grant_eligibility(grant_id):
     # Get grant eligibility rules
     conn = get_connection()
     c = conn.cursor()
-    c.execute('SELECT eligibility_rules, amount FROM grants_catalog WHERE id = ? OR opportunity_number = ? LIMIT 1',
+    c.execute('SELECT eligibility_rules, amount_max FROM grants_catalog WHERE id = ? OR opportunity_number = ? LIMIT 1',
               (grant_id, grant_id))
     row = c.fetchone()
     conn.close()
@@ -4551,14 +4551,15 @@ def check_grant_eligibility(grant_id):
     app_c = app_conn.cursor()
     app_c.execute('''
         SELECT SUM(federal_request + applicant_contribution + state_funding +
-                  local_funding + other_funding) as total_cost
+                  local_funding + other_funding) as total_cost,
+               SUM(federal_request) as total_federal
         FROM grant_budget WHERE grant_id = ?
     ''', (grant_id,))
     budget_row = app_c.fetchone()
     app_conn.close()
 
-    total_cost = float(budget_row[0] or 0)
-    federal_request = 0.0  # Will come from budget if available
+    total_cost = float(budget_row['total_cost'] or 0)
+    federal_request = float(budget_row['total_federal'] or 0)
 
     # Get number of units from application data
     units = 0
