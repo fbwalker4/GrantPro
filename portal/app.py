@@ -4530,6 +4530,13 @@ def check_grant_eligibility(grant_id):
     import json
     user = get_current_user()
 
+    # Parse request body — use JSON fields if provided, otherwise fall back to DB
+    data = request.get_json(silent=True) or {}
+    json_request = float(data.get('request_amount', 0) or 0)
+    json_total = float(data.get('total_budget', 0) or 0)
+    json_units = int(data.get('units', 0) or 0)
+    json_match = float(data.get('match_amount', 0) or 0)
+
     # Get grant eligibility rules
     conn = get_connection()
     c = conn.cursor()
@@ -4546,7 +4553,7 @@ def check_grant_eligibility(grant_id):
 
     rules = dict(rules) if hasattr(rules, 'keys') else {}
 
-    # Get user's budget for this grant
+    # Get user's budget for this grant from DB, then override with JSON if provided
     app_conn = get_connection()
     app_c = app_conn.cursor()
     app_c.execute('''
@@ -4556,25 +4563,30 @@ def check_grant_eligibility(grant_id):
     budget_row = app_c.fetchone()
     app_conn.close()
 
-    total_cost = float(budget_row['grand_total'] or 0) if budget_row else 0.0
-    federal_request = float(budget_row['requested_amount'] or 0) if budget_row else 0.0
+    db_total = float(budget_row['grand_total'] or 0) if budget_row else 0.0
+    db_request = float(budget_row['requested_amount'] or 0) if budget_row else 0.0
 
-    # Get number of units from application data
-    units = 0
-    try:
-        app_conn2 = get_connection()
-        app_c2 = app_conn2.cursor()
-        app_c2.execute('''
-            SELECT additional_data FROM user_applications
-            WHERE grant_id = ? AND user_id = ? ORDER BY started_at DESC LIMIT 1
-        ''', (grant_id, user['id']))
-        app_row = app_c2.fetchone()
-        app_conn2.close()
-        if app_row and app_row[0]:
-            additional = json.loads(app_row[0]) if isinstance(app_row[0], str) else (app_row[0] or {})
-            units = int(additional.get('total_units', 0) or 0)
-    except Exception:
-        pass
+    # JSON payload overrides DB values
+    total_cost = json_total if json_total > 0 else db_total
+    federal_request = json_request if json_request > 0 else db_request
+
+    # Get number of units from application data, then JSON override
+    units = json_units if json_units > 0 else 0
+    if units == 0:
+        try:
+            app_conn2 = get_connection()
+            app_c2 = app_conn2.cursor()
+            app_c2.execute('''
+                SELECT additional_data FROM user_applications
+                WHERE grant_id = ? AND user_id = ? ORDER BY started_at DESC LIMIT 1
+            ''', (grant_id, user['id']))
+            app_row = app_c2.fetchone()
+            app_conn2.close()
+            if app_row and app_row[0]:
+                additional = json.loads(app_row[0]) if isinstance(app_row[0], str) else (app_row[0] or {})
+                units = int(additional.get('total_units', 0) or 0)
+        except Exception:
+            pass
 
     warnings = []
     errors = []
@@ -4604,10 +4616,15 @@ def check_grant_eligibility(grant_id):
         checks['max_leverage'] = 'ok'
 
     # 4. Min match (20%)
-    if rules.get('min_match_percent') and total_cost > 0:
-        # Assuming applicant contribution = match
-        # This needs actual budget data to check properly
-        checks['min_match'] = 'ok'  # Placeholder - needs budget breakdown
+    if rules.get('min_match_percent') and total_cost > 0 and federal_request > 0:
+        match_pct = ((total_cost - federal_request) / total_cost) * 100
+        if match_pct < rules['min_match_percent']:
+            errors.append(f"Match ({match_pct:.0f}%) is below minimum {rules['min_match_percent']}% required")
+            checks['min_match'] = 'error'
+        else:
+            checks['min_match'] = 'ok'
+    else:
+        checks['min_match'] = 'ok'
 
     # 5. Pro forma threshold
     if rules.get('proforma_required_threshold') and total_cost >= rules['proforma_required_threshold']:
