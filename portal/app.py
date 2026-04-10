@@ -3141,6 +3141,9 @@ def grant_info(grant_id):
         return redirect(url_for('grants'))
     
     grant = dict(grant_row)
+    # Serialize eligibility_rules JSONB for template
+    import json
+    grant['eligibility_rules_json'] = json.dumps(grant.get('eligibility_rules')) if grant.get('eligibility_rules') else None
     return render_template('grant_info.html', grant=grant)
 
 

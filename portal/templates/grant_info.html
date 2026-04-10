@@ -50,6 +50,37 @@
         {% endif %}
     </div>
 
+    {% if grant.eligibility_rules_json and grant.eligibility_rules_json != 'null' %}
+    {% set rules = grant.eligibility_rules_json | from_json %}
+    <div class="card" style="border-left: 4px solid var(--accent-warning); background: #fffbf0;">
+        <div class="card-header" style="color: #8b5e00;">⚠️ Eligibility Caps &amp; Thresholds</div>
+        <ul style="margin: 0.5rem 0; padding-left: 1.2rem; color: #444;">
+            {% if rules.max_request %}
+            <li><strong>Max Request:</strong> ${{ "{:,.0f}".format(rules.max_request) }} per project</li>
+            {% endif %}
+            {% if rules.max_per_unit %}
+            <li><strong>Max Per Unit:</strong> ${{ "{:,.0f}".format(rules.max_per_unit) }} per household</li>
+            {% endif %}
+            {% if rules.max_leverage_ratio %}
+            <li><strong>Max Leverage:</strong> {{ rules.max_leverage_ratio }}:1 (total project cost / AHP request)</li>
+            {% endif %}
+            {% if rules.min_match_percent %}
+            <li><strong>Match Required:</strong> {{ rules.min_match_percent }}% of total project cost</li>
+            {% endif %}
+            {% if rules.proforma_required_threshold %}
+            <li><strong>Pro Forma:</strong> Required for projects over ${{ "{:,.0f}".format(rules.proforma_required_threshold) }} total cost</li>
+            {% endif %}
+            {% if rules.income_requirement %}
+            <li><strong>Income Limit:</strong> {{ rules.income_requirement }}</li>
+            {% endif %}
+            {% if rules.subsidy_layering_max_percent %}
+            <li><strong>Subsidy Layering:</strong> Total federal aid cannot exceed {{ rules.subsidy_layering_max_percent }}% of project cost</li>
+            {% endif %}
+        </ul>
+        <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #666;">These limits are enforced when you submit your application. Projects outside these thresholds may be flagged or rejected.</p>
+    </div>
+    {% endif %}
+
     <div class="card">
         <div class="card-header">Next Steps</div>
         <div class="actions">
