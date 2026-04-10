@@ -44,16 +44,16 @@
                 <label class="form-label" for="organization_type">Organization Type</label>
                 <select class="form-select" id="organization_type" name="organization_type">
                     <option value="">Select...</option>
-                    <option value="nonprofit" {% if profile.organization_type == 'nonprofit' %}selected{% endif %}>Nonprofit / 501(c)(3)</option>
-                    <option value="small_business" {% if profile.organization_type == 'small_business' %}selected{% endif %}>Small Business</option>
-                    <option value="government" {% if profile.organization_type == 'government' %}selected{% endif %}>Government</option>
-                    <option value="state_agency" {% if profile.organization_type == 'state_agency' %}selected{% endif %}>State Agency</option>
-                    <option value="local_government" {% if profile.organization_type == 'local_government' %}selected{% endif %}>Local Government</option>
-                    <option value="tribal" {% if profile.organization_type == 'tribal' %}selected{% endif %}>Native American / Tribal Government</option>
-                    <option value="housing_authority" {% if profile.organization_type == 'housing_authority' %}selected{% endif %}>Public Housing Authority</option>
-                    <option value="university" {% if profile.organization_type == 'university' %}selected{% endif %}>University</option>
-                    <option value="individual" {% if profile.organization_type == 'individual' %}selected{% endif %}>Individual / Artist</option>
-                    <option value="other" {% if profile.organization_type == 'other' %}selected{% endif %}>Other</option>
+                    <option value="nonprofit" {% if org_profile.organization_type == 'nonprofit' %}selected{% endif %}>Nonprofit / 501(c)(3)</option>
+                    <option value="small_business" {% if org_profile.organization_type == 'small_business' %}selected{% endif %}>Small Business</option>
+                    <option value="government" {% if org_profile.organization_type == 'government' %}selected{% endif %}>Government</option>
+                    <option value="state_agency" {% if org_profile.organization_type == 'state_agency' %}selected{% endif %}>State Agency</option>
+                    <option value="local_government" {% if org_profile.organization_type == 'local_government' %}selected{% endif %}>Local Government</option>
+                    <option value="tribal" {% if org_profile.organization_type == 'tribal' %}selected{% endif %}>Native American / Tribal Government</option>
+                    <option value="housing_authority" {% if org_profile.organization_type == 'housing_authority' %}selected{% endif %}>Public Housing Authority</option>
+                    <option value="university" {% if org_profile.organization_type == 'university' %}selected{% endif %}>University</option>
+                    <option value="individual" {% if org_profile.organization_type == 'individual' %}selected{% endif %}>Individual / Artist</option>
+                    <option value="other" {% if org_profile.organization_type == 'other' %}selected{% endif %}>Other</option>
                 </select>
             </div>
 
@@ -63,40 +63,40 @@
             </div>
             <div class="form-group">
                 <label class="form-label" for="ein">Employer ID Number (EIN)</label>
-                <input type="text" id="ein" name="ein" class="form-control" placeholder="XX-XXXXXXX" value="{{ profile.ein or '' }}">
+                <input type="text" id="ein" name="ein" class="form-control" placeholder="XX-XXXXXXX" value="{{ org_details.ein or '' }}">
                 <small style="color:#64748b;font-size:12px;">9-digit EIN (from IRS). Required for all federal grant applications.</small>
             </div>
             <div class="form-group">
                 <label class="form-label" for="uei">Unique Entity Identifier (UEI)</label>
-                <input type="text" id="uei" name="uei" class="form-control" placeholder="XXXXXXXXXXXX" value="{{ profile.uei or '' }}">
+                <input type="text" id="uei" name="uei" class="form-control" placeholder="XXXXXXXXXXXX" value="{{ org_details.uei or '' }}">
                 <small style="color:#64748b;font-size:12px;">12-character UEI from sam.gov. Required for all federal grants.</small>
             </div>
             <div class="form-group">
                 <label class="form-label" for="address_line1">Street Address</label>
-                <input type="text" id="address_line1" name="address_line1" class="form-control" placeholder="123 Main Street" value="{{ profile.address_line1 or '' }}">
+                <input type="text" id="address_line1" name="address_line1" class="form-control" placeholder="123 Main Street" value="{{ org_details.address_line1 or '' }}">
             </div>
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label" for="city">City</label>
-                    <input type="text" id="city" name="city" class="form-control" value="{{ profile.city or '' }}">
+                    <input type="text" id="city" name="city" class="form-control" value="{{ org_details.city or '' }}">
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="state">State</label>
-                    <input type="text" id="state" name="state" class="form-control" placeholder="MS" value="{{ profile.state or '' }}">
+                    <input type="text" id="state" name="state" class="form-control" placeholder="MS" value="{{ org_details.state or '' }}">
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="zip_code">ZIP Code</label>
-                    <input type="text" id="zip_code" name="zip_code" class="form-control" placeholder="39501" value="{{ profile.zip_code or '' }}">
+                    <input type="text" id="zip_code" name="zip_code" class="form-control" placeholder="39501" value="{{ org_details.zip_code or '' }}">
                 </div>
             </div>
             <div class="form-group">
                 <label class="form-label" for="mission_statement">Mission Statement</label>
-                <textarea id="mission_statement" name="mission_statement" class="form-control" rows="3" placeholder="Describe your organization's mission, who you serve, and your primary programs and activities.">{{ profile.mission_statement or '' }}</textarea>
+                <textarea id="mission_statement" name="mission_statement" class="form-control" rows="3" placeholder="Describe your organization's mission, who you serve, and your primary programs and activities.">{{ org_profile.mission_statement or '' }}</textarea>
                 <small style="color:#64748b;font-size:12px;">Used by GrantPro AI to generate authentic grant narratives.</small>
             </div>
             <div class="form-group">
                 <label class="form-label" for="congressional_district">Congressional District</label>
-                <input type="text" id="congressional_district" name="congressional_district" class="form-control" placeholder="MS-001" value="{{ profile.congressional_district or '' }}">
+                <input type="text" id="congressional_district" name="congressional_district" class="form-control" placeholder="MS-001" value="{{ org_details.congressional_district or '' }}">
                 <small style="color:#64748b;font-size:12px;">Your district (e.g. MS-001 for Gulfport/Biloxi).</small>
             </div>
 

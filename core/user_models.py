@@ -984,7 +984,7 @@ def get_organization_details(user_id):
     if row:
         org_details = dict(row) if hasattr(row, 'keys') else dict(zip(['user_id', 'ein', 'duns', 'uei', 'address_line1', 'address_line2',
                                'city', 'state', 'zip_code', 'country', 'phone', 'website',
-                               'created_at', 'updated_at'], row))
+                               'organization_type', 'mission_statement', 'created_at', 'updated_at'], row))
     
     # Get organization profile
     c.execute('SELECT * FROM organization_profile WHERE user_id = ?', (user_id,))
@@ -1044,19 +1044,21 @@ def save_organization_details(user_id, data):
     
     # Save organization details
     c.execute('''INSERT INTO organization_details 
-                 (user_id, ein, duns, uei, address_line1, address_line2, city, state, zip_code, country, phone, website, created_at, updated_at)
+                 (user_id, ein, duns, uei, address_line1, address_line2, city, state, zip_code, country, phone, website, organization_type, mission_statement, created_at, updated_at)
                  VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) '''
                '''ON CONFLICT (user_id) DO UPDATE SET 
                  ein = EXCLUDED.ein, duns = EXCLUDED.duns, uei = EXCLUDED.uei,
                  address_line1 = EXCLUDED.address_line1, address_line2 = EXCLUDED.address_line2,
                  city = EXCLUDED.city, state = EXCLUDED.state, zip_code = EXCLUDED.zip_code,
                  country = EXCLUDED.country, phone = EXCLUDED.phone, website = EXCLUDED.website,
+                 organization_type = EXCLUDED.organization_type, mission_statement = EXCLUDED.mission_statement,
                  created_at = EXCLUDED.created_at, updated_at = EXCLUDED.updated_at''',
                (user_id, 
                 org_details.get('ein'), org_details.get('duns'), org_details.get('uei'),
                 org_details.get('address_line1'), org_details.get('address_line2'),
                 org_details.get('city'), org_details.get('state'), org_details.get('zip_code'),
                 org_details.get('country', 'USA'), org_details.get('phone'), org_details.get('website'),
+                org_profile.get('organization_type'), org_profile.get('mission_statement'),
                 now, now))
     
     # Save organization profile — coerce numeric fields from string form input to int

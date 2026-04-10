@@ -103,7 +103,7 @@ app.config.update(
     SESSION_COOKIE_SECURE=os.environ.get('HTTPS', '').lower() == 'true' or os.environ.get('VERCEL', '') == '1',
     SESSION_COOKIE_HTTPONLY=True,  # Prevent JavaScript access
     SESSION_COOKIE_SAMESITE='Strict',  # Strict CSRF protection (strictest available)
-    PERMANENT_SESSION_LIFETIME=3600,  # 1 hour timeout
+    PERMANENT_SESSION_LIFETIME=3600,  # 1 hour default; extended to 30 days when 'Remember Me' is checked
 )
 
 # ============ RATE LIMITING ============
@@ -700,6 +700,10 @@ def login():
             session.clear()
             session['user_id'] = user['id']
             session['user_name'] = user['first_name'] or user['email']
+            # Remember me checkbox - extends session to 30 days
+            if request.form.get('remember_me'):
+                session.permanent = True
+                app.permanent_session_lifetime = timedelta(days=30)
             user_models.update_last_login(user['id'])
             logger.info(f'User login: {email}')
             flash(f'Welcome back, {session["user_name"]}!', 'success')
@@ -1311,7 +1315,16 @@ def profile():
         flash(flash_msg, 'success' if _org_details_saved else 'warning')
         return redirect(url_for('profile'))
     
-    return render_template('profile.html', user=user, profile=profile or {})
+    # Also load organization details for the org info sections
+    org_data = user_models.get_organization_details(user['id'])
+    org_details = org_data.get('organization_details') or {}
+    org_profile = org_data.get('organization_profile') or {}
+    org_focus_areas = org_data.get('focus_areas') or []
+    org_past_grants = org_data.get('past_grants') or []
+
+    return render_template('profile.html', user=user, profile=profile or {},
+                           org_details=org_details, org_profile=org_profile,
+                           focus_areas=org_focus_areas, past_grants=org_past_grants)
 
 
 # ============ ACCOUNT MANAGEMENT ============
