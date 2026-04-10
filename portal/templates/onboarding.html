@@ -513,8 +513,16 @@
                             <p class="form-hint">Required — used in every grant application.</p>
                             <div id="vault-501c3-upload" style="margin-top: 0.5rem; padding: 0.75rem; background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.1); border-radius: 6px; display: none;">
                                 <label style="font-size: 0.8rem; font-weight: 500;">Upload 501(c)(3) Determination Letter <span style="color: var(--text-muted);">(optional now, required for grants)</span></label>
+                                {% for doc in vault_documents %}
+                                {% if doc.doc_type == '501c3_letter' %}
+                                <div style="background: #d1fae5; border: 1px solid #10b981; border-radius: 6px; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
+                                    <span style="color: #065f46; font-size: 0.8rem;">&#10004; Already uploaded:</span>
+                                    <span style="color: #065f46; font-size: 0.8rem; font-weight: 500;">{{ doc.file_path.split('/')[-1] }}</span>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
                                 <input type="file" name="vault_501c3_letter" accept=".pdf,.jpg,.png" style="margin-top: 0.3rem; font-size: 0.8rem;">
-                                <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">IRS determination letter confirming your 501(c)(3) tax-exempt status.</p>
+                                <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">IRS determination letter confirming your 501(c)(3) tax-exempt status. Upload a new file to replace.</p>
                             </div>
                             <script>
                                 document.getElementById('organization_type').addEventListener('change', function() {
@@ -549,8 +557,16 @@
                             </p>
                             <div style="margin-top: 0.5rem; padding: 0.75rem; background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.1); border-radius: 6px;">
                                 <label style="font-size: 0.8rem; font-weight: 500;">Upload EIN Confirmation Letter <span style="color: var(--text-muted);">(optional now, required for grants)</span></label>
+                                {% for doc in vault_documents %}
+                                {% if doc.doc_type == 'ein_letter' %}
+                                <div style="background: #d1fae5; border: 1px solid #10b981; border-radius: 6px; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
+                                    <span style="color: #065f46; font-size: 0.8rem;">&#10004; Already uploaded:</span>
+                                    <span style="color: #065f46; font-size: 0.8rem; font-weight: 500;">{{ doc.file_path.split('/')[-1] }}</span>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
                                 <input type="file" name="vault_ein_letter" accept=".pdf,.jpg,.png" style="margin-top: 0.3rem; font-size: 0.8rem;">
-                                <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">IRS Letter CP 575 or 147C. PDF or image.</p>
+                                <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">IRS Letter CP 575 or 147C. Upload a new file to replace.</p>
                             </div>
                         </div>
 

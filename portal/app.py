@@ -2139,13 +2139,28 @@ def onboarding():
     except Exception:
         grant_readiness = {}
 
+    # Get vault documents for this user
+    vault_docs = []
+    try:
+        vault_conn = get_connection()
+        vault_c = vault_conn.cursor()
+        vault_c.execute(
+            'SELECT id, doc_type, file_path, uploaded_at FROM org_vault WHERE user_id = ? AND is_current = TRUE ORDER BY uploaded_at DESC',
+            (user['id'],)
+        )
+        vault_docs = vault_c.fetchall()
+        vault_conn.close()
+    except Exception:
+        pass
+
     return render_template('onboarding.html',
                          user=user,
                          org_details=org_details,
                          org_profile=org_profile,
                          focus_areas=focus_areas,
                          past_grants=past_grants,
-                         readiness=grant_readiness)
+                         readiness=grant_readiness,
+                         vault_documents=vault_docs)
 
 
 # ============ GRANT FINDER WIZARD ============
