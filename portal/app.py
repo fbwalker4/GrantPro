@@ -2023,8 +2023,8 @@ def onboarding():
                 past_grants.append({
                     'grant_name': name.strip(),
                     'funding_organization': request.form.getlist('funding_organization')[i] if i < len(request.form.getlist('funding_organization')) else '',
-                    'year_received': request.form.getlist('year_received')[i] if i < len(request.form.getlist('year_received')) else None,
-                    'amount_received': request.form.getlist('amount_received')[i] if i < len(request.form.getlist('amount_received')) else None,
+                    'year_received': safe_int(request.form.getlist('year_received')[i]) if i < len(request.form.getlist('year_received')) else None,
+                    'amount_received': safe_float(request.form.getlist('amount_received')[i]) if i < len(request.form.getlist('amount_received')) else None,
                     'status': request.form.getlist('grant_status')[i] if i < len(request.form.getlist('grant_status')) else 'completed',
                 })
         
