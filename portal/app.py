@@ -1241,7 +1241,13 @@ def profile():
                 profile_data['doc_margins'] = float(request.form.get('doc_margins'))
             except (ValueError, TypeError):
                 pass
-        user_models.update_user_profile(user['id'], profile_data)
+
+        try:
+            user_models.update_user_profile(user['id'], profile_data)
+        except Exception as e:
+            logger.error(f'update_user_profile FAILED user={user["id"]} data={profile_data}: {e}')
+            flash(f'Profile update failed (db error: {e}). Please try again.', 'error')
+            return redirect(url_for('profile'))
         
         # Update user table fields separately
         user_updates = {}
@@ -1256,7 +1262,45 @@ def profile():
         
         if user_updates:
             user_models.update_user(user['id'], user_updates)
-        
+
+        # Upsert SF-424 required fields to organization_details
+        try:
+            conn = get_connection()
+            c = conn.cursor()
+            ein = request.form.get('ein', '').strip()
+            uei = request.form.get('uei', '').strip()
+            address_line1 = request.form.get('address_line1', '').strip()
+            city = request.form.get('city', '').strip()
+            state = request.form.get('state', '').strip()
+            zip_code = request.form.get('zip_code', '').strip()
+            mission_stmt = request.form.get('mission_statement', '').strip()
+            cong_district = request.form.get('congressional_district', '').strip()
+            org_type = request.form.get('organization_type', '').strip()
+            c.execute(
+                "INSERT INTO organization_details "
+                "(user_id,ein,uei,address_line1,city,state,zip_code,mission_statement,congressional_district,organization_type) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?) "
+                "ON CONFLICT (user_id) DO UPDATE SET "
+                "ein=COALESCE(EXCLUDED.ein,organization_details.ein),"
+                "uei=COALESCE(EXCLUDED.uei,organization_details.uei),"
+                "address_line1=COALESCE(EXCLUDED.address_line1,organization_details.address_line1),"
+                "city=COALESCE(EXCLUDED.city,organization_details.city),"
+                "state=COALESCE(EXCLUDED.state,organization_details.state),"
+                "zip_code=COALESCE(EXCLUDED.zip_code,organization_details.zip_code),"
+                "mission_statement=COALESCE(EXCLUDED.mission_statement,organization_details.mission_statement),"
+                "congressional_district=COALESCE(EXCLUDED.congressional_district,organization_details.congressional_district),"
+                "organization_type=COALESCE(EXCLUDED.organization_type,organization_details.organization_type)",
+                (user['id'], ein, uei, address_line1, city, state, zip_code, mission_stmt, cong_district, org_type)
+            )
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            logger.error(f'Failed to upsert organization_details for user {user["id"]}: {e}')
+            try:
+                conn.close()
+            except Exception:
+                pass
+
         flash('Profile updated!', 'success')
         return redirect(url_for('profile'))
     
