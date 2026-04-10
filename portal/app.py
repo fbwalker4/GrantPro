@@ -2145,7 +2145,7 @@ def onboarding():
         vault_conn = get_connection()
         vault_c = vault_conn.cursor()
         vault_c.execute(
-            'SELECT id, doc_type, file_path, uploaded_at FROM org_vault WHERE user_id = ? AND is_current = TRUE ORDER BY uploaded_at DESC',
+            'SELECT id, doc_type, doc_name, uploaded_at FROM org_vault WHERE user_id = ? AND is_current = TRUE ORDER BY uploaded_at DESC',
             (user['id'],)
         )
         vault_docs = vault_c.fetchall()
