@@ -93,7 +93,7 @@
             {% if rules2.min_match_percent %}<li><strong>{{ rules2.min_match_percent }}% match</strong> required</li>{% endif %}
             {% if rules2.proforma_required_threshold %}<li><strong>Pro forma required</strong> if project exceeds ${{ "{:,.0f}".format(rules2.proforma_required_threshold) }}</li>{% endif %}
         </ul>
-        <a href="/budget-builder/{{ grant.id }}" class="btn btn-sm" style="background: #dc2626; color: #fff; margin-top: 0.25rem;">Build Budget</a>
+        <a href="/grant/{{ grant.id }}/budget-builder" class="btn btn-sm" style="background: #dc2626; color: #fff; margin-top: 0.25rem;">Build Budget</a>
     </div>
     {% endif %}
 
