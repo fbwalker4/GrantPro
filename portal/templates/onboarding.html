@@ -517,7 +517,8 @@
                                 {% if doc.doc_type == '501c3_letter' %}
                                 <div style="background: #d1fae5; border: 1px solid #10b981; border-radius: 6px; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
                                     <span style="color: #065f46; font-size: 0.8rem;">&#10004; Already uploaded:</span>
-                                    <span style="color: #065f46; font-size: 0.8rem; font-weight: 500;">{{ doc.file_path.split('/')[-1] }}</span>
+                                    <span style="color: #065f46; font-size: 0.8rem; font-weight: 500;">{{ doc.doc_name }}</span>
+                                    {% if doc.uploaded_at %}<span style="color: #065f46; font-size: 0.75rem;"> — uploaded {{ doc.uploaded_at.strftime('%b %d, %Y') }}</span>{% endif %}
                                 </div>
                                 {% endif %}
                                 {% endfor %}
@@ -561,7 +562,8 @@
                                 {% if doc.doc_type == 'ein_letter' %}
                                 <div style="background: #d1fae5; border: 1px solid #10b981; border-radius: 6px; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
                                     <span style="color: #065f46; font-size: 0.8rem;">&#10004; Already uploaded:</span>
-                                    <span style="color: #065f46; font-size: 0.8rem; font-weight: 500;">{{ doc.file_path.split('/')[-1] }}</span>
+                                    <span style="color: #065f46; font-size: 0.8rem; font-weight: 500;">{{ doc.doc_name }}</span>
+                                    {% if doc.uploaded_at %}<span style="color: #065f46; font-size: 0.75rem;"> — uploaded {{ doc.uploaded_at.strftime('%b %d, %Y') }}</span>{% endif %}
                                 </div>
                                 {% endif %}
                                 {% endfor %}
