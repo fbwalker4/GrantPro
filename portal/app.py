@@ -639,7 +639,104 @@ def pricing():
 def search_public():
     """Public grant search page - no login required"""
     all_grants = grant_researcher.get_all_grants()
-    return render_template('search_public.html', grants=all_grants)
+
+    # Server-side filters so search is actually usable without loading the full catalog.
+    query = request.args.get('q', '').strip().lower()
+    agency = request.args.get('agency', '').strip().lower()
+    category = request.args.get('category', '').strip().lower()
+    amount_min = request.args.get('amount', '').strip()
+    deadline = request.args.get('deadline', '').strip()
+    posted = request.args.get('posted', '').strip()
+    status = request.args.get('status', '').strip().lower()
+    sort = request.args.get('sort', 'posted-desc')
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 60, type=int)
+    per_page = max(20, min(per_page, 100))
+
+    def _safe_date(raw, fallback):
+        if not raw or raw in ('9999-12-31', '0000-01-01'):
+            return fallback
+        try:
+            return datetime.strptime(str(raw)[:10], '%Y-%m-%d').date()
+        except Exception:
+            try:
+                return datetime.strptime(str(raw)[:10], '%m/%d/%Y').date()
+            except Exception:
+                return fallback
+
+    filtered = []
+    now = datetime.now().date()
+    for grant in all_grants:
+        title = str(grant.get('title', '')).lower()
+        desc = str(grant.get('description', '')).lower()
+        ag = str(grant.get('agency', '')).lower()
+        ag_code = str(grant.get('agency_code', grant.get('agency', ''))).lower()
+        cat = str(grant.get('category', '')).lower()
+        st = str(grant.get('status', 'active')).lower()
+        amount_max_v = grant.get('amount_max', 0) or 0
+        deadline_date = _safe_date(grant.get('close_date') or grant.get('deadline'), datetime(9999, 12, 31).date())
+        posted_date = _safe_date(grant.get('open_date'), datetime(1900, 1, 1).date())
+
+        if query and query not in title and query not in desc and query not in ag and query not in ag_code and query not in cat:
+            continue
+        if agency and agency not in ag and agency not in ag_code:
+            continue
+        if category and category not in cat:
+            continue
+        if amount_min:
+            try:
+                if int(amount_max_v) < int(amount_min):
+                    continue
+            except Exception:
+                pass
+        if deadline == 'open' and deadline_date != datetime(9999, 12, 31).date():
+            continue
+        elif deadline:
+            try:
+                days = int(deadline)
+                if not (deadline_date >= now and deadline_date <= now + timedelta(days=days)):
+                    continue
+            except Exception:
+                pass
+        if posted:
+            try:
+                days = int(posted)
+                if posted_date < now - timedelta(days=days):
+                    continue
+            except Exception:
+                pass
+        if status and st != status:
+            continue
+        filtered.append(grant)
+
+    # Sort results before paging
+    def sort_key(g):
+        deadline_val = g.get('close_date') or g.get('deadline') or '9999-12-31'
+        posted_val = g.get('open_date') or '0000-01-01'
+        amount_val = g.get('amount_max', 0) or 0
+        return deadline_val, posted_val, amount_val
+
+    if sort == 'amount-desc':
+        filtered.sort(key=lambda g: g.get('amount_max', 0) or 0, reverse=True)
+    elif sort == 'amount-asc':
+        filtered.sort(key=lambda g: g.get('amount_max', 0) or 0)
+    elif sort == 'deadline-asc':
+        filtered.sort(key=lambda g: (g.get('close_date') or g.get('deadline') or '9999-12-31'))
+    elif sort == 'deadline-desc':
+        filtered.sort(key=lambda g: (g.get('close_date') or g.get('deadline') or '0000-01-01'), reverse=True)
+    elif sort == 'posted-asc':
+        filtered.sort(key=lambda g: (g.get('open_date') or '0000-01-01'))
+    else:
+        filtered.sort(key=lambda g: (g.get('open_date') or '0000-01-01'), reverse=True)
+
+    total_grants = len(filtered)
+    total_pages = max(1, (total_grants + per_page - 1) // per_page)
+    page = max(1, min(page, total_pages))
+    start = (page - 1) * per_page
+    end = start + per_page
+    paged = filtered[start:end]
+
+    return render_template('search_public.html', grants=paged, total_grants=total_grants, page=page, per_page=per_page, total_pages=total_pages, filters={'q': query, 'agency': agency, 'category': category, 'amount': amount_min, 'deadline': deadline, 'posted': posted, 'status': status, 'sort': sort})
 
 
 @app.route('/guide')
@@ -923,6 +1020,7 @@ def payment_checkout():
 
 
 @app.route('/payment/success')
+@app.route('/subscription/success')
 def payment_success():
     """Payment success page"""
     session_id = request.args.get('session_id')
@@ -975,20 +1073,25 @@ def subscription_manage():
     return redirect(portal_url)
 
 
-@app.route('/subscription/cancel', methods=['POST'])
+@app.route('/subscription/cancel', methods=['GET', 'POST'])
 @login_required
 @csrf_required
 def subscription_cancel():
     """Cancel subscription"""
+    # GET = safety confirmation redirect (no mutation)
+    if request.method == 'GET':
+        flash('To cancel your subscription, use the cancel action from Account Settings.', 'info')
+        return redirect(url_for('account_settings'))
+
     user = user_models.get_user_by_id(session['user_id'])
-    
+
     success, message = stripe_payment.cancel_subscription(user['id'])
-    
+
     if success:
         flash(message, 'success')
     else:
         flash(message, 'error')
-    
+
     return redirect(url_for('dashboard'))
 
 
@@ -2454,6 +2557,17 @@ def grants():
     # Use filtered list if any filters applied
     display_grants = filtered_grants if (org_type or category or agency or amount_min) else all_grants
 
+    # Pagination to avoid rendering the entire catalog into one giant HTML response
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 50, type=int)
+    per_page = max(10, min(per_page, 100))
+    total_grants = len(display_grants)
+    total_pages = max(1, (total_grants + per_page - 1) // per_page)
+    page = max(1, min(page, total_pages))
+    start = (page - 1) * per_page
+    end = start + per_page
+    paged_grants = display_grants[start:end]
+
     # Load user's grant readiness profile for eligibility checking
     readiness = user_models.get_grant_readiness(user['id']) if user else {}
 
@@ -2560,11 +2674,15 @@ def grants():
         pass
 
     return render_template('grants.html',
-                         grants=display_grants,
+                         grants=paged_grants,
                          saved_ids=saved_ids,
                          readiness=readiness,
                          filters={'org_type': org_type, 'category': category, 'agency': agency, 'amount_min': amount_min},
-                         user=user)
+                         user=user,
+                         page=page,
+                         per_page=per_page,
+                         total_grants=total_grants,
+                         total_pages=total_pages)
 
 
 @app.route('/api/save-grant', methods=['POST'])
@@ -5979,6 +6097,7 @@ def use_grant_template(grant_id):
 # ============ TEMPLATE ROUTES ============
 
 @app.route('/templates')
+@app.route('/list-templates')
 @login_required
 def list_templates():
     """List all available grant templates"""

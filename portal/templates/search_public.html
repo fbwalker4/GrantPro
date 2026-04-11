@@ -581,6 +581,9 @@
                     <svg viewBox="0 0 24 24" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2" fill="currentColor"/><circle cx="16" cy="12" r="2" fill="currentColor"/><circle cx="10" cy="18" r="2" fill="currentColor"/></svg>
                     Filters
                 </button>
+                <button class="search-btn" type="button" onclick="applyServerSearch()" style="margin-left: 0.5rem;">
+                    Apply Filters
+                </button>
                 <div class="filters-panel" id="filtersPanel">
                     <div class="filters">
                         <select id="agencyFilter" onchange="sortAndFilter()" aria-label="Filter by agency">
@@ -653,8 +656,18 @@
                     </div>
                 </div>
                 <div class="results-count" id="resultsCount">
-                    Showing <strong>{{ grants|length }}</strong> grants
+                    Showing <strong>{{ grants|length }}</strong> of {{ total_grants }} grants{% if total_pages > 1 %} — page {{ page }} of {{ total_pages }}{% endif %}
                 </div>
+                {% if total_pages > 1 %}
+                <div style="display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; margin-bottom:0.5rem;">
+                    {% if page > 1 %}
+                    <a class="btn-clear-all" href="?page={{ page - 1 }}&per_page={{ per_page }}{% if filters.q %}&q={{ filters.q|urlencode }}{% endif %}{% if filters.agency %}&agency={{ filters.agency|urlencode }}{% endif %}{% if filters.category %}&category={{ filters.category|urlencode }}{% endif %}{% if filters.amount %}&amount={{ filters.amount|urlencode }}{% endif %}{% if filters.deadline %}&deadline={{ filters.deadline|urlencode }}{% endif %}{% if filters.posted %}&posted={{ filters.posted|urlencode }}{% endif %}{% if filters.status %}&status={{ filters.status|urlencode }}{% endif %}{% if filters.sort and filters.sort != 'posted-desc' %}&sort={{ filters.sort|urlencode }}{% endif %}">← Previous</a>
+                    {% endif %}
+                    {% if page < total_pages %}
+                    <a class="btn-clear-all" href="?page={{ page + 1 }}&per_page={{ per_page }}{% if filters.q %}&q={{ filters.q|urlencode }}{% endif %}{% if filters.agency %}&agency={{ filters.agency|urlencode }}{% endif %}{% if filters.category %}&category={{ filters.category|urlencode }}{% endif %}{% if filters.amount %}&amount={{ filters.amount|urlencode }}{% endif %}{% if filters.deadline %}&deadline={{ filters.deadline|urlencode }}{% endif %}{% if filters.posted %}&posted={{ filters.posted|urlencode }}{% endif %}{% if filters.status %}&status={{ filters.status|urlencode }}{% endif %}{% if filters.sort and filters.sort != 'posted-desc' %}&sort={{ filters.sort|urlencode }}{% endif %}">Next →</a>
+                    {% endif %}
+                </div>
+                {% endif %}
                 <div class="sort-bar">
                     <label for="sortSelect">Sort by:</label>
                     <select id="sortSelect" onchange="sortAndFilter()" aria-label="Sort grants">
@@ -755,7 +768,7 @@
     </footer>
 
     <script>
-    var TOTAL_GRANTS = {{ grants|length }};
+    var TOTAL_GRANTS = {{ total_grants }};
 
     // Mobile nav toggle
     document.getElementById('hamburger').addEventListener('click', function() {
@@ -874,6 +887,29 @@
         document.getElementById('resultsCount').innerHTML = countHTML;
 
         return visible;
+    }
+
+    function applyServerSearch() {
+        var params = new URLSearchParams();
+        var q = document.getElementById('searchInput').value;
+        var agency = document.getElementById('agencyFilter').value;
+        var category = document.getElementById('categoryFilter').value;
+        var amount = document.getElementById('amountFilter').value;
+        var deadline = document.getElementById('deadlineFilter').value;
+        var posted = document.getElementById('postedFilter').value;
+        var status = document.getElementById('statusFilter').value;
+        var sort = document.getElementById('sortSelect').value;
+
+        if (q) params.set('q', q);
+        if (agency) params.set('agency', agency);
+        if (category) params.set('category', category);
+        if (amount) params.set('amount', amount);
+        if (deadline) params.set('deadline', deadline);
+        if (posted) params.set('posted', posted);
+        if (status) params.set('status', status);
+        if (sort && sort !== 'posted-desc') params.set('sort', sort);
+        params.set('per_page', '60');
+        window.location.search = params.toString();
     }
 
     // Main sort + filter function

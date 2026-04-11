@@ -6,12 +6,28 @@
 <div class="page-header">
     <div>
         <h1 class="page-title">Grant Database</h1>
-        <p class="page-subtitle">Browse {{ grants|length }} available funding opportunities</p>
+        <p class="page-subtitle">Showing {{ grants|length }} of {{ total_grants }} available funding opportunities{% if total_pages > 1 %} — page {{ page }} of {{ total_pages }}{% endif %}</p>
     </div>
     <a href="/wizard" class="btn btn-primary">
         <span>🔍</span> Smart Match
     </a>
 </div>
+
+{% if total_pages > 1 %}
+<div class="card" style="display:flex; gap:1rem; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-bottom:1rem;">
+    <div style="color: var(--text-secondary); font-size: 0.95rem;">
+        Pagination: page {{ page }} of {{ total_pages }}
+    </div>
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+        {% if page > 1 %}
+        <a class="btn btn-secondary" href="?page={{ page - 1 }}&per_page={{ per_page }}{% if filters.org_type %}&org_type={{ filters.org_type|urlencode }}{% endif %}{% if filters.category %}&category={{ filters.category|urlencode }}{% endif %}{% if filters.agency %}&agency={{ filters.agency|urlencode }}{% endif %}{% if filters.amount_min %}&amount_min={{ filters.amount_min|urlencode }}{% endif %}">← Previous</a>
+        {% endif %}
+        {% if page < total_pages %}
+        <a class="btn btn-primary" href="?page={{ page + 1 }}&per_page={{ per_page }}{% if filters.org_type %}&org_type={{ filters.org_type|urlencode }}{% endif %}{% if filters.category %}&category={{ filters.category|urlencode }}{% endif %}{% if filters.agency %}&agency={{ filters.agency|urlencode }}{% endif %}{% if filters.amount_min %}&amount_min={{ filters.amount_min|urlencode }}{% endif %}">Next →</a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
 
 <!-- Filters -->
 <div class="card">

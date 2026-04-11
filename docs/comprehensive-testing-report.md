@@ -2,6 +2,8 @@
 
 **Date:** March 16, 2026
 
+> Historical report. This document reflects an earlier state of the app and is no longer authoritative for current behavior. See `docs/GRANTPRO_REMAINING_WORK_CARD.md` and `docs/GRANTPRO_WORKLOG.md` for current status.
+
 ---
 
 ## PART 1: USER TESTING RESULTS
