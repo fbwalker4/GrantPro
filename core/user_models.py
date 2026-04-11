@@ -1046,7 +1046,7 @@ def save_organization_details(user_id, data):
     # Save organization details
     c.execute('''INSERT INTO organization_details 
                  (user_id, ein, duns, uei, address_line1, address_line2, city, state, zip_code, country, phone, website, organization_type, mission_statement, created_at, updated_at)
-                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) '''
+                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) '''
                '''ON CONFLICT (user_id) DO UPDATE SET 
                  ein = EXCLUDED.ein, duns = EXCLUDED.duns, uei = EXCLUDED.uei,
                  address_line1 = EXCLUDED.address_line1, address_line2 = EXCLUDED.address_line2,
