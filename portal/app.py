@@ -2161,8 +2161,25 @@ def onboarding():
             'SELECT id, doc_type, doc_name, uploaded_at FROM org_vault WHERE user_id = ? AND is_current = TRUE ORDER BY uploaded_at DESC',
             (user['id'],)
         )
-        vault_docs = vault_c.fetchall()
+        raw_vault_docs = vault_c.fetchall()
         vault_conn.close()
+        # Convert uploaded_at strings to datetime objects for template strftime compatibility
+        # and convert tuples to dicts so template can use doc.doc_name, doc.uploaded_at, etc.
+        from datetime import datetime
+        vault_docs = []
+        for doc in raw_vault_docs:
+            doc_id, doc_type, doc_name, uploaded_at = doc
+            if isinstance(uploaded_at, str):
+                try:
+                    uploaded_at = datetime.fromisoformat(uploaded_at.replace('Z', '+00:00'))
+                except (ValueError, TypeError):
+                    uploaded_at = None
+            vault_docs.append({
+                'id': doc_id,
+                'doc_type': doc_type,
+                'doc_name': doc_name,
+                'uploaded_at': uploaded_at,
+            })
     except Exception:
         pass
 
