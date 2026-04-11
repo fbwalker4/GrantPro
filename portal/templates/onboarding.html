@@ -1096,14 +1096,11 @@
                 <!-- Actions -->
                 <div class="form-actions">
                     <button type="button" class="skip-link" onclick="
-    // Remove required attributes so partial saves work
-    var form = document.getElementById('onboarding_form');
-    form.querySelectorAll('[required]').forEach(function(el){ el.removeAttribute('required'); });
-    // Also clear values of truly empty fields that would cause issues
-    // Then submit the form normally (includes CSRF token automatically)
-    form.submit();
+    // Navigate directly to dashboard — don't try to submit the form
+    // This is the simplest reliable skip behavior
+    window.location.href = '/dashboard';
     return false;
-  ">Skip for now (saves progress)</button>
+  ">Skip for now</button>
                     <button type="submit" class="btn btn-primary">Save Organization Profile</button>
                 </div>
             </form>
