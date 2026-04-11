@@ -1194,6 +1194,31 @@ def dashboard():
     # Profile completion
     profile_pct, profile_missing = calculate_profile_completion(user)
 
+    # Load vault documents for the "Your Documents" section
+    vault_conn = get_connection()
+    vault_c = vault_conn.cursor()
+    vault_c.execute(
+        'SELECT id, doc_type, doc_name, uploaded_at FROM org_vault WHERE user_id = ? AND is_current = TRUE ORDER BY uploaded_at DESC',
+        (user['id'],)
+    )
+    raw_vault_docs = vault_c.fetchall()
+    vault_conn.close()
+    from datetime import datetime
+    vault_documents = []
+    for doc in raw_vault_docs:
+        doc_id, doc_type, doc_name, uploaded_at = doc
+        if isinstance(uploaded_at, str):
+            try:
+                uploaded_at = datetime.fromisoformat(uploaded_at.replace('Z', '+00:00'))
+            except (ValueError, TypeError):
+                uploaded_at = None
+        vault_documents.append({
+            'id': doc_id,
+            'doc_type': doc_type,
+            'doc_name': doc_name,
+            'uploaded_at': uploaded_at,
+        })
+
     return render_template('dashboard.html',
                          user=user,
                          saved_grants=saved_details,
@@ -1202,7 +1227,8 @@ def dashboard():
                          total_funded=total_funded,
                          active_grants_list=active_grants_list,
                          profile_pct=profile_pct,
-                         profile_missing=profile_missing)
+                         profile_missing=profile_missing,
+                         vault_documents=vault_documents)
 
 
 @app.route('/profile', methods=['GET', 'POST'])

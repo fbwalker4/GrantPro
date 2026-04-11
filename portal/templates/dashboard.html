@@ -124,6 +124,33 @@
     </div>
 </div>
 
+<!-- Your Documents -->
+{% if vault_documents %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📄 Your Documents</h2>
+        <a href="/vault" class="btn btn-ghost">Manage Vault →</a>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; padding: 0.5rem 0;">
+        {% for doc in vault_documents %}
+        <div style="background: #d1fae5; border: 1px solid #10b981; border-radius: 6px; padding: 0.5rem 0.75rem; display: flex; align-items: center; gap: 0.5rem; min-width: 200px;">
+            <span style="font-size: 1.2rem;">
+                {% if doc.doc_type == '501c3_letter' %}📋
+                {% elif doc.doc_type == 'ein_letter' %}📄
+                {% elif doc.doc_type == 'org_chart' %}🗂️
+                {% else %}📎
+                {% endif %}
+            </span>
+            <div>
+                <div style="font-size: 0.85rem; font-weight: 500; color: #065f46; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ doc.doc_name }}</div>
+                {% if doc.uploaded_at %}<div style="font-size: 0.75rem; color: #065f46;">Uploaded {{ doc.uploaded_at.strftime('%b %d, %Y') }}</div>{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
 <!-- Quick Actions -->
 <div class="card">
     <div class="card-header">
