@@ -59,6 +59,20 @@ def serve_static(filename):
     from flask import send_from_directory
     return send_from_directory(str(Path(__file__).parent / "static"), filename)
 
+
+@app.route('/api/health')
+def api_health():
+    """Compatibility health endpoint for smoke tests and uptime checks."""
+    try:
+        import db_connection
+        conn = db_connection.get_connection()
+        conn.execute('SELECT 1').fetchone()
+        conn.close()
+        return jsonify({'status': 'ok'})
+    except Exception as exc:
+        logger.warning(f'Health check failed: {exc}')
+        return jsonify({'status': 'error'}), 500
+
 # ============ WSGI MIDDLEWARE: Server Header Stripping ============
 # Werkzeug sets Server: Werkzeug/X.Y.Z Python/X.Y.Z AFTER Flask's after_request.
 # We use WSGI middleware to override it after the full response is built.
@@ -567,8 +581,30 @@ def inject_org_context():
 
 @app.context_processor
 def inject_grants_count():
-    """Make grants_count available in all templates"""
-    return dict(grants_count=grant_researcher.get_grants_count())
+    """Make grant counts available in all templates.
+
+    Counts active/posted grants from the catalog. If the live total drops below
+    1000, templates should fall back to the word "Thousands" instead of showing
+    a small or misleading figure.
+    """
+    conn = get_db()
+    c = conn.cursor()
+    try:
+        c.execute("SELECT COUNT(*) FROM grants_catalog WHERE status IN ('active', 'posted')")
+        grants_count = c.fetchone()[0] or 0
+    except Exception:
+        try:
+            grants_count = grant_researcher.get_grants_count()
+        except Exception:
+            grants_count = 0
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+
+    grants_count_display = f"{grants_count:,}" if grants_count >= 1000 else "Thousands of"
+    return dict(grants_count=grants_count, grants_count_display=grants_count_display)
 
 
 @app.context_processor
@@ -651,10 +687,28 @@ def pricing():
     return render_template('pricing.html')
 
 
+def _dedupe_grants(items):
+    """Remove duplicate grant rows while preserving order."""
+    seen = set()
+    deduped = []
+    for grant in items or []:
+        key = (
+            str(grant.get('id') or '').strip().lower(),
+            str(grant.get('opportunity_number') or '').strip().lower(),
+            str(grant.get('title') or '').strip().lower(),
+            str(grant.get('agency') or '').strip().lower(),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(grant)
+    return deduped
+
+
 @app.route('/search')
 def search_public():
     """Public grant search page - no login required"""
-    all_grants = grant_researcher.get_all_grants()
+    all_grants = _dedupe_grants(grant_researcher.get_all_grants())
 
     # Server-side filters so search is actually usable without loading the full catalog.
     query = request.args.get('q', '').strip().lower()
@@ -1313,21 +1367,35 @@ def forgot_password():
 @csrf_required
 def reset_password(token):
     """Reset password page"""
+    error_message = None
+    if request.method == 'GET':
+        _email, verify_error = user_models.verify_password_reset(token)
+        if verify_error:
+            return render_template(
+                'reset_password.html',
+                token=token,
+                reset_complete=True,
+                message=verify_error,
+                message_type='error',
+            )
+
     if request.method == 'POST':
         password = request.form.get('password')
         confirm = request.form.get('confirm_password')
         
         if password != confirm:
-            flash('Passwords do not match', 'error')
+            error_message = 'Passwords do not match'
+            flash(error_message, 'error')
         else:
             success, error = user_models.use_password_reset(token, password)
             if success:
                 flash('Password reset! Please log in.', 'success')
                 return redirect(url_for('login'))
             else:
-                flash(error, 'error')
+                error_message = error
+                flash(error_message, 'error')
     
-    return render_template('reset_password.html', token=token)
+    return render_template('reset_password.html', token=token, message=error_message, message_type='error')
 
 
 # ============ PROFILE COMPLETION ============
@@ -6108,6 +6176,7 @@ def api_search_grants():
         min_amount=min_amount,
         max_amount=max_amount
     )
+    results = _dedupe_grants(results)
     
     return jsonify({'grants': results})
 
@@ -8523,6 +8592,7 @@ def server_error(e):
 # ============ SECURITY.TXT + ROBOTS.TXT ============
 
 @app.route('/.well-known/security.txt')
+@app.route('/security.txt')
 def security_txt():
     """Serve security.txt for vulnerability disclosure."""
     return send_file(

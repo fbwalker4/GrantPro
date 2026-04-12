@@ -30,6 +30,9 @@
 
     <h1>Help & FAQ</h1>
     <p>Everything you need to know about using Grant Pro.</p>
+    <div style="background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.14); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; color: var(--text-secondary);">
+        <strong style="color: var(--text-primary);">Recommended device:</strong> Grant Pro is best experienced on desktop or tablet. Mobile is fine for quick review, but research, drafting, and guided submission are much easier on a larger screen.
+    </div>
 
     <div class="toc">
         <h3>Quick Links</h3>
@@ -102,6 +105,7 @@
         <div class="faq-question">How do I create an account?</div>
         <div class="faq-answer">
             <p>Click "Sign Up" on the homepage and enter your email, password, and organization name (optional). You can also sign up as an individual if you don't represent an organization.</p>
+            <p>Best experience: Grant Pro is best experienced on desktop or tablet. For long-form writing, document review, and guided submission, we recommend using a larger screen.</p>
         </div>
     </div>
 
@@ -110,7 +114,7 @@
         <div class="faq-answer">
             <p>After signing up, you can:</p>
             <ul>
-                <li>Search and filter through {% if grants_count and grants_count > 500 %}{{ grants_count }}+{% else %}thousands of{% endif %} federal grants</li>
+                <li>Search and filter through {{ grants_count_display }} federal grants</li>
                 <li>Use the Grant Finder Wizard to find matching grants</li>
                 <li>Check eligibility for specific grants</li>
                 <li>Save grants to your favorites</li>
@@ -146,7 +150,7 @@
     <div class="faq-item">
         <div class="faq-question">What grants are available?</div>
         <div class="faq-answer">
-            <p>We have {% if grants_count and grants_count > 500 %}{{ grants_count }}+{% else %}thousands of{% endif %} grants from 21 federal agencies including:</p>
+            <p>We have {{ grants_count_display }} grants from 21 federal agencies including:</p>
             <ul>
                 <li><strong>NSF</strong> - National Science Foundation (research, education)</li>
                 <li><strong>DOE</strong> - Department of Energy (energy, technology)</li>
@@ -216,6 +220,7 @@
         <div class="faq-question">How do I start a grant application?</div>
         <div class="faq-answer">
             <p>Find a grant you're interested in, click on it, then click "Start Application". You'll be guided through each required section with tips on what to include.</p>
+            <p>Tip: Grant applications are easiest to complete on desktop or tablet. The guided submission workflow, copy blocks, and downloads are designed for larger screens.</p>
         </div>
     </div>
 
@@ -281,7 +286,7 @@
     <div class="faq-item">
         <div class="faq-question">Is there a free tier?</div>
         <div class="faq-answer">
-            <p>Yes! Sign up for free to search {% if grants_count and grants_count > 500 %}{{ grants_count }}+{% else %}thousands of{% endif %} federal grants, check eligibility, and use the Grant Finder Wizard. Upgrade when you're ready to start writing and submitting applications.</p>
+            <p>Yes! Sign up for free to search {{ grants_count_display }} federal grants, check eligibility, and use the Grant Finder Wizard. Upgrade when you're ready to start writing and submitting applications.</p>
         </div>
     </div>
 

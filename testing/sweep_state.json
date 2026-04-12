@@ -1,0 +1,19 @@
+{
+  "completed_checks": [
+    "public_routes_smoke",
+    "search_api_duplicate_deduplication",
+    "reset_password_invalid_token_handling",
+    "security_txt_alias_route",
+    "grant_count_copy",
+    "auth_session_smoke",
+    "admin_surface_smoke",
+    "payment_redirects_smoke",
+    "api_health_endpoint"
+  ],
+  "pending_checks": [
+    "client management create/edit/intake forms",
+    "vault upload/delete flows with seeded client data",
+    "api login compatibility endpoint"
+  ],
+  "current_blockers": []
+}

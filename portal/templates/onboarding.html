@@ -540,9 +540,22 @@
                                 {% for doc in vault_documents %}
                                 {% if doc.doc_type == '501c3_letter' %}
                                 <div style="background: #d1fae5; border: 1px solid #10b981; border-radius: 6px; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
-                                    <span style="color: #065f46; font-size: 0.8rem;">&#10004; Already uploaded:</span>
-                                    <span style="color: #065f46; font-size: 0.8rem; font-weight: 500;">{{ doc.doc_name }}</span>
-                                    {% if doc.uploaded_at %}<span style="color: #065f46; font-size: 0.75rem;"> — uploaded {{ doc.uploaded_at.strftime('%b %d, %Y') }}</span>{% endif %}
+                                    <div style="display:flex; align-items:center; justify-content:space-between; gap:0.75rem; flex-wrap:wrap;">
+                                        <div>
+                                            <span style="color: #065f46; font-size: 0.8rem;">&#10004; Already uploaded:</span>
+                                            <span style="color: #065f46; font-size: 0.8rem; font-weight: 500;">{{ doc.doc_name }}</span>
+                                            {% if doc.uploaded_at %}<span style="color: #065f46; font-size: 0.75rem;"> — uploaded {{ doc.uploaded_at.strftime('%b %d, %Y') }}</span>{% endif %}
+                                        </div>
+                                        <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+                                            <a href="/vault/view/{{ doc.id }}" class="btn btn-secondary" style="padding:0.35rem 0.6rem; font-size:0.75rem;">View</a>
+                                            <a href="/vault/download/{{ doc.id }}" class="btn btn-secondary" style="padding:0.35rem 0.6rem; font-size:0.75rem;">Download</a>
+                                            <a href="/vault" class="btn btn-secondary" style="padding:0.35rem 0.6rem; font-size:0.75rem;">Manage</a>
+                                            <form method="POST" action="/vault/delete/{{ doc.id }}" style="display:inline;" onsubmit="return confirm('Delete this 501(c)(3) letter?')">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-ghost" style="padding:0.35rem 0.6rem; font-size:0.75rem; color: var(--accent-danger);">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
                                 {% endif %}
                                 {% endfor %}
@@ -586,9 +599,22 @@
                                 {% for doc in vault_documents %}
                                 {% if doc.doc_type == 'ein_letter' %}
                                 <div style="background: #d1fae5; border: 1px solid #10b981; border-radius: 6px; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
-                                    <span style="color: #065f46; font-size: 0.8rem;">&#10004; Already uploaded:</span>
-                                    <span style="color: #065f46; font-size: 0.8rem; font-weight: 500;">{{ doc.doc_name }}</span>
-                                    {% if doc.uploaded_at %}<span style="color: #065f46; font-size: 0.75rem;"> — uploaded {{ doc.uploaded_at.strftime('%b %d, %Y') }}</span>{% endif %}
+                                    <div style="display:flex; align-items:center; justify-content:space-between; gap:0.75rem; flex-wrap:wrap;">
+                                        <div>
+                                            <span style="color: #065f46; font-size: 0.8rem;">&#10004; Already uploaded:</span>
+                                            <span style="color: #065f46; font-size: 0.8rem; font-weight: 500;">{{ doc.doc_name }}</span>
+                                            {% if doc.uploaded_at %}<span style="color: #065f46; font-size: 0.75rem;"> — uploaded {{ doc.uploaded_at.strftime('%b %d, %Y') }}</span>{% endif %}
+                                        </div>
+                                        <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+                                            <a href="/vault/view/{{ doc.id }}" class="btn btn-secondary" style="padding:0.35rem 0.6rem; font-size:0.75rem;">View</a>
+                                            <a href="/vault/download/{{ doc.id }}" class="btn btn-secondary" style="padding:0.35rem 0.6rem; font-size:0.75rem;">Download</a>
+                                            <a href="/vault" class="btn btn-secondary" style="padding:0.35rem 0.6rem; font-size:0.75rem;">Manage</a>
+                                            <form method="POST" action="/vault/delete/{{ doc.id }}" style="display:inline;" onsubmit="return confirm('Delete this EIN letter?')">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-ghost" style="padding:0.35rem 0.6rem; font-size:0.75rem; color: var(--accent-danger);">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
                                 {% endif %}
                                 {% endfor %}
@@ -1002,6 +1028,28 @@
 
                     <div style="margin-top: 0.5rem; padding: 0.75rem; background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.1); border-radius: 6px;">
                         <label style="font-size: 0.8rem; font-weight: 500;">Upload Organizational Chart <span style="color: var(--text-muted);">(optional now, helpful for grants)</span></label>
+                        {% for doc in vault_documents %}
+                        {% if doc.doc_type == 'org_chart' %}
+                        <div style="background: #d1fae5; border: 1px solid #10b981; border-radius: 6px; padding: 0.5rem 0.75rem; margin: 0.5rem 0;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:0.75rem; flex-wrap:wrap;">
+                                <div>
+                                    <span style="color: #065f46; font-size: 0.8rem;">&#10004; Already uploaded:</span>
+                                    <span style="color: #065f46; font-size: 0.8rem; font-weight: 500;">{{ doc.doc_name }}</span>
+                                    {% if doc.uploaded_at %}<span style="color: #065f46; font-size: 0.75rem;"> — uploaded {{ doc.uploaded_at.strftime('%b %d, %Y') }}</span>{% endif %}
+                                </div>
+                                <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+                                    <a href="/vault/view/{{ doc.id }}" class="btn btn-secondary" style="padding:0.35rem 0.6rem; font-size:0.75rem;">View</a>
+                                    <a href="/vault/download/{{ doc.id }}" class="btn btn-secondary" style="padding:0.35rem 0.6rem; font-size:0.75rem;">Download</a>
+                                    <a href="/vault" class="btn btn-secondary" style="padding:0.35rem 0.6rem; font-size:0.75rem;">Manage</a>
+                                    <form method="POST" action="/vault/delete/{{ doc.id }}" style="display:inline;" onsubmit="return confirm('Delete this org chart?')">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-ghost" style="padding:0.35rem 0.6rem; font-size:0.75rem; color: var(--accent-danger);">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
                         <input type="file" name="vault_org_chart" accept=".pdf,.jpg,.png" style="margin-top: 0.3rem; font-size: 0.8rem;">
                         <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">Shows your organization's structure. Many federal grants require this as a supporting document.</p>
                         <p style="font-size: 0.75rem; margin-top: 0.4rem;"><a href="/vault" style="color: var(--accent-hover); font-weight: 600; text-decoration: none;">Manage uploaded files in Vault →</a></p>

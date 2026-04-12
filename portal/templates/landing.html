@@ -191,6 +191,19 @@
             margin-left: auto;
             margin-right: auto;
         }
+
+        .hero-note {
+            display: inline-block;
+            margin-top: -1rem;
+            margin-bottom: 2rem;
+            padding: 0.5rem 0.9rem;
+            border-radius: 999px;
+            background: rgba(37, 99, 235, 0.08);
+            border: 1px solid rgba(37, 99, 235, 0.16);
+            color: var(--accent-primary);
+            font-size: 0.92rem;
+            font-weight: 600;
+        }
         
         .hero-buttons {
             display: flex;
@@ -815,16 +828,17 @@
             <div class="hero-badge">Grant Writing Software for Everyone</div>
             <h1>Win More Grants with <span>AI Assistance</span></h1>
             <p>Find federal grants you qualify for, draft your application with AI, and get step-by-step submission guidance. Search free — upgrade when you're ready to write.</p>
+            <div class="hero-note">Grant Pro is best experienced on desktop or tablet.</div>
             <div class="hero-buttons">
                 <a href="/signup?plan=monthly" class="btn btn-primary">Start Writing Grants</a>
                 <a href="/signup?tier=free" class="btn btn-secondary">Search Grants Free</a>
             </div>
             <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
-                Search {% if grants_count and grants_count > 500 %}{{ grants_count }}+{% else %}thousands of{% endif %} federal grants free &bull; AI writing + guided submission from $24.95/mo &bull; Cancel anytime
+                Search {{ grants_count_display }} federal grants free &bull; AI writing + guided submission from $24.95/mo &bull; Cancel anytime
             </p>
             <div style="margin-top: 2rem; padding: 1.25rem 2rem; background: rgba(37, 99, 235, 0.06); border: 1px solid rgba(37, 99, 235, 0.15); border-radius: 10px; display: inline-block;">
                 <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
-                    Not sure if your grant is in our system? Search our database of <strong>{% if grants_count and grants_count > 500 %}{{ grants_count }}+{% else %}thousands of{% endif %}</strong> federal grants before signing up.
+                    Not sure if your grant is in our system? Search our database of <strong>{{ grants_count_display }}</strong> federal grants before signing up.
                 </p>
                 <a href="/search" style="display: inline-flex; align-items: center; gap: 0.4rem; background: var(--gradient-primary); color: white; padding: 0.6rem 1.25rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Search Our Grant Database &rarr;</a>
             </div>

@@ -49,7 +49,9 @@ _load_dotenv()
 # ---------------------------------------------------------------------------
 # Supabase / Postgres configuration (GP- prefixed env vars)
 # ---------------------------------------------------------------------------
-def _gp_env(name: str) -> str | None:
+from typing import Optional
+
+def _gp_env(name: str) -> Optional[str]:
     """Return env var trying GP_NAME then GP-NAME."""
     return os.environ.get(f"GP_{name}") or os.environ.get(f"GP-{name}")
 

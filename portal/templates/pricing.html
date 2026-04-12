@@ -48,6 +48,15 @@
         .faq-item { background: var(--white); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .faq-item h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
         .faq-item p { color: var(--gray); font-size: 0.95rem; }
+        .device-note {
+            background: rgba(37, 99, 235, 0.08);
+            border: 1px solid rgba(37, 99, 235, 0.14);
+            color: var(--dark);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin: 0 auto 2rem;
+            max-width: 760px;
+        }
         .footer { text-align: center; padding: 2rem; color: var(--gray); font-size: 0.875rem; margin-top: 3rem; }
 
         /* Mobile nav toggle */
@@ -86,6 +95,7 @@
     <main class="container" role="main">
         <h1>Simple, Transparent Pricing</h1>
         <p class="subtitle">No hidden fees. Cancel anytime. Research free — upgrade when you find a grant worth pursuing.</p>
+        <div class="device-note">Grant Pro is best experienced on desktop or tablet. Research, drafting, and guided submission are easier with more screen space.</div>
         
         <div class="pricing-grid">
             <div class="plan">
@@ -214,7 +224,12 @@
             
             <div class="faq-item">
                 <h3>What grants are in your database?</h3>
-                <p>We cover federal grants from Grants.gov, plus state programs and private foundations. Currently {% if grants_count and grants_count > 500 %}{{ grants_count }}+{% else %}thousands of{% endif %} active opportunities with new grants added weekly.</p>
+                <p>We cover federal grants from Grants.gov, plus state programs and private foundations. Currently {{ grants_count_display }} active opportunities with new grants added weekly.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>What devices work best with Grant Pro?</h3>
+                <p>Grant Pro is best experienced on desktop or tablet. You can browse on mobile, but research, drafting, and guided submission are easier on a laptop, desktop, or large tablet.</p>
             </div>
             
             <div class="faq-item">

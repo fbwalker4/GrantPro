@@ -647,8 +647,10 @@ def create_password_reset(email):
     from datetime import timedelta
     expires = now + timedelta(hours=24)
     
-    c.execute('INSERT INTO password_resets (email, token, created_at, expires_at) VALUES (%s, %s, %s, %s) '
-              'ON CONFLICT (email) DO UPDATE SET token = EXCLUDED.token, created_at = EXCLUDED.created_at, expires_at = EXCLUDED.expires_at, used = FALSE',
+    # Replace any existing reset token for this email so the table does not
+    # need a unique constraint on email.
+    c.execute('DELETE FROM password_resets WHERE email = %s', (email,))
+    c.execute('INSERT INTO password_resets (email, token, created_at, expires_at, used) VALUES (%s, %s, %s, %s, FALSE)',
               (email, token, now.isoformat(), expires.isoformat()))
     conn.commit()
     conn.close()
@@ -709,7 +711,7 @@ def use_password_reset(token, new_password):
     password_hash = hash_password(new_password)
     c.execute('UPDATE users SET password_hash = ?, updated_at = ? WHERE email = ?',
               (password_hash, datetime.now().isoformat(), email))
-    c.execute('UPDATE password_resets SET used = 1 WHERE token = ?', (token,))
+    c.execute('UPDATE password_resets SET used = TRUE WHERE token = ?', (token,))
 
     conn.commit()
     conn.close()
