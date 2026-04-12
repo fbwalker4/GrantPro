@@ -1215,7 +1215,7 @@ def command_center():
     """Customer command-center view."""
     user = get_current_user()
     workflow = user_models.get_workflow_summary(user['id'])
-    tickets = ticket_helper.get_support_tickets_for_user(user['id'])
+    tickets = support_automation.get_support_tickets_for_user(user['id'])
     return render_template('command_center.html', user=user, workflow=workflow, tickets=tickets)
 
 
