@@ -541,14 +541,27 @@ def inject_org_context():
     orgs = get_user_orgs() if user else []
     active_org_id = get_active_org_id() if user else None
     active_org_name = ''
+    org_data = {}
+    if user:
+        try:
+            org_data = user_models.get_organization_details(user['id']) or {}
+        except Exception:
+            org_data = {}
+    active_org = None
     for o in orgs:
         if o['id'] == active_org_id:
             active_org_name = o['organization_name']
+            active_org = o
             break
     return dict(
         user_orgs=orgs,
         active_org_id=active_org_id,
         active_org_name=active_org_name,
+        active_org=active_org or {},
+        org_details=org_data.get('organization_details') or {},
+        org_profile=org_data.get('organization_profile') or {},
+        org_focus_areas=org_data.get('focus_areas') or [],
+        org_past_grants=org_data.get('past_grants') or [],
         show_org_switcher=len(orgs) > 1 or (user is not None and user.get('plan', '') in ('enterprise_5', 'enterprise_10', 'enterprise_15'))
     )
 
