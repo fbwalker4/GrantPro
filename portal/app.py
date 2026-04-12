@@ -1193,6 +1193,7 @@ def support_tickets():
     """Customer support ticket intake and status view."""
     user = get_current_user()
     workflow = user_models.get_workflow_summary(user['id'])
+    ticket_helper = support_automation
     if request.method == 'POST':
         subject = request.form.get('subject', '').strip()
         body = request.form.get('body', '').strip()
@@ -1200,11 +1201,11 @@ def support_tickets():
         if not subject or not body:
             flash('Please add both a subject and message.', 'error')
             return redirect(url_for('support_tickets'))
-        ticket_id = support_automation.create_support_ticket(user['id'], subject, body, category=category, workflow=workflow)
+        ticket_id = ticket_helper.create_support_ticket(user['id'], subject, body, category=category, workflow=workflow)
         flash(f'Support ticket created: {ticket_id}', 'success')
         return redirect(url_for('command_center'))
 
-    tickets = support_automation.get_support_tickets_for_user(user['id'])
+    tickets = ticket_helper.get_support_tickets_for_user(user['id'])
     return render_template('support_tickets.html', user=user, workflow=workflow, tickets=tickets)
 
 
@@ -1214,7 +1215,7 @@ def command_center():
     """Customer command-center view."""
     user = get_current_user()
     workflow = user_models.get_workflow_summary(user['id'])
-    tickets = support_automation.get_support_tickets_for_user(user['id'])
+    tickets = ticket_helper.get_support_tickets_for_user(user['id'])
     return render_template('command_center.html', user=user, workflow=workflow, tickets=tickets)
 
 
@@ -3075,11 +3076,27 @@ def admin_index():
     grants = conn.execute('SELECT COUNT(*) as count FROM grants').fetchone()
     users = conn.execute('SELECT COUNT(*) as count FROM users').fetchone()
     conn.close()
-    
+
+    ops_visibility = {
+        'health': [],
+        'logs': [],
+        'queue': [],
+        'ai_failures': [],
+        'file_issues': [],
+    }
+
     return render_template('admin.html', 
                          clients=clients['count'], 
                          grants=grants['count'],
-                         users=users['count'])
+                         users=users['count'],
+                         ops_visibility=ops_visibility,
+                         stuck_users=[],
+                         missing_docs=[],
+                         failed_drafts=[],
+                         upcoming_deadlines=[],
+                         tickets=[],
+                         billing_alerts=[],
+                         error_events=[])
 
 # ============ OLD ADMIN ROUTES (redirects) ============
 
