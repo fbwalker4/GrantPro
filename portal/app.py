@@ -112,6 +112,7 @@ app.config.update(
 import time
 from collections import defaultdict
 from flask import jsonify
+from core import support_automation
 
 # In-memory rate limiter (works locally; on Vercel, supplemented by DB check)
 rate_limit_store = defaultdict(list)
