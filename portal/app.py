@@ -1215,9 +1215,11 @@ def command_center():
     """Customer command-center view."""
     user = get_current_user()
     workflow = user_models.get_workflow_summary(user['id'])
-    org_details = user_models.get_organization_details(user['id']) or {}
+    org_bundle = user_models.get_organization_details(user['id']) or {}
+    org_details = org_bundle.get('organization_details') or {}
+    org_profile = org_bundle.get('organization_profile') or {}
     tickets = support_automation.get_support_tickets_for_user(user['id'])
-    return render_template('command_center.html', user=user, workflow=workflow, org_details=org_details, tickets=tickets)
+    return render_template('command_center.html', user=user, workflow=workflow, org_details=org_details, org_profile=org_profile, tickets=tickets)
 
 
 @app.route('/customer-command-center')
