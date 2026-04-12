@@ -1227,12 +1227,63 @@ def support_tickets():
 def command_center():
     """Customer command-center view."""
     user = get_current_user()
-    workflow = user_models.get_workflow_summary(user['id'])
+    workflow = user_models.get_workflow_summary(user['id']) or {}
     org_bundle = user_models.get_organization_details(user['id']) or {}
     org_details = org_bundle.get('organization_details') or {}
     org_profile = org_bundle.get('organization_profile') or {}
-    tickets = support_automation.get_support_tickets_for_user(user['id'])
-    return render_template('command_center.html', user=user, workflow=workflow, org_details=org_details, org_profile=org_profile, tickets=tickets)
+    readiness = user_models.get_grant_readiness(user['id']) or {}
+    tickets = support_automation.get_support_tickets_for_user(user['id']) or []
+    grants = user_models.get_user_grants(user['id']) or []
+    messages = workflow.get('messages') or []
+    history = workflow.get('history') or []
+    profile_pct, profile_missing = calculate_profile_completion(user)
+    readiness_pct = 0
+    readiness_missing = []
+    try:
+        readiness_fields = [
+            ('applicant_category', 'Applicant Type'),
+            ('sam_gov_status', 'SAM.gov Registration'),
+            ('has_uei', 'UEI Confirmation'),
+            ('funding_purposes', 'Funding Preferences'),
+        ]
+        readiness_filled = 0
+        readiness_total = len(readiness_fields)
+        for key, _label in readiness_fields:
+            value = readiness.get(key)
+            if key == 'sam_gov_status':
+                complete = value not in (None, '', 'unknown')
+            else:
+                complete = bool(value)
+            if complete:
+                readiness_filled += 1
+            else:
+                readiness_missing.append(_label)
+        readiness_pct = int(round(readiness_filled / readiness_total * 100)) if readiness_total else 0
+    except Exception:
+        readiness_pct = 0
+        readiness_missing = []
+    docs_missing = profile_missing
+    docs_skipped = []
+    vault_documents = []
+    return render_template(
+        'command_center.html',
+        user=user,
+        workflow=workflow,
+        org_details=org_details,
+        org_profile=org_profile,
+        readiness=readiness,
+        readiness_pct=readiness_pct,
+        readiness_missing=readiness_missing,
+        profile_pct=profile_pct,
+        profile_missing=profile_missing,
+        vault_documents=vault_documents,
+        docs_missing=docs_missing,
+        docs_skipped=docs_skipped,
+        grants=grants,
+        messages=messages,
+        history=history,
+        tickets=tickets,
+    )
 
 
 @app.route('/customer-command-center')
