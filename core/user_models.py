@@ -1521,8 +1521,12 @@ def get_workflow_summary(user_id):
     """Return a canonical workflow summary for the user."""
     conn = get_connection()
     c = conn.cursor()
-    c.execute('SELECT stage, items_json, complete_json, missing_json, skipped_json, pct_complete FROM workflow_state WHERE user_id = ?', (user_id,))
-    row = c.fetchone()
+    try:
+        c.execute('SELECT stage, items_json, complete_json, missing_json, skipped_json, pct_complete FROM workflow_state WHERE user_id = ?', (user_id,))
+        row = c.fetchone()
+    except Exception:
+        conn.close()
+        return build_user_workflow_summary(user_id)
     conn.close()
     if row:
         try:
