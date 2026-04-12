@@ -101,34 +101,16 @@ Only include grants scoring 50 or above. Sort by score descending.
 Return ONLY valid JSON array. No explanations outside the JSON."""
 
     try:
-        from google import genai
         import re
+        from core.ai_provider import generate_text, safe_json_loads
 
-        api_key = os.environ.get('GP_GOOGLE_API_KEY') or os.environ.get('GOOGLE_API_KEY')
-        if not api_key:
-            env_path = os.path.expanduser('~/.hermes/grant-system/.env')
-            if os.path.exists(env_path):
-                with open(env_path) as f:
-                    for line in f:
-                        if line.startswith('GP_GOOGLE_API_KEY='):
-                            api_key = line.split('=', 1)[1].strip()
+        result = generate_text(prompt, model='gemini-2.5-flash')
+        raw = result.text.strip()
 
-        if not api_key:
-            logger.error("No Google API key for grant matching")
-            return []
-
-        client = genai.Client(api_key=api_key)
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt
-        )
-
-        raw = response.text.strip()
-        if raw.startswith('```'):
             raw = re.sub(r'^```(?:json)?\n?', '', raw)
             raw = re.sub(r'\n?```$', '', raw)
 
-        matches = json.loads(raw)
+        matches = safe_json_loads(raw)
 
         # Enrich with grant details from catalog
         grants_by_id = {g['id']: g for g in grants}

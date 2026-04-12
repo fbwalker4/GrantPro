@@ -745,6 +745,32 @@ def guide():
     return render_template('guide.html')
 
 
+@app.route('/glossary')
+def glossary():
+    """Dedicated grant terminology glossary - public."""
+    user = get_current_user()
+    glossary_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'grant_glossary.json')
+    terms = []
+    if os.path.exists(glossary_path):
+        try:
+            with open(glossary_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            if isinstance(data, dict):
+                for term, payload in data.items():
+                    if isinstance(payload, dict):
+                        payload = dict(payload)
+                        payload.setdefault('term', term)
+                        terms.append(payload)
+                    else:
+                        terms.append({'term': term, 'definition': str(payload)})
+            elif isinstance(data, list):
+                terms = data
+        except Exception:
+            terms = []
+    terms = sorted(terms, key=lambda x: str(x.get('term', '')).lower())
+    return render_template('glossary.html', user=user, terms=terms)
+
+
 @app.route('/guide/sam-registration')
 def sam_registration_guide():
     """SAM.gov Registration Guide - public"""
@@ -2453,14 +2479,10 @@ def eligibility():
 @csrf_required
 def check_eligibility():
     """Check eligibility for a specific grant"""
-    # Check CSRF token for API
-    token = request.headers.get('X-CSRF-Token')
-    if not token or not hmac.compare_digest(str(token), str(session.get('csrf_token', ''))):
-        return jsonify({'eligible': False, 'reason': 'CSRF validation failed'}), 403
-    
-    data = request.json
+    # CSRF is already enforced by @csrf_required.
+    data = request.get_json(silent=True) or request.form.to_dict() or {}
     grant_id = data.get('grant_id')
-    user_info = data.get('user_info', {})
+    user_info = data.get('user_info', {}) or {}
     
     # Get grant details
     grants = grant_researcher.get_all_grants()
@@ -8323,25 +8345,38 @@ def shared_grant_view(token):
 
 # ============ ERROR HANDLERS ============
 
+def _error_payload(title, message, icon, status_code, error_id=None):
+    error_id = error_id or uuid.uuid4().hex[:10].upper()
+    wants_json = request.path.startswith('/api/') or 'application/json' in request.headers.get('Accept', '')
+    support_message = f"{message} Error reference: {error_id}."
+    if wants_json:
+        return jsonify({
+            'error': title,
+            'message': support_message,
+            'error_id': error_id,
+            'status': status_code,
+        }), status_code
+    return render_template('message.html', title=title,
+        message=support_message, icon=icon, error_id=error_id,
+        support_email='support@grantpro.org', retry_url=request.referrer or '/dashboard'), status_code
+
+
 @app.errorhandler(404)
 def not_found(e):
-    return render_template('message.html', title='Page Not Found',
-        message='The page you are looking for does not exist.', icon='🔍'), 404
+    return _error_payload('Page Not Found', 'The page you are looking for does not exist.', '🔍', 404)
 
 @app.errorhandler(405)
 def method_not_allowed(e):
-    return render_template('message.html', title='Method Not Allowed',
-        message='This action is not supported.', icon='🚫'), 405
+    return _error_payload('Method Not Allowed', 'This action is not supported.', '🚫', 405)
 
 @app.errorhandler(429)
 def too_many_requests(e):
-    return render_template('message.html', title='Too Many Requests',
-        message='Please slow down and try again in a moment.', icon='⏳'), 429
+    return _error_payload('Too Many Requests', 'Please slow down and try again in a moment.', '⏳', 429)
 
 @app.errorhandler(500)
 def server_error(e):
-    return render_template('message.html', title='Server Error',
-        message='Something went wrong. Please try again later.', icon='⚠️'), 500
+    app.logger.exception('Unhandled server error: %s', e)
+    return _error_payload('Server Error', 'Something went wrong. Please try again later.', '⚠️', 500)
 
 
 # ============ SECURITY.TXT + ROBOTS.TXT ============
@@ -8573,6 +8608,60 @@ def vault_delete(doc_id):
     redirect_url = url_for('vault', client_id=client_id) if client_id else url_for('vault')
     flash('Document removed from vault.', 'success')
     return redirect(redirect_url)
+
+
+@app.route('/vault/view/<doc_id>')
+@login_required
+def vault_view(doc_id):
+    """View a vault document inline in the browser."""
+    user_id = session['user_id']
+    client_id = request.args.get('client_id', '').strip()
+    conn = get_db()
+    row = conn.execute('SELECT * FROM org_vault WHERE id = ? AND user_id = ?', (doc_id, user_id)).fetchone()
+    conn.close()
+    if not row:
+        flash('Document not found.', 'error')
+        return redirect(url_for('vault', client_id=client_id) if client_id else url_for('vault'))
+    try:
+        file_data = row['file_data']
+        doc_name = row['doc_name'] or row['id']
+        doc_type = row['doc_type'] or 'document'
+    except Exception:
+        file_data = row[6]
+        doc_name = row[4] or row[0]
+        doc_type = row[3] or 'document'
+    return send_file(
+        io.BytesIO(file_data),
+        mimetype='application/octet-stream',
+        as_attachment=False,
+        download_name=f'{secure_filename(doc_name) or doc_type}.bin'
+    )
+
+
+@app.route('/vault/download/<doc_id>')
+@login_required
+def vault_download(doc_id):
+    """Download a vault document."""
+    user_id = session['user_id']
+    client_id = request.args.get('client_id', '').strip()
+    conn = get_db()
+    row = conn.execute('SELECT * FROM org_vault WHERE id = ? AND user_id = ?', (doc_id, user_id)).fetchone()
+    conn.close()
+    if not row:
+        flash('Document not found.', 'error')
+        return redirect(url_for('vault', client_id=client_id) if client_id else url_for('vault'))
+    try:
+        file_data = row['file_data']
+        doc_name = row['doc_name'] or row['id']
+    except Exception:
+        file_data = row[6]
+        doc_name = row[4] or row[0]
+    return send_file(
+        io.BytesIO(file_data),
+        mimetype='application/octet-stream',
+        as_attachment=True,
+        download_name=secure_filename(doc_name) or 'vault-document.bin'
+    )
 
 
 # ============ MATCH FUNDING FINDER ============

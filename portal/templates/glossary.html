@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block title %}Grant Glossary - Grant Pro{% endblock %}
+{% block content %}
+<style>
+.glossary-wrap { max-width: 1100px; margin: 0 auto; }
+.glossary-wrap h1 { font-family: 'Playfair Display', serif; margin-bottom: .5rem; }
+.glossary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+.glossary-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; }
+.glossary-card h3 { margin: 0 0 .5rem 0; font-size: 1.05rem; }
+.badge-row { display: flex; flex-wrap: wrap; gap: .35rem; margin: .5rem 0 .75rem; }
+.badge { display: inline-block; padding: .2rem .55rem; border-radius: 999px; font-size: .78rem; background: rgba(37,99,235,.12); color: var(--accent-primary); }
+.small { color: var(--text-secondary); font-size: .92rem; }
+.label { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin-top: .75rem; margin-bottom: .25rem; }
+</style>
+<div class="glossary-wrap">
+  <a href="/help" style="color: var(--accent-hover); text-decoration:none;">← Back to Help</a>
+  <h1>Grant Glossary</h1>
+  <p class="small">Plain-English definitions for the grant terms people keep tripping over.</p>
+
+  <div class="glossary-grid">
+    {% for term in terms %}
+    <div class="glossary-card" id="{{ term.term|lower|replace(' ', '-')|replace('/', '-') }}">
+      <h3>{{ term.term }}</h3>
+      {% if term.aliases %}
+      <div class="badge-row">
+        {% for alias in term.aliases %}<span class="badge">{{ alias }}</span>{% endfor %}
+      </div>
+      {% endif %}
+      <div class="label">Definition</div>
+      <div>{{ term.definition }}</div>
+      {% if term.plain_english %}
+      <div class="label">Plain English</div>
+      <div class="small">{{ term.plain_english }}</div>
+      {% endif %}
+      {% if term.why_it_matters %}
+      <div class="label">Why it matters</div>
+      <div class="small">{{ term.why_it_matters }}</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

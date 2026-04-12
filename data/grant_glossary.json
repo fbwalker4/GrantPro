@@ -1,0 +1,80 @@
+{
+  "NOFO": {
+    "aliases": ["FOA", "Notice of Funding Opportunity", "Funding Opportunity Announcement"],
+    "definition": "The official posting that announces a grant opportunity.",
+    "plain_english": "This is the grant listing itself — the document that says what the agency wants, who can apply, how to apply, and when it is due.",
+    "why_it_matters": "If you miss what the NOFO says, you can waste time on a grant you cannot win."
+  },
+  "Assistance Listing": {
+    "aliases": ["CFDA", "Catalog of Federal Domestic Assistance"],
+    "definition": "The federal listing number/category for a grant program.",
+    "plain_english": "The old CFDA name still gets used sometimes, but the current term is Assistance Listing.",
+    "why_it_matters": "It helps identify the correct federal program and is often referenced in award paperwork."
+  },
+  "Eligibility": {
+    "aliases": ["eligible", "eligibility requirements"],
+    "definition": "The rules that determine who may apply.",
+    "plain_english": "This tells you whether your organization type, location, or project can apply.",
+    "why_it_matters": "If you don’t meet eligibility, the application is dead on arrival."
+  },
+  "Match / Cost Share": {
+    "aliases": ["match", "cost share", "local match"],
+    "definition": "Money or in-kind support that the applicant contributes.",
+    "plain_english": "The grant only pays part of the bill; you cover the rest with your own money, partner support, or approved in-kind value.",
+    "why_it_matters": "Some grants require it, and failing to document it can disqualify the application."
+  },
+  "Indirect Costs": {
+    "aliases": ["overhead", "F&A", "Facilities and Administrative costs"],
+    "definition": "Shared organizational expenses that support the project but are not direct project costs.",
+    "plain_english": "Think rent, admin, accounting, and the lights staying on.",
+    "why_it_matters": "You need to know whether the grant allows indirect costs and at what rate."
+  },
+  "Supplanting": {
+    "aliases": [],
+    "definition": "Using grant money to replace money that should already be covering the expense.",
+    "plain_english": "The grant cannot just take the place of money you were already supposed to spend.",
+    "why_it_matters": "A lot of grants ban it outright."
+  },
+  "Period of Performance": {
+    "aliases": ["project period", "grant period"],
+    "definition": "The time window in which the grant-funded work must happen.",
+    "plain_english": "Start to finish, this is the window where the project has to be active and expenses have to fit.",
+    "why_it_matters": "Costs outside the period usually don’t count."
+  },
+  "Match Rate": {
+    "aliases": ["cost share percentage"],
+    "definition": "The percentage of the project cost you must provide.",
+    "plain_english": "If the grant says 20% match, you bring 20 cents for every dollar the grant covers.",
+    "why_it_matters": "This affects budget size and whether the grant is realistic for your organization."
+  },
+  "SAM.gov": {
+    "aliases": [],
+    "definition": "The federal registration system used by organizations that want to do business with the government.",
+    "plain_english": "You usually need this before you can get paid by a federal grant.",
+    "why_it_matters": "Expired registration can kill an award or block payment."
+  },
+  "UEI": {
+    "aliases": ["Unique Entity Identifier"],
+    "definition": "The identifier used by the federal government to identify your organization.",
+    "plain_english": "It’s the number that says, 'this is your organization' in the federal system.",
+    "why_it_matters": "It’s required for most federal grant workflows."
+  },
+  "MTDC": {
+    "aliases": ["Modified Total Direct Cost"],
+    "definition": "A federal budgeting base used to calculate indirect costs.",
+    "plain_english": "Not every dollar in the budget counts toward the indirect-cost math.",
+    "why_it_matters": "Using the wrong base can wreck your budget math."
+  },
+  "Formula Grant": {
+    "aliases": [],
+    "definition": "A grant distributed based on a formula, not a competitive score.",
+    "plain_english": "The money is often allocated based on rules like population or need.",
+    "why_it_matters": "These are easier to predict than competitive grants."
+  },
+  "Competitive Grant": {
+    "aliases": [],
+    "definition": "A grant awarded through a review and scoring process.",
+    "plain_english": "You’re competing against other applicants, and the best proposal wins.",
+    "why_it_matters": "You need a stronger narrative and compliance package."
+  }
+}

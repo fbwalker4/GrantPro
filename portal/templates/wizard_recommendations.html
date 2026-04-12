@@ -76,16 +76,22 @@
 </div>
 
 <script>
-    function saveGrant(grantId) {
-        fetch('/api/save-grant', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}'},
-            body: JSON.stringify({grant_id: grantId})
-        }).then(res => res.json()).then(data => {
+    async function saveGrant(grantId) {
+        try {
+            const res = await safeFetch('/api/save-grant', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}'},
+                body: JSON.stringify({grant_id: grantId})
+            });
+            const data = await res.json();
             if (data.success) {
                 alert('Grant saved to your dashboard!');
+            } else {
+                alert(data.message || 'Could not save grant.');
             }
-        });
+        } catch (err) {
+            alert('Could not save grant right now. Try again.');
+        }
     }
 </script>
 {% endblock %}

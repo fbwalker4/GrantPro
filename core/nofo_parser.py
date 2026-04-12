@@ -269,33 +269,15 @@ NOFO TEXT:
 Return ONLY valid JSON. No explanations, no markdown fences."""
 
     try:
-        from google import genai
-        api_key = os.environ.get('GP_GOOGLE_API_KEY') or os.environ.get('GOOGLE_API_KEY')
-        if not api_key:
-            # Try loading from .env
-            env_path = Path.home() / '.hermes' / 'grant-system' / '.env'
-            if env_path.exists():
-                for line in env_path.read_text().splitlines():
-                    if line.startswith('GP_GOOGLE_API_KEY='):
-                        api_key = line.split('=', 1)[1].strip()
+        from core.ai_provider import generate_text, safe_json_loads, AIProviderError
+        result = generate_text(prompt, model='gemini-2.5-flash')
+        raw_response = result.text.strip()
 
-        if not api_key:
-            logger.error("No Google API key found for NOFO parsing")
-            return {}
-
-        client = genai.Client(api_key=api_key)
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt
-        )
-
-        raw_response = response.text.strip()
-        # Strip markdown fences if present
         if raw_response.startswith("```"):
             raw_response = re.sub(r'^```(?:json)?\n?', '', raw_response)
             raw_response = re.sub(r'\n?```$', '', raw_response)
 
-        parsed = json.loads(raw_response)
+        parsed = safe_json_loads(raw_response)
         return parsed
 
     except json.JSONDecodeError as e:

@@ -258,12 +258,14 @@
             {% if slot.expired %}
             <span class="vault-badge expired">Expired</span>
             {% else %}
-            <span class="vault-badge uploaded">Uploaded</span>
+            <span class="vault-badge uploaded">Current</span>
             {% endif %}
             <span>{{ slot.doc.uploaded_at[:10] if slot.doc.uploaded_at else '' }}</span>
             <span>{{ slot.file_size_display }}</span>
         </div>
         <div class="vault-slot-actions">
+            <a class="btn btn-secondary" href="/vault/view/{{ slot.doc.id }}?client_id={{ client_id or '' }}">View</a>
+            <a class="btn btn-secondary" href="/vault/download/{{ slot.doc.id }}?client_id={{ client_id or '' }}">Download</a>
             <button class="btn btn-secondary" onclick="openUploadModal('{{ slot.doc_type }}', '{{ slot.name }}', true)">Replace</button>
             <form method="POST" action="/vault/delete/{{ slot.doc.id }}" style="display:inline;" onsubmit="return confirm('Remove this document?')">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -306,12 +308,14 @@
             {% if slot.expired %}
             <span class="vault-badge expired">Expired</span>
             {% else %}
-            <span class="vault-badge uploaded">Uploaded</span>
+            <span class="vault-badge uploaded">Current</span>
             {% endif %}
             <span>{{ slot.doc.uploaded_at[:10] if slot.doc.uploaded_at else '' }}</span>
             <span>{{ slot.file_size_display }}</span>
         </div>
         <div class="vault-slot-actions">
+            <a class="btn btn-secondary" href="/vault/view/{{ slot.doc.id }}?client_id={{ client_id or '' }}">View</a>
+            <a class="btn btn-secondary" href="/vault/download/{{ slot.doc.id }}?client_id={{ client_id or '' }}">Download</a>
             <button class="btn btn-secondary" onclick="openUploadModal('{{ slot.doc_type }}', '{{ slot.name }}', true)">Replace</button>
             <form method="POST" action="/vault/delete/{{ slot.doc.id }}" style="display:inline;" onsubmit="return confirm('Remove this document?')">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

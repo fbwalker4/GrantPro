@@ -938,5 +938,22 @@
         }, warnAt);
     })();
     </script>
+
+<script>
+window.safeFetch = async function(url, options={}) {
+  const opts = Object.assign({credentials: 'same-origin'}, options);
+  try {
+    const res = await fetch(url, opts);
+    if (res.status === 401 || res.status === 403) {
+      window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname + window.location.search);
+      throw new Error('Session expired');
+    }
+    return res;
+  } catch (err) {
+    console.error('safeFetch failed for', url, err);
+    throw err;
+  }
+};
+</script>
 </body>
 </html>
