@@ -8,6 +8,7 @@ import hmac
 import json
 import logging
 import os
+import uuid
 import re
 import sqlite3
 from datetime import datetime, timedelta
@@ -1190,7 +1191,7 @@ def logout():
 def support_tickets():
     """Customer support ticket intake and status view."""
     user = get_current_user()
-    workflow = user_models.get_user_workflow_summary(user['id'])
+    workflow = user_models.get_workflow_summary(user['id'])
     if request.method == 'POST':
         subject = request.form.get('subject', '').strip()
         body = request.form.get('body', '').strip()
@@ -1211,7 +1212,7 @@ def support_tickets():
 def command_center():
     """Customer command-center view."""
     user = get_current_user()
-    workflow = user_models.get_user_workflow_summary(user['id'])
+    workflow = user_models.get_workflow_summary(user['id'])
     tickets = support_automation.get_support_tickets_for_user(user['id'])
     return render_template('command_center.html', user=user, workflow=workflow, tickets=tickets)
 
