@@ -5,108 +5,206 @@
 {% block content %}
 <div class="page-header">
     <div>
-        <h1 class="page-title">⚙️ Admin Dashboard</h1>
-        <p class="page-subtitle">Manage your grant writing business</p>
+        <h1 class="page-title">⚙️ Operator Dashboard</h1>
+        <p class="page-subtitle">Monitor stuck users, missing documents, draft failures, deadlines, tickets, billing, errors, health, logs, queues, AI failures, and file issues.</p>
     </div>
 </div>
 
-<!-- Quick Stats -->
 <div class="stats-grid" style="margin-bottom: 2rem;">
-    <div class="stat-card">
-        <div class="stat-icon purple">👥</div>
-        <div class="stat-value">{{ users }}</div>
-        <div class="stat-label">Users</div>
+    <div class="stat-card"><div class="stat-icon purple">👥</div><div class="stat-value">{{ users }}</div><div class="stat-label">Users</div></div>
+    <div class="stat-card"><div class="stat-icon green">🏢</div><div class="stat-value">{{ clients }}</div><div class="stat-label">Clients</div></div>
+    <div class="stat-card"><div class="stat-icon amber">📋</div><div class="stat-value">{{ grants }}</div><div class="stat-label">Grants</div></div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-bottom:2rem;">
+    <div class="card"><h3 style="margin-top:0;">Stuck users</h3><p style="color:var(--text-secondary);">{{ stuck_users|length }} active applications need follow-up.</p></div>
+    <div class="card"><h3 style="margin-top:0;">Missing docs</h3><p style="color:var(--text-secondary);">{{ missing_docs|length }} grants are waiting on required files.</p></div>
+    <div class="card"><h3 style="margin-top:0;">Failed drafts</h3><p style="color:var(--text-secondary);">{{ failed_drafts|length }} draft records look incomplete or failed.</p></div>
+    <div class="card"><h3 style="margin-top:0;">Deadlines</h3><p style="color:var(--text-secondary);">{{ upcoming_deadlines|length }} deadlines fall inside the next 30 days.</p></div>
+    <div class="card"><h3 style="margin-top:0;">Tickets</h3><p style="color:var(--text-secondary);">{{ tickets|length }} support tickets surfaced from the system.</p></div>
+    <div class="card"><h3 style="margin-top:0;">Billing / errors</h3><p style="color:var(--text-secondary);">{{ billing_alerts|length }} billing alerts and {{ error_events|length }} logged errors.</p></div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.5rem;">
+    <div class="card">
+        <h3 style="margin-top:0;">System health</h3>
+        {% if ops_visibility.health %}
+        <ul style="margin:0;padding-left:1.2rem;color:var(--text-secondary);">
+            {% for item in ops_visibility.health %}
+            <li><strong>{{ item.name }}</strong>: {{ item.status }} — {{ item.detail }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}<p style="color:var(--text-secondary);">No health checks available.</p>{% endif %}
     </div>
-    <div class="stat-card">
-        <div class="stat-icon green">🏢</div>
-        <div class="stat-value">{{ clients }}</div>
-        <div class="stat-label">Clients</div>
+
+    <div class="card">
+        <h3 style="margin-top:0;">Logs</h3>
+        {% if ops_visibility.logs %}
+        <ul style="margin:0;padding-left:1.2rem;color:var(--text-secondary);">
+            {% for item in ops_visibility.logs %}
+            <li><strong>{{ item.status }}</strong> — {{ item.detail }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}<p style="color:var(--text-secondary);">No log visibility available.</p>{% endif %}
     </div>
-    <div class="stat-card">
-        <div class="stat-icon amber">📋</div>
-        <div class="stat-value">{{ grants }}</div>
-        <div class="stat-label">Grants</div>
+
+    <div class="card">
+        <h3 style="margin-top:0;">Queues</h3>
+        {% if ops_visibility.queue %}
+        <ul style="margin:0;padding-left:1.2rem;color:var(--text-secondary);">
+            {% for item in ops_visibility.queue %}
+            <li><strong>{{ item.table }}</strong>: {{ item.count }} pending ({{ item.status }})</li>
+            {% endfor %}
+        </ul>
+        {% else %}<p style="color:var(--text-secondary);">No queue tables found.</p>{% endif %}
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0;">AI failures</h3>
+        {% if ops_visibility.ai_failures %}
+        <div style="display:grid;gap:0.75rem;">
+            {% for item in ops_visibility.ai_failures %}
+            <div style="padding:0.9rem;border:1px solid var(--border-color);border-radius:10px;">
+                <strong>{{ item.subject or item.template_name or item.section or 'AI failure' }}</strong>
+                <div style="color:var(--text-secondary);font-size:0.9rem;">{{ item.error_message or item.status or 'failed' }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}<p style="color:var(--text-secondary);">No AI failures surfaced.</p>{% endif %}
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0;">File issues</h3>
+        {% if ops_visibility.file_issues %}
+        <div style="display:grid;gap:0.75rem;">
+            {% for item in ops_visibility.file_issues %}
+            <div style="padding:0.9rem;border:1px solid var(--border-color);border-radius:10px;">
+                <strong>{{ item.filename or item.file_name or item.path or item.id or 'File issue' }}</strong>
+                <div style="color:var(--text-secondary);font-size:0.9rem;">{{ item.status or 'missing' }}{% if item.error_message %} · {{ item.error_message }}{% endif %}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}<p style="color:var(--text-secondary);">No file issues surfaced.</p>{% endif %}
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0;">Stuck users</h3>
+        {% if stuck_users %}
+        <div style="display:grid;gap:0.75rem;">
+            {% for item in stuck_users %}
+            <div style="padding:0.9rem;border:1px solid var(--border-color);border-radius:10px;">
+                <strong>{{ item.first_name or '' }} {{ item.last_name or '' }}</strong>
+                <div style="color:var(--text-secondary);font-size:0.9rem;">{{ item.email }} · {{ item.grant_name or 'Grant draft' }}</div>
+                <div style="font-size:0.85rem;color:var(--text-muted);">Status: {{ item.application_status }} · Progress: {{ item.progress or 0 }}% · Updated: {{ item.updated_at or 'unknown' }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}<p style="color:var(--text-secondary);">No stuck users found.</p>{% endif %}
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0;">Missing docs</h3>
+        {% if missing_docs %}
+        <div style="display:grid;gap:0.75rem;">
+            {% for item in missing_docs %}
+            <div style="padding:0.9rem;border:1px solid var(--border-color);border-radius:10px;">
+                <strong>{{ item.grant_name }}</strong>
+                <div style="color:var(--text-secondary);font-size:0.9rem;">{{ item.organization_name or 'Unknown client' }}</div>
+                <div style="font-size:0.85rem;color:var(--text-muted);">Missing items: {{ item.missing_count }} · Deadline: {{ item.deadline or 'TBD' }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}<p style="color:var(--text-secondary);">No missing-document gaps surfaced.</p>{% endif %}
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0;">Failed drafts</h3>
+        {% if failed_drafts %}
+        <div style="display:grid;gap:0.75rem;">
+            {% for item in failed_drafts %}
+            <div style="padding:0.9rem;border:1px solid var(--border-color);border-radius:10px;">
+                <strong>{{ item.grant_name or 'Draft' }}</strong>
+                <div style="color:var(--text-secondary);font-size:0.9rem;">{{ item.organization_name or 'Unknown client' }} · {{ item.section or 'unknown section' }}</div>
+                <div style="font-size:0.85rem;color:var(--text-muted);">Version {{ item.version or 1 }} · Updated {{ item.updated_at or 'unknown' }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}<p style="color:var(--text-secondary);">No failed draft records found.</p>{% endif %}
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0;">Upcoming deadlines</h3>
+        {% if upcoming_deadlines %}
+        <div style="display:grid;gap:0.75rem;">
+            {% for item in upcoming_deadlines %}
+            <div style="padding:0.9rem;border:1px solid var(--border-color);border-radius:10px;">
+                <strong>{{ item.grant_name }}</strong>
+                <div style="color:var(--text-secondary);font-size:0.9rem;">{{ item.agency or 'Agency TBD' }}</div>
+                <div style="font-size:0.85rem;color:var(--text-muted);">Deadline: {{ item.deadline }} · Status: {{ item.status }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}<p style="color:var(--text-secondary);">No deadlines inside the next 30 days.</p>{% endif %}
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0;">Tickets</h3>
+        {% if tickets %}
+        <div style="display:grid;gap:0.75rem;">
+            {% for item in tickets %}
+            <div style="padding:0.9rem;border:1px solid var(--border-color);border-radius:10px;">
+                <strong>{{ item.subject or item.title or 'Ticket' }}</strong>
+                <div style="color:var(--text-secondary);font-size:0.9rem;">{{ item.email or item.requester_email or item.name or 'Unknown requester' }}</div>
+                <div style="font-size:0.85rem;color:var(--text-muted);">Status: {{ item.status or 'open' }} · Updated: {{ item.updated_at or item.created_at or 'unknown' }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}<p style="color:var(--text-secondary);">No ticket table or rows were found yet.</p>{% endif %}
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0;">Billing alerts</h3>
+        {% if billing_alerts %}
+        <div style="display:grid;gap:0.75rem;">
+            {% for item in billing_alerts %}
+            <div style="padding:0.9rem;border:1px solid var(--border-color);border-radius:10px;">
+                <strong>{{ item.email }}</strong>
+                <div style="color:var(--text-secondary);font-size:0.9rem;">{{ item.first_name or '' }} {{ item.last_name or '' }}</div>
+                <div style="font-size:0.85rem;color:var(--text-muted);">Plan: {{ item.plan }} · Status: {{ item.subscription_status }} · Failures: {{ item.payment_failure_count or 0 }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}<p style="color:var(--text-secondary);">No billing alerts found.</p>{% endif %}
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0;">Errors</h3>
+        {% if error_events %}
+        <div style="display:grid;gap:0.75rem;">
+            {% for item in error_events %}
+            <div style="padding:0.9rem;border:1px solid var(--border-color);border-radius:10px;">
+                <strong>{{ item.subject or item.template_name or 'Error event' }}</strong>
+                <div style="color:var(--text-secondary);font-size:0.9rem;">{{ item.to_email or item.error_message or 'Unknown error' }}</div>
+                <div style="font-size:0.85rem;color:var(--text-muted);">Status: {{ item.status or 'failed' }} · When: {{ item.sent_at or item.created_at or 'unknown' }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}<p style="color:var(--text-secondary);">No recent error logs found.</p>{% endif %}
     </div>
 </div>
 
-<!-- Admin Sections -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
-    <!-- Grants -->
-    <a href="/admin/grants" class="card" style="text-decoration: none; transition: all 0.2s;">
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <div style="width: 50px; height: 50px; background: rgba(99, 102, 241, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
-                📋
-            </div>
-            <div>
-                <h3 style="font-size: 1.1rem; font-weight: 600;">Manage Grants</h3>
-                <p style="font-size: 0.9rem; color: var(--text-secondary);">Add, edit, delete grants</p>
-            </div>
-        </div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-top:2rem;">
+    <a href="/admin/grants" class="card" style="text-decoration:none;">
+        <h3 style="margin-top:0;">Manage Grants</h3><p style="color:var(--text-secondary);margin-bottom:0;">Add, edit, and delete grants.</p>
     </a>
-    
-    <!-- Templates -->
-    <a href="/admin/templates" class="card" style="text-decoration: none; transition: all 0.2s;">
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
-                📝
-            </div>
-            <div>
-                <h3 style="font-size: 1.1rem; font-weight: 600;">Manage Templates</h3>
-                <p style="font-size: 0.9rem; color: var(--text-secondary);">Edit agency templates</p>
-            </div>
-        </div>
+    <a href="/admin/templates" class="card" style="text-decoration:none;">
+        <h3 style="margin-top:0;">Manage Templates</h3><p style="color:var(--text-secondary);margin-bottom:0;">Edit agency templates.</p>
     </a>
-    
-    <!-- Leads -->
-    <a href="/admin/leads" class="card" style="text-decoration: none; transition: all 0.2s;">
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <div style="width: 50px; height: 50px; background: rgba(245, 158, 11, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
-                👥
-            </div>
-            <div>
-                <h3 style="font-size: 1.1rem; font-weight: 600;">Manage Leads</h3>
-                <p style="font-size: 0.9rem; color: var(--text-secondary);">View email subscribers</p>
-            </div>
-        </div>
+    <a href="/admin/leads" class="card" style="text-decoration:none;">
+        <h3 style="margin-top:0;">Manage Leads</h3><p style="color:var(--text-secondary);margin-bottom:0;">Review subscribers and exports.</p>
     </a>
-    
-    <!-- Emails -->
-    <a href="/admin/emails" class="card" style="text-decoration: none; transition: all 0.2s;">
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <div style="width: 50px; height: 50px; background: rgba(239, 68, 68, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
-                📧
-            </div>
-            <div>
-                <h3 style="font-size: 1.1rem; font-weight: 600;">Email System</h3>
-                <p style="font-size: 0.9rem; color: var(--text-secondary);">View stats & send tests</p>
-            </div>
-        </div>
-    </a>
-    
-    <!-- Clients -->
-    <a href="/clients" class="card" style="text-decoration: none; transition: all 0.2s;">
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <div style="width: 50px; height: 50px; background: rgba(139, 92, 246, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
-                🏢
-            </div>
-            <div>
-                <h3 style="font-size: 1.1rem; font-weight: 600;">All Clients</h3>
-                <p style="font-size: 0.9rem; color: var(--text-secondary);">View all clients</p>
-            </div>
-        </div>
-    </a>
-    
-    <!-- Settings -->
-    <a href="/settings" class="card" style="text-decoration: none; transition: all 0.2s;">
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <div style="width: 50px; height: 50px; background: rgba(107, 114, 128, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
-                ⚙️
-            </div>
-            <div>
-                <h3 style="font-size: 1.1rem; font-weight: 600;">Settings</h3>
-                <p style="font-size: 0.9rem; color: var(--text-secondary);">System configuration</p>
-            </div>
-        </div>
+    <a href="/admin/emails" class="card" style="text-decoration:none;">
+        <h3 style="margin-top:0;">Email System</h3><p style="color:var(--text-secondary);margin-bottom:0;">Inspect email stats and send tests.</p>
     </a>
 </div>
 {% endblock %}

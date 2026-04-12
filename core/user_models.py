@@ -6,6 +6,7 @@ Handles user authentication and user data
 
 import sqlite3
 import hashlib
+import json
 import secrets
 from datetime import datetime
 from pathlib import Path
@@ -172,6 +173,53 @@ def init_user_db():
             FOREIGN KEY (user_id) REFERENCES users(id)
         )''')
 
+        # Persisted workflow state snapshot
+        c.execute('''CREATE TABLE IF NOT EXISTS workflow_state (
+            user_id TEXT PRIMARY KEY,
+            stage TEXT,
+            items_json TEXT,
+            complete_json TEXT,
+            missing_json TEXT,
+            skipped_json TEXT,
+            pct_complete INTEGER,
+            updated_at TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )''')
+
+        # Grant run logs and review checkpoints
+        c.execute('''CREATE TABLE IF NOT EXISTS grant_run_logs (
+            id TEXT PRIMARY KEY,
+            grant_id TEXT NOT NULL,
+            application_id TEXT,
+            user_id TEXT,
+            run_type TEXT NOT NULL,
+            ai_saw_json TEXT,
+            ai_produced_json TEXT,
+            missing_json TEXT,
+            changed_json TEXT,
+            submitted_json TEXT,
+            notes TEXT,
+            created_at TEXT,
+            FOREIGN KEY (grant_id) REFERENCES grants(id),
+            FOREIGN KEY (application_id) REFERENCES user_applications(id),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )''')
+        c.execute('''CREATE TABLE IF NOT EXISTS grant_review_checkpoints (
+            id TEXT PRIMARY KEY,
+            grant_id TEXT NOT NULL,
+            application_id TEXT,
+            user_id TEXT,
+            checkpoint_type TEXT NOT NULL,
+            status TEXT DEFAULT 'pending',
+            summary TEXT,
+            reviewer_notes TEXT,
+            created_at TEXT,
+            reviewed_at TEXT,
+            FOREIGN KEY (grant_id) REFERENCES grants(id),
+            FOREIGN KEY (application_id) REFERENCES user_applications(id),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )''')
+
         # Track if user has completed onboarding
         try:
             c.execute('''ALTER TABLE users ADD COLUMN onboarding_completed INTEGER DEFAULT 0''')
@@ -246,6 +294,37 @@ def init_user_db():
             initiated_by TEXT DEFAULT 'user',
             tables_purged TEXT,
             created_at TEXT
+        )''')
+
+        # Support tickets and automation
+        c.execute('''CREATE TABLE IF NOT EXISTS support_tickets (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            subject TEXT NOT NULL,
+            title TEXT NOT NULL,
+            body TEXT,
+            category TEXT,
+            status TEXT DEFAULT 'open',
+            priority TEXT DEFAULT 'normal',
+            source TEXT DEFAULT 'portal',
+            workflow_stage TEXT,
+            workflow_missing_json TEXT,
+            workflow_deadline TEXT,
+            canned_response TEXT,
+            escalation_reason TEXT,
+            assigned_to TEXT,
+            created_at TEXT,
+            updated_at TEXT,
+            resolved_at TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )''')
+        c.execute('''CREATE TABLE IF NOT EXISTS support_ticket_messages (
+            id TEXT PRIMARY KEY,
+            ticket_id TEXT NOT NULL,
+            sender_type TEXT NOT NULL,
+            body TEXT NOT NULL,
+            created_at TEXT,
+            FOREIGN KEY (ticket_id) REFERENCES support_tickets(id)
         )''')
 
         # Grant requirements extracted from NOFO documents
@@ -837,6 +916,7 @@ def purge_user_data(user_id):
             'saved_grants', 'user_applications', 'user_profiles',
             'organization_details', 'organization_profile', 'mission_focus',
             'past_grant_experience', 'subscription_events', 'data_exports',
+            'grant_run_logs', 'grant_review_checkpoints',
             'award_matches', 'testimonials',
         ]:
             try:
@@ -1241,3 +1321,316 @@ def get_readiness_completion(readiness):
     pct = int(round(filled / total * 100)) if total else 0
     missing = [label for complete, label in fields if not complete]
     return pct, missing
+
+
+# ============ CANONICAL WORKFLOW STATE MODEL ============
+
+WORKFLOW_STAGE_ORDER = [
+    'account_created', 'onboarding_started', 'profile_partial', 'documents_pending',
+    'readiness_partial', 'grant_matched', 'draft_started', 'review_ready',
+    'submission_ready', 'submitted', 'funded', 'closed',
+]
+
+WORKFLOW_ITEM_STATES = ('complete', 'missing', 'skipped', 'needs_review', 'outdated')
+
+# ============ GRANT / APPLICATION LIFECYCLE MODEL ============
+
+GRANT_LIFECYCLE_ORDER = [
+    'intake', 'screening', 'gap_detection', 'matching', 'drafting',
+    'review', 'submission', 'funded', 'closed',
+]
+
+GRANT_LIFECYCLE_TRANSITIONS = {
+    'intake': ('screening', 'gap_detection', 'matching', 'drafting', 'review', 'submission', 'funded', 'closed'),
+    'screening': ('gap_detection', 'matching', 'drafting', 'review', 'submission', 'funded', 'closed'),
+    'gap_detection': ('matching', 'drafting', 'review', 'submission', 'funded', 'closed'),
+    'matching': ('drafting', 'review', 'submission', 'funded', 'closed'),
+    'drafting': ('review', 'submission', 'funded', 'closed'),
+    'review': ('submission', 'funded', 'closed'),
+    'submission': ('funded', 'closed'),
+    'funded': ('closed',),
+    'closed': (),
+}
+
+GRANT_LIFECYCLE_ALIASES = {
+    'research': 'intake',
+    'draft': 'intake',
+    'in_progress': 'drafting',
+    'ready': 'review',
+    'review_ready': 'review',
+    'submission_ready': 'submission',
+    'submitted': 'submission',
+    'awarded': 'funded',
+    'won': 'funded',
+    'rejected': 'closed',
+    'archived': 'closed',
+}
+
+GRANT_WORKFLOW_STAGE_TO_LIFECYCLE = {
+    'account_created': 'intake',
+    'onboarding_started': 'intake',
+    'profile_partial': 'screening',
+    'documents_pending': 'gap_detection',
+    'readiness_partial': 'matching',
+    'grant_matched': 'matching',
+    'draft_started': 'drafting',
+    'review_ready': 'review',
+    'submission_ready': 'submission',
+    'submitted': 'submission',
+    'funded': 'funded',
+    'closed': 'closed',
+}
+
+GRANT_WORKFLOW_STATE_MACHINE = {
+    'order': GRANT_LIFECYCLE_ORDER,
+    'transitions': GRANT_LIFECYCLE_TRANSITIONS,
+    'terminal_states': ('funded', 'closed'),
+    'tracked_states': ('complete', 'missing', 'skipped', 'needs_review', 'outdated'),
+}
+
+
+def normalize_grant_lifecycle_state(state):
+    state = (state or 'intake').strip().lower().replace(' ', '_')
+    state = GRANT_LIFECYCLE_ALIASES.get(state, state)
+    return state if state in GRANT_LIFECYCLE_ORDER else 'intake'
+
+
+def normalize_workflow_stage(stage):
+    stage = (stage or 'account_created').strip().lower().replace(' ', '_')
+    return stage if stage in GRANT_WORKFLOW_STAGE_TO_LIFECYCLE else 'account_created'
+
+
+def get_grant_lifecycle_summary(grant_row=None, application_row=None, workflow_summary=None):
+    """Build a grant/application lifecycle summary from persisted records."""
+    def _as_dict(value):
+        if not value:
+            return {}
+        if isinstance(value, dict):
+            return value
+        if hasattr(value, 'keys'):
+            return dict(value)
+        return value
+
+    grant_row = _as_dict(grant_row)
+    application_row = _as_dict(application_row)
+    workflow_summary = _as_dict(workflow_summary)
+
+    workflow_stage = normalize_workflow_stage(
+        workflow_summary.get('stage') or application_row.get('status') or grant_row.get('status')
+    )
+    state = normalize_grant_lifecycle_state(
+        application_row.get('status') or grant_row.get('status') or GRANT_WORKFLOW_STAGE_TO_LIFECYCLE.get(workflow_stage)
+    )
+
+    if state == 'intake' and workflow_stage in ('review_ready', 'submission_ready', 'submitted', 'funded', 'closed'):
+        state = normalize_grant_lifecycle_state(GRANT_WORKFLOW_STAGE_TO_LIFECYCLE.get(workflow_stage))
+
+    can_transition_to = list(GRANT_LIFECYCLE_TRANSITIONS.get(state, ()))
+    return {
+        'state': state,
+        'state_label': state.replace('_', ' ').title(),
+        'can_transition_to': can_transition_to,
+        'next_state': can_transition_to[0] if can_transition_to else None,
+        'is_terminal': state in GRANT_WORKFLOW_STATE_MACHINE['terminal_states'],
+        'grant_id': grant_row.get('id'),
+        'application_id': application_row.get('id'),
+        'grant_status': grant_row.get('status'),
+        'application_status': application_row.get('status'),
+        'started_at': application_row.get('started_at') or grant_row.get('assigned_at'),
+        'submitted_at': application_row.get('submitted_at') or grant_row.get('submitted_at'),
+        'progress': application_row.get('progress', 0),
+        'workflow_stage': workflow_stage,
+        'workflow_state': GRANT_WORKFLOW_STAGE_TO_LIFECYCLE.get(workflow_stage),
+        'state_machine': GRANT_WORKFLOW_STATE_MACHINE,
+    }
+
+
+def persist_grant_lifecycle_state(grant_id, state, application_id=None, user_id=None, progress=None, submitted_at=None):
+    """Persist the canonical lifecycle state on grant/application rows."""
+    state = normalize_grant_lifecycle_state(state)
+    conn = get_connection()
+    c = conn.cursor()
+    now = datetime.now().isoformat()
+
+    try:
+        if grant_id:
+            c.execute('UPDATE grants SET status = ? WHERE id = ?', (state, grant_id))
+        if application_id:
+            updates = ['status = ?', 'updated_at = ?']
+            values = [state, now]
+            if progress is not None:
+                updates.insert(1, 'progress = ?')
+                values.insert(1, progress)
+            if submitted_at is not None:
+                updates.append('submitted_at = ?')
+                values.append(submitted_at)
+            c.execute(f"UPDATE user_applications SET {', '.join(updates)} WHERE id = ?", (*values, application_id))
+        elif grant_id and user_id:
+            c.execute('''UPDATE user_applications SET status = ?, updated_at = ?, progress = COALESCE(?, progress), submitted_at = COALESCE(?, submitted_at)
+                         WHERE grant_id = ? AND user_id = ?''',
+                      (state, now, progress, submitted_at, grant_id, user_id))
+        conn.commit()
+        return True
+    finally:
+        conn.close()
+
+
+def log_grant_run(grant_id, run_type, application_id=None, user_id=None, ai_saw=None,
+                  ai_produced=None, missing=None, changed=None, submitted=None, notes=None):
+    """Persist a grant run log capturing inputs, outputs, gaps, and submission state."""
+    conn = get_connection()
+    c = conn.cursor()
+    run_id = f"grant_run-{datetime.now().strftime('%Y%m%d%H%M%S')}-{secrets.token_hex(8)}"
+    created_at = datetime.now().isoformat()
+    c.execute('''INSERT INTO grant_run_logs
+                 (id, grant_id, application_id, user_id, run_type, ai_saw_json, ai_produced_json,
+                  missing_json, changed_json, submitted_json, notes, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+              (run_id, grant_id, application_id, user_id, run_type,
+               json.dumps(ai_saw) if ai_saw is not None else None,
+               json.dumps(ai_produced) if ai_produced is not None else None,
+               json.dumps(missing) if missing is not None else None,
+               json.dumps(changed) if changed is not None else None,
+               json.dumps(submitted) if submitted is not None else None,
+               notes, created_at))
+    conn.commit()
+    conn.close()
+    return run_id
+
+
+def add_grant_review_checkpoint(grant_id, checkpoint_type, application_id=None, user_id=None,
+                                summary=None, reviewer_notes=None, status='pending'):
+    """Create a review checkpoint for a grant run."""
+    conn = get_connection()
+    c = conn.cursor()
+    checkpoint_id = f"grant_checkpoint-{datetime.now().strftime('%Y%m%d%H%M%S')}-{secrets.token_hex(8)}"
+    now = datetime.now().isoformat()
+    reviewed_at = now if status in ('approved', 'rejected', 'completed') else None
+    c.execute('''INSERT INTO grant_review_checkpoints
+                 (id, grant_id, application_id, user_id, checkpoint_type, status, summary,
+                  reviewer_notes, created_at, reviewed_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+              (checkpoint_id, grant_id, application_id, user_id, checkpoint_type, status,
+               summary, reviewer_notes, now, reviewed_at))
+    conn.commit()
+    conn.close()
+    return checkpoint_id
+
+
+def get_workflow_summary(user_id):
+    """Return a canonical workflow summary for the user."""
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute('SELECT stage, items_json, complete_json, missing_json, skipped_json, pct_complete FROM workflow_state WHERE user_id = ?', (user_id,))
+    row = c.fetchone()
+    conn.close()
+    if row:
+        try:
+            items = json.loads(row[1] or '{}')
+        except Exception:
+            items = {}
+        return {
+            'stage': row[0] or 'account_created',
+            'items': items,
+            'complete': json.loads(row[2] or '[]'),
+            'missing': json.loads(row[3] or '[]'),
+            'skipped': json.loads(row[4] or '[]'),
+            'pct_complete': row[5] or 0,
+            'tracked_items': list(items.keys()),
+        }
+
+    org = get_organization_details(user_id) or {}
+    readiness = get_grant_readiness(user_id) or {}
+
+    org_details = org.get('organization_details') or {}
+    org_profile = org.get('organization_profile') or {}
+    docs = org.get('documents') or {}
+    focus_areas = org.get('focus_areas') or []
+    past_grants = org.get('past_grants') or []
+
+    items = {
+        'organization_type': 'complete' if org_profile.get('organization_type') else 'missing',
+        'ein': 'complete' if org_details.get('ein') else 'missing',
+        'uei': 'complete' if org_details.get('uei') else 'missing',
+        'address': 'complete' if org_details.get('address_line1') and org_details.get('city') and org_details.get('state') and org_details.get('zip_code') else 'missing',
+        'phone': 'complete' if org_details.get('phone') else 'missing',
+        'website': 'complete' if org_details.get('website') else 'skipped',
+        '501c3_letter': 'complete' if docs.get('501c3_letter') else 'missing',
+        'ein_letter': 'complete' if docs.get('ein_letter') else 'missing',
+        'org_chart': 'complete' if docs.get('org_chart') else 'missing',
+        'grant_readiness': 'complete' if readiness else 'missing',
+        'past_grants': 'complete' if past_grants else 'skipped',
+        'focus_areas': 'complete' if focus_areas else 'skipped',
+    }
+
+    missing = [k for k, v in items.items() if v == 'missing']
+    skipped = [k for k, v in items.items() if v == 'skipped']
+    complete = [k for k, v in items.items() if v == 'complete']
+
+    stage = 'account_created'
+    if org_details or org_profile:
+        stage = 'profile_partial'
+    if docs:
+        stage = 'documents_pending'
+    if readiness:
+        stage = 'readiness_partial'
+    if not missing and readiness:
+        stage = 'review_ready'
+
+    workflow = {
+        'stage': stage,
+        'items': items,
+        'complete': complete,
+        'missing': missing,
+        'skipped': skipped,
+        'pct_complete': int(round(len(complete) / len(items) * 100)) if items else 0,
+        'tracked_items': list(items.keys()),
+    }
+
+    save_workflow_summary(user_id, workflow)
+    return workflow
+
+
+def save_workflow_summary(user_id, workflow):
+    conn = get_connection()
+    c = conn.cursor()
+    now = datetime.now().isoformat()
+    c.execute('''INSERT INTO workflow_state (user_id, stage, items_json, complete_json, missing_json, skipped_json, pct_complete, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                 ON CONFLICT(user_id) DO UPDATE SET
+                   stage=excluded.stage,
+                   items_json=excluded.items_json,
+                   complete_json=excluded.complete_json,
+                   missing_json=excluded.missing_json,
+                   skipped_json=excluded.skipped_json,
+                   pct_complete=excluded.pct_complete,
+                   updated_at=excluded.updated_at''',
+              (user_id, workflow.get('stage'), json.dumps(workflow.get('items', {})), json.dumps(workflow.get('complete', [])), json.dumps(workflow.get('missing', [])), json.dumps(workflow.get('skipped', [])), workflow.get('pct_complete', 0), now))
+    conn.commit()
+    conn.close()
+
+
+def ensure_test_user(email='hermes-test-final@example.com', password='testpass123'):
+    """Create or repair the documented smoke-test user."""
+    conn = get_connection()
+    c = conn.cursor()
+    now = datetime.now().isoformat()
+    user_id = 'test-hermes-final'
+    c.execute('SELECT id FROM users WHERE email = ?', (email,))
+    row = c.fetchone()
+    password_hash = hash_password(password)
+    if row:
+        c.execute(
+            """UPDATE users SET password_hash = ?, first_name = COALESCE(first_name, 'Hermes'), last_name = COALESCE(last_name, 'Tester'),
+               organization_name = COALESCE(organization_name, 'Gulf Coast Community Development Corp'), role = COALESCE(role, 'user'),
+               verified = COALESCE(verified, 1), onboarding_completed = COALESCE(onboarding_completed, 1), updated_at = ? WHERE email = ?""",
+            (password_hash, now, email)
+        )
+    else:
+        c.execute(
+            """INSERT INTO users (id, email, password_hash, first_name, last_name, organization_name, role, verified, created_at, updated_at, onboarding_completed)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (user_id, email, password_hash, 'Hermes', 'Tester', 'Gulf Coast Community Development Corp', 'user', 1, now, now, 1)
+        )
+    conn.commit()
+    conn.close()

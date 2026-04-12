@@ -448,9 +448,12 @@
                     <a href="/onboarding" class="nav-link active">
                         <span>🏢</span> Organization
                     </a>
-                    <a href="/logout" class="nav-link">
-                        <span>🚪</span> Logout
-                    </a>
+                    <form method="POST" action="{{ url_for('logout') }}" style="margin: 0;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="nav-link" style="width: 100%; text-align: left; background: transparent; border: 0; padding: 0;">
+                            <span>🚪</span> Logout
+                        </button>
+                    </form>
                 </div>
             </nav>
         </aside>
@@ -478,9 +481,30 @@
             <form id="onboarding_form" method="POST" action="/onboarding" role="form" aria-label="Organization profile" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                <p style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+                <p style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
                     🔒 Your data is stored securely and never shared with third parties or used to train AI models. See our <a href="/privacy" style="color: var(--accent-hover); text-decoration: none; font-weight: 600;">Privacy Policy</a> for details.
                 </p>
+                {% if workflow %}
+                <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;">
+                        <div>
+                            <strong style="display:block; margin-bottom:0.25rem;">Workflow status: {{ workflow.stage }}</strong>
+                            <span style="color: var(--text-secondary); font-size: 0.9rem;">{{ workflow.pct_complete }}% complete</span>
+                        </div>
+                        <a href="/vault" style="color: var(--accent-hover); font-weight: 600; text-decoration: none;">Manage docs in Vault →</a>
+                    </div>
+                    {% if workflow.missing %}
+                    <div style="margin-top:0.75rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        Missing: {{ workflow.missing | join(', ') }}
+                    </div>
+                    {% endif %}
+                    {% if workflow.skipped %}
+                    <div style="margin-top:0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        Skipped: {{ workflow.skipped | join(', ') }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
                 
                 <!-- Section 0: Organization Identity (Required) -->
                 <div class="card" style="border: 1px solid rgba(37, 99, 235, 0.3);">

@@ -71,3 +71,32 @@ python3 jobs/check_awards.py
 - SQLite3 (standard library)
 - `core/grant_db.py` (for `init_db`)
 - `core/email_system.py` (for `send_award_congratulations`)
+
+---
+
+## cleanup_retention.py
+
+Safe retention sweep for stale operational records and approved temp files.
+
+### What it does
+
+1. Dry-run by default; use `--apply` to perform updates/deletes.
+2. Removes stale empty drafts older than 45 days.
+3. Clears expired testimonial tokens older than 90 days when they were already notified.
+4. Detects abandoned onboarding rows older than 30 days and preserves the account.
+5. Deletes closed/resolved tickets older than 180 days.
+6. Sweeps only approved temp directories for files older than 7 days.
+
+### Usage
+
+```bash
+python3 jobs/cleanup_retention.py
+python3 jobs/cleanup_retention.py --apply --temp-dir /tmp
+```
+
+### Scheduling with cron
+
+```cron
+# Run weekly on Sundays at 3 AM
+0 3 * * 0 cd /path/to/grant-system && python3 jobs/cleanup_retention.py --apply --temp-dir /tmp >> tracking/cleanup_retention.log 2>&1
+```

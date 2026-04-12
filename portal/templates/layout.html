@@ -765,6 +765,10 @@
                     <span class="nav-link-icon">📁</span>
                     My Grants
                 </a>
+                <a href="/command-center" class="nav-link {% if request.path.startswith('/command-center') or request.path.startswith('/customer-command-center') %}active{% endif %}">
+                    <span class="nav-link-icon">🧭</span>
+                    Command Center
+                </a>
                 <a href="/vault" class="nav-link {% if request.path == '/vault' %}active{% endif %}">
                     <span class="nav-link-icon">🔒</span>
                     Vault
@@ -814,7 +818,10 @@
                         <div class="user-name">{{ user.first_name or user.email }}</div>
                         <div class="user-email">{{ user.email }}</div>
                     </div>
-                    <a href="/logout" class="btn-ghost" style="padding: 0.5rem;">⏻</a>
+                    <form method="POST" action="{{ url_for('logout') }}" style="margin: 0;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn-ghost" style="padding: 0.5rem;" aria-label="Logout">⏻</button>
+                    </form>
                 </div>
                 {% else %}
                 <div class="user-card">

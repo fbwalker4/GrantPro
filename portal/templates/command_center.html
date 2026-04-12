@@ -1,0 +1,152 @@
+{% extends "layout.html" %}
+{% block title %}Command Center - Grant Pro{% endblock %}
+{% block content %}
+<style>
+  .cc-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .cc-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; }
+  .cc-card h2 { margin-bottom: 0.75rem; font-size: 1.1rem; }
+  .cc-muted { color: var(--text-secondary); font-size: 0.92rem; }
+  .pill { display:inline-block; padding:0.22rem 0.65rem; border-radius:999px; font-size:0.78rem; font-weight:600; margin-right:0.35rem; margin-bottom:0.35rem; }
+  .pill-ok { background: rgba(16,185,129,.14); color:#34d399; }
+  .pill-warn { background: rgba(245,158,11,.14); color:#fbbf24; }
+  .pill-info { background: rgba(59,130,246,.14); color:#60a5fa; }
+  .list { display:grid; gap:0.75rem; }
+  .list-item { border:1px solid var(--border-color); border-radius:10px; padding:0.85rem; background: rgba(255,255,255,0.02); }
+  .list-item strong { display:block; margin-bottom:0.2rem; }
+  .metric { font-size:2rem; font-weight:700; line-height:1; }
+  .metric-label { color: var(--text-secondary); font-size:0.85rem; }
+  .progress { background: var(--bg-tertiary); border-radius:999px; height:10px; overflow:hidden; }
+  .progress > div { height:100%; background: linear-gradient(90deg, #2563eb, #10b981); }
+</style>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Customer Command Center</h1>
+    <p class="page-subtitle">Profile, documents, readiness, grants, messages, tickets, and history in one place.</p>
+  </div>
+  <div>
+    <a href="/dashboard" class="btn btn-secondary">← Dashboard</a>
+    <a href="/profile" class="btn btn-primary">Update Profile</a>
+  </div>
+</div>
+
+<div class="cc-grid" style="margin-bottom: 1rem;">
+  <div class="cc-card">
+    <div class="metric">{{ profile_pct }}%</div>
+    <div class="metric-label">Profile completion</div>
+    <div class="progress" style="margin:0.75rem 0;"><div style="width: {{ profile_pct }}%"></div></div>
+    <div class="cc-muted">{% if profile_missing %}Missing: {{ profile_missing[:4] | join(', ') }}{% else %}Profile looks complete.{% endif %}</div>
+  </div>
+  <div class="cc-card">
+    <div class="metric">{{ readiness_pct }}%</div>
+    <div class="metric-label">Grant readiness</div>
+    <div class="progress" style="margin:0.75rem 0;"><div style="width: {{ readiness_pct }}%"></div></div>
+    <div class="cc-muted">{% if readiness_missing %}Needs: {{ readiness_missing[:4] | join(', ') }}{% else %}Ready for grant screening.{% endif %}</div>
+  </div>
+  <div class="cc-card">
+    <div class="metric">{{ vault_documents|length }}</div>
+    <div class="metric-label">Current documents</div>
+    <div class="cc-muted" style="margin-top:0.75rem;">{{ docs_missing|length }} missing • {{ docs_skipped|length }} skipped</div>
+  </div>
+</div>
+
+<div class="cc-grid">
+  <div class="cc-card">
+    <h2>Profile</h2>
+    <div class="cc-muted">{{ org_details.ein or 'EIN not set' }} · {{ org_details.uei or 'UEI not set' }}</div>
+    <div style="margin-top:0.75rem;">
+      <span class="pill pill-info">{{ org_profile.organization_type or user.organization_type or 'Organization type pending' }}</span>
+      {% if org_profile.mission_statement %}<div class="cc-muted" style="margin-top:0.5rem;">{{ org_profile.mission_statement }}</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="cc-card">
+    <h2>Documents</h2>
+    <div class="list">
+      {% for doc in vault_documents[:5] %}
+      <div class="list-item">
+        <strong>{{ doc.doc_name }}</strong>
+        <div class="cc-muted">{{ doc.doc_type }}{% if doc.uploaded_at %} · {{ doc.uploaded_at.strftime('%b %d, %Y') }}{% endif %}</div>
+      </div>
+      {% endfor %}
+      {% if not vault_documents %}
+      <div class="cc-muted">No documents uploaded yet.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="cc-card">
+    <h2>Skipped items</h2>
+    <div>
+      {% if docs_skipped %}
+        {% for item in docs_skipped[:6] %}<span class="pill pill-warn">{{ item }}</span>{% endfor %}
+      {% else %}
+        <div class="cc-muted">No skipped items.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="cc-card">
+    <h2>Readiness</h2>
+    <div class="list">
+      {% for key, value in readiness.items() if key not in ['id', 'user_id', 'created_at', 'updated_at'] %}
+      <div class="list-item">
+        <strong>{{ key.replace('_', ' ')|title }}</strong>
+        <div class="cc-muted">{{ value }}</div>
+      </div>
+      {% endfor %}
+      {% if not readiness %}<div class="cc-muted">No readiness profile saved yet.</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="cc-card">
+    <h2>Grants</h2>
+    <div class="list">
+      {% for grant in grants %}
+      <div class="list-item">
+        <strong><a href="/grant/{{ grant.id }}">{{ grant.title }}</a></strong>
+        <div class="cc-muted">{{ grant.agency }} · {{ grant.status }}{% if grant.deadline %} · Due {{ grant.deadline }}{% endif %}</div>
+      </div>
+      {% endfor %}
+      {% if not grants %}<div class="cc-muted">No grant history yet.</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="cc-card">
+    <h2>Messages</h2>
+    <div class="list">
+      {% for message in messages %}
+      <div class="list-item">
+        <strong>{{ message.subject }}</strong>
+        <div class="cc-muted">{{ message.preview }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="cc-card">
+    <h2>Tickets</h2>
+    <p class="cc-muted"><a href="/support/tickets">Open a new support ticket</a> or review the latest status below.</p>
+    <div class="list">
+      {% for ticket in tickets %}
+      <div class="list-item">
+        <strong>{{ ticket.title }}</strong>
+        <div class="cc-muted">{{ ticket.status }} · {{ ticket.priority }}{% if ticket.canned_response %} · {{ ticket.canned_response }}{% endif %}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="cc-card" style="grid-column: 1 / -1;">
+    <h2>History</h2>
+    <div class="list">
+      {% for item in history %}
+      <div class="list-item">
+        <strong>{{ item.label }}</strong>
+        <div class="cc-muted">{{ item.detail }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

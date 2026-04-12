@@ -313,6 +313,7 @@ _seed_catalog()
 
 # Initialize user database
 user_models.init_user_db()
+user_models.ensure_test_user()
 
 
 # ============ AUTH HELPERS ============
@@ -1050,25 +1051,40 @@ def payment_checkout():
 def payment_success():
     """Payment success page"""
     session_id = request.args.get('session_id')
-    
-    if session_id and os.getenv('STRIPE_API_KEY'):
-        # Verify the payment with Stripe
-        import stripe
-        stripe.api_key = os.getenv('STRIPE_API_KEY')
-        try:
-            stripe_session = stripe.checkout.Session.retrieve(session_id)
-            if stripe_session.payment_status == 'paid':
-                user_id = stripe_session.get('metadata', {}).get('user_id')
-                if user_id:
-                    user = user_models.get_user_by_id(user_id)
-                    plan = stripe_session.get('metadata', {}).get('plan', 'monthly')
-                    flash(f'Payment successful! You are now on the {plan.title()} plan.', 'success')
-                    return render_template('payment_success.html', user=user, plan=plan)
-        except Exception as e:
-            logger.warning(f'Stripe session verification failed: {e}')
 
-    flash('Payment successful!', 'success')
-    return redirect(url_for('dashboard'))
+    if not session_id:
+        flash('Payment could not be verified. Please use the Stripe confirmation link.', 'error')
+        return redirect(url_for('upgrade'))
+
+    if not os.getenv('STRIPE_API_KEY'):
+        flash('Payment verification is unavailable right now. Please contact support.', 'error')
+        return redirect(url_for('upgrade'))
+
+    import stripe
+    stripe.api_key = os.getenv('STRIPE_API_KEY')
+    try:
+        stripe_session = stripe.checkout.Session.retrieve(session_id)
+        if stripe_session.payment_status != 'paid':
+            flash('Payment was not completed. Please try again.', 'error')
+            return redirect(url_for('upgrade'))
+
+        user_id = stripe_session.get('metadata', {}).get('user_id')
+        if not user_id:
+            flash('Payment was verified, but the account link is missing. Please contact support.', 'error')
+            return redirect(url_for('support_tickets'))
+
+        user = user_models.get_user_by_id(user_id)
+        if not user:
+            flash('Payment was verified, but the account could not be found. Please contact support.', 'error')
+            return redirect(url_for('support_tickets'))
+
+        plan = stripe_session.get('metadata', {}).get('plan', 'monthly')
+        flash(f'Payment successful! You are now on the {plan.title()} plan.', 'success')
+        return render_template('payment_success.html', user=user, plan=plan)
+    except Exception as e:
+        logger.warning(f'Stripe session verification failed: {e}')
+        flash('Payment could not be verified. Please contact support if you were charged.', 'error')
+        return redirect(url_for('upgrade'))
 
 
 @app.route('/payment/cancel')
@@ -1158,13 +1174,52 @@ def contact():
     return render_template('contact.html', inquiry_type=inquiry_type, user=user)
 
 
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
+@csrf_required
 def logout():
     """Logout"""
     logger.info(f'User logout: {session.get("user_id")}')
     session.clear()
     flash('You have been logged out', 'info')
     return redirect(url_for('index'))
+
+
+@app.route('/support/tickets', methods=['GET', 'POST'])
+@app.route('/support-tickets', methods=['GET', 'POST'])
+@login_required
+def support_tickets():
+    """Customer support ticket intake and status view."""
+    user = get_current_user()
+    workflow = user_models.get_user_workflow_summary(user['id'])
+    if request.method == 'POST':
+        subject = request.form.get('subject', '').strip()
+        body = request.form.get('body', '').strip()
+        category = request.form.get('category', 'general').strip()
+        if not subject or not body:
+            flash('Please add both a subject and message.', 'error')
+            return redirect(url_for('support_tickets'))
+        ticket_id = support_automation.create_support_ticket(user['id'], subject, body, category=category, workflow=workflow)
+        flash(f'Support ticket created: {ticket_id}', 'success')
+        return redirect(url_for('command_center'))
+
+    tickets = support_automation.get_support_tickets_for_user(user['id'])
+    return render_template('support_tickets.html', user=user, workflow=workflow, tickets=tickets)
+
+
+@app.route('/command-center')
+@login_required
+def command_center():
+    """Customer command-center view."""
+    user = get_current_user()
+    workflow = user_models.get_user_workflow_summary(user['id'])
+    tickets = support_automation.get_support_tickets_for_user(user['id'])
+    return render_template('command_center.html', user=user, workflow=workflow, tickets=tickets)
+
+
+@app.route('/customer-command-center')
+@login_required
+def customer_command_center():
+    return redirect(url_for('command_center'))
 
 
 @app.route('/forgot-password', methods=['GET', 'POST'])

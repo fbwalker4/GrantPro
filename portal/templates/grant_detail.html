@@ -15,6 +15,13 @@
         <div style="background: rgba(37, 99, 235, 0.06); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);">
             <strong>Workflow:</strong> 1) Write each section below (use AI Generate for a first draft) → 2) Build your budget → 3) Run the Submission Checklist to make sure nothing is missing → 4) Use Guided Submission to submit to the agency portal.
         </div>
+        {% if workflow %}
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);">
+            <strong>Org workflow:</strong> {{ workflow.stage }} ({{ workflow.pct_complete }}% complete)
+            {% if workflow.missing %}<br>Missing: {{ workflow.missing | join(', ') }}{% endif %}
+            {% if workflow.skipped %}<br>Skipped: {{ workflow.skipped | join(', ') }}{% endif %}
+        </div>
+        {% endif %}
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
         <a href="/grant/{{ grant.id }}/match-funding" class="btn btn-primary" style="background:#d97706;border-color:#d97706;">&#128176; Match Funding</a>
         <a href="/grant/{{ grant.id }}/budget-builder" class="btn btn-primary" style="background:#059669;border-color:#059669;">💰 Budget Builder</a>
@@ -109,7 +116,10 @@
     <p style="color: var(--text-secondary); margin-bottom: 1rem;">
         Once you have submitted this grant through the appropriate portal, record the submission details here.
     </p>
-    <a href="/grant/{{ grant.id }}/mark-submitted" class="btn btn-success">Mark as Submitted</a>
+    <form method="POST" action="{{ url_for('mark_submitted', grant_id=grant.id) }}" style="margin: 0;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-success">Mark as Submitted</button>
+    </form>
 </div>
 {% elif grant.status == 'submitted' %}
 <div class="card" style="margin-bottom: 2rem; border-left: 4px solid #f59e0b;">

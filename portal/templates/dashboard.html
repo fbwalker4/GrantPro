@@ -95,10 +95,22 @@
         <h1 class="page-title">Welcome back, {{ user.first_name or 'there' }} 👋</h1>
         <p class="page-subtitle">Here's what's happening with your grant applications</p>
     </div>
-    <a href="/wizard" class="btn btn-primary">
+        <a href="/wizard" class="btn btn-primary">
         <span>🔍</span> Find Grants
     </a>
+    <a href="/command-center" class="btn btn-secondary" style="margin-left: 0.5rem;">
+        <span>🧭</span> Command Center
+    </a>
 </div>
+{% if workflow %}
+<div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+    <strong style="display:block; margin-bottom:0.25rem;">Workflow status: {{ workflow.stage }} ({{ workflow.pct_complete }}% complete)</strong>
+    <div style="color: var(--text-secondary); font-size: 0.9rem;">
+        {% if workflow.missing %}Missing: {{ workflow.missing | join(', ') }}{% endif %}
+        {% if workflow.skipped %}{% if workflow.missing %}<br>{% endif %}Skipped: {{ workflow.skipped | join(', ') }}{% endif %}
+    </div>
+</div>
+{% endif %}
 
 <!-- Stats Grid -->
 <div class="stats-grid">

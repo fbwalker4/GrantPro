@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+{% block title %}Support Tickets - Grant Pro{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Support Tickets</h1>
+    <p class="page-subtitle">Create a ticket and see the workflow-aware status, priority, and canned response.</p>
+  </div>
+  <div>
+    <a href="/command-center" class="btn btn-secondary">← Command Center</a>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:1rem;">
+  <h3 style="margin-top:0;">New ticket</h3>
+  <form method="POST" class="form-grid" style="display:grid;gap:0.75rem;max-width:760px;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div>
+      <label>Subject</label>
+      <input type="text" name="subject" placeholder="e.g. Can't find my deadline checklist" required>
+    </div>
+    <div>
+      <label>Category</label>
+      <select name="category">
+        <option value="general">General</option>
+        <option value="account">Account</option>
+        <option value="workflow">Workflow</option>
+        <option value="billing">Billing</option>
+        <option value="deadline">Deadline</option>
+      </select>
+    </div>
+    <div>
+      <label>Message</label>
+      <textarea name="body" rows="5" placeholder="Describe the issue and any deadline impact." required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Create ticket</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0;">Latest tickets</h3>
+  <p style="color:var(--text-secondary);">Workflow stage: {{ workflow.get('stage', 'unknown') if workflow else 'unknown' }} · Missing items: {{ (workflow.get('missing', []) if workflow else [])|length }} · Skipped: {{ (workflow.get('skipped', []) if workflow else [])|length }}</p>
+  <div style="display:grid;gap:0.75rem;">
+    {% for ticket in tickets %}
+    {% set ticket_subject = ticket.get('subject') or ticket.get('title') or 'Support Ticket' %}
+    {% set ticket_status = ticket.get('status') or 'open' %}
+    {% set ticket_priority = ticket.get('priority') or 'normal' %}
+    {% set ticket_category = ticket.get('category') or 'general' %}
+    <div style="padding:0.9rem;border:1px solid var(--border-color);border-radius:10px;">
+      <strong>{{ ticket_subject }}</strong>
+      <div style="color:var(--text-secondary);font-size:0.9rem;">Status: {{ ticket_status }} · Priority: {{ ticket_priority }} · Category: {{ ticket_category }}</div>
+      {% if ticket.get('canned_response') %}<div style="margin-top:0.4rem;font-size:0.9rem;">{{ ticket.get('canned_response') }}</div>{% endif %}
+      {% if ticket.get('escalation_reason') %}<div style="margin-top:0.4rem;font-size:0.85rem;color:var(--text-muted);">Escalation: {{ ticket.get('escalation_reason') }}</div>{% endif %}
+    </div>
+    {% else %}
+    <p style="color:var(--text-secondary);">No tickets yet.</p>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

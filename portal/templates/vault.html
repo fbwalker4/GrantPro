@@ -215,9 +215,18 @@
 <div class="page-header">
     <div>
         <h1 class="page-title">{% if client_name %}{{ client_name }} - Document Vault{% else %}Organization Vault{% endif %}</h1>
-        <p class="page-subtitle">{% if client_name %}Manage documents for {{ client_name }}. These will be used in grants assigned to this client.{% else %}Upload your permanent organizational documents once. They'll be automatically included in every grant application that requires them.{% endif %}</p>
+        <p class="page-subtitle">Store and manage the reusable documents that power grant applications.</p>
     </div>
 </div>
+{% if workflow %}
+<div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+    <strong style="display:block; margin-bottom:0.25rem;">Workflow status: {{ workflow.stage }} ({{ workflow.pct_complete }}% complete)</strong>
+    <div style="color: var(--text-secondary); font-size: 0.9rem;">
+        {% if workflow.missing %}Missing: {{ workflow.missing | join(', ') }}{% endif %}
+        {% if workflow.skipped %}{% if workflow.missing %}<br>{% endif %}Skipped: {{ workflow.skipped | join(', ') }}{% endif %}
+    </div>
+</div>
+{% endif %}
 
 <div class="vault-stats">
     <div class="vault-stat">
