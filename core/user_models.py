@@ -1526,7 +1526,15 @@ def get_workflow_summary(user_id):
         row = c.fetchone()
     except Exception:
         conn.close()
-        return build_user_workflow_summary(user_id)
+        return {
+            'stage': 'account_created',
+            'items': {},
+            'complete': [],
+            'missing': [],
+            'skipped': [],
+            'pct_complete': 0,
+            'tracked_items': [],
+        }
     conn.close()
     if row:
         try:
