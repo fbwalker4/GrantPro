@@ -1623,14 +1623,14 @@ def ensure_test_user(email='hermes-test-final@example.com', password='testpass12
         c.execute(
             """UPDATE users SET password_hash = ?, first_name = COALESCE(first_name, 'Hermes'), last_name = COALESCE(last_name, 'Tester'),
                organization_name = COALESCE(organization_name, 'Gulf Coast Community Development Corp'), role = COALESCE(role, 'user'),
-               verified = COALESCE(verified, 1), onboarding_completed = COALESCE(onboarding_completed, 1), updated_at = ? WHERE email = ?""",
+               verified = COALESCE(verified, FALSE), onboarding_completed = COALESCE(onboarding_completed, FALSE), updated_at = ? WHERE email = ?""",
             (password_hash, now, email)
         )
     else:
         c.execute(
             """INSERT INTO users (id, email, password_hash, first_name, last_name, organization_name, role, verified, created_at, updated_at, onboarding_completed)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (user_id, email, password_hash, 'Hermes', 'Tester', 'Gulf Coast Community Development Corp', 'user', 1, now, now, 1)
+            (user_id, email, password_hash, 'Hermes', 'Tester', 'Gulf Coast Community Development Corp', 'user', True, now, now, True)
         )
     conn.commit()
     conn.close()
