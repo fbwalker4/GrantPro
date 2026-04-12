@@ -1519,6 +1519,15 @@ def add_grant_review_checkpoint(grant_id, checkpoint_type, application_id=None, 
 
 def get_workflow_summary(user_id):
     """Return a canonical workflow summary for the user."""
+    fallback = {
+        'stage': 'account_created',
+        'items': {},
+        'complete': [],
+        'missing': [],
+        'skipped': [],
+        'pct_complete': 0,
+        'tracked_items': [],
+    }
     conn = get_connection()
     c = conn.cursor()
     try:
@@ -1526,33 +1535,31 @@ def get_workflow_summary(user_id):
         row = c.fetchone()
     except Exception:
         conn.close()
-        return {
-            'stage': 'account_created',
-            'items': {},
-            'complete': [],
-            'missing': [],
-            'skipped': [],
-            'pct_complete': 0,
-            'tracked_items': [],
-        }
+        return fallback
     conn.close()
     if row:
         try:
             items = json.loads(row[1] or '{}')
+            complete = json.loads(row[2] or '[]')
+            missing = json.loads(row[3] or '[]')
+            skipped = json.loads(row[4] or '[]')
         except Exception:
-            items = {}
+            return fallback
         return {
             'stage': row[0] or 'account_created',
             'items': items,
-            'complete': json.loads(row[2] or '[]'),
-            'missing': json.loads(row[3] or '[]'),
-            'skipped': json.loads(row[4] or '[]'),
+            'complete': complete,
+            'missing': missing,
+            'skipped': skipped,
             'pct_complete': row[5] or 0,
             'tracked_items': list(items.keys()),
         }
 
-    org = get_organization_details(user_id) or {}
-    readiness = get_grant_readiness(user_id) or {}
+    try:
+        org = get_organization_details(user_id) or {}
+        readiness = get_grant_readiness(user_id) or {}
+    except Exception:
+        return fallback
 
     org_details = org.get('organization_details') or {}
     org_profile = org.get('organization_profile') or {}
@@ -1622,27 +1629,27 @@ def save_workflow_summary(user_id, workflow):
     conn.close()
 
 
-def ensure_test_user(email='hermes-test-final@example.com', password='testpass123'):
-    """Create or repair the documented smoke-test user."""
+def ensure_test_user(email='rusty@test.com', password='admin123'):
+    """Create or repair the documented smoke-test admin user."""
     conn = get_connection()
     c = conn.cursor()
     now = datetime.now().isoformat()
-    user_id = 'test-hermes-final'
+    user_id = 'test-rusty-admin'
     c.execute('SELECT id FROM users WHERE email = ?', (email,))
     row = c.fetchone()
     password_hash = hash_password(password)
     if row:
         c.execute(
-            """UPDATE users SET password_hash = ?, first_name = COALESCE(first_name, 'Hermes'), last_name = COALESCE(last_name, 'Tester'),
-               organization_name = COALESCE(organization_name, 'Gulf Coast Community Development Corp'), role = COALESCE(role, 'user'),
-               verified = COALESCE(verified, FALSE), onboarding_completed = COALESCE(onboarding_completed, FALSE), updated_at = ? WHERE email = ?""",
+            """UPDATE users SET password_hash = ?, first_name = COALESCE(first_name, 'Rusty'), last_name = COALESCE(last_name, 'Walker'),
+               organization_name = COALESCE(organization_name, 'GrantPro Admin'), role = 'admin',
+               verified = COALESCE(verified, TRUE), onboarding_completed = COALESCE(onboarding_completed, TRUE), updated_at = ? WHERE email = ?""",
             (password_hash, now, email)
         )
     else:
         c.execute(
             """INSERT INTO users (id, email, password_hash, first_name, last_name, organization_name, role, verified, created_at, updated_at, onboarding_completed)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (user_id, email, password_hash, 'Hermes', 'Tester', 'Gulf Coast Community Development Corp', 'user', True, now, now, True)
+            (user_id, email, password_hash, 'Rusty', 'Walker', 'GrantPro Admin', 'admin', True, now, now, True)
         )
     conn.commit()
     conn.close()

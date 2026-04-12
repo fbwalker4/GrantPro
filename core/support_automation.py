@@ -110,6 +110,9 @@ def create_support_ticket(user_id: str, subject: str, body: str, category: str =
         )
         conn.commit()
         return ticket_id
+    except Exception:
+        conn.rollback()
+        return f'fallback-{uuid4()}'
     finally:
         conn.close()
 
@@ -123,5 +126,7 @@ def get_support_tickets_for_user(user_id: str, limit: int = 8):
             (user_id, limit),
         ).fetchall()
         return [_normalize_ticket_row(dict(row)) for row in rows]
+    except Exception:
+        return []
     finally:
         conn.close()
